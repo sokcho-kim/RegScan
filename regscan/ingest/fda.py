@@ -79,7 +79,8 @@ class FDAClient:
         if self.api_key:
             params["api_key"] = self.api_key
 
-        url = f"{self.BASE_URL}/drug/drugsfda.json?{urlencode(params)}"
+        # urlencode가 +를 %2B로 바꾸면 FDA API가 500 에러 반환
+        url = f"{self.BASE_URL}/drug/drugsfda.json?{urlencode(params, safe='[]+ ')}"
 
         return await self._request(url)
 

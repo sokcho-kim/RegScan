@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:open.fda.gov)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(pip install:*)",
+      "Bash(python:*)"
     ]
   }
 }
