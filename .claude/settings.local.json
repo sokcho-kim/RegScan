@@ -7,7 +7,10 @@
       "Bash(git commit:*)",
       "Bash(python -m pytest:*)",
       "Bash(pip install:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(playwright install:*)",
+      "Bash(timeout:*)",
+      "Bash(dir:*)"
     ]
   }
 }
