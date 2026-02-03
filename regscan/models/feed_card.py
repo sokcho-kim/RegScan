@@ -19,7 +19,10 @@ class SourceType(str, Enum):
     # 글로벌 규제
     FDA_APPROVAL = "FDA_APPROVAL"  # FDA 승인
     FDA_GUIDANCE = "FDA_GUIDANCE"  # FDA 가이드라인
-    EMA_DECISION = "EMA_DECISION"  # EMA 결정
+    EMA_MEDICINE = "EMA_MEDICINE"  # EMA 의약품 승인
+    EMA_ORPHAN = "EMA_ORPHAN"  # EMA 희귀의약품 지정
+    EMA_SHORTAGE = "EMA_SHORTAGE"  # EMA 공급 부족
+    EMA_SAFETY = "EMA_SAFETY"  # EMA 안전성 통신 (DHPC)
     CMS_COVERAGE = "CMS_COVERAGE"  # CMS 급여 결정
 
     # 학술 (Phase 2)

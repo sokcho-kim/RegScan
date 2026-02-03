@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seladelpar - RegScan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex items-center space-x-4">
+                <a href="dashboard_mockup.html" class="flex items-center space-x-2 hover:opacity-80 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    <span class="text-sm">목록으로</span>
+                </a>
+                <div class="h-6 w-px bg-white/30"></div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="activity" class="w-4 h-4"></i>
+                    </div>
+                    <span class="font-semibold">RegScan</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Drug Header -->
+        <div class="bg-white rounded-2xl shadow-sm p-8 mb-6">
+            <div class="flex items-start justify-between">
+                <div>
+                    <div class="flex items-center space-x-3 mb-2">
+                        <span class="px-3 py-1 bg-red-100 text-red-700 text-sm font-semibold rounded-full animate-pulse">
+                            🔥 HOT
+                        </span>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-medium rounded-full">
+                            Breakthrough Therapy
+                        </span>
+                    </div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-1">Seladelpar</h1>
+                    <p class="text-lg text-gray-500">셀라델파 | CymaBay Therapeutics</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-5xl font-bold text-red-500">65</div>
+                    <div class="text-sm text-gray-500">핫이슈 스코어</div>
+                </div>
+            </div>
+
+            <!-- Score Breakdown -->
+            <div class="mt-6 p-4 bg-gray-50 rounded-xl">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">스코어 구성</h3>
+                <div class="grid grid-cols-5 gap-4">
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-blue-600">+15</div>
+                        <div class="text-xs text-gray-500">Breakthrough</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-blue-600">+15</div>
+                        <div class="text-xs text-gray-500">6개월 내 승인</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-yellow-600">+15</div>
+                        <div class="text-xs text-gray-500">EMA PRIME</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-green-600">+10</div>
+                        <div class="text-xs text-gray-500">다기관 승인</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-purple-600">+10</div>
+                        <div class="text-xs text-gray-500">희귀의약품</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-6">
+            <!-- Left Column -->
+            <div class="col-span-2 space-y-6">
+                <!-- Global Regulatory Status -->
+                <div class="bg-white rounded-xl shadow-sm">
+                    <div class="p-5 border-b border-gray-100">
+                        <h2 class="text-lg font-semibold text-gray-900">
+                            <i data-lucide="globe" class="w-5 h-5 inline mr-2 text-indigo-500"></i>
+                            글로벌 규제 현황
+                        </h2>
+                    </div>
+                    <div class="p-5">
+                        <div class="relative">
+                            <!-- Timeline -->
+                            <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+
+                            <!-- FDA -->
+                            <div class="relative flex items-start mb-8">
+                                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center z-10 border-4 border-white shadow">
+                                    <span class="text-xl">🇺🇸</span>
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="font-semibold text-blue-900">FDA</span>
+                                            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded">승인됨</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4 text-sm">
+                                            <div>
+                                                <span class="text-gray-500">승인일:</span>
+                                                <span class="font-medium text-gray-900 ml-1">2025-08-14</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-500">적응증:</span>
+                                                <span class="font-medium text-gray-900 ml-1">원발성 담즙성 담관염</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-500">지정:</span>
+                                                <span class="font-medium text-purple-600 ml-1">Breakthrough, Orphan</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-500">신청사:</span>
+                                                <span class="font-medium text-gray-900 ml-1">CymaBay Therapeutics</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- EMA -->
+                            <div class="relative flex items-start mb-8">
+                                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center z-10 border-4 border-white shadow">
+                                    <span class="text-xl">🇪🇺</span>
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-100">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="font-semibold text-yellow-900">EMA</span>
+                                            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded">승인됨</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-4 text-sm">
+                                            <div>
+                                                <span class="text-gray-500">승인일:</span>
+                                                <span class="font-medium text-gray-900 ml-1">2025-09-22</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-500">적응증:</span>
+                                                <span class="font-medium text-gray-900 ml-1">Primary Biliary Cholangitis</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-500">지정:</span>
+                                                <span class="font-medium text-purple-600 ml-1">PRIME, Orphan</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-500">제품명:</span>
+                                                <span class="font-medium text-gray-900 ml-1">Livdelzi</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- MFDS -->
+                            <div class="relative flex items-start">
+                                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center z-10 border-4 border-white shadow">
+                                    <span class="text-xl">🇰🇷</span>
+                                </div>
+                                <div class="ml-4 flex-1">
+                                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 border-dashed">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="font-semibold text-gray-700">MFDS (식약처)</span>
+                                            <span class="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs font-medium rounded">미허가</span>
+                                        </div>
+                                        <p class="text-sm text-gray-500">아직 국내 허가 정보가 없습니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clinical Trials -->
+                <div class="bg-white rounded-xl shadow-sm">
+                    <div class="p-5 border-b border-gray-100">
+                        <h2 class="text-lg font-semibold text-gray-900">
+                            <i data-lucide="flask-conical" class="w-5 h-5 inline mr-2 text-green-500"></i>
+                            국내 임상시험 (CRIS)
+                        </h2>
+                    </div>
+                    <div class="p-5">
+                        <div class="text-center py-8 text-gray-500">
+                            <i data-lucide="search-x" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
+                            <p>등록된 국내 임상시험이 없습니다.</p>
+                            <p class="text-sm mt-1">글로벌 임상: <a href="#" class="text-indigo-600 hover:underline">ClinicalTrials.gov에서 검색</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- 국내 영향 분석 -->
+                <div class="bg-white rounded-xl shadow-sm">
+                    <div class="p-5 border-b border-gray-100">
+                        <h2 class="text-lg font-semibold text-gray-900">
+                            <i data-lucide="target" class="w-5 h-5 inline mr-2 text-amber-500"></i>
+                            국내 영향 분석
+                        </h2>
+                    </div>
+                    <div class="p-5">
+                        <div class="p-4 bg-amber-50 rounded-lg border border-amber-200 mb-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600"></i>
+                                <span class="font-semibold text-amber-800">도입 불투명</span>
+                            </div>
+                            <p class="text-sm text-amber-700">
+                                FDA/EMA 승인 완료, 국내 CRIS 임상 없음
+                            </p>
+                        </div>
+
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                                <span class="text-gray-600">글로벌 승인</span>
+                                <span class="font-medium text-green-600">✓ FDA, EMA</span>
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                                <span class="text-gray-600">MFDS 허가</span>
+                                <span class="font-medium text-gray-400">✗ 없음</span>
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-gray-100">
+                                <span class="text-gray-600">CRIS 임상</span>
+                                <span class="font-medium text-gray-400">✗ 없음</span>
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <span class="text-gray-600">예상 도입</span>
+                                <span class="font-medium text-gray-500">미정</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drug Info -->
+                <div class="bg-white rounded-xl shadow-sm">
+                    <div class="p-5 border-b border-gray-100">
+                        <h2 class="text-lg font-semibold text-gray-900">
+                            <i data-lucide="pill" class="w-5 h-5 inline mr-2 text-indigo-500"></i>
+                            약물 정보
+                        </h2>
+                    </div>
+                    <div class="p-5 space-y-4 text-sm">
+                        <div>
+                            <span class="text-gray-500 block">INN</span>
+                            <span class="font-medium text-gray-900">Seladelpar</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 block">작용 기전</span>
+                            <span class="font-medium text-gray-900">PPAR-δ agonist</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 block">적응증</span>
+                            <span class="font-medium text-gray-900">원발성 담즙성 담관염 (PBC)</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 block">제조사</span>
+                            <span class="font-medium text-gray-900">CymaBay Therapeutics (Gilead 인수)</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 block">제품명</span>
+                            <span class="font-medium text-gray-900">Livdelzi</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Links -->
+                <div class="bg-white rounded-xl shadow-sm p-5">
+                    <h3 class="font-semibold text-gray-900 mb-3">외부 링크</h3>
+                    <div class="space-y-2">
+                        <a href="#" class="flex items-center text-sm text-indigo-600 hover:text-indigo-800">
+                            <i data-lucide="external-link" class="w-4 h-4 mr-2"></i>
+                            FDA Label (DailyMed)
+                        </a>
+                        <a href="#" class="flex items-center text-sm text-indigo-600 hover:text-indigo-800">
+                            <i data-lucide="external-link" class="w-4 h-4 mr-2"></i>
+                            EMA Product Page
+                        </a>
+                        <a href="#" class="flex items-center text-sm text-indigo-600 hover:text-indigo-800">
+                            <i data-lucide="external-link" class="w-4 h-4 mr-2"></i>
+                            ClinicalTrials.gov
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

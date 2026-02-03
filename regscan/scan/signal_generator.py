@@ -46,17 +46,17 @@ class SignalGenerator:
             id=self._generate_id(source_type),
             source_type=source_type,
             title=self._build_title(parsed_data, source_type),
-            summary=self._build_summary(parsed_data),
+            summary=self._build_summary(parsed_data, source_type),
             why_it_matters=why_text,
-            change_type=self._detect_change_type(parsed_data),
-            domain=self._classify_domain(parsed_data),
-            impact_level=self._assess_impact(parsed_data),
-            published_at=self._parse_date(parsed_data),
+            change_type=self._detect_change_type(parsed_data, source_type),
+            domain=self._classify_domain(parsed_data, source_type),
+            impact_level=self._assess_impact(parsed_data, source_type),
+            published_at=self._parse_date(parsed_data, source_type),
             effective_at=None,
             collected_at=datetime.now(),
             citation=self._build_citation(parsed_data, source_type),
-            tags=self._extract_tags(parsed_data),
-            target_roles=self._identify_target_roles(parsed_data),
+            tags=self._extract_tags(parsed_data, source_type),
+            target_roles=self._identify_target_roles(parsed_data, source_type),
         )
 
     @property
@@ -93,13 +93,112 @@ class SignalGenerator:
 
             return title[:50]
 
+        # EMA 의약품
+        if source_type == SourceType.EMA_MEDICINE:
+            name = data.get("name", "")
+            inn = data.get("inn", "") or data.get("active_substance", "")
+            status = data.get("medicine_status", "")
+
+            if status.lower() == "authorised":
+                action = "EU 승인"
+            elif status.lower() == "withdrawn":
+                action = "EU 철회"
+            else:
+                action = "EU 결정"
+
+            if name and inn and name.lower() != inn.lower():
+                title = f"EMA, {name}({inn}) {action}"
+            elif name:
+                title = f"EMA, {name} {action}"
+            else:
+                title = f"EMA 의약품 {action}"
+
+            return title[:50]
+
+        # EMA 희귀의약품
+        if source_type == SourceType.EMA_ORPHAN:
+            name = data.get("name", "")
+            return f"EMA 희귀의약품 지정: {name}"[:50]
+
+        # EMA 공급 부족
+        if source_type == SourceType.EMA_SHORTAGE:
+            medicine = data.get("medicine_affected", "")
+            status = data.get("shortage_status", "")
+            if "ongoing" in status.lower():
+                return f"EMA 공급부족 지속: {medicine}"[:50]
+            return f"EMA 공급부족: {medicine}"[:50]
+
+        # EMA 안전성
+        if source_type == SourceType.EMA_SAFETY:
+            name = data.get("name", "")
+            dhpc_type = data.get("dhpc_type", "")
+            return f"EMA 안전성 통신: {name}"[:50]
+
         # 기본
         return data.get("title", "정보 없음")[:50]
 
-    def _build_summary(self, data: dict[str, Any]) -> str:
+    def _build_summary(self, data: dict[str, Any], source_type: SourceType = None) -> str:
         """요약 생성"""
         parts = []
 
+        # EMA 의약품
+        if source_type in (SourceType.EMA_MEDICINE, SourceType.EMA_ORPHAN):
+            mah = data.get("mah") or data.get("sponsor")
+            if mah:
+                parts.append(f"MAH: {mah}")
+
+            therapeutic_area = data.get("therapeutic_area", "")
+            if therapeutic_area:
+                # 세미콜론으로 구분된 경우 첫 번째만
+                area = therapeutic_area.split(";")[0].strip()
+                parts.append(f"적응증: {area}")
+
+            atc = data.get("atc_code", "")
+            if atc:
+                parts.append(f"ATC: {atc}")
+
+            # 특수 지정 표시
+            flags = []
+            if data.get("is_orphan"):
+                flags.append("희귀의약품")
+            if data.get("is_biosimilar"):
+                flags.append("바이오시밀러")
+            if data.get("is_conditional"):
+                flags.append("조건부승인")
+            if data.get("is_accelerated"):
+                flags.append("신속심사")
+            if flags:
+                parts.append(f"[{', '.join(flags)}]")
+
+            if parts:
+                return ". ".join(parts)[:100]
+
+        # EMA 공급 부족
+        if source_type == SourceType.EMA_SHORTAGE:
+            inn = data.get("inn", "")
+            if inn:
+                parts.append(f"성분: {inn}")
+            alternatives = data.get("alternatives_available", "")
+            if alternatives:
+                parts.append(f"대체제: {alternatives[:30]}")
+            expected = data.get("expected_resolution_date", "")
+            if expected:
+                parts.append(f"예상해결: {expected}")
+            if parts:
+                return ". ".join(parts)[:100]
+
+        # EMA 안전성
+        if source_type == SourceType.EMA_SAFETY:
+            substances = data.get("active_substances", "")
+            if substances:
+                parts.append(f"성분: {substances}")
+            outcome = data.get("regulatory_outcome", "")
+            if outcome:
+                parts.append(f"조치: {outcome[:30]}")
+            if parts:
+                return ". ".join(parts)[:100]
+
+        # FDA/기본
         sponsor = data.get("sponsor")
         if sponsor:
             parts.append(f"제약사: {sponsor}")
@@ -117,8 +216,26 @@ class SignalGenerator:
 
         return data.get("summary", "")[:100]
 
-    def _detect_change_type(self, data: dict[str, Any]) -> ChangeType:
+    def _detect_change_type(self, data: dict[str, Any], source_type: SourceType = None) -> ChangeType:
         """변경 유형 감지"""
+        # EMA
+        if source_type in (SourceType.EMA_MEDICINE, SourceType.EMA_ORPHAN):
+            status = data.get("medicine_status", "").lower()
+            if status == "authorised":
+                return ChangeType.NEW
+            elif status == "withdrawn":
+                return ChangeType.DELETED
+            elif "conditional" in status:
+                return ChangeType.NEW
+            return ChangeType.INFO
+
+        if source_type == SourceType.EMA_SHORTAGE:
+            return ChangeType.INFO
+
+        if source_type == SourceType.EMA_SAFETY:
+            return ChangeType.REVISED  # 안전성 정보는 보통 개정
+
+        # FDA
         submission_type = data.get("submission_type", "")
 
         mapping = {
@@ -131,10 +248,33 @@ class SignalGenerator:
 
         return mapping.get(submission_type, ChangeType.INFO)
 
-    def _classify_domain(self, data: dict[str, Any]) -> list[Domain]:
+    def _classify_domain(self, data: dict[str, Any], source_type: SourceType = None) -> list[Domain]:
         """도메인 분류"""
-        domains = [Domain.DRUG]  # FDA 승인은 기본적으로 DRUG
+        domains = [Domain.DRUG]  # 기본적으로 DRUG
 
+        # EMA 안전성
+        if source_type == SourceType.EMA_SAFETY:
+            domains = [Domain.DRUG, Domain.SAFETY]
+            return domains
+
+        # EMA 공급 부족
+        if source_type == SourceType.EMA_SHORTAGE:
+            domains = [Domain.DRUG, Domain.REIMBURSEMENT]  # 공급 이슈는 급여에 영향
+            return domains
+
+        # EMA 의약품/희귀의약품
+        if source_type in (SourceType.EMA_MEDICINE, SourceType.EMA_ORPHAN):
+            therapeutic_area = data.get("therapeutic_area", "").lower()
+            pharm_group = data.get("pharmacotherapeutic_group", "").lower()
+            search_text = therapeutic_area + " " + pharm_group
+
+            if any(kw in search_text for kw in ["safety", "risk"]):
+                domains.append(Domain.SAFETY)
+            if any(kw in search_text for kw in ["efficacy", "effective"]):
+                domains.append(Domain.EFFICACY)
+            return domains
+
+        # FDA
         pharm_class = " ".join(data.get("pharm_class", [])).lower()
         generic = data.get("generic_name", "").lower()
         search_text = pharm_class + " " + generic
@@ -147,8 +287,46 @@ class SignalGenerator:
 
         return domains
 
-    def _assess_impact(self, data: dict[str, Any]) -> ImpactLevel:
+    def _assess_impact(self, data: dict[str, Any], source_type: SourceType = None) -> ImpactLevel:
         """영향도 평가"""
+        # EMA 의약품
+        if source_type == SourceType.EMA_MEDICINE:
+            # 높은 영향도
+            if data.get("is_orphan"):
+                return ImpactLevel.HIGH
+            if data.get("is_accelerated"):
+                return ImpactLevel.HIGH
+            if data.get("is_prime"):
+                return ImpactLevel.HIGH
+            if data.get("is_conditional"):
+                return ImpactLevel.HIGH
+            if data.get("is_advanced_therapy"):
+                return ImpactLevel.HIGH
+
+            # 중간 영향도
+            therapeutic_area = data.get("therapeutic_area", "").lower()
+            if any(kw in therapeutic_area for kw in ["cancer", "neoplasm", "oncolog"]):
+                return ImpactLevel.MID
+            if data.get("is_biosimilar"):
+                return ImpactLevel.MID
+
+            return ImpactLevel.LOW
+
+        # EMA 희귀의약품
+        if source_type == SourceType.EMA_ORPHAN:
+            return ImpactLevel.HIGH  # 희귀의약품 지정은 항상 HIGH
+
+        # EMA 공급 부족
+        if source_type == SourceType.EMA_SHORTAGE:
+            if data.get("is_ongoing"):
+                return ImpactLevel.HIGH  # 진행 중인 부족은 HIGH
+            return ImpactLevel.MID
+
+        # EMA 안전성
+        if source_type == SourceType.EMA_SAFETY:
+            return ImpactLevel.HIGH  # 안전성 이슈는 항상 HIGH
+
+        # FDA
         submission_type = data.get("submission_type", "")
         submission_class = data.get("submission_class_code", "")
         pharm_class = " ".join(data.get("pharm_class", [])).lower()
@@ -170,8 +348,27 @@ class SignalGenerator:
         # 기본값
         return ImpactLevel.LOW
 
-    def _parse_date(self, data: dict[str, Any]) -> datetime:
+    def _parse_date(self, data: dict[str, Any], source_type: SourceType = None) -> datetime:
         """날짜 파싱"""
+        # EMA
+        if source_type in (SourceType.EMA_MEDICINE, SourceType.EMA_ORPHAN,
+                          SourceType.EMA_SHORTAGE, SourceType.EMA_SAFETY):
+            # EMA 파서에서 이미 YYYY-MM-DD로 변환됨
+            date_str = (data.get("approval_date") or
+                       data.get("marketing_authorisation_date") or
+                       data.get("designation_date") or
+                       data.get("start_date") or
+                       data.get("dissemination_date") or "")
+
+            if date_str:
+                try:
+                    return datetime.strptime(date_str, "%Y-%m-%d")
+                except ValueError:
+                    pass
+
+            return datetime.now()
+
+        # FDA
         date_str = data.get("submission_status_date", "")
 
         if date_str:
@@ -193,11 +390,46 @@ class SignalGenerator:
             snapshot_date=datetime.now().strftime("%Y-%m-%d"),
         )
 
-    def _extract_tags(self, data: dict[str, Any]) -> list[str]:
+    def _extract_tags(self, data: dict[str, Any], source_type: SourceType = None) -> list[str]:
         """태그 추출"""
         tags = []
 
-        # 제약사
+        # EMA
+        if source_type in (SourceType.EMA_MEDICINE, SourceType.EMA_ORPHAN,
+                          SourceType.EMA_SHORTAGE, SourceType.EMA_SAFETY):
+            # MAH
+            mah = data.get("mah") or data.get("sponsor")
+            if mah:
+                tags.append(mah)
+
+            # ATC 코드
+            atc = data.get("atc_code")
+            if atc:
+                tags.append(atc)
+
+            # INN/성분명
+            inn = data.get("inn") or data.get("active_substance") or data.get("generic_name")
+            if inn:
+                tags.append(inn)
+
+            # 치료영역 (첫 번째만)
+            therapeutic_area = data.get("therapeutic_area", "")
+            if therapeutic_area:
+                first_area = therapeutic_area.split(";")[0].strip()
+                if first_area:
+                    tags.append(first_area)
+
+            # 특수 지정
+            if data.get("is_orphan"):
+                tags.append("Orphan")
+            if data.get("is_biosimilar"):
+                tags.append("Biosimilar")
+            if data.get("is_accelerated"):
+                tags.append("Accelerated")
+
+            return tags[:10]
+
+        # FDA/기본
         sponsor = data.get("sponsor")
         if sponsor:
             tags.append(sponsor)
@@ -213,10 +445,35 @@ class SignalGenerator:
 
         return tags[:10]  # 최대 10개
 
-    def _identify_target_roles(self, data: dict[str, Any]) -> list[Role]:
+    def _identify_target_roles(self, data: dict[str, Any], source_type: SourceType = None) -> list[Role]:
         """대상 역할 식별"""
-        roles = [Role.PHYSICIAN, Role.PHARMACIST]  # FDA 승인은 기본
+        roles = [Role.PHYSICIAN, Role.PHARMACIST]  # 기본
 
+        # EMA
+        if source_type in (SourceType.EMA_MEDICINE, SourceType.EMA_ORPHAN):
+            therapeutic_area = data.get("therapeutic_area", "").lower()
+
+            # 고가 약제 = 경영진 관심
+            if any(kw in therapeutic_area for kw in ["cancer", "neoplasm", "oncolog"]):
+                roles.append(Role.ADMIN)
+            if data.get("is_orphan"):
+                roles.append(Role.ADMIN)  # 희귀의약품도 고가
+            if data.get("is_advanced_therapy"):
+                roles.append(Role.ADMIN)  # 첨단치료제도 고가
+
+            return roles
+
+        if source_type == SourceType.EMA_SHORTAGE:
+            # 공급 부족은 원무팀도 관심
+            roles.append(Role.ADMIN)
+            return roles
+
+        if source_type == SourceType.EMA_SAFETY:
+            # 안전성 이슈는 심사간호사도 관심
+            roles.append(Role.REVIEWER_NURSE)
+            return roles
+
+        # FDA
         pharm_class = " ".join(data.get("pharm_class", [])).lower()
 
         # 특수 분류에 따른 추가 역할

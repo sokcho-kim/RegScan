@@ -1,0 +1,212 @@
+{
+  "generated_at": "2026-02-03T11:32:01.818001",
+  "total_articles": 122,
+  "by_source": {
+    "endpoints": 6,
+    "fiercepharma": 5,
+    "medigatenews": 5,
+    "yakup": 106
+  },
+  "by_category": {
+    "Startups, Health Tech": 1,
+    "Pharma": 1,
+    "Deals, R&D": 1,
+    "R&D, Pharma": 1,
+    "pharma/biotech": 1,
+    "Deals, Health Tech": 1,
+    "헬스": 37,
+    "약국": 16,
+    "학술": 16,
+    "정책": 16,
+    "산업": 16,
+    "pharma": 5
+  },
+  "hot_topics": {
+    "AI": 128,
+    "비만": 57,
+    "희귀질환": 19,
+    "mRNA": 12,
+    "ADC": 2,
+    "유전자치료": 1
+  },
+  "companies": {
+    "한미약품": 14,
+    "GSK": 3,
+    "AbbVie": 1,
+    "Novo Nordisk": 1
+  },
+  "keywords": {
+    "치료제": 84,
+    "글로벌": 66,
+    "코로나": 64,
+    "밝혔다": 62,
+    "이라고": 56,
+    "hiv": 51,
+    "유로로": 47,
+    "대표는": 43,
+    "가운데": 42,
+    "새로운": 40,
+    "있도록": 40,
+    "있다는": 39,
+    "다양한": 38,
+    "지난해": 37,
+    "온라인": 34,
+    "실적을": 34,
+    "강조했다": 33,
+    "대상으로": 30,
+    "치료를": 29,
+    "형간염": 29,
+    "설명했다": 28,
+    "것이다": 27,
+    "환자의": 25,
+    "아니라": 25,
+    "있다고": 25,
+    "전이성": 25,
+    "보고서는": 24,
+    "환자들을": 24,
+    "일라이": 23,
+    "따르면": 22,
+    "나타났다": 22,
+    "것이라고": 22,
+    "가능한": 21,
+    "중요한": 21,
+    "차세대": 21,
+    "테라퓨틱스": 21,
+    "fda": 20,
+    "이라며": 20,
+    "데이터를": 20,
+    "알려져": 20,
+    "의약품": 20,
+    "영향을": 19,
+    "이러한": 19,
+    "설명이다": 18,
+    "보인다": 18,
+    "환자가": 18,
+    "건강한": 18,
+    "기반으로": 18,
+    "스위스프랑으로": 18,
+    "결과를": 17
+  },
+  "recent_headlines": [
+    {
+      "title": "Carbon Health files for bankruptcy, seeking to sell or restructure",
+      "source": "endpoints",
+      "date": "Mon, 02 Feb 2026 21:22:13 +0000",
+      "category": "Startups, Health Tech"
+    },
+    {
+      "title": "First 10 Medicare-negotiated drug prices have taken effect: Are seniors really saving money?",
+      "source": "endpoints",
+      "date": "Mon, 02 Feb 2026 20:42:11 +0000",
+      "category": "Pharma"
+    },
+    {
+      "title": "New CagriSema data show improvement over semaglutide",
+      "source": "endpoints",
+      "date": "Mon, 02 Feb 2026 19:16:29 +0000",
+      "category": "R&D, Pharma"
+    },
+    {
+      "title": "GSK returns rights to Wave's RNA editing program for AATD",
+      "source": "endpoints",
+      "date": "Mon, 02 Feb 2026 16:06:46 +0000",
+      "category": "Deals, R&D"
+    },
+    {
+      "title": "Spring Health acquires Alma, expanding insurance reach in virtual mental health",
+      "source": "endpoints",
+      "date": "Mon, 02 Feb 2026 15:43:15 +0000",
+      "category": "Deals, Health Tech"
+    },
+    {
+      "title": "엔비피헬스케어 ‘바이크롬 간 유산균’ 라디오 CM송 송출",
+      "source": "yakup",
+      "date": "2026.02.03 11:26",
+      "category": "pharma"
+    },
+    {
+      "title": "일양약품, ‘회계처리 위반 및 외부감사 방해 의혹’ 무혐의-공소권 없음 처분",
+      "source": "yakup",
+      "date": "2026.02.03 11:11",
+      "category": "산업"
+    },
+    {
+      "title": "일양약품, ‘회계처리 위반 및 외부감사 방해 의혹’ 무혐의-공소권 없음 처분",
+      "source": "yakup",
+      "date": "2026.02.03 11:11",
+      "category": "pharma"
+    },
+    {
+      "title": "노보・카카오헬스케어, 위고비 처방 대상 \\'노보핏케어\\' 론치",
+      "source": "yakup",
+      "date": "2026.02.03 11:04",
+      "category": "산업"
+    },
+    {
+      "title": "노보・카카오헬스케어, 위고비 처방 대상 \\'노보핏케어\\' 론치",
+      "source": "yakup",
+      "date": "2026.02.03 11:04",
+      "category": "pharma"
+    },
+    {
+      "title": "UCB 유전성 미토콘드리아 질환 EU 승인 권고",
+      "source": "yakup",
+      "date": "2026.02.03 10:43",
+      "category": "헬스"
+    },
+    {
+      "title": "명인제약, 이관순 전 한미약품 부회장 사내이사 선임",
+      "source": "yakup",
+      "date": "2026.02.03 10:40",
+      "category": "산업"
+    },
+    {
+      "title": "명인제약, 이관순 전 한미약품 부회장 사내이사 선임",
+      "source": "yakup",
+      "date": "2026.02.03 10:40",
+      "category": "pharma"
+    },
+    {
+      "title": "오설록, 설 맞이 선물 프로모션 진행",
+      "source": "yakup",
+      "date": "2026.02.03 10:29",
+      "category": "산업"
+    },
+    {
+      "title": "오설록, 설 맞이 선물 프로모션 진행",
+      "source": "yakup",
+      "date": "2026.02.03 10:29",
+      "category": "pharma"
+    },
+    {
+      "title": "\\'올리브영 PB\\' 바이오힐보·브링그린·컬러그램, 유럽 진출",
+      "source": "yakup",
+      "date": "2026.02.03 10:20",
+      "category": "산업"
+    },
+    {
+      "title": "명인제약, 주당 1500원 현금배당…주주환원·지배구조 투트랙 강화",
+      "source": "yakup",
+      "date": "2026.02.03 10:04",
+      "category": "산업"
+    },
+    {
+      "title": "다발골수종 치료,‘완전관해’ 넘어 ‘MRD’ 시대.. 다우바이오,정밀 진단 솔루션 확장 ",
+      "source": "yakup",
+      "date": "2026.02.03 10:01",
+      "category": "산업"
+    },
+    {
+      "title": "현대ADM, 암 환자 사망 주원인 \\'전이\\' 차단 첫 독자 임상 돌입 ",
+      "source": "yakup",
+      "date": "2026.02.03 09:56",
+      "category": "산업"
+    },
+    {
+      "title": "EGFRm 비소세포 폐암 치료제 FDA 심사 돌입",
+      "source": "yakup",
+      "date": "2026.02.03 09:55",
+      "category": "헬스"
+    }
+  ]
+}

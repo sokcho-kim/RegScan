@@ -125,6 +125,34 @@ class FeedCardRepository:
 
             return [self._to_feed_card(db) for db in db_cards]
 
+    async def get_by_source(
+        self,
+        source_type,
+        limit: int = 20,
+    ) -> list[FeedCard]:
+        """소스 타입별 조회"""
+        async with self.async_session() as session:
+            stmt = (
+                select(FeedCardDB)
+                .where(FeedCardDB.source_type == source_type.value)
+                .order_by(FeedCardDB.published_at.desc())
+                .limit(limit)
+            )
+            result = await session.execute(stmt)
+            db_cards = result.scalars().all()
+
+            return [self._to_feed_card(db) for db in db_cards]
+
+    async def count(self, source_type=None) -> int:
+        """카드 수 조회"""
+        async with self.async_session() as session:
+            from sqlalchemy import func
+            stmt = select(func.count(FeedCardDB.id))
+            if source_type:
+                stmt = stmt.where(FeedCardDB.source_type == source_type.value)
+            result = await session.execute(stmt)
+            return result.scalar() or 0
+
     async def get_today(self, source_type: Optional[str] = None) -> list[FeedCard]:
         """오늘 수집된 카드 조회"""
         today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)

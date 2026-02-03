@@ -13,6 +13,27 @@ from .mohw import (
     MOHWNoticeIngestor,
     MOHWAdminNoticeIngestor,
 )
+from .ema import (
+    EMAClient,
+    EMAEndpoint,
+    EMAMedicineIngestor,
+    EMAOrphanIngestor,
+    EMAShortageIngestor,
+    EMASafetyIngestor,
+    fetch_ema_medicines,
+    fetch_ema_all,
+)
+from .mfds import (
+    MFDSClient,
+    MFDSPermitIngestor,
+    MFDSNewDrugIngestor,
+)
+from .cris import (
+    CRISClient,
+    CRISTrialIngestor,
+    CRISActiveTrialIngestor,
+    CRISDrugTrialIngestor,
+)
 
 __all__ = [
     "BaseIngestor",
@@ -26,4 +47,22 @@ __all__ = [
     "MOHWPreAnnouncementIngestor",
     "MOHWNoticeIngestor",
     "MOHWAdminNoticeIngestor",
+    # EMA
+    "EMAClient",
+    "EMAEndpoint",
+    "EMAMedicineIngestor",
+    "EMAOrphanIngestor",
+    "EMAShortageIngestor",
+    "EMASafetyIngestor",
+    "fetch_ema_medicines",
+    "fetch_ema_all",
+    # MFDS
+    "MFDSClient",
+    "MFDSPermitIngestor",
+    "MFDSNewDrugIngestor",
+    # CRIS
+    "CRISClient",
+    "CRISTrialIngestor",
+    "CRISActiveTrialIngestor",
+    "CRISDrugTrialIngestor",
 ]

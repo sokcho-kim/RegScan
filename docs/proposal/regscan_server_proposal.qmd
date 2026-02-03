@@ -1,0 +1,104 @@
+---
+title: "RegScan 서버 구축 제안"
+author: "RegScan Team"
+date: "2026-02-04"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    width: 1600
+    height: 900
+    margin: 0.2
+    fontsize: 28px
+---
+
+## 1. 프로젝트 개요
+
+<br>
+
+**RegScan** - 글로벌 의약품 규제 인텔리전스
+
+<br>
+
+| 기능 | 설명 |
+|:-----|:-----|
+| 데이터 수집 | FDA, EMA, MFDS, CRIS 자동 수집 |
+| 통합 분석 | INN* 기반 글로벌 승인 현황 매칭 |
+| 핫이슈 선별 | 스코어링 기반 주요 약물 자동 선별 |
+| 국내 영향 | 글로벌 승인 → 국내 도입 예측 |
+
+<br>
+
+::: {.callout-note appearance="minimal"}
+*INN (International Nonproprietary Name): 의약품 성분의 국제 표준명 (예: 휴미라 → adalimumab)
+:::
+
+---
+
+## 2. 작업 계획
+
+<br>
+
+**수집 & 배포**
+
+- 전체 데이터 수집 (6만건)
+- Dockerfile 작성
+- Cloud Run 배포
+
+<br>
+
+**API & 연동**
+
+- FastAPI 엔드포인트 개발
+- 대시보드 연동
+
+---
+
+## 3. 필요 자원
+
+<br>
+
+**GCP Cloud Run (Serverless)**
+
+<br>
+
+| 리소스 | 용도 | 월 비용 |
+|:-------|:-----|--------:|
+| Cloud Run Jobs | 데이터 수집 (매일 02:00) | $3 |
+| Cloud Run Service | API 서빙 | $5 |
+| Cloud Storage | 데이터 저장 | $1 |
+| Cloud Scheduler | 배치 트리거 | 무료 |
+| **합계** | | **$10/월** |
+
+<br>
+
+※ Serverless → 사용 안 할 때 비용 $0
+
+---
+
+## 4. 시안: 목록 화면
+
+![](dashboard_screenshot.png){width="80%" fig-align="center"}
+
+---
+
+## 5. 시안: 브리핑 리포트
+
+![](report_screenshot.png){width="75%" fig-align="center"}
+
+---
+
+## 6. 데이터 수집 상세
+
+| 소스 | 수집 데이터 | API / 방식 | 건수 |
+|:-----|:-----------|:-----------|-----:|
+| 🇺🇸 FDA | 신약 승인 내역 | openFDA API | ~1,500 |
+| 🇪🇺 EMA | 유럽 허가 의약품 | EMA Open Data | ~2,700 |
+| 🇰🇷 MFDS | 국내 허가 의약품 | 공공데이터포털 API | ~44,000 |
+| 🧪 CRIS | 국내 임상시험 | 공공데이터포털 API | ~11,500 |
+
+<br>
+
+**수집 주기**: 매일 02:00 자동 실행
+
+**저장 형식**: JSON → Cloud Storage → API 서빙

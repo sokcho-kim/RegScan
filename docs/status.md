@@ -1,13 +1,20 @@
 # RegScan 구현 현황
 
-> 최종 업데이트: 2026-02-02 (오후)
+> 최종 업데이트: 2026-02-03 (심야)
 
 ## 현재 작업
 
-### FDA→KR 매핑 엔진 구현 중
-- 계획 문서: `worklog/plans/2026-02-02_fda_kr_mapping.md`
-- 목표: 해외 승인 → 국내 급여 경로 분석
-- 핵심: 비교기준, 시간축, 제도경로, 선례 검증
+### 글로벌 규제기관 통합 (Week 6) - 주요 진행
+- 조사 리포트: `docs/research/2026-02-03_global_regulatory_api_research.md`
+- **EMA 연동 완료** (2,655건)
+- **MFDS 연동 완료** (284,477건, 공공데이터포털 API)
+- **GlobalRegulatoryStatus 구현 완료**
+- **DB 저장 로직 완료** (스냅샷, GlobalStatus, FeedCard)
+- **E2E 파이프라인 테스트 완료**
+- **MVP 리포트 생성기 완료** (일간/주간)
+- **WHO ATC 연동 완료** (6,440건, INN→ATC 자동매칭)
+- **EMA↔MFDS INN 매칭 완료** (영문 성분명 기반)
+- 다음: FDA 수집, 스케줄러, Timeline 모델 완성
 
 ---
 
@@ -17,9 +24,14 @@
 
 | 소스 | 상태 | 파일 | 비고 |
 |------|------|------|------|
-| FDA Approvals | ✅ 완료 | `ingest/fda.py` | openFDA API, 41건 테스트 완료 |
-| HIRA 보험인정기준 | ✅ 완료 | `ingest/hira.py` | Playwright, 25건 테스트 완료 |
-| MOHW 행정예고 | ✅ 완료 | `ingest/mohw.py` | Playwright, iframe 처리 |
+| FDA Approvals | ✅ 완료 | `ingest/fda.py` | openFDA API |
+| EMA Medicines | ✅ 완료 | `ingest/ema.py` | 16개 JSON 엔드포인트, 2,655건 |
+| EMA Orphan | ✅ 완료 | `ingest/ema.py` | 3,138건 |
+| EMA Shortage | ✅ 완료 | `ingest/ema.py` | 74건 |
+| EMA Safety | ✅ 완료 | `ingest/ema.py` | DHPC 161건 |
+| HIRA 보험인정기준 | ✅ 완료 | `ingest/hira.py` | Playwright |
+| MOHW 행정예고 | ✅ 완료 | `ingest/mohw.py` | Playwright |
+| **MFDS 허가정보** | ✅ 완료 | `ingest/mfds.py` | 공공데이터포털 API, 284,477건 |
 | HIRA 공지사항 | ⚠️ 미완성 | `ingest/hira.py` | 페이지 로드 이슈 |
 
 ### Parse Layer (파싱)
@@ -27,77 +39,49 @@
 | 파서 | 상태 | 파일 | 비고 |
 |------|------|------|------|
 | FDADrugParser | ✅ 완료 | `parse/fda_parser.py` | domain/change_type 추론 |
+| EMAMedicineParser | ✅ 완료 | `parse/ema_parser.py` | INN, ATC, 날짜 정규화 |
+| EMAOrphanParser | ✅ 완료 | `parse/ema_parser.py` | 희귀의약품 지정 |
+| EMAShortageParser | ✅ 완료 | `parse/ema_parser.py` | 공급 부족 |
+| **MFDSPermitParser** | ✅ 완료 | `parse/mfds_parser.py` | 허가정보, 영문 INN 추출 |
 | HIRAParser | ✅ 완료 | `parse/hira_parser.py` | 카테고리별 domain 매핑 |
-| MOHWParser | ❌ 미구현 | - | raw data 그대로 사용 중 |
-| KR 조-항-호-목 파서 | ❌ 미구현 | - | 로드맵에 스펙 정의됨 |
+| MOHWParser | ❌ 미구현 | - | raw data 사용 중 |
 
 ### Scan Layer (신호 생성)
 
 | 기능 | 상태 | 파일 | 비고 |
 |------|------|------|------|
-| SignalGenerator | ✅ 완료 | `scan/signal.py` | FeedCard 생성 |
+| SignalGenerator (FDA) | ✅ 완료 | `scan/signal_generator.py` | FeedCard 생성 |
+| SignalGenerator (EMA) | ✅ 완료 | `scan/signal_generator.py` | 4개 SourceType 지원 |
 | why_it_matters | ✅ 완료 | `scan/why_it_matters.py` | 템플릿 + LLM 폴백 |
 | Delta Analyzer | ❌ 미구현 | - | 버전 비교 |
-| Evidence Trend | ❌ 미구현 | - | 논문 동향 분석 |
+
+### Map Engine (글로벌 매핑)
+
+| 기능 | 상태 | 파일 | 비고 |
+|------|------|------|------|
+| GlobalRegulatoryStatus | ✅ 완료 | `map/global_status.py` | FDA+EMA+**MFDS** 통합 상태 |
+| HotIssueScorer | ✅ 완료 | `map/global_status.py` | 핫이슈 스코어링 (0-100) |
+| merge_by_inn | ✅ 완료 | `map/global_status.py` | INN 기반 병합 |
+| **merge_global_status** | ✅ 완료 | `map/global_status.py` | FDA+EMA+MFDS 3자 병합 |
+| **enrich_with_mfds** | ✅ 완료 | `map/global_status.py` | 기존 데이터에 MFDS 추가 |
+| Timeline 모델 | 🔄 진행중 | `map/timeline.py` | FDA→MFDS→HIRA 시간축 |
+| 성분명 매칭 | ✅ 완료 | `map/matcher.py` | 정규화 + 매칭 로직 |
 
 ### Storage Layer (저장)
 
 | 기능 | 상태 | 파일 | 비고 |
 |------|------|------|------|
 | FeedCardRepository | ✅ 완료 | `db/repository.py` | SQLite + SQLAlchemy |
-| Snapshot Registry | ❌ 미구현 | - | 버전 관리 |
-| Object Storage | ❌ 미구현 | - | S3/MinIO |
+| SnapshotRepository | ✅ 완료 | `db/snapshot_repository.py` | 원본 데이터 버전관리 |
+| GlobalStatusRepository | ✅ 완료 | `db/global_status_repository.py` | 글로벌 규제 현황 |
 
-### Scripts (실행 스크립트)
-
-| 스크립트 | 상태 | 파일 | 비고 |
-|------|------|------|------|
-| collect_fda.py | ✅ 완료 | `scripts/collect_fda.py` | FDA 단독 수집 |
-| collect_hira.py | ✅ 완료 | `scripts/collect_hira.py` | HIRA 단독 수집 |
-| collect_mohw.py | ✅ 완료 | `scripts/collect_mohw.py` | MOHW 단독 수집 |
-| collect_all.py | ✅ 완료 | `scripts/collect_all.py` | 통합 파이프라인 (60건 테스트) |
-
----
-
-### Map Engine (신규 구현 중)
+### Report Layer (리포트)
 
 | 기능 | 상태 | 파일 | 비고 |
 |------|------|------|------|
-| Timeline 모델 | 🔄 진행중 | `map/timeline.py` | FDA→MFDS→HIRA 시간축 |
-| 성분명 매칭 | 🔄 진행중 | `map/matcher.py` | 정규화 + 매칭 로직 |
-| 선례 분석 | ⬜ 예정 | `map/analyzer.py` | 동일계열 선례 검색 |
-| 리포트 생성 | ⬜ 예정 | `map/report.py` | 전문가용 리포트 |
-
-### 외부 데이터 연동
-
-| 데이터 | 출처 | 건수 | 상태 |
-|--------|------|------|------|
-| MFDS 허가 | scrape-hub | 44,311건 | △ 연동 예정 |
-| ATC 매핑 | scrape-hub/kpis | 21,702건 | △ 연동 예정 |
-| 고시 히스토리 | scrape-hub/cg_parsed | 4,573건 | △ 연동 예정 |
-
----
-
-## 미구현 (로드맵 기준)
-
-### Sources (추가 데이터 소스)
-- [ ] EMA (유럽 의약품청)
-- [ ] CMS (미국 메디케어)
-- [ ] PubMed/PMC (논문)
-- [ ] medRxiv/bioRxiv (프리프린트)
-
-### Infrastructure
-- [ ] Scheduler (Airflow/cron)
-- [ ] Queue (Redis Streams/RabbitMQ)
-- [ ] Worker 아키텍처
-- [ ] Postgres 마이그레이션
-- [ ] Redis Cache
-- [ ] Feed API (FastAPI)
-
-### Advanced Features
-- [ ] Map Engine (해외→국내 경로 매핑)
-- [ ] Personalization (Role/Institution 프로필)
-- [ ] Search/Vector DB
+| ReportGenerator | ✅ 완료 | `report/generator.py` | 일간/주간 리포트 |
+| 텍스트 출력 | ✅ 완료 | `report/generator.py` | 콘솔 출력용 |
+| 마크다운 출력 | ✅ 완료 | `report/generator.py` | 파일 저장용 |
 
 ---
 
@@ -105,22 +89,53 @@
 
 | 테스트 | 결과 | 날짜 |
 |--------|------|------|
-| FDA 파이프라인 | ✅ 41건 수집/파싱/변환 | 2026-01-31 |
-| HIRA 보험인정기준 | ✅ 25건 수집 | 2026-02-01 |
-| MOHW 행정예고 | ✅ 10건 수집 | 2026-02-01 |
-| 통합 파이프라인 | ✅ 60건 (FDA 35 + HIRA 25) | 2026-02-01 |
+| FDA 파이프라인 | ✅ 41건 | 2026-01-31 |
+| HIRA 보험인정기준 | ✅ 25건 | 2026-02-01 |
+| MOHW 행정예고 | ✅ 10건 | 2026-02-01 |
+| 통합 파이프라인 | ✅ 60건 | 2026-02-01 |
+| **EMA 수집** | ✅ 2,655건 | 2026-02-03 |
+| **EMA → FeedCard** | ✅ HIGH 3, MID 1, LOW 6 | 2026-02-03 |
+| **GlobalRegulatoryStatus** | ✅ 1,532건 병합 | 2026-02-03 |
+| **DB 저장 로직** | ✅ 스냅샷+GlobalStatus | 2026-02-03 |
+| **E2E 파이프라인** | ✅ EMA 20건 처리 | 2026-02-03 |
+| **MVP 리포트** | ✅ 일간/주간 생성 | 2026-02-03 |
+| **WHO ATC 연동** | ✅ 6,440건, INN매칭 | 2026-02-03 |
+| **MFDS API** | ✅ 284,477건 수집가능 | 2026-02-03 |
+| **MFDS↔EMA 매칭** | ✅ 19건/200건 샘플 | 2026-02-03 |
+
+---
+
+## 미구현 (로드맵 기준)
+
+### Sources (추가 데이터 소스)
+- [x] EMA (유럽 의약품청) - ✅ 연동 완료
+- [x] **MFDS (식약처)** - ✅ 연동 완료 (공공데이터포털 API)
+- [x] WHO ATC - ✅ 연동 완료 (6,440건)
+- [ ] CRIS (임상시험정보) - 내부 분석용 (상업적 이용 불가)
+- [ ] ClinicalTrials.gov - 상업적 이용 가능 (CRIS 대안)
+- [ ] WHO EML - eEML 스크래핑 예정
+- [ ] PMDA (일본) - 후순위
+- [ ] CMS (미국 메디케어)
+- [ ] PubMed/PMC (논문)
+
+### Infrastructure
+- [ ] Scheduler (Airflow/cron)
+- [ ] Postgres 마이그레이션
+- [ ] Feed API (FastAPI)
 
 ---
 
 ## 진행률
 
 ```
-전체 로드맵 대비: ████░░░░░░░░░░░░░░░░ ~20%
+전체 로드맵 대비: ████████████░░░░░░░░ ~55%
 
-데이터 수집:      ██████████░░░░░░░░░░ 50% (3/6 소스)
-파싱:            ████████░░░░░░░░░░░░ 40% (기초 파서만)
-신호 생성:        ████░░░░░░░░░░░░░░░░ 20% (Delta 없음)
-인프라:          ██░░░░░░░░░░░░░░░░░░ 10% (SQLite만)
-개인화:          ░░░░░░░░░░░░░░░░░░░░ 0%
+데이터 수집:      ██████████████░░░░░░ 70% (FDA+EMA+MFDS+HIRA+MOHW)
+파싱:            ████████████░░░░░░░░ 60% (FDA+EMA+MFDS)
+신호 생성:        ████████░░░░░░░░░░░░ 40% (FDA+EMA FeedCard)
+글로벌 매핑:      ██████████████░░░░░░ 70% (GlobalStatus+ATC+MFDS매칭)
+저장:            ████████████░░░░░░░░ 60% (Snapshot+GlobalStatus+FeedCard)
+리포트:          ████████░░░░░░░░░░░░ 40% (일간/주간 MVP)
+인프라:          ████░░░░░░░░░░░░░░░░ 20% (SQLite+async)
 API:            ░░░░░░░░░░░░░░░░░░░░ 0%
 ```
