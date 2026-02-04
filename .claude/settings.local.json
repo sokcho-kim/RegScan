@@ -70,7 +70,8 @@
       "Bash(curl:*)",
       "Bash(pip show:*)",
       "Bash(du:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git push:*)"
     ]
   }
 }
