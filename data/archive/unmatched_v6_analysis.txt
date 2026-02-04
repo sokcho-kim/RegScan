@@ -1,0 +1,91 @@
+================================================================================
+미연결 10,841건 분석 (v6)
+================================================================================
+
+1. 성분명 유무
+   성분명 있음: 10,743건 (99.1%)
+   성분명 없음: 98건 (0.9%)
+
+2. 성분명 없는 품목 (상위 20건)
+----------------------------------------
+   [1] 서흥캡슐0호
+   [2] 서흥캡슐엘롱게이트0호
+   [3] 서흥캡슐1호
+   [4] 서흥캡슐2호
+   [5] 서흥캡슐3호
+   [6] 서흥캡슐4호
+   [7] 서흥캡슐00호
+   [8] 신양아산화질소
+   [9] 서흥에치피엠씨캡슐00호
+   [10] 서흥에치피엠씨캡슐0호
+   [11] 서흥에치피엠씨캡슐엘롱게이트0호
+   [12] 서흥에치피엠씨캡슐1호
+   [13] 서흥에치피엠씨캡슐2호
+   [14] 서흥에치피엠씨캡슐3호
+   [15] 서흥에치피엠씨캡슐4호
+   [16] 서흥캡슐엘롱게이트00호
+   [17] 서흥에치피엠씨캡슐엘롱게이트00호
+   [18] 주사용수키트주사
+   [19] 한미젤라틴공캡슐5호
+   [20] 맥스디오정160mg(발사르탄)
+
+3. 미매칭 성분명 TOP 30
+----------------------------------------
+   Ginkgo Biloba Leaf Dried Extract: 304건
+   Angelica Gigas Root: 249건
+   Benfotiamine: 193건
+   Tadalafil: 185건
+   Artemisiae Argyi Folium 95% Ethanol Soft Extract (20→1): 146건
+   Rivaroxaban Micronized: 144건
+   Alisma Rhizome: 112건
+   Bepotastine Besylate: 111건
+   DL-Camphor: 107건
+   Oxygen: 105건
+   Cetirizine Hydrochloride: 102건
+   Ascorbic Acid Granules 97%: 101건
+   Ascorbic Acid Coated: 95건
+   Rivastigmine Tartarate: 87건
+   Cholecalciferol Concentrate Powder: 87건
+   Omega-3-Acid Ethyl Esters 90: 87건
+   Milk-Thistle Fruit Dried Extract: 83건
+   Anhydrous Dibasic Calcium Phosphate: 81건
+   Metformin Hydrochloride with Colloidal Anhydrous Silica: 81건
+   Limaprost Alfadex: 80건
+   Ampelopsis Radix: 79건
+   Cinnamomi Ramulus: 78건
+   Angelica Gigas Root·Chaenomelis Fructus·Saposhnikovia Root·Dipsaci Radix·Acanthopanax Root Bark·Achyranthes Root·Clematidis Radix·Cinnamon Bark·Gentianae Macrophyllae Radix·Cnidium Rhizome·Gastrodia Rhizome·Safflower 25% Ethanol Soft Extract (3.5→1): 75건
+   As Dried Extract: 71건
+   Carboxymethylcellulose Sodium: 70건
+   Linagliptin Micronized: 70건
+   Clarithromycin Coated Granules: 66건
+   Allantoin: 62건
+   Itraconazole Solid Dispersions: 60건
+   Pelargonium Sidoides 11% Ethanol Dried Extract (5.5∼6.6→1): 58건
+
+4. 한약재/생약 vs 양약 추정
+----------------------------------------
+   한약재/생약 추정: 4,990건 (46.4%)
+   양약 추정: 5,753건 (53.6%)
+
+5. 양약인데 미매칭 (상위 20건)
+----------------------------------------
+   Tadalafil: 185건
+   Rivaroxaban Micronized: 144건
+   Bepotastine Besylate: 111건
+   Oxygen: 105건
+   Cetirizine Hydrochloride: 102건
+   Benfotiamine: 101건
+   Rivastigmine Tartarate: 87건
+   Omega-3-Acid Ethyl Esters 90: 87건
+   Metformin Hydrochloride with Colloidal Anhydrous Silica: 81건
+   Limaprost Alfadex: 80건
+   Carboxymethylcellulose Sodium: 70건
+   Linagliptin Micronized: 70건
+   Itraconazole Solid Dispersions: 60건
+   DL-Camphor: 58건
+   Varenicline Salicylate: 54건
+   Sugammadex Sodium: 51건
+   Orlistat: 50건
+   Nitrogen: 47건
+   Allantoin: 46건
+   Polydeoxyribonucleotide Sodium: 45건

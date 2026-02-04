@@ -53,3 +53,9 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Large data files
+data/hira/medical_fees_*.json
+data/hira/drug_prices_*.json
+data/bridge/drug_dictionary_normalized.json
+data/bridge/yakga_master_latest.csv

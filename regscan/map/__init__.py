@@ -14,6 +14,7 @@ from .global_status import (
     HotIssueScorer,
     GlobalStatusBuilder,
     merge_by_inn,
+    enrich_with_hira,
 )
 from .atc import (
     ATCEntry,
@@ -24,6 +25,15 @@ from .atc import (
     get_atc_database,
     enrich_with_atc,
     classify_therapeutic_area,
+)
+from .ingredient_bridge import (
+    ReimbursementStatus,
+    HIRAReimbursementInfo,
+    IngredientBridge,
+    normalize_ingredient_name,
+    is_herbal_ingredient,
+    get_ingredient_bridge,
+    lookup_hira_reimbursement,
 )
 
 __all__ = [
@@ -42,6 +52,7 @@ __all__ = [
     "HotIssueScorer",
     "GlobalStatusBuilder",
     "merge_by_inn",
+    "enrich_with_hira",
     # ATC
     "ATCEntry",
     "ATCDatabase",
@@ -51,4 +62,12 @@ __all__ = [
     "get_atc_database",
     "enrich_with_atc",
     "classify_therapeutic_area",
+    # Ingredient Bridge (MFDS ↔ HIRA)
+    "ReimbursementStatus",
+    "HIRAReimbursementInfo",
+    "IngredientBridge",
+    "normalize_ingredient_name",
+    "is_herbal_ingredient",
+    "get_ingredient_bridge",
+    "lookup_hira_reimbursement",
 ]

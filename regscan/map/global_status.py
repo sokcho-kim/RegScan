@@ -11,6 +11,12 @@ from enum import Enum
 from typing import Any, Optional
 
 from .matcher import IngredientMatcher
+from .ingredient_bridge import (
+    IngredientBridge,
+    HIRAReimbursementInfo,
+    ReimbursementStatus,
+    get_ingredient_bridge,
+)
 
 
 class ApprovalStatus(str, Enum):
@@ -85,6 +91,9 @@ class GlobalRegulatoryStatus:
     who_eml: bool = False                 # Essential Medicines List 등재
     who_prequalified: bool = False        # WHO 사전적격
 
+    # HIRA 급여 정보 (국내)
+    hira_reimbursement: Optional[HIRAReimbursementInfo] = None
+
     # 분석 결과
     global_score: int = 0                 # 글로벌 중요도 점수 (0-100)
     hot_issue_level: HotIssueLevel = HotIssueLevel.LOW
@@ -126,6 +135,20 @@ class GlobalRegulatoryStatus:
                 dates.append(approval.approval_date)
         return min(dates) if dates else None
 
+    @property
+    def is_hira_reimbursed(self) -> bool:
+        """국내 급여 여부"""
+        if self.hira_reimbursement:
+            return self.hira_reimbursement.status == ReimbursementStatus.REIMBURSED
+        return False
+
+    @property
+    def hira_status_summary(self) -> str:
+        """HIRA 급여 상태 요약"""
+        if not self.hira_reimbursement:
+            return "미조회"
+        return self.hira_reimbursement.status.value
+
     def to_dict(self) -> dict[str, Any]:
         """딕셔너리 변환"""
         return {
@@ -137,6 +160,7 @@ class GlobalRegulatoryStatus:
             "pmda": self._approval_to_dict(self.pmda),
             "mfds": self._approval_to_dict(self.mfds),
             "who_eml": self.who_eml,
+            "hira_reimbursement": self.hira_reimbursement.to_dict() if self.hira_reimbursement else None,
             "approved_agencies": self.approved_agencies,
             "approval_count": self.approval_count,
             "global_score": self.global_score,
@@ -331,9 +355,19 @@ class HotIssueScorer:
 class GlobalStatusBuilder:
     """GlobalRegulatoryStatus 빌더"""
 
-    def __init__(self):
+    def __init__(self, ingredient_bridge: Optional[IngredientBridge] = None):
         self.matcher = IngredientMatcher()
         self.scorer = HotIssueScorer()
+        self._bridge = ingredient_bridge
+
+    def _get_bridge(self) -> Optional[IngredientBridge]:
+        """IngredientBridge 인스턴스 반환 (lazy loading)"""
+        if self._bridge is None:
+            try:
+                self._bridge = get_ingredient_bridge()
+            except Exception:
+                pass  # 데이터 없으면 None 유지
+        return self._bridge
 
     def build_from_fda_ema(
         self,
@@ -564,6 +598,31 @@ class GlobalStatusBuilder:
         """MFDS 데이터만으로 GlobalRegulatoryStatus 생성"""
         return self.build_from_all(None, None, mfds_data)
 
+    def enrich_with_hira(self, status: GlobalRegulatoryStatus) -> GlobalRegulatoryStatus:
+        """
+        GlobalRegulatoryStatus에 HIRA 급여 정보 추가
+
+        Args:
+            status: HIRA 정보를 추가할 GlobalRegulatoryStatus
+
+        Returns:
+            HIRA 정보가 추가된 GlobalRegulatoryStatus
+        """
+        bridge = self._get_bridge()
+        if not bridge:
+            return status
+
+        # INN으로 HIRA 조회
+        ingredient_name = status.inn or status.normalized_name
+        if not ingredient_name and status.mfds:
+            ingredient_name = status.mfds.raw_data.get("ITEM_INGR_NAME", "")
+
+        if ingredient_name:
+            hira_info = bridge.lookup(ingredient_name)
+            status.hira_reimbursement = hira_info
+
+        return status
+
 
 def merge_by_inn(
     fda_list: list[dict],
@@ -727,5 +786,25 @@ def enrich_with_mfds(
             status.global_score = score
             status.hot_issue_level = builder.scorer.determine_level(score)
             status.hot_issue_reasons = reasons
+
+    return global_statuses
+
+
+def enrich_with_hira(
+    global_statuses: list[GlobalRegulatoryStatus],
+) -> list[GlobalRegulatoryStatus]:
+    """
+    기존 GlobalRegulatoryStatus 목록에 HIRA 급여 정보 추가
+
+    Args:
+        global_statuses: GlobalRegulatoryStatus 목록
+
+    Returns:
+        HIRA 정보가 추가된 GlobalRegulatoryStatus 목록
+    """
+    builder = GlobalStatusBuilder()
+
+    for status in global_statuses:
+        builder.enrich_with_hira(status)
 
     return global_statuses

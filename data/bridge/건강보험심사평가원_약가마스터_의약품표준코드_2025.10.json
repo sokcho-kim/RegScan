@@ -1,0 +1,11 @@
+{
+  "dataset_id": "15067462",
+  "title": "건강보험심사평가원_약가마스터_의약품표준코드",
+  "download_url": "https://www.data.go.kr/cmm/cmm/fileDownload.do?atchFileId=FILE_000000003550228&fileDetailSn=1",
+  "file_name": "건강보험심사평가원_약가마스터_의약품표준코드_2025.10.csv",
+  "file_size": 54880067,
+  "last_updated": "20251001",
+  "row_count": 305522,
+  "downloaded_at": "2025-12-12T17:57:24.759784",
+  "local_path": "C:\\Jimin\\scrape-hub\\data\\data_go\\yakga_master\\건강보험심사평가원_약가마스터_의약품표준코드_2025.10.csv"
+}

@@ -1,0 +1,88 @@
+================================================================================
+추가 정규화 위험성 분석
+================================================================================
+
+1. Rivaroxaban (Micronized 제거 시 위험?)
+----------------------------------------
+   511401ATB: rivaroxaban(micronized)
+   511402ATB: rivaroxaban(micronized)
+   511403ATB: rivaroxaban(micronized)
+   511404ACH: rivaroxaban(micronized)
+   511404ATB: rivaroxaban(micronized)
+
+2. Cetirizine Hydrochloride (마스터에 있는지?)
+----------------------------------------
+   130501ACS: cetirizine dihydrochloride
+   130501ALQ: cetirizine dihydrochloride
+   130501ATB: cetirizine dihydrochloride
+   130501ATD: cetirizine dihydrochloride
+   130502ALQ: cetirizine dihydrochloride
+   130503ACS: cetirizine dihydrochloride
+   130504ALQ: cetirizine dihydrochloride
+   130505ALQ: cetirizine dihydrochloride
+   130507ALQ: cetirizine dihydrochloride
+   130508ALQ: cetirizine dihydrochloride
+   130509ALQ: cetirizine dihydrochloride
+   130510ALQ: cetirizine dihydrochloride
+   259900ACH: cetirizine dihydrochloride
+   259900ACR: cetirizine HCl
+   259900ATB: cetirizine dihydrochloride
+   443100ATB: cetirizine HCl
+   463601ATB: levocetirizine dihydrochloride
+   463602ALQ: Levocetirizine HCl
+   463630ALQ: levocetirizine dihydrochloride
+   463631ALQ: levocetirizine dihydrochloride
+   463632ALQ: levocetirizine dihydrochloride
+   463633ALQ: levocetirizine dihydrochloride
+   463634ALQ: levocetirizine dihydrochloride
+   463635ALQ: levocetirizine dihydrochloride
+   463636ALQ: levocetirizine dihydrochloride
+   463637ALQ: levocetirizine dihydrochloride
+   463638ALQ: levocetirizine hydrochloride
+   524800ATB: levocetirizine dihydrochloride
+   601700ACR: cetirizine HCl
+   659900ACH: levocetirizine dihydrochloride
+   659900ATB: levocetirizine dihydrochloride
+   670600ATB: levocetirizine dihydrochloride
+   739501ATB: cetirizine hydrochloride
+
+3. Tadalafil (마스터에 있는지?)
+----------------------------------------
+   560701APD: tadalafil
+   560701ATB: tadalafil
+   560701ATD: tadalafil
+   560702APD: tadalafil
+   560702ATB: tadalafil
+   560702ATD: tadalafil
+   560703APD: tadalafil
+   560703ATB: tadalafil
+   560703ATD: tadalafil
+   652600ATB: tadalafil
+   656300ACE: tadalafil
+   740300ATB: tadalafil
+   745300ATB: tadalafil
+   745400ATB: tadalafil
+
+4. Bepotastine Besylate
+----------------------------------------
+   453901ATB: bepotastine besilate
+   453902ATB: bepotastine besilate
+   453903COS: bepotastine besilate(as bepotastine 10.7mg)
+   453904ATR: bepotastine besilate (as bepotastine)
+   453930COS: bepotastine besilate (as bepotastine)
+   453931COS: bepotastine besilate (as bepotastine)
+   508801ATD: bepotastine calcium dihydrate (as bepotastine)
+   521601ATB: bepotastine salicylate (as bepotastine)
+   521602ATR: bepotastine salicylate (as bepotastine)
+   639501ATB: bepotastine nicotinate(as bepotastine)
+
+5. Rivastigmine (Tartarate vs Tartrate 철자)
+----------------------------------------
+   224501ACH: rivastigmine tartrate (as rivastigmine)
+   224502ALQ: rivastigmine
+   224503ACH: rivastigmine tartrate (as rivastigmine)
+   224504ACH: rivastigmine tartrate (as rivastigmine)
+   224505ACH: rivastigmine tartrate (as rivastigmine)
+   224506CPC: rivastigmine
+   224507CPC: rivastigmine
+   224508CPC: rivastigmine

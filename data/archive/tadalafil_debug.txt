@@ -1,0 +1,63 @@
+================================================================================
+Tadalafil 미매칭 원인 분석
+================================================================================
+
+1. MFDS에서 Tadalafil 품목 (상위 10건)
+----------------------------------------
+   [1] 시알리스정20밀리그램(타다라필)
+       INN: "Tadalafil"
+       정규화: "tadalafil"
+   [2] 시알리스정10밀리그램(타다라필)
+       INN: "Tadalafil"
+       정규화: "tadalafil"
+   [3] 시알리스정5밀리그램(타다라필)
+       INN: "Tadalafil"
+       정규화: "tadalafil"
+   [4] 고든구강용해필름20mg(타다라필)(수출명: CALIBERI)
+       INN: "Tadalafil"
+       정규화: "tadalafil"
+   [5] 불티움구강붕해필름20밀리그램(타다라필)
+       INN: "Tadalafil"
+       정규화: "tadalafil"
+   [6] 불티움구강붕해필름10밀리그램(타다라필)
+
+       INN: "Tadalafil"
+       정규화: "tadalafil"
+   [7] 구구정10밀리그램(타다라필)
+       INN: "Tadalafil"
+       정규화: "tadalafil"
+   [8] 구구정20밀리그램(타다라필)
+       INN: "Tadalafil"
+       정규화: "tadalafil"
+   [9] 구구정5밀리그램(타다라필)
+       INN: "Tadalafil/Tadalafil"
+       정규화: "tadalafil/tadalafil"
+   [10] 해피롱정20밀리그램(타다라필)
+       INN: "Tadalafil"
+       정규화: "tadalafil"
+   ... 총 191건
+
+2. 마스터에서 Tadalafil (전체)
+----------------------------------------
+   560701APD: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+   560701ATB: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+   560701ATD: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+   560702APD: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+   560702ATB: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+   560702ATD: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+   560703APD: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+   560703ATB: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+   560703ATD: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+   652600ATB: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+   656300ACE: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+   740300ATB: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+   745300ATB: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+   745400ATB: "tadalafil" -> 정규화: "tadalafil" [HIRA:X]
+
+3. 브릿지 테이블 매칭 테스트
+----------------------------------------
+   "Tadalafil" -> 코드 0개, HIRA 0개
+   "tadalafil" -> 코드 14개, HIRA 0개
+      샘플: ['740300ATB', '560701APD', '560702ATD', '652600ATB', '560703ATB']
+   "tadalafil" -> 코드 14개, HIRA 0개
+      샘플: ['740300ATB', '560701APD', '560702ATD', '652600ATB', '560703ATB']

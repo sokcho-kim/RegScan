@@ -1,0 +1,99 @@
+================================================================================
+미연결 16,417건 분석
+================================================================================
+
+전체 미연결: 16,417건
+
+1. 성분명(INN) 유무
+----------------------------------------
+  성분명 있음: 16,319건 (99.4%)
+  성분명 없음: 98건 (0.6%)
+
+2. 성분명 없는 품목 샘플 (상위 20건)
+----------------------------------------
+  [1] 서흥캡슐0호
+  [2] 서흥캡슐엘롱게이트0호
+  [3] 서흥캡슐1호
+  [4] 서흥캡슐2호
+  [5] 서흥캡슐3호
+  [6] 서흥캡슐4호
+  [7] 서흥캡슐00호
+  [8] 신양아산화질소
+  [9] 서흥에치피엠씨캡슐00호
+  [10] 서흥에치피엠씨캡슐0호
+  [11] 서흥에치피엠씨캡슐엘롱게이트0호
+  [12] 서흥에치피엠씨캡슐1호
+  [13] 서흥에치피엠씨캡슐2호
+  [14] 서흥에치피엠씨캡슐3호
+  [15] 서흥에치피엠씨캡슐4호
+  [16] 서흥캡슐엘롱게이트00호
+  [17] 서흥에치피엠씨캡슐엘롱게이트00호
+  [18] 주사용수키트주사
+  [19] 한미젤라틴공캡슐5호
+  [20] 맥스디오정160mg(발사르탄)
+
+3. 성분명 있는데 미매칭 (상위 30건)
+----------------------------------------
+  자주 나오는 미매칭 성분명:
+    Amlodipine Besylate: 1337건
+    Atorvastatin Calcium Trihydrate: 471건
+    Ginkgo Biloba Leaf Dried Extract: 304건
+    Montelukast Sodium: 269건
+    Angelica Gigas Root: 249건
+    Ranitidine Hydrochloride: 237건
+    Esomeprazole Magnesium Trihydrate: 213건
+    Oseltamivir Phosphate: 199건
+    Benfotiamine: 193건
+    Sitagliptin Hydrochloride Hydrate: 186건
+    Tadalafil: 185건
+    Quetiapine Fumarate: 157건
+    Loxoprofen Sodium Hydrate: 147건
+    Artemisiae Argyi Folium 95% Ethanol Soft Extract (20→1): 146건
+    Clopidogrel Bisulfate: 140건
+    Atorvastatin Calcium Hydrate: 136건
+    Escitalopram Oxalate: 134건
+    Anhydrous Caffeine: 131건
+    Alisma Rhizome: 112건
+    Bepotastine Besylate: 111건
+    DL-Camphor: 107건
+    Oxygen: 105건
+    Cetirizine Hydrochloride: 102건
+    Ascorbic Acid Granules 97%: 101건
+    Sildenafil Citrate: 98건
+    Ascorbic Acid Coated: 95건
+    Fimasartan Potassium Trihydrate: 89건
+    Rivastigmine Tartarate: 87건
+    Cholecalciferol Concentrate Powder: 87건
+    Omega-3-Acid Ethyl Esters 90: 87건
+
+4. 한글 vs 영문 성분명
+----------------------------------------
+  한글만: 0건 (0.0%)
+  영문만: 16,319건 (100.0%)
+  혼합: 0건 (0.0%)
+
+5. 한글 성분명 샘플 (미매칭)
+----------------------------------------
+
+6. 영문 성분명 샘플 (미매칭)
+----------------------------------------
+  [1] Caffeine·Sodium Benzoate
+  [2] Caffeine·Sodium Benzoate
+  [3] Atractylodes Rhizome/Capsicum Tincture/Cinnamon Ba
+  [4] Salicylic Acid
+  [5] Dried Aluminium Hydroxide Gel/Magnesium Carbonate/
+  [6] Ephedra Herb/Ginseng/Guaifenesin/Platycodon Root/P
+  [7] Ascorbic Acid Granules 97%/Calcium Pantothenate/Cy
+  [8] Aurantii Pericarpium Oil/Cinnamon Bark Oil/Clove O
+  [9] Dried Aluminium Hydroxide Gel/Magnesium Carbonate/
+  [10] Anhydrous Caffeine
+  [11] Amomum Fruit/Amomum Fruit/Amomum Tsao-ko Fruit/Amo
+  [12] Anhydrous Caffeine/Calcium Pantothenate/Ginseng Fl
+  [13] D-Camphor/Diphenhydramine/Glycol Salicylate/L-Ment
+  [14] Glutathione (Reduced)
+  [15] Bomeolum/Bomeolum/D-Camphor/D-Camphor/L-Menthol/L-
+  [16] Nortriptyline Hydrochloride
+  [17] Nortriptyline Hydrochloride
+  [18] Nitrofurazone
+  [19] Aluminium Phosphate Gel/Colloidal Aluminium Phosph
+  [20] Bomeolum/Bomeolum/Bomeolum/Bomeolum/Bomeolum/DL-Ca

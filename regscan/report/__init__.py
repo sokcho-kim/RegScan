@@ -6,10 +6,18 @@ from .generator import (
     WeeklyReport,
     ReportStats,
 )
+from .llm_generator import (
+    LLMBriefingGenerator,
+    BriefingReport,
+    generate_briefing,
+)
 
 __all__ = [
     "ReportGenerator",
     "DailyReport",
     "WeeklyReport",
     "ReportStats",
+    "LLMBriefingGenerator",
+    "BriefingReport",
+    "generate_briefing",
 ]

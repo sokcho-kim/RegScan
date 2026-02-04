@@ -63,7 +63,14 @@
       "Bash(\"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\" --headless=new --screenshot=\"C:\\\\Users\\\\sokch\\\\Downloads\\\\ppt_slide5_new.png\" --window-size=1600,900 \"file:///C:/Jimin/RegScan/docs/proposal/regscan_server_proposal.html#/5\")",
       "Bash(\"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\" --headless=new --print-to-pdf=\"C:\\\\Jimin\\\\RegScan\\\\docs\\\\proposal\\\\regscan_server_proposal.pdf\" --no-pdf-header-footer \"file:///C:/Jimin/RegScan/docs/proposal/regscan_server_proposal.html?print-pdf\")",
       "Bash(\"C:\\\\Program Files\\\\Quarto\\\\bin\\\\quarto.exe\" render regscan_server_proposal.qmd --to pdf)",
-      "Bash(\"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\" --headless=new --print-to-pdf=\"C:\\\\Jimin\\\\RegScan\\\\docs\\\\proposal\\\\regscan_server_proposal.pdf\" --print-to-pdf-no-header --no-margins \"file:///C:/Jimin/RegScan/docs/proposal/regscan_server_proposal.html\")"
+      "Bash(\"C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe\" --headless=new --print-to-pdf=\"C:\\\\Jimin\\\\RegScan\\\\docs\\\\proposal\\\\regscan_server_proposal.pdf\" --print-to-pdf-no-header --no-margins \"file:///C:/Jimin/RegScan/docs/proposal/regscan_server_proposal.html\")",
+      "Bash(iconv:*)",
+      "Bash(chcp:*)",
+      "WebFetch(domain:www.hira.or.kr)",
+      "Bash(curl:*)",
+      "Bash(pip show:*)",
+      "Bash(du:*)",
+      "Bash(git reset:*)"
     ]
   }
 }
