@@ -1,0 +1,379 @@
+{
+  "scan_date": "2026-02-05",
+  "scan_time": "2026-02-05T16:26:27.755255",
+  "summary": {
+    "fda_new": 11,
+    "ema_new": 0,
+    "mfds_new": 0,
+    "total_new": 11,
+    "hot_issues": 5
+  },
+  "fda_new": [
+    {
+      "source": "fda",
+      "drug_name": "LORBRENA",
+      "generic_name": "LORLATINIB",
+      "approval_date": "2018-11-02",
+      "application_number": "NDA210868",
+      "indication": "Kinase Inhibitor [EPC]",
+      "sponsor": "PFIZER",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "SERTRALINE HYDROCHLORIDE",
+      "generic_name": "SERTRALINE HYDROCHLORIDE",
+      "approval_date": "2026-01-29",
+      "application_number": "ANDA220275",
+      "indication": "",
+      "sponsor": "ZYDUS LIFESCIENCES",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "LACOSAMIDE ORAL SOLUTION",
+      "generic_name": "LACOSAMIDE ORAL",
+      "approval_date": "2026-01-29",
+      "application_number": "ANDA220386",
+      "indication": "",
+      "sponsor": "INDOCO",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": false,
+      "existing_approvals": []
+    },
+    {
+      "source": "fda",
+      "drug_name": "LYBALVI",
+      "generic_name": "OLANZAPINE AND SAMIDORPHAN L-MALATE",
+      "approval_date": "2021-05-28",
+      "application_number": "NDA213378",
+      "indication": "Atypical Antipsychotic [EPC]",
+      "sponsor": "ALKERMES INC",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": false,
+      "existing_approvals": []
+    },
+    {
+      "source": "fda",
+      "drug_name": "GABAPENTIN",
+      "generic_name": "GABAPENTIN",
+      "approval_date": "2003-09-12",
+      "application_number": "ANDA075350",
+      "indication": "",
+      "sponsor": "ACTAVIS ELIZABETH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ENBREL",
+      "generic_name": "ETANERCEPT",
+      "approval_date": "1998-11-02",
+      "application_number": "BLA103795",
+      "indication": "Tumor Necrosis Factor Blocker [EPC]",
+      "sponsor": "IMMUNEX",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인",
+        "고관심 적응증 (tumor)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "WEGOVY",
+      "generic_name": "SEMAGLUTIDE",
+      "approval_date": "2025-12-22",
+      "application_number": "NDA218316",
+      "indication": "GLP-1 Receptor Agonist [EPC]",
+      "sponsor": "NOVO",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "CETIRIZINE HCL",
+      "generic_name": "CETIRIZINE HCL",
+      "approval_date": "2009-07-23",
+      "application_number": "NDA022429",
+      "indication": "",
+      "sponsor": "BIONPHARMA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "GABAPENTIN",
+      "generic_name": "GABAPENTIN",
+      "approval_date": "2017-03-24",
+      "application_number": "ANDA207099",
+      "indication": "",
+      "sponsor": "RISING",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "WEGOVY",
+      "generic_name": "SEMAGLUTIDE",
+      "approval_date": "2021-06-04",
+      "application_number": "NDA215256",
+      "indication": "GLP-1 Receptor Agonist [EPC]",
+      "sponsor": "NOVO",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "LIVDELZI",
+      "generic_name": "SELADELPAR LYSINE",
+      "approval_date": "2024-08-14",
+      "application_number": "NDA217899",
+      "indication": "",
+      "sponsor": "GILEAD SCIENCES INC",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    }
+  ],
+  "ema_new": [],
+  "mfds_new": [],
+  "hot_issues": [
+    {
+      "source": "fda",
+      "drug_name": "ENBREL",
+      "generic_name": "ETANERCEPT",
+      "approval_date": "1998-11-02",
+      "application_number": "BLA103795",
+      "indication": "Tumor Necrosis Factor Blocker [EPC]",
+      "sponsor": "IMMUNEX",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인",
+        "고관심 적응증 (tumor)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "LORBRENA",
+      "generic_name": "LORLATINIB",
+      "approval_date": "2018-11-02",
+      "application_number": "NDA210868",
+      "indication": "Kinase Inhibitor [EPC]",
+      "sponsor": "PFIZER",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "WEGOVY",
+      "generic_name": "SEMAGLUTIDE",
+      "approval_date": "2025-12-22",
+      "application_number": "NDA218316",
+      "indication": "GLP-1 Receptor Agonist [EPC]",
+      "sponsor": "NOVO",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "WEGOVY",
+      "generic_name": "SEMAGLUTIDE",
+      "approval_date": "2021-06-04",
+      "application_number": "NDA215256",
+      "indication": "GLP-1 Receptor Agonist [EPC]",
+      "sponsor": "NOVO",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "LIVDELZI",
+      "generic_name": "SELADELPAR LYSINE",
+      "approval_date": "2024-08-14",
+      "application_number": "NDA217899",
+      "indication": "",
+      "sponsor": "GILEAD SCIENCES INC",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    }
+  ],
+  "errors": []
+}

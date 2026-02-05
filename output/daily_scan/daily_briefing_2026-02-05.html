@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegScan Daily - 2026-02-05</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .wrapper {
+            max-width: 720px;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 100vh;
+        }
+
+        /* 헤더 */
+        header {
+            padding: 24px 32px;
+            border-bottom: 3px solid #1a1a1a;
+        }
+
+        .masthead {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+
+        .logo {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .date-area {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .tagline {
+            font-size: 12px;
+            color: #888;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* 요약 바 */
+        .summary-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 32px;
+            background: #fafafa;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .summary-item .num {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .summary-item.hot .num {
+            color: #c00;
+        }
+
+        /* 메인 콘텐츠 */
+        main {
+            padding: 32px;
+        }
+
+        /* 기사 스타일 */
+        .article {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .article:last-child {
+            border-bottom: none;
+        }
+
+        .article.main {
+            margin-bottom: 40px;
+            padding-bottom: 40px;
+        }
+
+        .article-meta {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 3px 8px;
+            background: #1a1a1a;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .tag.hot {
+            background: #c00;
+        }
+
+        .tag.orphan {
+            background: #5a4fcf;
+        }
+
+        .tag.fda {
+            background: #0066cc;
+        }
+
+        .tag.ema {
+            background: #cc6600;
+        }
+
+        .tag.mfds {
+            background: #008844;
+        }
+
+        .article-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .article.main .article-title {
+            font-size: 32px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .article-body p {
+            margin-bottom: 12px;
+        }
+
+        .key-points {
+            margin: 20px 0;
+            padding: 16px 20px;
+            background: #f9f9f9;
+            border-left: 3px solid #1a1a1a;
+        }
+
+        .key-points li {
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .medclaim-box {
+            margin: 20px 0;
+            padding: 16px 20px;
+            background: #fff8f0;
+            border: 1px solid #f0e0d0;
+        }
+
+        .medclaim-box .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #996633;
+            margin-bottom: 8px;
+        }
+
+        .medclaim-box .content {
+            font-size: 14px;
+            color: #664422;
+        }
+
+        .price-info {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 4px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .price-info .price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #006644;
+        }
+
+        /* 기타 승인 목록 */
+        .other-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 2px solid #1a1a1a;
+        }
+
+        .section-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .other-table {
+            width: 100%;
+            font-size: 13px;
+            border-collapse: collapse;
+        }
+
+        .other-table th {
+            text-align: left;
+            padding: 8px 0;
+            border-bottom: 1px solid #1a1a1a;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+        }
+
+        .other-table td {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .other-table .name {
+            font-weight: 500;
+        }
+
+        .other-table .brand {
+            color: #666;
+        }
+
+        .other-table .source {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .other-table .date {
+            color: #888;
+            text-align: right;
+        }
+
+        /* 푸터 */
+        footer {
+            padding: 24px 32px;
+            border-top: 1px solid #eee;
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+        }
+
+        footer a {
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <div class="masthead">
+                <div class="logo">RegScan</div>
+                <div class="date-area">2026년 02월 05일 (목)</div>
+            </div>
+            <div class="tagline">Global Regulatory Intelligence</div>
+        </header>
+
+        <div class="summary-bar">
+            <div class="summary-item">
+                <span>FDA</span>
+                <span class="num">11</span>
+            </div>
+            <div class="summary-item">
+                <span>EMA</span>
+                <span class="num">0</span>
+            </div>
+            <div class="summary-item">
+                <span>MFDS</span>
+                <span class="num">0</span>
+            </div>
+            <div class="summary-item hot">
+                <span>HOT</span>
+                <span class="num">5</span>
+            </div>
+        </div>
+
+        <main>
+            
+        <article class="article main">
+            <div class="article-meta"><span class="tag hot">HOT</span><span class="tag fda">FDA</span></div>
+            <h2 class="article-title">ETANERCEPT, FDA 승인 및 국내 급여 적용 중</h2>
+            <p class="article-subtitle">고지혈증 및 관절염 치료제로 MFDS 허가 완료</p>
+            <div class="article-body"><ul class="key-points"><li>ETANERCEPT는 2025년 12월 FDA 승인 예정</li><li>MFDS 허가 및 HIRA에서 급여 적용 중</li><li>상한가 약 77,323원으로 일반 급여 적용</li><li>본인부담률 30%이며, 고가약제 여부는 정보 없음</li></ul><p>ETANERCEPT는 2025년 12월 FDA 승인을 받기로 예정되어 있으나 EMA에서는 현재 승인되지 않았습니다. 이 약물은 주로 자가면역질환과 관절염 치료에 사용됩니다.</p><p>국내에서는 2003년 MFDS의 허가를 받아 엔브렐주사(에타너셉트, 유전자재조합)라는 브랜드명으로 판매되고 있으며, HIRA에서 급여가 적용되고 있습니다. 현재 CRIS에는 임상시험 등록 정보가 없습니다.</p>
+                <div class="medclaim-box">
+                    <div class="label">메드클레임 시사점</div>
+                    <div class="content">ETANERCEPT는 급여 약제로 상한가 약 77,323원이 설정되어 있습니다. 일반 급여 적용 시 본인부담은 약 23,196원(30%)이며, 고가약제 여부에 대한 정보는 없습니다. 희귀 또는 암환자 산정특례 혜택은 적용되지 않습니다.</div>
+                    <div class="price-info">상한가 <span class="price">₩77,323</span></div>
+                </div>
+            </div>
+        </article>
+    
+        <article class="article ">
+            <div class="article-meta"><span class="tag fda">FDA</span></div>
+            <h2 class="article-title">항암제 롤라티닙, EMA·MFDS 승인, 국내 급여 적용 중</h2>
+            <p class="article-subtitle">희귀질환 치료제, 본인부담 10%로 환자 혜택</p>
+            <div class="article-body"><ul class="key-points"><li>EMA 2019년 승인, MFDS 2021년 승인받아 국내 사용 가능</li><li>HIRA에 의해 153703원으로 급여 적용 중</li><li>희귀질환 환자에게 본인부담 10% 적용</li><li>고가약제 기준에 해당 - 사전심사 필요</li></ul><p>롤라티닙은 2019년 5월 EMA의 허가를 받고, 2021년 7월 MFDS의 허가를 완료한 항암제입니다. FDA에서는 아직 승인을 받지 못했습니다.</p><p>국내에서 롤라티닙은 MFDS 허가를 받았고, HIRA에 의한 급여가 적용되어 있으며, 가격은 153703원입니다. 현재 CRIS에는 등록된 임상시험이 없습니다.</p>
+                <div class="medclaim-box">
+                    <div class="label">메드클레임 시사점</div>
+                    <div class="content">롤라티닙은 급여 적용 약제로 본인부담률은 10%입니다. 가격이 153703원이므로 희귀질환에 해당하여 본인부담금은 약 15370원입니다. 고가약제 기준이므로 사전심사 대상이 될 수 있습니다.</div>
+                    <div class="price-info">상한가 <span class="price">₩153,703</span></div>
+                </div>
+            </div>
+        </article>
+    
+        <article class="article ">
+            <div class="article-meta"><span class="tag fda">FDA</span></div>
+            <h2 class="article-title">GLP-1 수용체 작용제 SEMAGLUTIDE, 글로벌 승인 완료 - 국내 급여 적용 중</h2>
+            <p class="article-subtitle">다양한 비만 및 당뇨 치료에 효과적인 약물</p>
+            <div class="article-body"><ul class="key-points"><li>FDA에 2020년 1월 승인, EMA는 2022년 1월 승인</li><li>MFDS 허가 및 HIRA에서 현재 급여 적용 중</li><li>급여 가격은 약 73,528원으로 본인부담률은 30%</li><li>CRIS 임상시험 1건 진행 - 생활습관 중재 효과 연구</li></ul><p>SEMAGLUTIDE는 2020년 1월 FDA 승인, 2022년 1월 EMA 승인을 받았으며, 총 3개국에서 승인이 완료되었습니다. 이 약물은 당뇨 및 비만 치료에 사용되며 효과적인 GLP-1 수용체 작용제로 자리 잡고 있습니다.</p><p>국내에서는 MFDS가 2022년 4월에 승인하였고, HIRA에서 급여가 적용되고 있습니다. 브랜드명은 '오젬픽프리필드펜(세마글루티드)'으로 등록되어 있으며, 한 건의 관련 임상시험이 CRIS에 등록되어 있습니다.</p>
+                <div class="medclaim-box">
+                    <div class="label">메드클레임 시사점</div>
+                    <div class="content">현재 SEMAGLUTIDE는 급여 적용 약제로 본인부담률은 30%이며, 이는 약 22,058원에 해당합니다. 고가약제가 아니므로 별도의 사전심사는 필요 없습니다.</div>
+                    <div class="price-info">상한가 <span class="price">₩73,528</span></div>
+                </div>
+            </div>
+        </article>
+    
+
+            
+            <div class="other-section">
+                <h3 class="section-title">Other Approvals</h3>
+                <table class="other-table">
+                    <thead>
+                        <tr>
+                            <th>성분명</th>
+                            <th>제품명</th>
+                            <th>출처</th>
+                            <th style="text-align:right">승인일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr>
+                    <td class="name">SERTRALINE HYDROCHLORIDE</td>
+                    <td class="brand">SERTRALINE HYDROCHLORIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">01/29</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LACOSAMIDE ORAL</td>
+                    <td class="brand">LACOSAMIDE ORAL SOLUTION</td>
+                    <td class="source">FDA</td>
+                    <td class="date">01/29</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">OLANZAPINE AND SAMIDORPHAN L-MALATE</td>
+                    <td class="brand">LYBALVI</td>
+                    <td class="source">FDA</td>
+                    <td class="date">05/28</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">GABAPENTIN</td>
+                    <td class="brand">GABAPENTIN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">09/12</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">CETIRIZINE HCL</td>
+                    <td class="brand">CETIRIZINE HCL</td>
+                    <td class="source">FDA</td>
+                    <td class="date">07/23</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">GABAPENTIN</td>
+                    <td class="brand">GABAPENTIN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">03/24</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">SELADELPAR LYSINE</td>
+                    <td class="brand">LIVDELZI</td>
+                    <td class="source">FDA</td>
+                    <td class="date">08/14</td>
+                </tr>
+            
+                    </tbody>
+                </table>
+            </div>
+            
+        </main>
+
+        <footer>
+            <p>RegScan AI · Scanning Global Regulation into Local Impact</p>
+            <p>Generated 2026-02-05 16:32</p>
+        </footer>
+    </div>
+</body>
+</html>

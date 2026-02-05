@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegScan Daily - 2026-02-05</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700;900&family=Noto+Sans+KR:wght@400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #e8e4df;
+            color: #1a1a1a;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .newspaper {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fffef9;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+        }
+
+        /* 신문 헤더 */
+        .paper-header {
+            border-bottom: 4px double #1a1a1a;
+            padding: 16px 32px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .edition {
+            letter-spacing: 1px;
+        }
+
+        .masthead {
+            text-align: center;
+            padding: 12px 0;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .paper-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 56px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        .paper-subtitle {
+            font-size: 13px;
+            color: #666;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .header-bottom {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 8px;
+            font-size: 11px;
+            color: #444;
+        }
+
+        /* 속보 바 */
+        .breaking-bar {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 8px 32px;
+            font-size: 13px;
+            display: flex;
+            gap: 24px;
+        }
+
+        .breaking-bar .label {
+            background: #c00;
+            padding: 2px 10px;
+            font-weight: 600;
+            font-size: 11px;
+        }
+
+        .breaking-bar .stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .breaking-bar .stat {
+            display: flex;
+            gap: 6px;
+        }
+
+        .breaking-bar .stat-num {
+            font-weight: 600;
+            color: #ffd700;
+        }
+
+        /* 메인 콘텐츠 */
+        .content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 0;
+        }
+
+        /* 왼쪽 메인 영역 */
+        .main-section {
+            padding: 24px 32px;
+            border-right: 1px solid #ddd;
+        }
+
+        /* 톱 기사 */
+        .top-story {
+            margin-bottom: 32px;
+        }
+
+        .top-headline {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1.2;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .top-subhead {
+            font-size: 18px;
+            color: #444;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #1a1a1a;
+        }
+
+        .top-body {
+            column-count: 2;
+            column-gap: 24px;
+            font-size: 15px;
+            line-height: 1.8;
+            text-align: justify;
+        }
+
+        .top-body p {
+            margin-bottom: 12px;
+        }
+
+        .top-body p:first-child::first-letter {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 64px;
+            font-weight: 700;
+            float: left;
+            line-height: 0.8;
+            margin-right: 8px;
+            margin-top: 4px;
+        }
+
+        /* 가격 박스 */
+        .price-highlight {
+            background: #f5f5f0;
+            border: 1px solid #ddd;
+            padding: 12px 16px;
+            margin: 16px 0;
+            break-inside: avoid;
+        }
+
+        .price-highlight .label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .price-highlight .price {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #006644;
+        }
+
+        .price-highlight .note {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        /* 서브 기사들 */
+        .sub-stories {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #ddd;
+        }
+
+        .sub-story {
+            padding-right: 24px;
+        }
+
+        .sub-story:first-child {
+            border-right: 1px solid #ddd;
+        }
+
+        .sub-headline {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        .sub-meta {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .sub-body {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #333;
+        }
+
+        /* 오른쪽 사이드바 */
+        .sidebar {
+            padding: 24px 20px;
+            background: #fafaf5;
+        }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+
+        .sidebar-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 14px;
+            font-weight: 700;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #1a1a1a;
+            margin-bottom: 12px;
+        }
+
+        /* 핫이슈 박스 */
+        .hot-issue {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .hot-issue .tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            margin-bottom: 6px;
+        }
+
+        .hot-issue .tag.fda { background: #0066cc; color: #fff; }
+        .hot-issue .tag.ema { background: #cc6600; color: #fff; }
+        .hot-issue .tag.mfds { background: #008844; color: #fff; }
+        .hot-issue .tag.hot { background: #c00; color: #fff; }
+
+        .hot-issue .title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+
+        .hot-issue .desc {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* 기타 승인 리스트 */
+        .approval-list {
+            font-size: 12px;
+        }
+
+        .approval-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .approval-item:last-child {
+            border-bottom: none;
+        }
+
+        .approval-item .name {
+            font-weight: 500;
+        }
+
+        .approval-item .source {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            background: #eee;
+        }
+
+        /* 인용 박스 */
+        .quote-box {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .quote-box .quote {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 16px;
+            font-style: italic;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .quote-box .source {
+            font-size: 11px;
+            color: #aaa;
+            text-align: right;
+        }
+
+        /* 푸터 */
+        .paper-footer {
+            border-top: 4px double #1a1a1a;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #888;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            .main-section {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+            .top-body {
+                column-count: 1;
+            }
+            .sub-stories {
+                grid-template-columns: 1fr;
+            }
+            .sub-story:first-child {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 16px;
+            }
+            .top-headline {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="newspaper">
+        <header class="paper-header">
+            <div class="header-top">
+                <span class="edition">DAILY EDITION</span>
+                <span>Vol. 1 No. 37</span>
+                <span>정가 무료</span>
+            </div>
+            <div class="masthead">
+                <h1 class="paper-title">RegScan</h1>
+                <p class="paper-subtitle">Global Regulatory Intelligence</p>
+            </div>
+            <div class="header-bottom">
+                <span>2026년 2월 5일 목요일</span>
+                <span>서울 · 맑음 -3℃</span>
+                <span>regscan.ai</span>
+            </div>
+        </header>
+
+        <div class="breaking-bar">
+            <span class="label">TODAY</span>
+            <div class="stats">
+                <div class="stat">
+                    <span>FDA</span>
+                    <span class="stat-num">11</span>
+                </div>
+                <div class="stat">
+                    <span>EMA</span>
+                    <span class="stat-num">0</span>
+                </div>
+                <div class="stat">
+                    <span>MFDS</span>
+                    <span class="stat-num">0</span>
+                </div>
+                <div class="stat">
+                    <span>HOT</span>
+                    <span class="stat-num" style="color:#ff6b6b">5</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <main class="main-section">
+                <article class="top-story">
+                    <h2 class="top-headline">에타너셉트, FDA 승인 앞두고 국내 급여 77,323원 적용 중</h2>
+                    <p class="top-subhead">류마티스 관절염 바이오시밀러 시장 경쟁 본격화... 본인부담 30%로 접근성 확보</p>
+
+                    <div class="top-body">
+                        <p>에타너셉트(Etanercept)가 2025년 12월 FDA 승인을 앞두고 있는 가운데, 국내에서는 이미 MFDS 허가와 HIRA 급여 적용이 완료되어 환자들의 접근성이 확보된 것으로 확인됐다.</p>
+
+                        <p>이 약물은 TNF-알파 억제제로 류마티스 관절염, 건선성 관절염, 강직성 척추염 등 자가면역질환 치료에 사용된다. 국내에서는 '엔브렐주사'라는 브랜드명으로 2003년부터 처방되고 있다.</p>
+
+                        <div class="price-highlight">
+                            <div class="label">HIRA 급여 상한가</div>
+                            <div class="price">₩77,323</div>
+                            <div class="note">본인부담 30% 적용 시 약 23,196원</div>
+                        </div>
+
+                        <p>HIRA에 따르면 현재 상한가는 77,323원으로 책정되어 있으며, 일반 급여 적용 시 환자 본인부담은 약 23,196원(30%)이다. 고가약제 기준에는 해당하지 않아 별도의 사전심사 없이 처방이 가능하다.</p>
+
+                        <p>업계에서는 FDA 승인이 확정되면 글로벌 바이오시밀러 시장에서의 경쟁이 더욱 치열해질 것으로 전망하고 있다. 특히 국내 제약사들의 바이오시밀러 품목이 다수 출시되어 있어 가격 경쟁 압력이 지속될 것으로 보인다.</p>
+                    </div>
+                </article>
+
+                <div class="sub-stories">
+                    <article class="sub-story">
+                        <h3 class="sub-headline">세마글루티드, 글로벌 3개국 승인 완료... 비만·당뇨 시장 공략</h3>
+                        <p class="sub-meta">FDA·EMA·MFDS 모두 허가 | 급여가 73,528원</p>
+                        <p class="sub-body">GLP-1 수용체 작용제 세마글루티드가 FDA(2020), EMA(2022), MFDS(2022) 승인을 모두 획득하며 글로벌 비만·당뇨 치료제 시장을 선도하고 있다. 국내에서는 '오젬픽'으로 판매 중이며, 본인부담 30% 적용 시 약 22,058원이다.</p>
+                    </article>
+
+                    <article class="sub-story">
+                        <h3 class="sub-headline">로라티닙, 희귀암 치료제로 본인부담 10% 혜택</h3>
+                        <p class="sub-meta">EMA 2019 · MFDS 2021 | 고가약제 사전심사 대상</p>
+                        <p class="sub-body">ALK 양성 비소세포폐암 치료제 로라티닙이 희귀질환 치료제로 분류되어 본인부담률 10%가 적용된다. 급여가 153,703원으로 환자 부담은 약 15,370원이며, 고가약제로 사전심사 대상이다.</p>
+                    </article>
+                </div>
+            </main>
+
+            <aside class="sidebar">
+                <div class="quote-box">
+                    <p class="quote">"규제 승인은 시작일 뿐, 급여 적용까지가 진정한 시장 진입이다"</p>
+                    <p class="source">— RegScan Weekly Insight</p>
+                </div>
+
+                <section class="sidebar-section">
+                    <h4 class="sidebar-title">HOT ISSUES</h4>
+
+                    <div class="hot-issue">
+                        <span class="tag hot">HOT</span>
+                        <span class="tag fda">FDA</span>
+                        <h5 class="title">셀라델파, FDA 승인 완료... MFDS 미허가</h5>
+                        <p class="desc">희귀의약품 지정. 원발성 담즙성 담관염(PBC) 치료제. 국내 도입 기대.</p>
+                    </div>
+
+                    <div class="hot-issue">
+                        <span class="tag fda">FDA</span>
+                        <h5 class="title">올란자핀+사미도르판, 정신질환 복합제</h5>
+                        <p class="desc">LYBALVI 브랜드. 조현병·양극성장애 치료. 체중증가 부작용 감소.</p>
+                    </div>
+
+                    <div class="hot-issue">
+                        <span class="tag fda">FDA</span>
+                        <h5 class="title">라코사마이드 경구용액, 뇌전증 치료</h5>
+                        <p class="desc">소아 환자 편의성 개선. 기존 정제 대비 복용 용이.</p>
+                    </div>
+                </section>
+
+                <section class="sidebar-section">
+                    <h4 class="sidebar-title">OTHER APPROVALS</h4>
+                    <div class="approval-list">
+                        <div class="approval-item">
+                            <span class="name">Sertraline HCl</span>
+                            <span class="source">FDA</span>
+                        </div>
+                        <div class="approval-item">
+                            <span class="name">Gabapentin</span>
+                            <span class="source">FDA</span>
+                        </div>
+                        <div class="approval-item">
+                            <span class="name">Cetirizine HCl</span>
+                            <span class="source">FDA</span>
+                        </div>
+                        <div class="approval-item">
+                            <span class="name">Gabapentin</span>
+                            <span class="source">FDA</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="sidebar-section">
+                    <h4 class="sidebar-title">이번 주 주목</h4>
+                    <div style="font-size:12px; line-height:1.7; color:#555;">
+                        <p><strong>FDA PDUFA 일정</strong></p>
+                        <p style="margin-bottom:8px;">2/7 — 신약 3건 심사 예정</p>
+                        <p><strong>MFDS 허가심사</strong></p>
+                        <p>2/10 — 바이오시밀러 2건</p>
+                    </div>
+                </section>
+            </aside>
+        </div>
+
+        <footer class="paper-footer">
+            <span>RegScan AI · Scanning Global Regulation into Local Impact</span>
+            <span>Generated 2026-02-05 17:00</span>
+            <span>© 2026 RegScan</span>
+        </footer>
+    </div>
+</body>
+</html>

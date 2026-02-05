@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-02-05T10:44:16.271836",
+  "use_llm": true,
+  "count": 5,
+  "reports": [
+    {
+      "inn": "POLATUZUMAB VEDOTIN-PIIQ",
+      "score": 75,
+      "headline": "희귀의약품 POLATUZUMAB VEDOTIN, 글로벌 승인 완료",
+      "subtitle": "FDA·EMA·MFDS 승인, 국내 비급여 상태",
+      "key_points": [
+        "FDA 2023년 4월, EMA 2020년 1월 승인 - 다국적 승인을 확보",
+        "MFDS 2020년 10월 허가, 국내 이름은 폴라이비주",
+        "HIRA 급여 미등재 상태로 비급여로 분류됨",
+        "희귀의약품으로 환자 접근성의 한계 존재"
+      ]
+    },
+    {
+      "inn": "ZOLBETUXIMAB-CLZB",
+      "score": 70,
+      "headline": "졸베툭시맙, 3개국 승인 완료 - 국내 급여 미적용",
+      "subtitle": "미국, 유럽, 한국에서의 승인으로 주목받는 치료제",
+      "key_points": [
+        "FDA 2025년, EMA 및 MFDS 2024년 승인",
+        "국내 HIRA에서 급여 등록되지 않아 비급여 상태",
+        "희귀의약품으로 지정, 향후 급여 가능성 있음",
+        "현재 임상시험 진행되지 않음"
+      ]
+    },
+    {
+      "inn": "MIRVETUXIMAB SORAVTANSINE-GYNX",
+      "score": 70,
+      "headline": "신규 희귀의약품 MIRVETUXIMAB, 3국 승인 완료",
+      "subtitle": "FDA·EMA·MFDS 승인 - 국내 급여 미적용",
+      "key_points": [
+        "FDA 2025년 7월, EMA 2024년 11월 승인으로 글로벌 시장 진입",
+        "MFDS 2025년 12월 허가 - 현재 비급여 상태",
+        "국내 HIRA에 등록되지 않아 급여 미적용",
+        "희귀의약품으로 3개국 동시 승인 기록"
+      ]
+    },
+    {
+      "inn": "TALQUETAMAB-TGVS",
+      "score": 70,
+      "headline": "희귀의약품 TALQUETAMAB, 글로벌 승인 완료",
+      "subtitle": "FDA·EMA·MFDS 승인 - 국내 급여는 미정",
+      "key_points": [
+        "FDA는 2025년 10월 승인 예정, EMA는 2023년 8월 승인",
+        "MFDS는 2024년 6월 승인이지만 HIRA에 등재되지 않음",
+        "희귀의약품으로 3개국 승인의 중요성 부각",
+        "비급여 상태로 환자 전액 부담 가능성"
+      ]
+    },
+    {
+      "inn": "SELADELPAR LYSINE",
+      "score": 65,
+      "headline": "SELADELPAR LYSINE, FDA 승인 - 국내 미허가",
+      "subtitle": "희귀의약품으로 EMA 승인 예정",
+      "key_points": [
+        "FDA에서 2024년 8월 승인, EMA는 2025년 5월 예정",
+        "MFDS 미허가 상태로 국내 처방 불가",
+        "현재 HIRA 급여 심사 중단 상태",
+        "희귀의약품으로 글로벌 관심과 기대 상승"
+      ]
+    }
+  ]
+}
