@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegScan Daily - 2026-02-06</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .wrapper {
+            max-width: 720px;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 100vh;
+        }
+
+        /* 헤더 */
+        header {
+            padding: 24px 32px;
+            border-bottom: 3px solid #1a1a1a;
+        }
+
+        .masthead {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+
+        .logo {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .date-area {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .tagline {
+            font-size: 12px;
+            color: #888;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* 요약 바 */
+        .summary-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 32px;
+            background: #fafafa;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .summary-item .num {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .summary-item.hot .num {
+            color: #c00;
+        }
+
+        /* 메인 콘텐츠 */
+        main {
+            padding: 32px;
+        }
+
+        /* 기사 스타일 */
+        .article {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .article:last-child {
+            border-bottom: none;
+        }
+
+        .article.main {
+            margin-bottom: 40px;
+            padding-bottom: 40px;
+        }
+
+        .article-meta {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 3px 8px;
+            background: #1a1a1a;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .tag.hot {
+            background: #c00;
+        }
+
+        .tag.orphan {
+            background: #5a4fcf;
+        }
+
+        .tag.fda {
+            background: #0066cc;
+        }
+
+        .tag.ema {
+            background: #cc6600;
+        }
+
+        .tag.mfds {
+            background: #008844;
+        }
+
+        .article-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .article.main .article-title {
+            font-size: 32px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .article-body p {
+            margin-bottom: 12px;
+        }
+
+        .key-points {
+            margin: 20px 0;
+            padding: 16px 20px;
+            background: #f9f9f9;
+            border-left: 3px solid #1a1a1a;
+        }
+
+        .key-points li {
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .medclaim-box {
+            margin: 20px 0;
+            padding: 16px 20px;
+            background: #fff8f0;
+            border: 1px solid #f0e0d0;
+        }
+
+        .medclaim-box .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #996633;
+            margin-bottom: 8px;
+        }
+
+        .medclaim-box .content {
+            font-size: 14px;
+            color: #664422;
+        }
+
+        .price-info {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 4px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .price-info .price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #006644;
+        }
+
+        /* 기타 승인 목록 */
+        .other-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 2px solid #1a1a1a;
+        }
+
+        .section-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .other-table {
+            width: 100%;
+            font-size: 13px;
+            border-collapse: collapse;
+        }
+
+        .other-table th {
+            text-align: left;
+            padding: 8px 0;
+            border-bottom: 1px solid #1a1a1a;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+        }
+
+        .other-table td {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .other-table .name {
+            font-weight: 500;
+        }
+
+        .other-table .brand {
+            color: #666;
+        }
+
+        .other-table .source {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .other-table .date {
+            color: #888;
+            text-align: right;
+        }
+
+        /* 푸터 */
+        footer {
+            padding: 24px 32px;
+            border-top: 1px solid #eee;
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+        }
+
+        footer a {
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <div class="masthead">
+                <div class="logo">RegScan</div>
+                <div class="date-area">2026년 02월 06일 (금)</div>
+            </div>
+            <div class="tagline">Global Regulatory Intelligence</div>
+        </header>
+
+        <div class="summary-bar">
+            <div class="summary-item">
+                <span>FDA</span>
+                <span class="num">17</span>
+            </div>
+            <div class="summary-item">
+                <span>EMA</span>
+                <span class="num">14</span>
+            </div>
+            <div class="summary-item">
+                <span>MFDS</span>
+                <span class="num">7</span>
+            </div>
+            <div class="summary-item hot">
+                <span>HOT</span>
+                <span class="num">15</span>
+            </div>
+        </div>
+
+        <main>
+            
+        <article class="article main">
+            <div class="article-meta"><span class="tag hot">HOT</span><span class="tag ema">EMA</span><span class="tag orphan">희귀의약품</span></div>
+            <h2 class="article-title">Belumosudil, EMA 승인</h2>
+            <p class="article-subtitle">Rezurock · 2026-01-30</p>
+            <div class="article-body"></div>
+        </article>
+    
+        <article class="article ">
+            <div class="article-meta"><span class="tag hot">HOT</span><span class="tag fda">FDA</span></div>
+            <h2 class="article-title">ETANERCEPT 규제 동향 브리핑</h2>
+            <p class="article-subtitle">글로벌: FDA | MFDS: 허가 | HIRA: 삭제</p>
+            <div class="article-body"><ul class="key-points"><li>FDA 승인</li><li>MFDS 허가</li></ul><p>FDA 승인 (2025-12-10)</p><p>MFDS 허가 완료 (엔브렐주사25밀리그램(에타너셉트,유전자재조합)) | HIRA: deleted | 상한가 ₩nan</p>
+                <div class="medclaim-box">
+                    <div class="label">메드클레임 시사점</div>
+                    <div class="content">비급여 또는 급여 미적용</div>
+                    
+                </div>
+            </div>
+        </article>
+    
+        <article class="article ">
+            <div class="article-meta"><span class="tag hot">HOT</span><span class="tag ema">EMA</span></div>
+            <h2 class="article-title">DASATINIB 규제 동향 브리핑</h2>
+            <p class="article-subtitle">글로벌: FDA | MFDS: 허가 | HIRA: 급여 (₩44,497)</p>
+            <div class="article-body"><ul class="key-points"><li>FDA 승인</li><li>MFDS 허가</li><li>주요 질환 치료제</li></ul><p>FDA 승인 (2010-07-28)</p><p>MFDS 허가 완료 (스프라이셀정70밀리그램(다사티닙)) | HIRA: reimbursed | 상한가 ₩44,497</p>
+                <div class="medclaim-box">
+                    <div class="label">메드클레임 시사점</div>
+                    <div class="content">건강보험 급여 적용 중</div>
+                    <div class="price-info">상한가 <span class="price">₩44,497</span></div>
+                </div>
+            </div>
+        </article>
+    
+        <article class="article ">
+            <div class="article-meta"><span class="tag hot">HOT</span><span class="tag ema">EMA</span></div>
+            <h2 class="article-title">DULAGLUTIDE 규제 동향 브리핑</h2>
+            <p class="article-subtitle">글로벌: FDA+EMA | MFDS: 허가 | HIRA: 급여 (₩30,666)</p>
+            <div class="article-body"><ul class="key-points"><li>FDA 승인</li><li>EMA 승인</li><li>MFDS 허가</li><li>3개국 승인</li></ul><p>FDA 승인 (2025-05-28), EMA 승인 (2014-11-21)</p><p>MFDS 허가 완료 (트루리시티 0.75밀리그램/0.5밀리리터(둘라글루타이드,유전자재조합) 일회용 펜) | HIRA: reimbursed | 상한가 ₩30,666</p>
+                <div class="medclaim-box">
+                    <div class="label">메드클레임 시사점</div>
+                    <div class="content">건강보험 급여 적용 중</div>
+                    <div class="price-info">상한가 <span class="price">₩30,666</span></div>
+                </div>
+            </div>
+        </article>
+    
+
+            
+            <div class="other-section">
+                <h3 class="section-title">Other Approvals</h3>
+                <table class="other-table">
+                    <thead>
+                        <tr>
+                            <th>성분명</th>
+                            <th>제품명</th>
+                            <th>출처</th>
+                            <th style="text-align:right">승인일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr>
+                    <td class="name">PRIMAQUINE PHOSPHATE</td>
+                    <td class="brand">PRIMAQUINE PHOSPHATE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">01/23</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ARSENIC TRIOXIDE</td>
+                    <td class="brand">ARSENIC TRIOXIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">10/15</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">SELADELPAR LYSINE</td>
+                    <td class="brand">LIVDELZI</td>
+                    <td class="source">FDA</td>
+                    <td class="date">08/14</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">OLANZAPINE</td>
+                    <td class="brand">ZYPREXA</td>
+                    <td class="source">FDA</td>
+                    <td class="date">09/30</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">OLANZAPINE</td>
+                    <td class="brand">ZYPREXA ZYDIS</td>
+                    <td class="source">FDA</td>
+                    <td class="date">04/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">OLANZAPINE PAMOATE</td>
+                    <td class="brand">ZYPREXA RELPREVV</td>
+                    <td class="source">FDA</td>
+                    <td class="date">12/11</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">METHYLPHENIDATE HYDROCHLORIDE</td>
+                    <td class="brand">CONCERTA</td>
+                    <td class="source">FDA</td>
+                    <td class="date">08/01</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">OLANZAPINE AND SAMIDORPHAN L-MALATE</td>
+                    <td class="brand">LYBALVI</td>
+                    <td class="source">FDA</td>
+                    <td class="date">05/28</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">AMOXICILLIN AND CLAVULANATE POTASSIUM</td>
+                    <td class="brand">AMOXICILLIN AND CLAVULANATE POTASSIUM</td>
+                    <td class="source">FDA</td>
+                    <td class="date">11/09</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">AMLODIPINE</td>
+                    <td class="brand">NORLIQVA</td>
+                    <td class="source">FDA</td>
+                    <td class="date">02/24</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">DAPTOMYCIN</td>
+                    <td class="brand">DAPTOMYCIN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">06/29</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">WATER</td>
+                    <td class="brand">PUR-WASH</td>
+                    <td class="source">FDA</td>
+                    <td class="date">09/01</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ORAL SEMAGLUTIDE</td>
+                    <td class="brand">RYBELSUS</td>
+                    <td class="source">FDA</td>
+                    <td class="date">09/20</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">VENLAFAXINE HYDROCHLORIDE</td>
+                    <td class="brand">VENLAFAXINE HYDROCHLORIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">11/23</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">OLANZAPINE</td>
+                    <td class="brand">ZYPREXA INTRAMUSCULAR</td>
+                    <td class="source">FDA</td>
+                    <td class="date">03/29</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">CETIRIZINE HCL</td>
+                    <td class="brand">CETIRIZINE HCL</td>
+                    <td class="source">FDA</td>
+                    <td class="date">07/23</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">eltrombopag</td>
+                    <td class="brand">Eltrombopag Viatris</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/12</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">deferasirox</td>
+                    <td class="brand">Exjade</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/28</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">quizartinib</td>
+                    <td class="brand">Vanflyta</td>
+                    <td class="source">EMA</td>
+                    <td class="date">11/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">adalimumab</td>
+                    <td class="brand">Yuflyma</td>
+                    <td class="source">EMA</td>
+                    <td class="date">02/11</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">travoprost;timolol</td>
+                    <td class="brand">DuoTrav</td>
+                    <td class="source">EMA</td>
+                    <td class="date">04/23</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">sugammadex</td>
+                    <td class="brand">Sugammadex Amomed</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/10</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">fingolimod</td>
+                    <td class="brand">Gilenya</td>
+                    <td class="source">EMA</td>
+                    <td class="date">03/17</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ustekinumab</td>
+                    <td class="brand">Uzpruvo</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/05</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">trastuzumab</td>
+                    <td class="brand">Trazimera</td>
+                    <td class="source">EMA</td>
+                    <td class="date">07/26</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">gallium (68Ga) chloride;germanium (68Ge) chloride</td>
+                    <td class="brand">GalliaPharm</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/01</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">flutemetamol (18F)</td>
+                    <td class="brand">Vizamyl</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/22</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">Pranlukast Hydrate</td>
+                    <td class="brand">씨투케어정50밀리그램(프란루카스트수화물)</td>
+                    <td class="source">MFDS</td>
+                    <td class="date">01/30</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">Lactulose Concentrate Solution</td>
+                    <td class="brand">락토락시럽(락툴로오스농축액)</td>
+                    <td class="source">MFDS</td>
+                    <td class="date">01/30</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">Doxylamine Succinate</td>
+                    <td class="brand">쿨드림롱정(독시라민숙신산염)</td>
+                    <td class="source">MFDS</td>
+                    <td class="date">01/30</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">Amlodipine Besylate/Chlorthalidone/Telmisartan</td>
+                    <td class="brand">텔미트리플정80/5/25밀리그램(텔미사르탄,암로디핀,클로르탈리돈)</td>
+                    <td class="source">MFDS</td>
+                    <td class="date">01/30</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">Amlodipine Besylate/Chlorthalidone/Telmisartan</td>
+                    <td class="brand">텔미트리플정80/5/12.5밀리그램(텔미사르탄,암로디핀,클로르탈리돈)</td>
+                    <td class="source">MFDS</td>
+                    <td class="date">01/30</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">Amlodipine Besylate/Chlorthalidone/Telmisartan</td>
+                    <td class="brand">텔미트리플정40/5/12.5밀리그램(텔미사르탄,암로디핀,클로르탈리돈)</td>
+                    <td class="source">MFDS</td>
+                    <td class="date">01/30</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">Tofacitinib Citrate</td>
+                    <td class="brand">토마토정10밀리그램(토파시티닙시트르산염)</td>
+                    <td class="source">MFDS</td>
+                    <td class="date">02/02</td>
+                </tr>
+            
+                    </tbody>
+                </table>
+            </div>
+            
+        </main>
+
+        <footer>
+            <p>RegScan AI · Scanning Global Regulation into Local Impact</p>
+            <p>Generated 2026-02-06 14:10</p>
+        </footer>
+    </div>
+</body>
+</html>
