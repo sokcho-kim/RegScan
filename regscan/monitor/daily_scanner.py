@@ -233,8 +233,10 @@ class DailyScanner:
                         self._existing_drugs[name]["data"]["ema"] = item
                         count += 1
 
-        # MFDS 데이터
-        mfds_files = list(self.data_dir.glob("mfds/permits_*.json"))
+        # MFDS 데이터 (full 파일 우선)
+        mfds_files = list(self.data_dir.glob("mfds/permits_full_*.json"))
+        if not mfds_files:
+            mfds_files = list(self.data_dir.glob("mfds/permits_*.json"))
         if mfds_files:
             mfds_file = sorted(mfds_files)[-1]
             with open(mfds_file, encoding="utf-8") as f:
@@ -428,34 +430,44 @@ class DailyScanner:
             raw_data=item,
         )
 
+    @staticmethod
+    def _parse_ema_date(date_str: str) -> Optional[date]:
+        """EMA 날짜 파싱 (DD/MM/YYYY 형식)"""
+        if not date_str or not date_str.strip():
+            return None
+        try:
+            return datetime.strptime(date_str.strip(), "%d/%m/%Y").date()
+        except (ValueError, TypeError):
+            return None
+
     async def _scan_ema(self, days_back: int) -> list[NewApproval]:
-        """EMA 신규 승인 스캔"""
+        """EMA 신규 승인 스캔 (JSON Report 방식)"""
         if not self._client:
             raise RuntimeError("Scanner must be used as async context manager")
 
-        # EMA API - 최근 업데이트된 의약품 조회
-        url = "https://medicines.ema.europa.eu/ema-dap-products-api/api/products"
-
-        # 날짜 필터
-        from_date = (datetime.now() - timedelta(days=days_back)).strftime("%Y-%m-%d")
-
-        params = {
-            "pageSize": 100,
-            "pageNumber": 1,
-        }
+        # EMA JSON report - 전체 의약품 목록 (ingestor와 동일한 엔드포인트)
+        url = "https://www.ema.europa.eu/en/documents/report/medicines-output-medicines_json-report_en.json"
+        from_dt = (datetime.now() - timedelta(days=days_back)).date()
 
         try:
-            response = await self._client.get(url, params=params)
+            response = await self._client.get(url, follow_redirects=True, timeout=60.0)
 
             if response.status_code != 200:
                 logger.warning(f"EMA API 응답: {response.status_code}")
                 return []
 
             data = response.json()
+            # EMA JSON report: {"meta": {...}, "data": [...]} 또는 raw list
+            if isinstance(data, dict):
+                items = data.get("data", data.get("results", []))
+            elif isinstance(data, list):
+                items = data
+            else:
+                items = []
 
             approvals = []
-            for item in data.get("results", data if isinstance(data, list) else []):
-                approval = self._parse_ema_approval(item, from_date)
+            for item in items:
+                approval = self._parse_ema_approval(item, from_dt)
                 if approval:
                     approvals.append(approval)
 
@@ -465,45 +477,52 @@ class DailyScanner:
             logger.warning(f"EMA 스캔 에러: {e}")
             return []
 
-    def _parse_ema_approval(self, item: dict, from_date: str) -> Optional[NewApproval]:
-        """EMA 응답 파싱"""
-        # 승인일 확인
-        auth_date_str = item.get("marketingAuthorisationDate", "") or item.get("authDate", "")
-        if not auth_date_str:
+    def _parse_ema_approval(self, item: dict, from_date: date) -> Optional[NewApproval]:
+        """EMA 응답 파싱 (JSON Report 형식)
+
+        EMA JSON Report 필드명: marketing_authorisation_date, last_updated_date 등
+        날짜 형식: DD/MM/YYYY
+        Boolean 필드: "Yes"/"No" 문자열
+        """
+        # 날짜 파싱 - EC 결정일 > 최종업데이트일 > 승인일 순으로 우선
+        ec_date = self._parse_ema_date(item.get("european_commission_decision_date", ""))
+        updated_date = self._parse_ema_date(item.get("last_updated_date", ""))
+        auth_date = self._parse_ema_date(item.get("marketing_authorisation_date", ""))
+
+        # 최근 활동 날짜 결정
+        activity_date = ec_date or updated_date or auth_date
+        if not activity_date:
             return None
 
-        try:
-            if "T" in auth_date_str:
-                approval_date = datetime.fromisoformat(auth_date_str.replace("Z", "")).date()
-            else:
-                approval_date = datetime.strptime(auth_date_str[:10], "%Y-%m-%d").date()
-        except:
+        # 최근 항목만 필터
+        if activity_date < from_date:
             return None
 
-        # 최근 승인만 필터
-        from_dt = datetime.strptime(from_date, "%Y-%m-%d").date()
-        if approval_date < from_dt:
-            return None
+        # 실제 승인일 (표시용)
+        approval_date = auth_date or ec_date or activity_date
 
-        generic_name = item.get("inn") or item.get("activeSubstance", "")
-        brand_name = item.get("medicineName", "")
+        generic_name = (
+            item.get("international_non_proprietary_name_common_name") or
+            item.get("active_substance") or ""
+        )
+        brand_name = item.get("name_of_medicine", "")
 
         if not generic_name:
             return None
 
-        # PRIME, Orphan 등 확인
-        is_prime = item.get("prime", False) or "PRIME" in str(item)
-        is_orphan = item.get("orphan", False) or "orphan" in str(item).lower()
-        is_conditional = item.get("conditional", False) or "conditional" in str(item).lower()
-        is_accelerated = item.get("acceleratedAssessment", False)
+        # Boolean 필드 ("Yes"/"No" 문자열)
+        is_prime = str(item.get("prime_priority_medicine", "")).lower() == "yes"
+        is_orphan = str(item.get("orphan_medicine", "")).lower() == "yes"
+        is_conditional = str(item.get("conditional_approval", "")).lower() == "yes"
+        is_accelerated = str(item.get("accelerated_assessment", "")).lower() == "yes"
 
         return NewApproval(
             source=ApprovalSource.EMA,
             drug_name=brand_name,
             generic_name=generic_name,
             approval_date=approval_date,
-            indication=item.get("therapeuticArea", ""),
-            sponsor=item.get("marketingAuthorisationHolder", ""),
+            indication=item.get("therapeutic_area_mesh", ""),
+            sponsor=item.get("marketing_authorisation_developer_applicant_holder", ""),
             is_prime=is_prime,
             is_orphan=is_orphan,
             is_conditional=is_conditional,
@@ -512,32 +531,32 @@ class DailyScanner:
         )
 
     async def _scan_mfds(self, days_back: int) -> list[NewApproval]:
-        """MFDS 신규 허가 스캔"""
-        if not self._client:
-            raise RuntimeError("Scanner must be used as async context manager")
+        """MFDS 신규 허가 스캔
 
-        # 공공데이터포털 MFDS API
-        url = "http://apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService05/getDrugPrdtPrmsnDtlInq03"
-
-        # 최근 날짜 기준
+        공공데이터포털 API는 날짜 필터를 미지원하고 44K건을 임의 순서로 반환.
+        따라서 캐시된 전체 데이터 파일(permits_full_*.json)에서
+        최근 허가 품목을 필터링합니다.
+        """
         from_date = (datetime.now() - timedelta(days=days_back)).strftime("%Y%m%d")
 
-        params = {
-            "serviceKey": settings.DATA_GO_KR_API_KEY,
-            "type": "json",
-            "numOfRows": 100,
-            "pageNo": 1,
-        }
+        # 캐시된 전체 데이터 파일 우선 사용
+        mfds_dir = self.data_dir / "mfds"
+        full_files = sorted(mfds_dir.glob("permits_full_*.json")) if mfds_dir.exists() else []
+        if not full_files:
+            # full 파일 없으면 일반 permits 파일 사용
+            full_files = sorted(mfds_dir.glob("permits_*.json")) if mfds_dir.exists() else []
+
+        if not full_files:
+            logger.warning("MFDS 캐시 데이터 없음 - 먼저 collect_all을 실행하세요")
+            return []
 
         try:
-            response = await self._client.get(url, params=params)
+            mfds_file = full_files[-1]  # 가장 최근 파일
+            with open(mfds_file, encoding="utf-8") as f:
+                mfds_data = json.load(f)
 
-            if response.status_code != 200:
-                logger.warning(f"MFDS API 응답: {response.status_code}")
-                return []
-
-            data = response.json()
-            items = data.get("body", {}).get("items", [])
+            items = mfds_data if isinstance(mfds_data, list) else mfds_data.get("results", [])
+            logger.info(f"MFDS 캐시 로드: {mfds_file.name} ({len(items):,}건)")
 
             approvals = []
             for item in items:

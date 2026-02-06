@@ -1,0 +1,1211 @@
+{
+  "scan_date": "2026-02-06",
+  "scan_time": "2026-02-06T10:06:38.716443",
+  "summary": {
+    "fda_new": 17,
+    "ema_new": 14,
+    "mfds_new": 7,
+    "total_new": 38,
+    "hot_issues": 15
+  },
+  "fda_new": [
+    {
+      "source": "fda",
+      "drug_name": "PRIMAQUINE PHOSPHATE",
+      "generic_name": "PRIMAQUINE PHOSPHATE",
+      "approval_date": "1952-01-23",
+      "application_number": "NDA008316",
+      "indication": "",
+      "sponsor": "SANOFI AVENTIS US",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ARSENIC TRIOXIDE",
+      "generic_name": "ARSENIC TRIOXIDE",
+      "approval_date": "2021-10-15",
+      "application_number": "ANDA214011",
+      "indication": "",
+      "sponsor": "EUGIA PHARMA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "LIVDELZI",
+      "generic_name": "SELADELPAR LYSINE",
+      "approval_date": "2024-08-14",
+      "application_number": "NDA217899",
+      "indication": "",
+      "sponsor": "GILEAD SCIENCES INC",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ZYPREXA",
+      "generic_name": "OLANZAPINE",
+      "approval_date": "1996-09-30",
+      "application_number": "NDA020592",
+      "indication": "Atypical Antipsychotic [EPC]",
+      "sponsor": "CHEPLAPHARM",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ZYPREXA ZYDIS",
+      "generic_name": "OLANZAPINE",
+      "approval_date": "2000-04-06",
+      "application_number": "NDA021086",
+      "indication": "Atypical Antipsychotic [EPC]",
+      "sponsor": "CHEPLAPHARM",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ZYPREXA RELPREVV",
+      "generic_name": "OLANZAPINE PAMOATE",
+      "approval_date": "2009-12-11",
+      "application_number": "NDA022173",
+      "indication": "",
+      "sponsor": "CHEPLAPHARM",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": false,
+      "existing_approvals": []
+    },
+    {
+      "source": "fda",
+      "drug_name": "CONCERTA",
+      "generic_name": "METHYLPHENIDATE HYDROCHLORIDE",
+      "approval_date": "2000-08-01",
+      "application_number": "NDA021121",
+      "indication": "",
+      "sponsor": "JANSSEN PHARMS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "LYBALVI",
+      "generic_name": "OLANZAPINE AND SAMIDORPHAN L-MALATE",
+      "approval_date": "2021-05-28",
+      "application_number": "NDA213378",
+      "indication": "Atypical Antipsychotic [EPC]",
+      "sponsor": "ALKERMES INC",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": false,
+      "existing_approvals": []
+    },
+    {
+      "source": "fda",
+      "drug_name": "AMOXICILLIN AND CLAVULANATE POTASSIUM",
+      "generic_name": "AMOXICILLIN AND CLAVULANATE POTASSIUM",
+      "approval_date": "2007-11-09",
+      "application_number": "ANDA065373",
+      "indication": "",
+      "sponsor": "HIKMA PHARMS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": false,
+      "existing_approvals": []
+    },
+    {
+      "source": "fda",
+      "drug_name": "NORLIQVA",
+      "generic_name": "AMLODIPINE",
+      "approval_date": "2022-02-24",
+      "application_number": "NDA214439",
+      "indication": "Dihydropyridine Calcium Channel Blocker [EPC], Calcium Channel Blocker [EPC]",
+      "sponsor": "CMP DEV LLC",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPTOMYCIN",
+      "generic_name": "DAPTOMYCIN",
+      "approval_date": "2021-06-29",
+      "application_number": "ANDA213786",
+      "indication": "Lipopeptide Antibacterial [EPC]",
+      "sponsor": "MEITHEAL",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "PUR-WASH",
+      "generic_name": "WATER",
+      "approval_date": "2011-09-01",
+      "application_number": "NDA022305",
+      "indication": "",
+      "sponsor": "NIAGARA PHARMS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "fda"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "RYBELSUS",
+      "generic_name": "ORAL SEMAGLUTIDE",
+      "approval_date": "2019-09-20",
+      "application_number": "NDA213051",
+      "indication": "GLP-1 Receptor Agonist [EPC]",
+      "sponsor": "NOVO",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": false,
+      "existing_approvals": []
+    },
+    {
+      "source": "fda",
+      "drug_name": "VENLAFAXINE HYDROCHLORIDE",
+      "generic_name": "VENLAFAXINE HYDROCHLORIDE",
+      "approval_date": "2018-11-23",
+      "application_number": "ANDA201272",
+      "indication": "",
+      "sponsor": "MEDICAP LABS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ZYPREXA INTRAMUSCULAR",
+      "generic_name": "OLANZAPINE",
+      "approval_date": "2004-03-29",
+      "application_number": "NDA021253",
+      "indication": "Atypical Antipsychotic [EPC]",
+      "sponsor": "CHEPLAPHARM",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ENBREL",
+      "generic_name": "ETANERCEPT",
+      "approval_date": "1998-11-02",
+      "application_number": "BLA103795",
+      "indication": "Tumor Necrosis Factor Blocker [EPC]",
+      "sponsor": "IMMUNEX",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인",
+        "고관심 적응증 (tumor)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "CETIRIZINE HCL",
+      "generic_name": "CETIRIZINE HCL",
+      "approval_date": "2009-07-23",
+      "application_number": "NDA022429",
+      "indication": "",
+      "sponsor": "BIONPHARMA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda"
+      ]
+    }
+  ],
+  "ema_new": [
+    {
+      "source": "ema",
+      "drug_name": "Eltrombopag Viatris",
+      "generic_name": "eltrombopag",
+      "approval_date": "2024-12-12",
+      "application_number": "",
+      "indication": "Purpura, Thrombocytopenic, Idiopathic",
+      "sponsor": "Viatris Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Exjade",
+      "generic_name": "deferasirox",
+      "approval_date": "2006-08-28",
+      "application_number": "",
+      "indication": "beta-Thalassemia;Iron Overload",
+      "sponsor": "Novartis Europharm Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Dasatinib Accord Healthcare",
+      "generic_name": "dasatinib",
+      "approval_date": "2024-07-26",
+      "application_number": "",
+      "indication": "Precursor Cell Lymphoblastic Leukemia-Lymphoma;Leukemia, Myelogenous, Chronic, BCR-ABL Positive",
+      "sponsor": "Accord Healthcare S.L.U.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "고관심 적응증 (lymphoma)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Vanflyta",
+      "generic_name": "quizartinib",
+      "approval_date": "2023-11-06",
+      "application_number": "",
+      "indication": "Leukemia, Myeloid",
+      "sponsor": "Daiichi Sankyo Europe GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "high_interest",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "고관심 적응증 (leukemia)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Yuflyma",
+      "generic_name": "adalimumab",
+      "approval_date": "2021-02-11",
+      "application_number": "",
+      "indication": "Arthritis, Rheumatoid;Arthritis, Psoriatic;Psoriasis;Spondylitis, Ankylosing;Uveitis;Hidradenitis Suppurativa;Colitis, Ulcerative;Crohn Disease;Arthritis, Juvenile Rheumatoid",
+      "sponsor": "Celltrion Healthcare Hungary Kft.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "DuoTrav",
+      "generic_name": "travoprost;timolol",
+      "approval_date": "2006-04-23",
+      "application_number": "",
+      "indication": "Glaucoma, Open-Angle;Ocular Hypertension",
+      "sponsor": "Novartis Europharm Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Sugammadex Amomed",
+      "generic_name": "sugammadex",
+      "approval_date": "2023-01-10",
+      "application_number": "",
+      "indication": "Neuromuscular Blockade",
+      "sponsor": "AOP Orphan Pharmaceuticals GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Gilenya",
+      "generic_name": "fingolimod",
+      "approval_date": "2011-03-17",
+      "application_number": "",
+      "indication": "Multiple Sclerosis",
+      "sponsor": "Novartis Europharm Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Uzpruvo",
+      "generic_name": "ustekinumab",
+      "approval_date": "2024-01-05",
+      "application_number": "",
+      "indication": "Psoriasis;Arthritis, Psoriatic;Crohn Disease;Colitis, Ulcerative",
+      "sponsor": "Stada Arzneimittel AG",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Trazimera",
+      "generic_name": "trastuzumab",
+      "approval_date": "2018-07-26",
+      "application_number": "",
+      "indication": "Stomach Neoplasms;Breast Neoplasms",
+      "sponsor": "Pfizer Europe MA EEIG",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "GalliaPharm",
+      "generic_name": "gallium (68Ga) chloride;germanium (68Ge) chloride",
+      "approval_date": "2024-08-01",
+      "application_number": "",
+      "indication": "Radionuclide Imaging",
+      "sponsor": "Eckert & Ziegler Radiopharma GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Vizamyl",
+      "generic_name": "flutemetamol (18F)",
+      "approval_date": "2014-08-22",
+      "application_number": "",
+      "indication": "Radionuclide Imaging;Alzheimer Disease",
+      "sponsor": "GE Healthcare AS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "high_interest",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "고관심 적응증 (alzheimer)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Rezurock",
+      "generic_name": "Belumosudil",
+      "approval_date": "2026-01-30",
+      "application_number": "",
+      "indication": "Graft vs Host Disease",
+      "sponsor": "Sanofi Winthrop Industrie",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 50,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품",
+        "EMA Conditional Approval"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Trulicity",
+      "generic_name": "dulaglutide",
+      "approval_date": "2014-11-21",
+      "application_number": "",
+      "indication": "Diabetes Mellitus, Type 2",
+      "sponsor": "Eli Lilly Nederland B.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "고관심 적응증 (diabetes)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    }
+  ],
+  "mfds_new": [
+    {
+      "source": "mfds",
+      "drug_name": "씨투케어정50밀리그램(프란루카스트수화물)",
+      "generic_name": "Pranlukast Hydrate",
+      "approval_date": "2026-01-30",
+      "application_number": "202600277",
+      "indication": "",
+      "sponsor": "(주)바이넥스",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "mfds",
+      "drug_name": "락토락시럽(락툴로오스농축액)",
+      "generic_name": "Lactulose Concentrate Solution",
+      "approval_date": "2026-01-30",
+      "application_number": "202600282",
+      "indication": "",
+      "sponsor": "(주)마더스제약",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "mfds",
+      "drug_name": "쿨드림롱정(독시라민숙신산염)",
+      "generic_name": "Doxylamine Succinate",
+      "approval_date": "2026-01-30",
+      "application_number": "202600284",
+      "indication": "",
+      "sponsor": "(주)녹십자",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "mfds",
+      "drug_name": "텔미트리플정80/5/25밀리그램(텔미사르탄,암로디핀,클로르탈리돈)",
+      "generic_name": "Amlodipine Besylate/Chlorthalidone/Telmisartan",
+      "approval_date": "2026-01-30",
+      "application_number": "202600285",
+      "indication": "",
+      "sponsor": "(주)녹십자",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "mfds",
+      "drug_name": "텔미트리플정80/5/12.5밀리그램(텔미사르탄,암로디핀,클로르탈리돈)",
+      "generic_name": "Amlodipine Besylate/Chlorthalidone/Telmisartan",
+      "approval_date": "2026-01-30",
+      "application_number": "202600286",
+      "indication": "",
+      "sponsor": "(주)녹십자",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "mfds",
+      "drug_name": "텔미트리플정40/5/12.5밀리그램(텔미사르탄,암로디핀,클로르탈리돈)",
+      "generic_name": "Amlodipine Besylate/Chlorthalidone/Telmisartan",
+      "approval_date": "2026-01-30",
+      "application_number": "202600287",
+      "indication": "",
+      "sponsor": "(주)녹십자",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "mfds",
+      "drug_name": "토마토정10밀리그램(토파시티닙시트르산염)",
+      "generic_name": "Tofacitinib Citrate",
+      "approval_date": "2026-02-02",
+      "application_number": "202600292",
+      "indication": "",
+      "sponsor": "(주)한국피엠지제약",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    }
+  ],
+  "hot_issues": [
+    {
+      "source": "ema",
+      "drug_name": "Rezurock",
+      "generic_name": "Belumosudil",
+      "approval_date": "2026-01-30",
+      "application_number": "",
+      "indication": "Graft vs Host Disease",
+      "sponsor": "Sanofi Winthrop Industrie",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 50,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품",
+        "EMA Conditional Approval"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ENBREL",
+      "generic_name": "ETANERCEPT",
+      "approval_date": "1998-11-02",
+      "application_number": "BLA103795",
+      "indication": "Tumor Necrosis Factor Blocker [EPC]",
+      "sponsor": "IMMUNEX",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인",
+        "고관심 적응증 (tumor)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Dasatinib Accord Healthcare",
+      "generic_name": "dasatinib",
+      "approval_date": "2024-07-26",
+      "application_number": "",
+      "indication": "Precursor Cell Lymphoblastic Leukemia-Lymphoma;Leukemia, Myelogenous, Chronic, BCR-ABL Positive",
+      "sponsor": "Accord Healthcare S.L.U.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "고관심 적응증 (lymphoma)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Trulicity",
+      "generic_name": "dulaglutide",
+      "approval_date": "2014-11-21",
+      "application_number": "",
+      "indication": "Diabetes Mellitus, Type 2",
+      "sponsor": "Eli Lilly Nederland B.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "고관심 적응증 (diabetes)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ARSENIC TRIOXIDE",
+      "generic_name": "ARSENIC TRIOXIDE",
+      "approval_date": "2021-10-15",
+      "application_number": "ANDA214011",
+      "indication": "",
+      "sponsor": "EUGIA PHARMA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "LIVDELZI",
+      "generic_name": "SELADELPAR LYSINE",
+      "approval_date": "2024-08-14",
+      "application_number": "NDA217899",
+      "indication": "",
+      "sponsor": "GILEAD SCIENCES INC",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ZYPREXA",
+      "generic_name": "OLANZAPINE",
+      "approval_date": "1996-09-30",
+      "application_number": "NDA020592",
+      "indication": "Atypical Antipsychotic [EPC]",
+      "sponsor": "CHEPLAPHARM",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ZYPREXA ZYDIS",
+      "generic_name": "OLANZAPINE",
+      "approval_date": "2000-04-06",
+      "application_number": "NDA021086",
+      "indication": "Atypical Antipsychotic [EPC]",
+      "sponsor": "CHEPLAPHARM",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "CONCERTA",
+      "generic_name": "METHYLPHENIDATE HYDROCHLORIDE",
+      "approval_date": "2000-08-01",
+      "application_number": "NDA021121",
+      "indication": "",
+      "sponsor": "JANSSEN PHARMS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "NORLIQVA",
+      "generic_name": "AMLODIPINE",
+      "approval_date": "2022-02-24",
+      "application_number": "NDA214439",
+      "indication": "Dihydropyridine Calcium Channel Blocker [EPC], Calcium Channel Blocker [EPC]",
+      "sponsor": "CMP DEV LLC",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPTOMYCIN",
+      "generic_name": "DAPTOMYCIN",
+      "approval_date": "2021-06-29",
+      "application_number": "ANDA213786",
+      "indication": "Lipopeptide Antibacterial [EPC]",
+      "sponsor": "MEITHEAL",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ZYPREXA INTRAMUSCULAR",
+      "generic_name": "OLANZAPINE",
+      "approval_date": "2004-03-29",
+      "application_number": "NDA021253",
+      "indication": "Atypical Antipsychotic [EPC]",
+      "sponsor": "CHEPLAPHARM",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Yuflyma",
+      "generic_name": "adalimumab",
+      "approval_date": "2021-02-11",
+      "application_number": "",
+      "indication": "Arthritis, Rheumatoid;Arthritis, Psoriatic;Psoriasis;Spondylitis, Ankylosing;Uveitis;Hidradenitis Suppurativa;Colitis, Ulcerative;Crohn Disease;Arthritis, Juvenile Rheumatoid",
+      "sponsor": "Celltrion Healthcare Hungary Kft.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Uzpruvo",
+      "generic_name": "ustekinumab",
+      "approval_date": "2024-01-05",
+      "application_number": "",
+      "indication": "Psoriasis;Arthritis, Psoriatic;Crohn Disease;Colitis, Ulcerative",
+      "sponsor": "Stada Arzneimittel AG",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Trazimera",
+      "generic_name": "trastuzumab",
+      "approval_date": "2018-07-26",
+      "application_number": "",
+      "indication": "Stomach Neoplasms;Breast Neoplasms",
+      "sponsor": "Pfizer Europe MA EEIG",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    }
+  ],
+  "errors": []
+}
