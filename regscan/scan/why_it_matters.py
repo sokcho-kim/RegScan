@@ -188,6 +188,10 @@ class WhyItMattersGenerator:
                 timeout=settings.LLM_TIMEOUT,
             )
 
+            if not response.choices:
+                logger.warning("OpenAI API 응답에 choices가 비어 있음")
+                return None
+
             text = response.choices[0].message.content.strip()
             # 80자 제한
             return text[:80] if len(text) > 80 else text

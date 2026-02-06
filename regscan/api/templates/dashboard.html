@@ -1,0 +1,454 @@
+{% extends "base.html" %}
+
+{% block title %}RegScan Dashboard{% endblock %}
+
+{% block extra_css %}
+/* ── Summary Bar ── */
+.summary-bar {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 0 32px;
+    background: #fafafa;
+    border-bottom: 1px solid #eee;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 24px 10px 0;
+    border-right: 1px solid #eee;
+}
+
+.summary-item:last-child { border-right: none; }
+
+.summary-item .label { color: #888; }
+
+.summary-item .num {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.summary-item.hot .num { color: #c00; }
+
+/* ── Main Layout ── */
+.dashboard-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 40px;
+}
+
+/* ── Top Story ── */
+.top-story {
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #ddd;
+}
+
+.top-story .article-meta {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.tag {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    padding: 3px 8px;
+    font-weight: 500;
+    color: #fff;
+}
+
+.tag.hot { background: #c00; }
+.tag.high { background: #e67700; }
+.tag.mid { background: #555; }
+.tag.fda { background: #0066cc; }
+.tag.ema { background: #cc6600; }
+.tag.mfds { background: #008844; }
+.tag.orphan { background: #5a4fcf; }
+
+.top-story h2 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+}
+
+.top-story h2 a {
+    color: #1a1a1a;
+    text-decoration: none;
+}
+
+.top-story h2 a:hover { color: #444; }
+
+.top-story .subtitle {
+    font-size: 16px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.top-story .summary-text {
+    font-size: 15px;
+    color: #444;
+    line-height: 1.8;
+}
+
+/* ── Hot Issue List ── */
+.section-heading {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #1a1a1a;
+    margin-bottom: 0;
+}
+
+.issue-list {
+    list-style: none;
+}
+
+.issue-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s;
+}
+
+.issue-item:hover { background: #fafafa; margin: 0 -8px; padding: 16px 8px; }
+
+.issue-info { flex: 1; }
+
+.issue-info .meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.issue-info .inn-name {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.issue-info .desc {
+    font-size: 13px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.issue-info .badges {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 2px;
+}
+
+.badge.fda { background: #e8f0fe; color: #1a56db; }
+.badge.ema { background: #fef3c7; color: #92400e; }
+.badge.mfds { background: #d1fae5; color: #065f46; }
+.badge.cris { background: #ede9fe; color: #5b21b6; }
+.badge.orphan { background: #fce7f3; color: #9d174d; }
+
+.issue-score {
+    text-align: right;
+    min-width: 48px;
+    flex-shrink: 0;
+}
+
+.issue-score .number {
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.score-hot { color: #c00; }
+.score-high { color: #e67700; }
+.score-mid { color: #555; }
+
+.issue-score .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #999;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.sidebar-section h3 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #1a1a1a;
+    margin-bottom: 12px;
+}
+
+.imminent-list {
+    list-style: none;
+}
+
+.imminent-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.imminent-item a {
+    color: #1a1a1a;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.imminent-item a:hover { color: #555; }
+
+.imminent-item .detail {
+    font-size: 12px;
+    color: #888;
+    margin-top: 2px;
+}
+
+.imminent-badge {
+    font-family: 'Inter', sans-serif;
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 6px;
+    background: #fef3c7;
+    color: #92400e;
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+/* Data status */
+.data-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 13px;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.data-row .data-label { color: #888; }
+.data-row .data-value { font-weight: 600; }
+
+.scheduler-info {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #888;
+    margin-top: 8px;
+}
+
+.scheduler-info .next-run {
+    font-weight: 500;
+    color: #555;
+}
+{% endblock %}
+
+{% block content %}
+<!-- Summary Bar -->
+<div style="background:#fafafa; border-bottom:1px solid #eee;">
+    <div class="summary-bar">
+        <div class="summary-item">
+            <span class="label">FDA</span>
+            <span class="num">{{ fda_count }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="label">EMA</span>
+            <span class="num">{{ ema_count }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="label">MFDS</span>
+            <span class="num">{{ mfds_count }}</span>
+        </div>
+        <div class="summary-item hot">
+            <span class="label">HOT</span>
+            <span class="num">{{ hot_count }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Grid -->
+<div class="dashboard-wrap">
+    <main>
+        {% if top_story %}
+        <!-- Top Story -->
+        <article class="top-story">
+            <div class="article-meta">
+                {% if top_story.global_score >= 80 %}
+                <span class="tag hot">HOT</span>
+                {% elif top_story.global_score >= 60 %}
+                <span class="tag high">HIGH</span>
+                {% endif %}
+                {% if top_story.fda_approved %}<span class="tag fda">FDA</span>{% endif %}
+                {% if top_story.ema_approved %}<span class="tag ema">EMA</span>{% endif %}
+                {% for reason in top_story.hot_issue_reasons %}
+                    {% if '희귀' in reason or 'Orphan' in reason %}
+                    <span class="tag orphan">희귀의약품</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <h2><a href="/dashboard/drug/{{ top_story.inn }}">{{ top_story.inn }}</a></h2>
+            <p class="subtitle">{{ top_story.summary }}</p>
+            <div class="summary-text">
+                {% if top_story.hot_issue_reasons %}
+                    {% for reason in top_story.hot_issue_reasons[:3] %}
+                    <span style="color:#c00;">&#x25B8;</span> {{ reason }}<br>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </article>
+        {% endif %}
+
+        <!-- Hot Issues -->
+        <h3 class="section-heading">Hot Issues</h3>
+        <ul class="issue-list">
+            {% for drug in hot_issues %}
+            <li>
+                <a href="/dashboard/drug/{{ drug.inn }}" class="issue-item">
+                    <div class="issue-info">
+                        <div class="meta">
+                            {% if drug.global_score >= 80 %}
+                            <span class="tag hot">HOT</span>
+                            {% elif drug.global_score >= 60 %}
+                            <span class="tag high">HIGH</span>
+                            {% else %}
+                            <span class="tag mid">MID</span>
+                            {% endif %}
+                            <span class="inn-name">{{ drug.inn }}</span>
+                        </div>
+                        <div class="desc">{{ drug.summary }}</div>
+                        <div class="badges">
+                            {% if drug.fda_approved %}
+                            <span class="badge fda">FDA{% if drug.fda_date %} {{ drug.fda_date }}{% endif %}</span>
+                            {% endif %}
+                            {% if drug.ema_approved %}
+                            <span class="badge ema">EMA{% if drug.ema_date %} {{ drug.ema_date }}{% endif %}</span>
+                            {% endif %}
+                            {% if drug.mfds_approved %}
+                            <span class="badge mfds">MFDS</span>
+                            {% elif not drug.mfds_approved %}
+                            <span class="badge" style="background:#f5f5f5;color:#999;">MFDS 미허가</span>
+                            {% endif %}
+                            {% if drug.cris_trials %}
+                            <span class="badge cris">CRIS {{ drug.cris_trials|length }}건</span>
+                            {% endif %}
+                            {% for reason in drug.hot_issue_reasons %}
+                                {% if '희귀' in reason or 'Orphan' in reason %}
+                                <span class="badge orphan">희귀의약품</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="issue-score">
+                        <div class="number {% if drug.global_score >= 80 %}score-hot{% elif drug.global_score >= 60 %}score-high{% else %}score-mid{% endif %}">{{ drug.global_score }}</div>
+                        <div class="label">점수</div>
+                    </div>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </main>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <!-- Imminent -->
+        <div class="sidebar-section">
+            <h3>국내 도입 임박</h3>
+            {% if imminent %}
+            <ul class="imminent-list">
+                {% for drug in imminent[:8] %}
+                <li class="imminent-item">
+                    <a href="/dashboard/drug/{{ drug.inn }}">{{ drug.inn }}</a>
+                    <span class="imminent-badge">임박</span>
+                    <div class="detail">
+                        {% if drug.fda_approved %}FDA{% endif %}
+                        {% if drug.ema_approved %}{% if drug.fda_approved %}+{% endif %}EMA{% endif %}
+                        승인
+                        {% if drug.cris_trials %} &middot; CRIS {{ drug.cris_trials|length }}건{% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p style="font-size:13px; color:#999; padding:8px 0;">해당 약물 없음</p>
+            {% endif %}
+        </div>
+
+        <!-- Data Status -->
+        <div class="sidebar-section">
+            <h3>데이터 현황</h3>
+            <div class="data-row">
+                <span class="data-label">통합 약물</span>
+                <span class="data-value">{{ total_drugs }}건</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">FDA 승인</span>
+                <span class="data-value">{{ fda_count }}건</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">EMA 승인</span>
+                <span class="data-value">{{ ema_count }}건</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">MFDS 허가</span>
+                <span class="data-value">{{ mfds_count }}건</span>
+            </div>
+            {% if loaded_at %}
+            <div class="scheduler-info">
+                마지막 로드: {{ loaded_at }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Scheduler -->
+        <div class="sidebar-section">
+            <h3>스케줄러</h3>
+            {% if scheduler.running %}
+            <div class="data-row">
+                <span class="data-label">상태</span>
+                <span class="data-value" style="color:#008844;">실행 중</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">스케줄</span>
+                <span class="data-value">{{ scheduler.schedule }}</span>
+            </div>
+            {% if scheduler.next_run %}
+            <div class="scheduler-info">
+                다음 실행: <span class="next-run">{{ scheduler.next_run }}</span>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="data-row">
+                <span class="data-label">상태</span>
+                <span class="data-value" style="color:#999;">비활성</span>
+            </div>
+            {% endif %}
+        </div>
+    </aside>
+</div>
+{% endblock %}

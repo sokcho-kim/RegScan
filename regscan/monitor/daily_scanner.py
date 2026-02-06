@@ -397,7 +397,8 @@ class DailyScanner:
         date_str = recent_approval.get("submission_status_date", "")
         try:
             approval_date = datetime.strptime(date_str, "%Y%m%d").date()
-        except:
+        except (ValueError, TypeError):
+            logger.warning("FDA 승인일 파싱 실패 (date_str=%r), 오늘 날짜로 대체", date_str)
             approval_date = date.today()
 
         # 특별 지정 확인
@@ -579,7 +580,8 @@ class DailyScanner:
 
         try:
             approval_date = datetime.strptime(permit_date_str[:8], "%Y%m%d").date()
-        except:
+        except (ValueError, TypeError):
+            logger.debug("MFDS 허가일 파싱 실패 (permit_date_str=%r), 건너뜀", permit_date_str)
             return None
 
         # 최근 허가만 필터

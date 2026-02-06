@@ -1,16 +1,42 @@
 """DB 모듈"""
 
-from .models import FeedCardDB, SnapshotDB, GlobalStatusDB, Base
+from .models import (
+    Base,
+    DrugDB,
+    RegulatoryEventDB,
+    HIRAReimbursementDB,
+    ClinicalTrialDB,
+    BriefingReportDB,
+    ScanSnapshotDB,
+    FeedCardDB,
+)
+from .database import (
+    get_async_engine,
+    get_sync_engine,
+    get_async_session,
+    get_sync_session,
+    init_db,
+    close_engines,
+)
 from .repository import FeedCardRepository
-from .snapshot_repository import SnapshotRepository
-from .global_status_repository import GlobalStatusRepository
 
 __all__ = [
-    "FeedCardDB",
-    "SnapshotDB",
-    "GlobalStatusDB",
+    # Models
     "Base",
+    "DrugDB",
+    "RegulatoryEventDB",
+    "HIRAReimbursementDB",
+    "ClinicalTrialDB",
+    "BriefingReportDB",
+    "ScanSnapshotDB",
+    "FeedCardDB",
+    # Engine/Session
+    "get_async_engine",
+    "get_sync_engine",
+    "get_async_session",
+    "get_sync_session",
+    "init_db",
+    "close_engines",
+    # Repositories
     "FeedCardRepository",
-    "SnapshotRepository",
-    "GlobalStatusRepository",
 ]

@@ -1,0 +1,465 @@
+{% extends "base.html" %}
+
+{% block title %}RegScan - {{ drug.inn }}{% endblock %}
+
+{% block extra_css %}
+.briefing-wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 32px 60px;
+}
+
+/* ── Tags ── */
+.article-tags {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-family: 'Inter', sans-serif;
+}
+
+.tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.tag.hot { background: #c00; }
+.tag.high { background: #e67700; }
+.tag.fda { background: #0066cc; }
+.tag.ema { background: #cc6600; }
+.tag.mfds { background: #008844; }
+.tag.orphan { background: #5a4fcf; }
+.tag.source { background: #f3f4f6; color: #555; }
+
+/* ── Title ── */
+.briefing-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+    color: #1a1a1a;
+}
+
+.briefing-subtitle {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #666;
+    margin-bottom: 24px;
+}
+
+/* ── Author line ── */
+.author-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 28px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid #ddd;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #888;
+}
+
+.author-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #eef2ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #4f46e5;
+}
+
+/* ── Key Points ── */
+.key-points {
+    border-left: 4px solid #c00;
+    background: linear-gradient(90deg, #fef8f0 0%, #fff 100%);
+    padding: 20px 24px;
+    margin-bottom: 36px;
+    border-radius: 0 6px 6px 0;
+}
+
+.key-points h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.key-points ul {
+    list-style: none;
+    padding: 0;
+}
+
+.key-points li {
+    padding: 4px 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.key-points li::before {
+    content: "\25B8";
+    color: #c00;
+    margin-right: 8px;
+}
+
+/* ── Article Body ── */
+.article-body {
+    font-size: 17px;
+    line-height: 1.9;
+    color: #333;
+}
+
+.article-body h2 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 40px 0 16px;
+}
+
+.article-body p {
+    margin-bottom: 16px;
+}
+
+/* ── Timeline ── */
+.timeline-box {
+    background: #fafafa;
+    border-radius: 8px;
+    padding: 24px;
+    margin: 28px 0;
+}
+
+.timeline-box h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #ddd;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+    padding-left: 20px;
+}
+
+.timeline-item:last-child { margin-bottom: 0; }
+
+.timeline-dot {
+    position: absolute;
+    left: -20px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.timeline-dot.fda { background: #3b82f6; }
+.timeline-dot.ema { background: #f59e0b; }
+.timeline-dot.mfds-yes { background: #10b981; }
+.timeline-dot.mfds-no {
+    background: #fff;
+    border: 2px dashed #aaa;
+}
+
+.timeline-date {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.timeline-date.fda { color: #3b82f6; }
+.timeline-date.ema { color: #d97706; }
+.timeline-date.mfds { color: #999; }
+
+.timeline-label {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.timeline-detail {
+    font-size: 13px;
+    color: #888;
+}
+
+/* ── MedClaim Box ── */
+.medclaim-box {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 8px;
+    padding: 24px;
+    margin: 32px 0;
+}
+
+.medclaim-box h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4338ca;
+    margin-bottom: 12px;
+}
+
+.medclaim-box p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.medclaim-box p:last-child { margin-bottom: 0; }
+
+/* ── HIRA Price ── */
+.hira-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 24px 0;
+}
+
+.hira-box .hira-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #166534;
+    margin-bottom: 4px;
+}
+
+.hira-box .hira-price {
+    font-family: 'Inter', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #15803d;
+}
+
+.hira-box .hira-detail {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+}
+
+/* ── Source Footer ── */
+.source-footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid #ddd;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #999;
+}
+
+.source-footer strong { color: #666; }
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #888;
+    text-decoration: none;
+}
+
+.back-link:hover { color: #1a1a1a; }
+{% endblock %}
+
+{% block content %}
+<div class="briefing-wrap">
+    <a href="/dashboard" class="back-link">&larr; Dashboard</a>
+
+    <!-- Tags -->
+    <div class="article-tags">
+        {% if drug.global_score >= 80 %}
+        <span class="tag hot">HOT ISSUE</span>
+        {% elif drug.global_score >= 60 %}
+        <span class="tag high">HIGH</span>
+        {% endif %}
+        {% if drug.fda_approved %}<span class="tag fda">FDA</span>{% endif %}
+        {% if drug.ema_approved %}<span class="tag ema">EMA</span>{% endif %}
+        {% if drug.mfds_approved %}<span class="tag mfds">MFDS</span>{% endif %}
+        {% for reason in drug.hot_issue_reasons %}
+            {% if '희귀' in reason or 'Orphan' in reason %}
+            <span class="tag orphan">희귀의약품</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Title -->
+    {% if briefing %}
+    <h1 class="briefing-title">{{ briefing.headline }}</h1>
+    <p class="briefing-subtitle">{{ briefing.subtitle }}</p>
+    {% else %}
+    <h1 class="briefing-title">{{ drug.inn }} 규제 동향</h1>
+    <p class="briefing-subtitle">{{ drug.summary }}</p>
+    {% endif %}
+
+    <!-- Author -->
+    <div class="author-line">
+        <div class="author-avatar">AI</div>
+        <span>RegScan AI 리포터</span>
+        <span>&middot;</span>
+        <span>{{ today }}</span>
+    </div>
+
+    <!-- Key Points -->
+    {% if briefing and briefing.key_points %}
+    <div class="key-points">
+        <h4>핵심 요약</h4>
+        <ul>
+            {% for point in briefing.key_points %}
+            <li>{{ point }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% elif drug.hot_issue_reasons %}
+    <div class="key-points">
+        <h4>핵심 요약</h4>
+        <ul>
+            {% for reason in drug.hot_issue_reasons %}
+            <li>{{ reason }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <article class="article-body">
+        <!-- Timeline -->
+        {% if drug.fda_approved or drug.ema_approved %}
+        <div class="timeline-box">
+            <h4>승인 타임라인</h4>
+            <div class="timeline">
+                {% if drug.fda_approved %}
+                <div class="timeline-item">
+                    <div class="timeline-dot fda"></div>
+                    <div class="timeline-date fda">{{ drug.fda_date.strftime('%Y-%m-%d') if drug.fda_date else '날짜 미상' }}</div>
+                    <div class="timeline-label">FDA 승인</div>
+                    {% for reason in drug.hot_issue_reasons %}
+                        {% if 'Breakthrough' in reason or 'Fast Track' in reason or 'Accelerated' in reason %}
+                        <div class="timeline-detail">{{ reason }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if drug.ema_approved %}
+                <div class="timeline-item">
+                    <div class="timeline-dot ema"></div>
+                    <div class="timeline-date ema">{{ drug.ema_date.strftime('%Y-%m-%d') if drug.ema_date else '날짜 미상' }}</div>
+                    <div class="timeline-label">EMA 승인</div>
+                    {% for reason in drug.hot_issue_reasons %}
+                        {% if 'PRIME' in reason or 'Conditional' in reason %}
+                        <div class="timeline-detail">{{ reason }}</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="timeline-item">
+                    {% if drug.mfds_approved %}
+                    <div class="timeline-dot mfds-yes"></div>
+                    <div class="timeline-date mfds">{{ drug.mfds_date.strftime('%Y-%m-%d') if drug.mfds_date else '' }}</div>
+                    <div class="timeline-label">MFDS 허가</div>
+                    {% if drug.mfds_brand_name %}
+                    <div class="timeline-detail">{{ drug.mfds_brand_name }}</div>
+                    {% endif %}
+                    {% else %}
+                    <div class="timeline-dot mfds-no"></div>
+                    <div class="timeline-date mfds">미정</div>
+                    <div class="timeline-label" style="color:#999;">MFDS 허가</div>
+                    <div class="timeline-detail">허가 신청 미확인</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Briefing body -->
+        {% if briefing %}
+            {% if briefing.global_section %}
+            <h2>글로벌 승인 현황</h2>
+            <p>{{ briefing.global_section }}</p>
+            {% endif %}
+
+            {% if briefing.domestic_section %}
+            <h2>국내 도입 전망</h2>
+            <p>{{ briefing.domestic_section }}</p>
+            {% endif %}
+        {% else %}
+            <h2>현황 요약</h2>
+            <p>{{ drug.summary }}</p>
+            {% if drug.analysis_notes %}
+                {% for note in drug.analysis_notes %}
+                <p>{{ note }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+
+        <!-- MedClaim -->
+        {% if briefing and briefing.medclaim_section %}
+        <div class="medclaim-box">
+            <h4>메드클레임 시사점</h4>
+            <p>{{ briefing.medclaim_section }}</p>
+        </div>
+        {% endif %}
+
+        <!-- HIRA Price -->
+        {% if drug.hira_price %}
+        <div class="hira-box">
+            <div class="hira-label">HIRA 상한가</div>
+            <div class="hira-price">₩{{ "{:,.0f}".format(drug.hira_price) }}</div>
+            {% if drug.hira_criteria %}
+            <div class="hira-detail">{{ drug.hira_criteria }}</div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- CRIS Trials -->
+        {% if drug.cris_trials %}
+        <h2>국내 임상시험</h2>
+        {% for trial in drug.cris_trials %}
+        <p>
+            <strong>{{ trial.trial_id }}</strong> &middot; {{ trial.title or '' }}<br>
+            <span style="font-size:14px; color:#888;">
+                {{ trial.phase or '' }}{% if trial.status %} &middot; {{ trial.status }}{% endif %}
+            </span>
+        </p>
+        {% endfor %}
+        {% endif %}
+    </article>
+
+    <!-- Source -->
+    <div class="source-footer">
+        <p><strong>데이터 출처:</strong> FDA Drug Approvals Database, EMA Public Assessment Reports,
+        MFDS 의약품통합정보시스템, HIRA 급여목록, CRIS 임상연구정보서비스</p>
+        <p style="margin-top:8px;">
+            본 리포트는 RegScan이 공개 데이터를 기반으로 생성한 브리핑 자료입니다.
+            의사결정에 활용 시 원문 확인을 권장합니다.
+        </p>
+    </div>
+</div>
+{% endblock %}

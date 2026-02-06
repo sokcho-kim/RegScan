@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RegScan{% endblock %}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif KR', serif;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .meta-text {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ── Sticky Header ── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: #fff;
+            border-bottom: 3px solid #1a1a1a;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .logo {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: #1a1a1a;
+            text-decoration: none;
+        }
+
+        .logo:hover { color: #333; }
+
+        .header-right {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+        }
+
+        .tagline {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            color: #999;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .header-date {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* ── Footer ── */
+        footer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 32px;
+            border-top: 1px solid #ddd;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            color: #999;
+            text-align: center;
+        }
+
+        footer a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <a href="/dashboard" class="logo">RegScan</a>
+            <div class="header-right">
+                <span class="tagline">Global Regulatory Intelligence</span>
+                <span class="header-date">{{ today }}</span>
+            </div>
+        </div>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        <p>RegScan &middot; Scanning Global Regulation into Local Impact</p>
+        <p style="margin-top:4px;">Data: FDA &middot; EMA &middot; MFDS &middot; HIRA &middot; CRIS</p>
+    </footer>
+</body>
+</html>

@@ -1,6 +1,7 @@
 """EMA (European Medicines Agency) 데이터 수집"""
 
 import asyncio
+import logging
 from datetime import datetime
 from typing import Any, Optional
 from enum import Enum
@@ -8,6 +9,8 @@ from enum import Enum
 import httpx
 
 from .base import BaseIngestor
+
+logger = logging.getLogger(__name__)
 
 
 class EMAEndpoint(str, Enum):
@@ -170,9 +173,9 @@ class EMAClient:
                 await asyncio.sleep(retry_delay)
 
         # 실패 시 빈 리스트 반환 (에러 로깅)
-        print(f"[EMA] Request failed after {max_retries} attempts: {url}")
+        logger.error(f"[EMA] Request failed after {max_retries} attempts: {url}")
         if last_error:
-            print(f"[EMA] Last error: {last_error}")
+            logger.error(f"[EMA] Last error: {last_error}")
         return []
 
 
