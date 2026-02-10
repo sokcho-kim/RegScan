@@ -34,6 +34,9 @@ from .cris import (
     CRISActiveTrialIngestor,
     CRISDrugTrialIngestor,
 )
+from .asti import ASTIClient, ASTIIngestor
+from .healthkr import HealthKRClient, HealthKRIngestor
+from .biorxiv import BioRxivClient, BioRxivIngestor
 
 __all__ = [
     "BaseIngestor",
@@ -65,4 +68,13 @@ __all__ = [
     "CRISTrialIngestor",
     "CRISActiveTrialIngestor",
     "CRISDrugTrialIngestor",
+    # v2: ASTI
+    "ASTIClient",
+    "ASTIIngestor",
+    # v2: Health.kr
+    "HealthKRClient",
+    "HealthKRIngestor",
+    # v2: bioRxiv
+    "BioRxivClient",
+    "BioRxivIngestor",
 ]

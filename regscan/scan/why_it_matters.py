@@ -212,16 +212,16 @@ class WhyItMattersGenerator:
         # 도메인 추론
         domain = self._infer_domain(pharm_class, generic_name)
 
-        # 1. submission_type 매칭
-        if submission_type in TEMPLATES:
-            return TEMPLATES[submission_type].format(domain=domain)
-
-        # 2. 약리학적 분류 키워드 매칭
+        # 1. 약리학적 분류 키워드 매칭 (더 구체적이므로 우선)
         search_text = " ".join(pharm_class).lower() + " " + generic_name
 
         for keyword, template_key in KEYWORD_MAP.items():
             if keyword in search_text:
                 return TEMPLATES[template_key]
+
+        # 2. submission_type 매칭 (키워드 매칭 실패 시 폴백)
+        if submission_type in TEMPLATES:
+            return TEMPLATES[submission_type].format(domain=domain)
 
         # 3. 기본값
         return TEMPLATES["default"]

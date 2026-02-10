@@ -2,7 +2,11 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from regscan.api.deps import get_data_store, DataStore
-from regscan.api.schemas import DrugSummary, DrugDetail, MedclaimInsight, BriefingReportResponse
+from regscan.api.schemas import (
+    DrugSummary, DrugDetail, MedclaimInsight, BriefingReportResponse,
+    PreprintResponse, MarketReportResponse, ExpertOpinionResponse,
+    AIInsightResponse, ArticleResponse,
+)
 from regscan.map.ingredient_bridge import ReimbursementStatus
 from regscan.report import LLMBriefingGenerator
 
@@ -220,3 +224,167 @@ async def get_briefing_report(
         generated_at=report.generated_at,
         markdown=report.to_markdown(),
     )
+
+
+# ── v2 엔드포인트 ──
+
+
+@router.get("/{inn}/insight", response_model=AIInsightResponse)
+async def get_ai_insight(inn: str):
+    """AI 추론·검증 결과 조회 (v2)"""
+    from regscan.config import settings
+    if not settings.is_postgres:
+        raise HTTPException(status_code=501, detail="PostgreSQL 모드에서만 지원됩니다")
+
+    from regscan.db.database import get_async_session
+    from regscan.db.models import AIInsightDB, DrugDB
+    from sqlalchemy import select
+
+    async with get_async_session()() as session:
+        stmt = (
+            select(AIInsightDB)
+            .join(DrugDB, AIInsightDB.drug_id == DrugDB.id)
+            .where(DrugDB.inn == inn)
+            .order_by(AIInsightDB.generated_at.desc())
+            .limit(1)
+        )
+        result = await session.execute(stmt)
+        row = result.scalar_one_or_none()
+
+        if not row:
+            raise HTTPException(status_code=404, detail=f"AI insight not found: {inn}")
+
+        return AIInsightResponse(
+            impact_score=row.impact_score,
+            risk_factors=row.risk_factors or [],
+            opportunity_factors=row.opportunity_factors or [],
+            reasoning_chain=row.reasoning_chain or "",
+            market_forecast=row.market_forecast or "",
+            reasoning_model=row.reasoning_model or "",
+            verified_score=row.verified_score,
+            corrections=row.corrections or [],
+            confidence_level=row.confidence_level or "",
+            generated_at=row.generated_at,
+        )
+
+
+@router.get("/{inn}/article", response_model=ArticleResponse)
+async def get_ai_article(
+    inn: str,
+    article_type: str = Query(default="briefing", description="기사 유형"),
+):
+    """AI 기사 조회 (v2)"""
+    from regscan.config import settings
+    if not settings.is_postgres:
+        raise HTTPException(status_code=501, detail="PostgreSQL 모드에서만 지원됩니다")
+
+    from regscan.db.database import get_async_session
+    from regscan.db.models import ArticleDB, DrugDB
+    from sqlalchemy import select
+
+    async with get_async_session()() as session:
+        stmt = (
+            select(ArticleDB)
+            .join(DrugDB, ArticleDB.drug_id == DrugDB.id)
+            .where(DrugDB.inn == inn, ArticleDB.article_type == article_type)
+            .order_by(ArticleDB.generated_at.desc())
+            .limit(1)
+        )
+        result = await session.execute(stmt)
+        row = result.scalar_one_or_none()
+
+        if not row:
+            raise HTTPException(status_code=404, detail=f"Article not found: {inn}")
+
+        return ArticleResponse(
+            article_type=row.article_type,
+            headline=row.headline or "",
+            subtitle=row.subtitle or "",
+            lead_paragraph=row.lead_paragraph or "",
+            body_html=row.body_html or "",
+            tags=row.tags or [],
+            writer_model=row.writer_model or "",
+            generated_at=row.generated_at,
+        )
+
+
+@router.get("/{inn}/preprints", response_model=list[PreprintResponse])
+async def get_preprints(
+    inn: str,
+    limit: int = Query(default=20, le=100),
+):
+    """관련 프리프린트 논문 조회 (v2)"""
+    from regscan.config import settings
+    if not settings.is_postgres:
+        raise HTTPException(status_code=501, detail="PostgreSQL 모드에서만 지원됩니다")
+
+    from regscan.db.database import get_async_session
+    from regscan.db.models import PreprintDB, DrugDB
+    from sqlalchemy import select
+
+    async with get_async_session()() as session:
+        stmt = (
+            select(PreprintDB)
+            .join(DrugDB, PreprintDB.drug_id == DrugDB.id)
+            .where(DrugDB.inn == inn)
+            .order_by(PreprintDB.published_date.desc())
+            .limit(limit)
+        )
+        result = await session.execute(stmt)
+        rows = result.scalars().all()
+
+        return [
+            PreprintResponse(
+                doi=r.doi or "",
+                title=r.title or "",
+                authors=r.authors or "",
+                abstract=r.abstract or "",
+                server=r.server or "",
+                category=r.category or "",
+                published_date=r.published_date,
+                pdf_url=r.pdf_url or "",
+                gemini_parsed=r.gemini_parsed or False,
+                extracted_facts=r.extracted_facts,
+            )
+            for r in rows
+        ]
+
+
+@router.get("/{inn}/market", response_model=list[MarketReportResponse])
+async def get_market_reports(
+    inn: str,
+    limit: int = Query(default=20, le=100),
+):
+    """시장 리포트 조회 (v2)"""
+    from regscan.config import settings
+    if not settings.is_postgres:
+        raise HTTPException(status_code=501, detail="PostgreSQL 모드에서만 지원됩니다")
+
+    from regscan.db.database import get_async_session
+    from regscan.db.models import MarketReportDB, DrugDB
+    from sqlalchemy import select
+
+    async with get_async_session()() as session:
+        stmt = (
+            select(MarketReportDB)
+            .join(DrugDB, MarketReportDB.drug_id == DrugDB.id)
+            .where(DrugDB.inn == inn)
+            .order_by(MarketReportDB.published_date.desc())
+            .limit(limit)
+        )
+        result = await session.execute(stmt)
+        rows = result.scalars().all()
+
+        return [
+            MarketReportResponse(
+                source=r.source or "",
+                title=r.title or "",
+                publisher=r.publisher or "",
+                published_date=r.published_date,
+                market_size_krw=r.market_size_krw,
+                growth_rate=r.growth_rate,
+                summary=r.summary or "",
+                source_url=r.source_url or "",
+            )
+            for r in rows
+        ]

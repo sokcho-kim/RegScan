@@ -62,6 +62,29 @@ class Settings(BaseSettings):
     GENERATE_BRIEFING: bool = True  # 핫이슈 브리핑 자동 생성
     GENERATE_HTML: bool = True      # HTML 뉴스레터 자동 생성
 
+    # ── v2: AI 엔진 ──
+    GEMINI_API_KEY: Optional[str] = None
+    ENABLE_GEMINI_PARSING: bool = False
+    GEMINI_MODEL: str = "gemini-2.0-flash"
+
+    ENABLE_AI_REASONING: bool = False
+    REASONING_MODEL: str = "o4-mini"
+
+    ENABLE_AI_VERIFIER: bool = False
+    VERIFIER_MODEL: str = "gpt-5.2"
+
+    ENABLE_AI_WRITER: bool = False
+    WRITER_MODEL: str = "gpt-5.2"
+
+    # v2: 비용 제한
+    MAX_REASONING_CALLS_PER_DAY: int = 50
+    MAX_WRITER_CALLS_PER_DAY: int = 50
+
+    # v2: 신규 소스 토글
+    ENABLE_ASTI: bool = False
+    ENABLE_HEALTHKR: bool = False
+    ENABLE_BIORXIV: bool = False
+
     # 로깅
     LOG_LEVEL: str = "INFO"
 

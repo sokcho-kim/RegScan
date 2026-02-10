@@ -29,7 +29,10 @@ RegScan/
 │   │   ├── mfds.py             # MFDS 공공데이터포털 API 클라이언트 + 수집기
 │   │   ├── cris.py             # CRIS 임상연구정보서비스 API 클라이언트 + 수집기
 │   │   ├── hira.py             # HIRA 보험인정기준/공지사항 Playwright 크롤러
-│   │   └── mohw.py             # 보건복지부 입법/행정예고 Playwright 크롤러
+│   │   ├── mohw.py             # 보건복지부 입법/행정예고 Playwright 크롤러
+│   │   ├── asti.py             # [v2] ASTI/KISTI 시장 리포트 Playwright 크롤러
+│   │   ├── healthkr.py         # [v2] Health.kr 전문가 리뷰 Playwright 크롤러
+│   │   └── biorxiv.py          # [v2] bioRxiv/medRxiv REST API 수집기
 │   │
 │   ├── parse/                  # 데이터 파서 (원본 -> 정규화 dict)
 │   │   ├── __init__.py
@@ -37,7 +40,10 @@ RegScan/
 │   │   ├── ema_parser.py       # EMA 의약품/희귀의약품/공급부족/DHPC 파서
 │   │   ├── mfds_parser.py      # MFDS 허가정보 파서 (MFDSPermitParser)
 │   │   ├── cris_parser.py      # CRIS 임상시험 파서 (CRISTrialParser)
-│   │   └── hira_parser.py      # HIRA 보험인정기준/공지사항 파서 (HIRAParser)
+│   │   ├── hira_parser.py      # HIRA 보험인정기준/공지사항 파서 (HIRAParser)
+│   │   ├── asti_parser.py      # [v2] ASTI 시장 리포트 파서 (시장규모/성장률 추출)
+│   │   ├── healthkr_parser.py  # [v2] Health.kr 전문가 리뷰 파서
+│   │   └── biorxiv_parser.py   # [v2] bioRxiv/medRxiv 프리프린트 파서
 │   │
 │   ├── map/                    # 매핑 & 통합 로직
 │   │   ├── __init__.py
@@ -75,16 +81,30 @@ RegScan/
 │   │       ├── stats.py        # 전체 통계, 핫이슈, 도입임박 약물
 │   │       └── scheduler.py    # 스케줄러 상태/수동실행
 │   │
+│   ├── ai/                     # [v2] AI Intelligence Layer
+│   │   ├── __init__.py
+│   │   ├── gemini_parser.py    # Gemini PDF 파서 (bioRxiv PDF→구조화 데이터)
+│   │   ├── reasoning_engine.py # o4-mini 기반 CoT 추론 엔진
+│   │   ├── verifier.py         # GPT-5.2 기반 팩트체크 검증기
+│   │   ├── writing_engine.py   # GPT-5.2 기반 기사 작성 엔진
+│   │   ├── pipeline.py         # AIIntelligencePipeline 오케스트레이터
+│   │   └── prompts/            # AI 프롬프트 모음
+│   │       ├── __init__.py
+│   │       ├── reasoning_prompt.py  # 4대 스트림 CoT 분석 프롬프트
+│   │       ├── verifier_prompt.py   # 팩트체크 검증 프롬프트
+│   │       └── writer_prompt.py     # Few-Shot 기사 작성 프롬프트
+│   │
 │   ├── models/                 # 공통 데이터 모델
 │   │   ├── __init__.py
 │   │   └── feed_card.py        # FeedCard, SourceType, ChangeType, Domain, ImpactLevel 등
 │   │
 │   ├── db/                     # 데이터베이스 (SQLAlchemy + aiosqlite)
 │   │   ├── __init__.py
-│   │   ├── models.py           # SQLAlchemy ORM 모델 (SnapshotDB, FeedCardDB 등)
+│   │   ├── models.py           # SQLAlchemy ORM 모델 (v1 6개 + v2 5개 테이블)
 │   │   ├── repository.py       # FeedCardRepository (CRUD)
 │   │   ├── global_status_repository.py  # GlobalStatusRepository
-│   │   └── snapshot_repository.py       # SnapshotRepository
+│   │   ├── snapshot_repository.py       # SnapshotRepository
+│   │   └── v2_loader.py        # [v2] V2Loader (preprints/market/expert/insight/article upsert)
 │   │
 │   ├── scripts/                # 패키지 내장 스크립트 (python -m 실행용)
 │   │   ├── __init__.py
@@ -139,10 +159,14 @@ RegScan/
 │   ├── __init__.py
 │   ├── test_fda.py             # FDA 수집기 테스트
 │   ├── test_hira.py            # HIRA 수집기 테스트
-│   └── test_models.py          # 데이터 모델 테스트
+│   ├── test_models.py          # 데이터 모델 테스트
+│   ├── test_v2_schema.py       # [v2] v2 테이블 생성·CRUD 테스트 (7개)
+│   ├── test_v2_pipeline.py     # [v2] 파서·설정·임포트 테스트 (13개)
+│   └── test_ai_pipeline.py     # [v2] AI 3단 파이프라인 단위 테스트 (9개)
 │
 └── docs/                       # 프로젝트 문서
     ├── architecture/           # 아키텍처 문서
+    ├── schema/                 # DB 스키마 문서 (v2_schema.md 포함)
     ├── worklog/                # 작업일지
     ├── research/               # 리서치 리포트
     ├── design/                 # 설계 문서
@@ -164,6 +188,9 @@ RegScan/
                      │                                             │
                      │  HIRA 웹    MOHW 웹                         │
                      │  (Playwright 크롤링)                         │
+                     │                                             │
+                     │  [v2] ASTI 웹    Health.kr 웹   bioRxiv API │
+                     │  (Playwright)    (Playwright)   (REST)      │
                      └────────┬────────────────────────────────────┘
                               │
                     ┌─────────▼─────────┐
@@ -174,6 +201,8 @@ RegScan/
                     ┌─────────▼─────────┐
                     │   parse/ (파싱)     │  FDADrugParser, EMAMedicineParser,
                     │                    │  MFDSPermitParser, CRISTrialParser
+                    │                    │  [v2] ASTIReportParser, HealthKRParser,
+                    │                    │       BioRxivParser
                     │                    │  -> 정규화된 dict 출력
                     └─────────┬──────────┘
                               │
@@ -196,13 +225,24 @@ RegScan/
     │  api/ (서빙)  │  │ monitor/    │  │ report/    │
     │  FastAPI      │  │ DailyScanner│  │ LLM 브리핑  │
     │  REST 엔드포인트│  │ 일간 스캔    │  │ HTML 뉴스레터│
-    └──────────────┘  └──────┬──────┘  └─────┬──────┘
-                             │               │
-                      ┌──────▼───────────────▼──────┐
-                      │   output/ (결과 저장)          │
-                      │   daily_scan/*.json           │
-                      │   daily_scan/*.html           │
-                      └────────────────────────────────┘
+    └──────┬───────┘  └──────┬──────┘  └─────┬──────┘
+           │                 │               │
+           │          ┌──────▼───────────────▼──────┐
+           │          │   output/ (결과 저장)          │
+           │          │   daily_scan/*.json           │
+           │          │   daily_scan/*.html           │
+           │          └────────────────────────────────┘
+           │
+    ┌──────▼─────────────────────────────────────┐
+    │  [v2] ai/ (AI Intelligence Layer)           │
+    │                                             │
+    │  GeminiParser → PDF 파싱                     │
+    │  ReasoningEngine (o4-mini) → CoT 추론        │
+    │  InsightVerifier (GPT-5.2) → 팩트체크         │
+    │  WritingEngine (GPT-5.2) → 기사 생성          │
+    │                                             │
+    │  AIIntelligencePipeline 오케스트레이터         │
+    └─────────────────────────────────────────────┘
 ```
 
 ### API 서버 시작 시 데이터 흐름
@@ -245,6 +285,9 @@ uvicorn regscan.api.main:app
 | `cris.py` | `CRISClient`, `CRISTrialIngestor` | 공공데이터포털 API로 CRIS 임상시험 수집 (11.5K건) |
 | `hira.py` | `HIRAInsuranceCriteriaIngestor`, `HIRANoticeIngestor` | Playwright로 HIRA 보험인정기준(고시/행정해석/심사지침) 크롤링 |
 | `mohw.py` | `MOHWPreAnnouncementIngestor` | Playwright로 보건복지부 입법/행정예고 크롤링 |
+| `asti.py` | `ASTIClient`, `ASTIIngestor` | **[v2]** Playwright로 ASTI 시장 리포트 크롤링. 키워드: 의약품/바이오/제약/신약 |
+| `healthkr.py` | `HealthKRClient`, `HealthKRIngestor` | **[v2]** Playwright로 Health.kr 전문가 리뷰 수집. 검색→drug_cd→KPIC 섹션 파싱 |
+| `biorxiv.py` | `BioRxivClient`, `BioRxivIngestor` | **[v2]** REST API로 bioRxiv/medRxiv 프리프린트 수집. 키워드 필터링 |
 
 ### 3.2 parse/ -- 데이터 파서
 
@@ -257,6 +300,9 @@ uvicorn regscan.api.main:app
 | `mfds_parser.py` | `MFDSPermitParser` | 공공데이터포털 JSON | `main_ingredient`, `permit_date`, `is_new_drug`, `indication` |
 | `cris_parser.py` | `CRISTrialParser` | 공공데이터포털 JSON | `trial_id`, `phase`, `status`, `drug_names`, `is_drug_trial` |
 | `hira_parser.py` | `HIRAParser` | Playwright 크롤링 결과 | `title`, `category`, `change_type`, `domain` |
+| `asti_parser.py` | `ASTIReportParser` | **[v2]** ASTI 크롤링 결과 | `title`, `market_size_krw`, `growth_rate`, `published_date` |
+| `healthkr_parser.py` | `HealthKRParser` | **[v2]** Health.kr 크롤링 결과 | `title`, `source`, `summary`, `published_date` |
+| `biorxiv_parser.py` | `BioRxivParser` | **[v2]** bioRxiv API 응답 | `doi`, `title`, `authors`, `pdf_url`, `published_date` |
 
 ### 3.3 map/ -- 매핑 & 통합
 
@@ -308,7 +354,27 @@ uvicorn regscan.api.main:app
 | `llm_generator.py` | `LLMBriefingGenerator`, `BriefingReport` | OpenAI/Anthropic LLM으로 약물별 브리핑 리포트 생성. Few-Shot + CoT 프롬프트 |
 | `prompts.py` | -- | 시스템 프롬프트, 브리핑 리포트, 메드클레임, 간단요약 프롬프트 템플릿 |
 
-### 3.7 api/ -- FastAPI REST API
+### 3.7 ai/ -- AI Intelligence Layer [v2]
+
+3단 AI 파이프라인: 추론 → 검증 → 작성. 모든 단계 `ENABLE_*` 플래그로 독립 토글.
+
+| 모듈 | 주요 클래스 | 역할 |
+|------|-----------|------|
+| `gemini_parser.py` | `GeminiParser` | bioRxiv PDF → Gemini API → 구조화 데이터 (약물명/적응증/MOA/결과). MD5 캐싱 |
+| `reasoning_engine.py` | `ReasoningEngine` | o4-mini (reasoning_effort=high)로 4대 스트림 CoT 분석. impact_score/risk/opportunity 생성 |
+| `verifier.py` | `InsightVerifier` | GPT-5.2 (temperature=0.2)로 추론 결과 팩트체크. verified_score/corrections/confidence 생성 |
+| `writing_engine.py` | `WritingEngine` | GPT-5.2 (temperature=0.7)로 기사 작성. briefing/newsletter/press_release 3종 |
+| `pipeline.py` | `AIIntelligencePipeline` | 3단 오케스트레이터. 일일 호출 제한, 단계별 fallback, 사용량 추적 |
+| `prompts/` | -- | reasoning/verifier/writer 프롬프트 템플릿. Few-Shot 예시 포함 |
+
+**파이프라인 흐름:**
+```
+[o4-mini] Reasoning → [GPT-5.2] Verifier → [GPT-5.2] Writer
+     ↓ fallback           ↓ fallback           ↓ fallback
+  global_score 유지    confidence=low       템플릿 기사
+```
+
+### 3.8 api/ -- FastAPI REST API
 
 | 모듈 | 역할 |
 |------|------|
@@ -349,6 +415,25 @@ uvicorn regscan.api.main:app
 | `GENERATE_BRIEFING` | `bool` | `True` | 핫이슈 브리핑 자동 생성 |
 | `GENERATE_HTML` | `bool` | `True` | HTML 뉴스레터 자동 생성 |
 | `LOG_LEVEL` | `str` | `"INFO"` | 로깅 레벨 |
+
+#### v2 추가 설정
+
+| 변수명 | 타입 | 기본값 | 설명 |
+|--------|------|--------|------|
+| `GEMINI_API_KEY` | `str?` | `None` | Google Gemini API 키 (PDF 파싱용) |
+| `ENABLE_GEMINI_PARSING` | `bool` | `False` | Gemini PDF 파싱 활성화 |
+| `GEMINI_MODEL` | `str` | `"gemini-2.5-flash"` | Gemini 모델명 |
+| `ENABLE_AI_REASONING` | `bool` | `False` | o4-mini 추론 엔진 활성화 |
+| `REASONING_MODEL` | `str` | `"o4-mini"` | 추론 모델명 |
+| `ENABLE_AI_VERIFIER` | `bool` | `False` | GPT-5.2 검증기 활성화 |
+| `VERIFIER_MODEL` | `str` | `"gpt-5.2"` | 검증 모델명 |
+| `ENABLE_AI_WRITER` | `bool` | `False` | GPT-5.2 기사 작성기 활성화 |
+| `WRITER_MODEL` | `str` | `"gpt-5.2"` | 기사 작성 모델명 |
+| `MAX_REASONING_CALLS_PER_DAY` | `int` | `50` | 일일 추론 API 호출 제한 |
+| `MAX_WRITER_CALLS_PER_DAY` | `int` | `50` | 일일 기사 작성 API 호출 제한 |
+| `ENABLE_ASTI` | `bool` | `False` | ASTI 시장 리포트 수집 활성화 |
+| `ENABLE_HEALTHKR` | `bool` | `False` | Health.kr 전문가 리뷰 수집 활성화 |
+| `ENABLE_BIORXIV` | `bool` | `False` | bioRxiv 프리프린트 수집 활성화 |
 
 ### 4.2 .env 파일 예시
 
@@ -403,6 +488,10 @@ API 서버 실행: `uvicorn regscan.api.main:app --reload`
 | `GET` | `/api/v1/drugs/{inn}` | 약물 상세 (글로벌+국내+CRIS) | -- |
 | `GET` | `/api/v1/drugs/{inn}/medclaim` | 메드클레임 시사점 (급여/본인부담/인사이트) | -- |
 | `GET` | `/api/v1/drugs/{inn}/briefing` | LLM 브리핑 리포트 생성 | `use_llm=true` |
+| `GET` | `/api/v1/drugs/{inn}/insight` | **[v2]** AI 추론·검증 결과 | -- |
+| `GET` | `/api/v1/drugs/{inn}/article` | **[v2]** AI 기사 조회 | `article_type=briefing` |
+| `GET` | `/api/v1/drugs/{inn}/preprints` | **[v2]** 프리프린트 논문 목록 | -- |
+| `GET` | `/api/v1/drugs/{inn}/market` | **[v2]** 시장 리포트 목록 | -- |
 
 ### Scheduler (`/api/v1/scheduler`)
 
@@ -423,29 +512,36 @@ APScheduler가 매일 지정 시각(기본 08:00)에 `run_daily_pipeline()`을 �
 ```
 run_daily_pipeline()
 │
-├── [Step 1/4] 일간 스캔 실행
-│   ├── DailyScanner() 생성
-│   ├── load_existing_data()        # data/fda, data/ema, data/mfds 최신 파일 로드
-│   │                                # 기존 약물을 normalized_name으로 인덱싱
+├── [Step 1/9] 데이터 수집 (FDA/EMA/MFDS/CRIS)
 │   └── scanner.scan(days_back=7)
-│       ├── _scan_fda(7)            # openFDA API로 최근 7일 신규 승인 조회
-│       ├── _scan_ema(7)            # EMA JSON Report에서 최근 7일 활동 필터링
-│       ├── _scan_mfds(7)           # 캐시된 전체 데이터에서 최근 7일 허가 필터링
-│       ├── _match_existing()       # 각 신규 건을 기존 데이터와 크로스 매칭
-│       └── _calculate_hot_issue_score()
-│           │                        # Breakthrough +20, PRIME +20
-│           │                        # global_concurrent +25, domestic_arrival +30
-│           └── threshold >= 20이면 hot_issues에 추가
 │
-├── [Step 2/4] 스캔 결과 JSON 저장
+├── [Step 2/9] 데이터 파싱 + 매핑 + 스코어링
+│
+├── [Step 3/9] DB 저장 (drugs, regulatory_events 등)
+│
+├── [Step 4/9] 스캔 결과 JSON 저장
 │   └── output/daily_scan/scan_YYYY-MM-DD.json
 │
-├── [Step 3/4] HTML 뉴스레터 생성 (GENERATE_HTML=True 시)
-│   ├── scripts/generate_daily_html.py 동적 import
-│   └── output/daily_scan/daily_briefing_YYYY-MM-DD.html
+├── [Step 4.5/9] [v2] 신규 소스 수집 — ENABLE_* 체크
+│   ├── ASTI 시장 리포트 (ENABLE_ASTI)
+│   ├── Health.kr 전문가 리뷰 (ENABLE_HEALTHKR)
+│   └── bioRxiv 프리프린트 (ENABLE_BIORXIV)
 │
-└── [Step 4/4] DataStore 리로드
-    └── reload_data()               # 최신 데이터로 API 서빙 갱신
+├── [Step 4.6/9] [v2] Gemini PDF 파싱 — ENABLE_GEMINI_PARSING 체크
+│   └── 핫이슈(score>=60) 프리프린트 PDF만 선택 파싱
+│
+├── [Step 5/9] LLM 브리핑 생성 (기존 v1)
+│
+├── [Step 5.5/9] [v2] AI 3단 파이프라인 — ENABLE_AI_* 체크
+│   ├── ReasoningEngine (o4-mini): 영향도 추론
+│   ├── InsightVerifier (GPT-5.2): 팩트체크
+│   └── WritingEngine (GPT-5.2): 기사 생성
+│   └── 핫이슈(score>=60) 상위 10건만 대상
+│
+├── [Step 6/9] HTML 뉴스레터 생성
+│
+└── [Step 7/9] DataStore 리로드
+    └── reload_data()
 ```
 
 ### ScanResult 구조
@@ -507,10 +603,13 @@ ScanResult(
 ### pytest 단위 테스트
 
 ```bash
-pytest tests/                    # 전체 테스트 실행
+pytest tests/                    # 전체 테스트 실행 (52건)
 pytest tests/test_fda.py         # FDA 수집기 테스트
 pytest tests/test_hira.py        # HIRA 수집기 테스트
 pytest tests/test_models.py      # 데이터 모델 테스트
+pytest tests/test_v2_schema.py   # [v2] DB 스키마 테스트 (7건)
+pytest tests/test_v2_pipeline.py # [v2] 파서·설정·임포트 테스트 (13건)
+pytest tests/test_ai_pipeline.py # [v2] AI 파이프라인 테스트 (9건)
 ```
 
 ---

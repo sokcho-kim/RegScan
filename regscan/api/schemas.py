@@ -162,3 +162,67 @@ class BriefingReportResponse(BaseModel):
     medclaim_section: str
     generated_at: datetime
     markdown: str  # 마크다운 형식 전체 리포트
+
+
+# ── v2 스키마 ──
+
+class PreprintResponse(BaseModel):
+    """프리프린트 논문 응답"""
+    doi: str
+    title: str
+    authors: str = ""
+    abstract: str = ""
+    server: str = ""
+    category: str = ""
+    published_date: Optional[date] = None
+    pdf_url: str = ""
+    gemini_parsed: bool = False
+    extracted_facts: Optional[dict] = None
+
+
+class MarketReportResponse(BaseModel):
+    """시장 리포트 응답"""
+    source: str
+    title: str
+    publisher: str = ""
+    published_date: Optional[date] = None
+    market_size_krw: Optional[float] = None
+    growth_rate: Optional[float] = None
+    summary: str = ""
+    source_url: str = ""
+
+
+class ExpertOpinionResponse(BaseModel):
+    """전문가 리뷰 응답"""
+    source: str
+    title: str
+    author: str = ""
+    summary: str = ""
+    published_date: Optional[date] = None
+    source_url: str = ""
+
+
+class AIInsightResponse(BaseModel):
+    """AI 인사이트 응답"""
+    impact_score: Optional[int] = None
+    risk_factors: list[str] = []
+    opportunity_factors: list[str] = []
+    reasoning_chain: str = ""
+    market_forecast: str = ""
+    reasoning_model: str = ""
+    verified_score: Optional[int] = None
+    corrections: list[dict] = []
+    confidence_level: str = ""
+    generated_at: Optional[datetime] = None
+
+
+class ArticleResponse(BaseModel):
+    """AI 기사 응답"""
+    article_type: str
+    headline: str
+    subtitle: str = ""
+    lead_paragraph: str = ""
+    body_html: str = ""
+    tags: list[str] = []
+    writer_model: str = ""
+    generated_at: Optional[datetime] = None

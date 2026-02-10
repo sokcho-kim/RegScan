@@ -138,6 +138,81 @@ async def run_daily_pipeline() -> dict:
                 logger.warning(f"      DB 적재 실패: {e}")
                 result_summary["steps"]["db_load"] = f"error: {e}"
 
+        # Step 4.6: v2 신규 소스 수집 + AI 파이프라인
+        any_v2 = (
+            settings.ENABLE_ASTI or settings.ENABLE_HEALTHKR
+            or settings.ENABLE_BIORXIV or settings.ENABLE_AI_REASONING
+        )
+        if any_v2:
+            logger.info("[4.6/6] v2 파이프라인 (신규 소스 + AI)...")
+            try:
+                v2_counts = {}
+
+                # bioRxiv
+                if settings.ENABLE_BIORXIV:
+                    try:
+                        from regscan.ingest.biorxiv import BioRxivIngestor
+                        from regscan.parse.biorxiv_parser import BioRxivParser
+
+                        hot_inns = [d.inn for d in store.get_hot_issues(min_score=60)][:20]
+                        ingestor = BioRxivIngestor(
+                            drug_keywords=hot_inns,
+                            days_back=settings.SCAN_DAYS_BACK,
+                        )
+                        async with ingestor:
+                            raw = await ingestor.fetch()
+                        parser = BioRxivParser()
+                        parsed = parser.parse_many(raw)
+                        v2_counts["biorxiv"] = len(parsed)
+                    except Exception as e:
+                        logger.warning("      bioRxiv 수집 실패: %s", e)
+
+                # AI 파이프라인 (핫이슈만)
+                ai_enabled = (
+                    settings.ENABLE_AI_REASONING
+                    or settings.ENABLE_AI_VERIFIER
+                    or settings.ENABLE_AI_WRITER
+                )
+                if ai_enabled:
+                    try:
+                        from regscan.ai.pipeline import AIIntelligencePipeline
+                        from regscan.db.v2_loader import V2Loader
+
+                        ai_pipeline = AIIntelligencePipeline()
+                        v2_loader = V2Loader()
+                        hot_issues = store.get_hot_issues(min_score=60)
+
+                        for drug in hot_issues[:10]:
+                            try:
+                                drug_dict = {
+                                    "inn": drug.inn,
+                                    "fda_approved": drug.fda_approved,
+                                    "ema_approved": drug.ema_approved,
+                                    "mfds_approved": drug.mfds_approved,
+                                    "global_score": drug.global_score,
+                                    "hira_status": drug.hira_status.value if drug.hira_status else None,
+                                    "hira_price": drug.hira_price,
+                                }
+                                insight, article = await ai_pipeline.run(drug=drug_dict)
+                                drug_id = await v2_loader.get_drug_id(drug.inn)
+                                if insight:
+                                    await v2_loader.save_ai_insight(drug_id, insight)
+                                if article and article.get("headline"):
+                                    await v2_loader.save_article(drug_id, article)
+                            except Exception as e:
+                                logger.warning("      AI 실패 (%s): %s", drug.inn, e)
+
+                        v2_counts["ai_pipeline"] = "ok"
+                    except Exception as e:
+                        logger.warning("      AI 파이프라인 실패: %s", e)
+
+                result_summary["steps"]["v2_pipeline"] = v2_counts
+            except Exception as e:
+                logger.warning("      v2 파이프라인 실패: %s", e)
+                result_summary["steps"]["v2_pipeline"] = f"error: {e}"
+        else:
+            result_summary["steps"]["v2_pipeline"] = "skipped"
+
         # Step 5: 핫이슈 LLM 브리핑 일괄 생성·저장
         logger.info("[5/6] 핫이슈 LLM 브리핑 생성...")
         try:
