@@ -85,6 +85,11 @@ class Settings(BaseSettings):
     ENABLE_HEALTHKR: bool = False
     ENABLE_BIORXIV: bool = False
 
+    # 기사 발행 기준
+    MIN_SCORE_FOR_DB: int = 10            # DB 적재 최소 점수 (MFDS-only OTC 제외)
+    MIN_SCORE_FOR_BRIEFING: int = 40      # v1 LLM 브리핑 대상
+    MIN_SCORE_FOR_AI_PIPELINE: int = 40   # v2 AI 파이프라인 대상
+
     # 로깅
     LOG_LEVEL: str = "INFO"
 

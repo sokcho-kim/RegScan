@@ -100,9 +100,17 @@ async def run_pipeline(days_back: int = 7) -> dict:
         store = reload_data()
 
         loader = DBLoader()
-        load_result = await loader.upsert_impacts(store.impacts)
+        qualified = [
+            d for d in store.impacts
+            if d.global_score >= settings.MIN_SCORE_FOR_DB
+        ]
+        skipped_count = len(store.impacts) - len(qualified)
+        load_result = await loader.upsert_impacts(qualified)
         result["steps"]["db_load"] = load_result
-        logger.info(f"  DB 적재 완료: {load_result}")
+        logger.info(
+            f"  DB 적재 완료: {load_result} "
+            f"(score<{settings.MIN_SCORE_FOR_DB} 제외: {skipped_count}건)"
+        )
 
         # 스냅샷 메타 저장
         from datetime import date as date_type
@@ -147,7 +155,7 @@ async def run_pipeline(days_back: int = 7) -> dict:
                     from regscan.ingest.healthkr import HealthKRIngestor
                     from regscan.parse.healthkr_parser import HealthKRParser
 
-                    hot_inns = [d.inn for d in store.get_hot_issues(min_score=60)]
+                    hot_inns = [d.inn for d in store.get_hot_issues(min_score=settings.MIN_SCORE_FOR_AI_PIPELINE)]
                     ingestor = HealthKRIngestor(drug_names=hot_inns[:20])
                     async with ingestor:
                         raw = await ingestor.fetch()
@@ -165,7 +173,7 @@ async def run_pipeline(days_back: int = 7) -> dict:
                     from regscan.ingest.biorxiv import BioRxivIngestor
                     from regscan.parse.biorxiv_parser import BioRxivParser
 
-                    hot_inns = [d.inn for d in store.get_hot_issues(min_score=60)]
+                    hot_inns = [d.inn for d in store.get_hot_issues(min_score=settings.MIN_SCORE_FOR_AI_PIPELINE)]
                     ingestor = BioRxivIngestor(
                         drug_keywords=hot_inns[:20], days_back=days_back
                     )
@@ -254,7 +262,7 @@ async def run_pipeline(days_back: int = 7) -> dict:
             from regscan.api.routes.drugs import get_llm_generator
 
             generator = get_llm_generator()
-            hot_issues = store.get_hot_issues(min_score=40)
+            hot_issues = store.get_hot_issues(min_score=settings.MIN_SCORE_FOR_BRIEFING)
             generated, failed = 0, 0
 
             for drug in hot_issues:
@@ -291,7 +299,7 @@ async def run_pipeline(days_back: int = 7) -> dict:
                 v2_loader = V2Loader()
                 ai_generated, ai_failed = 0, 0
 
-                hot_issues = store.get_hot_issues(min_score=60)
+                hot_issues = store.get_hot_issues(min_score=settings.MIN_SCORE_FOR_AI_PIPELINE)
                 for drug in hot_issues:
                     try:
                         drug_dict = {
