@@ -1,0 +1,12 @@
+{
+  "external": [
+    {
+      "stream_name": "external",
+      "sub_category": "",
+      "drug_count": 0,
+      "signal_count": 12,
+      "inn_list": [],
+      "errors": []
+    }
+  ]
+}

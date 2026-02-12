@@ -1,0 +1,53 @@
+{
+  "therapeutic_area": [
+    {
+      "stream_name": "therapeutic_area",
+      "sub_category": "rare_disease",
+      "drug_count": 40,
+      "signal_count": 0,
+      "inn_list": [
+        "ECULIZUMAB-AEEB",
+        "POZELIMAB",
+        "ECULIZUMAB-AAGH",
+        "PEGCETACOPLAN",
+        "ZILUCOPLAN",
+        "RAVULIZUMAB",
+        "ECULIZUMAB",
+        "ETEPLIRSEN",
+        "TOFERSEN",
+        "NUSINERSEN",
+        "CASIMERSEN",
+        "GOLODIRSEN",
+        "EPLONTERSEN",
+        "LUMACAFTOR AND IVACAFTOR",
+        "VANZACAFTOR, TEZACAFTOR, AND DEUTIVACAFTOR",
+        "IVACAFTOR",
+        "miglustat",
+        "velaglucerase alfa",
+        "vamorolone",
+        "pegunigalsidase alfa",
+        "pridopidine hydrochloride",
+        "agalsidase alfa",
+        "deutivacaftor;tezacaftor;vanzacaftor calcium dihydrate",
+        "tobramycin",
+        "tezacaftor;ivacaftor",
+        "imiglucerase",
+        "ivacaftor;tezacaftor;elexacaftor",
+        "Lumacaftor;ivacaftor",
+        "delandistrogene moxeparvovec",
+        "migalastat hydrochloride",
+        "givinostat hydrochloride monohydrate",
+        "Colistimethate sodium",
+        "Eliglustat (tartrate)",
+        "levofloxacin",
+        "ataluren",
+        "agalsidase beta",
+        "aztreonam lysine",
+        "mannitol",
+        "idebenone;titanium dioxide",
+        "taliglucerase alfa"
+      ],
+      "errors": []
+    }
+  ]
+}
