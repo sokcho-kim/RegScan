@@ -83,8 +83,21 @@ class DomesticImpact:
 
     # 분석 메타
     global_score: int = 0
+    korea_relevance_score: int = 0               # 국내 연관성 점수 (0~100)
+    korea_relevance_reasons: list[str] = field(default_factory=list)
     hot_issue_reasons: list[str] = field(default_factory=list)
     analysis_notes: list[str] = field(default_factory=list)
+
+    @property
+    def quadrant(self) -> str:
+        """2축 분류 4분면 결정"""
+        if self.global_score >= 60 and self.korea_relevance_score >= 50:
+            return "top_priority"
+        elif self.global_score >= 60:
+            return "watch"
+        elif self.korea_relevance_score >= 50:
+            return "track"
+        return "normal"
 
     @property
     def is_globally_approved(self) -> bool:
@@ -159,9 +172,129 @@ class DomesticImpact:
             "cris_trial_count": len(self.cris_trials),
             "has_active_trial": self.has_active_trial,
             "global_score": self.global_score,
+            "korea_relevance_score": self.korea_relevance_score,
+            "quadrant": self.quadrant,
             "summary": self.summary,
             "analysis_notes": self.analysis_notes,
         }
+
+
+# ── 국내 다빈도 질환 키워드 (심평원 통계 기반) ──
+
+KOREA_HIGH_BURDEN_KEYWORDS = [
+    # 암 (사망원인 1위)
+    "cancer", "neoplasm", "tumor", "oncolog", "leukemia", "lymphoma",
+    "carcinoma", "melanoma", "myeloma",
+    # 심뇌혈관 (사망원인 2, 4위)
+    "hypertension", "stroke", "myocardial", "heart failure", "atrial fibrillation",
+    "coronary", "thrombosis",
+    # 당뇨 (유병률 상위)
+    "diabetes", "insulin",
+    # 호흡기 (다빈도)
+    "asthma", "copd", "pneumonia",
+    # 정신건강
+    "depression", "schizophrenia", "bipolar", "anxiety",
+    # 근골격 (고령화)
+    "osteoporosis", "rheumatoid", "arthritis",
+    # 감염
+    "hepatitis", "hiv", "tuberculosis",
+    # 신장
+    "chronic kidney", "dialysis", "renal",
+    # 희귀질환 (산정특례 대상)
+    "rare disease", "orphan",
+]
+
+
+class KoreaRelevanceScorer:
+    """한국 시장 연관성 점수 산정 (0~100)
+
+    global_score와 독립적인 2번째 축.
+    기존 수집 데이터(MFDS, HIRA, CRIS)만으로 산정.
+    """
+
+    WEIGHTS = {
+        "mfds_approved": 20,       # MFDS 허가
+        "hira_reimbursed": 20,     # HIRA 급여 등재
+        "hira_deleted": 5,         # HIRA 급여 삭제 이력
+        "cris_active": 15,         # CRIS 활성 임상시험
+        "cris_multiple": 5,        # CRIS 2건 이상
+        "atc_market_exists": 15,   # 동일 ATC 치료영역에 급여 약물 존재
+        "high_burden_disease": 15, # 국내 다빈도 질환
+        "mfds_orphan": 10,         # MFDS 희귀의약품 지정
+    }
+
+    def __init__(self, hira_atc_codes: set[str] | None = None):
+        """
+        Args:
+            hira_atc_codes: HIRA 급여 약물의 ATC 3단계 코드 집합.
+                            없으면 ATC 시장 존재 항목을 스킵.
+        """
+        self._hira_atc_codes = hira_atc_codes or set()
+
+    def calculate(
+        self,
+        impact: DomesticImpact,
+        atc_code: str = "",
+        indication: str = "",
+    ) -> tuple[int, list[str]]:
+        """한국 연관성 점수 산정.
+
+        Args:
+            impact: 국내 영향 분석 결과 (MFDS/HIRA/CRIS 정보 포함)
+            atc_code: 약물의 ATC 코드 (EMA 소스)
+            indication: 적응증 텍스트
+
+        Returns:
+            (점수, 사유 목록)
+        """
+        score = 0
+        reasons: list[str] = []
+
+        # 1. MFDS 허가
+        if impact.mfds_approved:
+            score += self.WEIGHTS["mfds_approved"]
+            reasons.append("MFDS 허가")
+
+        # 2. HIRA 급여
+        if impact.hira_status == ReimbursementStatus.REIMBURSED:
+            score += self.WEIGHTS["hira_reimbursed"]
+            reasons.append("HIRA 급여 등재")
+        elif impact.hira_status == ReimbursementStatus.DELETED:
+            score += self.WEIGHTS["hira_deleted"]
+            reasons.append("HIRA 급여 삭제 이력")
+
+        # 3. CRIS 임상
+        if impact.has_active_trial:
+            score += self.WEIGHTS["cris_active"]
+            trial_count = len(impact.cris_trials)
+            reasons.append(f"국내 임상시험 {trial_count}건")
+            if trial_count >= 2:
+                score += self.WEIGHTS["cris_multiple"]
+
+        # 4. ATC 코드 기반 시장 존재
+        if atc_code and len(atc_code) >= 3 and self._hira_atc_codes:
+            atc_3level = atc_code[:3]
+            if atc_3level in self._hira_atc_codes:
+                score += self.WEIGHTS["atc_market_exists"]
+                reasons.append(f"동일 치료영역({atc_3level}) 급여 약물 존재")
+
+        # 5. 국내 다빈도 질환
+        if indication and self._is_high_burden(indication):
+            score += self.WEIGHTS["high_burden_disease"]
+            reasons.append("국내 다빈도 질환")
+
+        # 6. MFDS 희귀의약품
+        if any("희귀" in r or "Orphan" in r for r in impact.hot_issue_reasons):
+            score += self.WEIGHTS["mfds_orphan"]
+            reasons.append("희귀의약품 지정")
+
+        return min(score, 100), reasons
+
+    @staticmethod
+    def _is_high_burden(indication: str) -> bool:
+        """적응증이 국내 다빈도 질환에 해당하는지 확인."""
+        text = indication.lower()
+        return any(kw in text for kw in KOREA_HIGH_BURDEN_KEYWORDS)
 
 
 class DomesticImpactAnalyzer:
@@ -181,9 +314,14 @@ class DomesticImpactAnalyzer:
         imminent = analyzer.get_by_status(DomesticStatus.IMMINENT)
     """
 
-    def __init__(self, ingredient_bridge: Optional[IngredientBridge] = None):
+    def __init__(
+        self,
+        ingredient_bridge: Optional[IngredientBridge] = None,
+        hira_atc_codes: set[str] | None = None,
+    ):
         self._bridge = ingredient_bridge
         self._matcher = IngredientMatcher()
+        self._korea_scorer = KoreaRelevanceScorer(hira_atc_codes=hira_atc_codes)
         self._cris_by_drug: dict[str, list[dict]] = {}
         self._results: list[DomesticImpact] = []
 
@@ -259,6 +397,19 @@ class DomesticImpactAnalyzer:
 
         # 상태 결정
         impact.domestic_status = self._determine_status(impact)
+
+        # 한국 연관성 점수 산정
+        indication = ""
+        for approval in [status.fda, status.ema]:
+            if approval and approval.indication:
+                indication += " " + approval.indication
+        korea_score, korea_reasons = self._korea_scorer.calculate(
+            impact,
+            atc_code=status.atc_code or "",
+            indication=indication,
+        )
+        impact.korea_relevance_score = korea_score
+        impact.korea_relevance_reasons = korea_reasons
 
         # 분석 노트
         self._add_analysis_notes(impact)

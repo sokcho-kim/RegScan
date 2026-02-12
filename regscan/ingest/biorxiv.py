@@ -120,6 +120,88 @@ class BioRxivClient:
         return filtered
 
 
+class MedRxivCompoundIngestor(BaseIngestor):
+    """medRxiv 복합 키워드 수집기 (Stream 3 외부시그널용)
+
+    치료영역별 복합 키워드로 medRxiv에서 논문 수집.
+    키워드: [area] AND (phase 3 OR clinical trial OR cost-effectiveness OR real-world evidence)
+    """
+
+    COMPOUND_SUFFIXES = [
+        "phase 3", "clinical trial", "cost-effectiveness",
+        "real-world evidence", "real world evidence",
+        "randomized controlled trial", "RCT",
+    ]
+
+    def __init__(
+        self,
+        therapeutic_areas: list[str] | None = None,
+        days_back: int = 30,
+        timeout: float = 30.0,
+    ):
+        super().__init__(timeout=timeout)
+        self.therapeutic_areas = therapeutic_areas or ["oncology", "diabetes", "immunology"]
+        self.days_back = days_back
+
+    def source_type(self) -> str:
+        return "MEDRXIV_COMPOUND"
+
+    async def fetch(self) -> list[dict[str, Any]]:
+        """medRxiv 복합 키워드 수집"""
+        all_papers = []
+        seen_dois: set[str] = set()
+
+        async with BioRxivClient(timeout=self.timeout) as client:
+            # medRxiv만 사용
+            try:
+                server_papers = await client.fetch_all_recent(
+                    server="medrxiv", days_back=self.days_back,
+                )
+                logger.info("medRxiv 전체 수집: %d건", len(server_papers))
+            except Exception as e:
+                logger.warning("medRxiv 수집 실패: %s", e)
+                return []
+
+            # 복합 키워드 매칭
+            for paper in server_papers:
+                text = (
+                    paper.get("title", "") + " " + paper.get("abstract", "")
+                ).lower()
+
+                matched_area = None
+                matched_suffix = None
+
+                for area in self.therapeutic_areas:
+                    area_lower = area.lower()
+                    if area_lower in text:
+                        matched_area = area
+                        break
+
+                if not matched_area:
+                    continue
+
+                for suffix in self.COMPOUND_SUFFIXES:
+                    if suffix.lower() in text:
+                        matched_suffix = suffix
+                        break
+
+                if not matched_suffix:
+                    continue
+
+                doi = paper.get("doi", "")
+                if doi and doi not in seen_dois:
+                    seen_dois.add(doi)
+                    paper["server"] = "medrxiv"
+                    paper["search_keyword"] = f"{matched_area} AND {matched_suffix}"
+                    paper["matched_area"] = matched_area
+                    paper["collected_at"] = self._now().isoformat()
+                    all_papers.append(paper)
+
+            logger.info("medRxiv 복합 키워드 매칭: %d건", len(all_papers))
+
+        return all_papers
+
+
 class BioRxivIngestor(BaseIngestor):
     """bioRxiv/medRxiv 프리프린트 수집기"""
 
@@ -141,33 +223,53 @@ class BioRxivIngestor(BaseIngestor):
     async def fetch(self) -> list[dict[str, Any]]:
         """bioRxiv/medRxiv 프리프린트 수집
 
+        서버당 1회만 fetch → 메모리에서 키워드 필터링 (API 호출 최소화).
+
         Returns:
             프리프린트 목록 (파싱 전 raw data)
         """
         all_papers = []
         seen_dois = set()
+        keywords_lower = [kw.lower() for kw in self.drug_keywords]
 
         async with BioRxivClient(timeout=self.timeout) as client:
             for server in self.servers:
-                for keyword in self.drug_keywords:
-                    try:
-                        papers = await client.search_by_keyword(
-                            keyword=keyword,
-                            server=server,
-                            days_back=self.days_back,
+                try:
+                    # 서버당 1회만 전체 수집
+                    server_papers = await client.fetch_all_recent(
+                        server=server, days_back=self.days_back,
+                    )
+                    logger.info(
+                        "%s 전체 수집: %d건, 키워드 필터링 시작...",
+                        server, len(server_papers),
+                    )
+
+                    # 메모리에서 전체 키워드 필터링
+                    for paper in server_papers:
+                        text = (
+                            paper.get("title", "") + " " + paper.get("abstract", "")
+                        ).lower()
+                        matched_keyword = next(
+                            (kw for kw in keywords_lower if kw in text), None
                         )
-                        for paper in papers:
-                            doi = paper.get("doi", "")
-                            if doi and doi not in seen_dois:
-                                seen_dois.add(doi)
-                                paper["server"] = server
-                                paper["search_keyword"] = keyword
-                                paper["collected_at"] = self._now().isoformat()
-                                all_papers.append(paper)
-                    except Exception as e:
-                        logger.warning(
-                            "%s '%s' 수집 실패: %s", server, keyword, e
-                        )
+                        if not matched_keyword:
+                            continue
+
+                        doi = paper.get("doi", "")
+                        if doi and doi not in seen_dois:
+                            seen_dois.add(doi)
+                            paper["server"] = server
+                            paper["search_keyword"] = matched_keyword
+                            paper["collected_at"] = self._now().isoformat()
+                            all_papers.append(paper)
+
+                    logger.info(
+                        "%s 키워드 매칭: %d건 (키워드 %d개)",
+                        server, len([p for p in all_papers if p.get("server") == server]),
+                        len(keywords_lower),
+                    )
+                except Exception as e:
+                    logger.warning("%s 수집 실패: %s", server, e)
 
         logger.info("bioRxiv/medRxiv 총 %d건 수집 완료", len(all_papers))
         return all_papers

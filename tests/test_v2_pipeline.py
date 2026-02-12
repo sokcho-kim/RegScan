@@ -137,7 +137,7 @@ class TestV2Settings:
         assert settings.ENABLE_AI_WRITER is False
         assert settings.ENABLE_ASTI is False
         assert settings.ENABLE_HEALTHKR is False
-        assert settings.ENABLE_BIORXIV is False
+        assert settings.ENABLE_BIORXIV is True
         assert settings.ENABLE_GEMINI_PARSING is False
         assert settings.MAX_REASONING_CALLS_PER_DAY == 50
         assert settings.MAX_WRITER_CALLS_PER_DAY == 50

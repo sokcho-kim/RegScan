@@ -83,12 +83,25 @@ class Settings(BaseSettings):
     # v2: 신규 소스 토글
     ENABLE_ASTI: bool = False
     ENABLE_HEALTHKR: bool = False
-    ENABLE_BIORXIV: bool = False
+    ENABLE_BIORXIV: bool = True
 
     # 기사 발행 기준
     MIN_SCORE_FOR_DB: int = 10            # DB 적재 최소 점수 (MFDS-only OTC 제외)
     MIN_SCORE_FOR_BRIEFING: int = 40      # v1 LLM 브리핑 대상
     MIN_SCORE_FOR_AI_PIPELINE: int = 40   # v2 AI 파이프라인 대상
+
+    # ── v3: 3-Stream Architecture ──
+    ENABLE_STREAM_THERAPEUTIC: bool = True
+    ENABLE_STREAM_INNOVATION: bool = True
+    ENABLE_STREAM_EXTERNAL: bool = True
+
+    THERAPEUTIC_AREAS: str = "oncology,rare_disease,immunology,cardiovascular,metabolic"
+
+    CT_GOV_MONTHS_BACK: int = 6
+    MEDRXIV_DAYS_BACK: int = 30
+
+    ENABLE_STREAM_BRIEFINGS: bool = True
+    ENABLE_UNIFIED_BRIEFING: bool = True
 
     # 로깅
     LOG_LEVEL: str = "INFO"

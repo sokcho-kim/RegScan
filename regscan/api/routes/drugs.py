@@ -5,7 +5,7 @@ from regscan.api.deps import get_data_store, DataStore
 from regscan.api.schemas import (
     DrugSummary, DrugDetail, MedclaimInsight, BriefingReportResponse,
     PreprintResponse, MarketReportResponse, ExpertOpinionResponse,
-    AIInsightResponse, ArticleResponse,
+    AIInsightResponse, ArticleResponse, ChangeLogResponse,
 )
 from regscan.map.ingredient_bridge import ReimbursementStatus
 from regscan.report import LLMBriefingGenerator
@@ -60,8 +60,10 @@ def list_drugs(
             hira_reimbursed=i.hira_status == ReimbursementStatus.REIMBURSED,
             hira_price=i.hira_price,
             global_score=i.global_score,
+            korea_relevance_score=i.korea_relevance_score,
             hot_issue_level="HOT" if i.global_score >= 80 else "HIGH" if i.global_score >= 60 else "MID" if i.global_score >= 40 else "LOW",
             domestic_status=i.domestic_status.value,
+            quadrant=i.quadrant,
         )
         for i in items
     ]
@@ -85,8 +87,10 @@ def search_drugs(
             hira_reimbursed=i.hira_status == ReimbursementStatus.REIMBURSED,
             hira_price=i.hira_price,
             global_score=i.global_score,
+            korea_relevance_score=i.korea_relevance_score,
             hot_issue_level="HOT" if i.global_score >= 80 else "HIGH" if i.global_score >= 60 else "MID" if i.global_score >= 40 else "LOW",
             domestic_status=i.domestic_status.value,
+            quadrant=i.quadrant,
         )
         for i in items
     ]
@@ -126,9 +130,11 @@ def get_drug_detail(
             for t in impact.cris_trials
         ],
         global_score=impact.global_score,
+        korea_relevance_score=impact.korea_relevance_score,
         hot_issue_level="HOT" if impact.global_score >= 80 else "HIGH" if impact.global_score >= 60 else "MID" if impact.global_score >= 40 else "LOW",
         hot_issue_reasons=impact.hot_issue_reasons,
         domestic_status=impact.domestic_status.value,
+        quadrant=impact.quadrant,
         analysis_notes=impact.analysis_notes,
         summary=impact.summary,
     )

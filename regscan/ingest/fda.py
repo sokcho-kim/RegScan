@@ -130,6 +130,54 @@ class FDAClient:
 
         return await self._request(url)
 
+    async def search_by_pharm_class(
+        self,
+        term: str,
+        limit: int = 100,
+        skip: int = 0,
+    ) -> dict[str, Any]:
+        """FDA pharm_class_epc 기반 검색 (치료영역 스트림용)
+
+        Args:
+            term: pharmacologic class 검색어 (e.g. "Antineoplastic")
+            limit: 최대 결과 수
+            skip: 건너뛸 결과 수
+        """
+        params = {
+            "search": f'openfda.pharm_class_epc:"{term}"',
+            "limit": limit,
+            "skip": skip,
+        }
+        if self.api_key:
+            params["api_key"] = self.api_key
+
+        url = f"{self.BASE_URL}/drug/drugsfda.json?{urlencode(params)}"
+        return await self._request(url)
+
+    async def search_by_submission_class(
+        self,
+        code: str,
+        limit: int = 100,
+        skip: int = 0,
+    ) -> dict[str, Any]:
+        """FDA submission_class_code 기반 검색 (혁신지표 스트림용)
+
+        Args:
+            code: submission class code (e.g. "1" for NME Type 1)
+            limit: 최대 결과 수
+            skip: 건너뛸 결과 수
+        """
+        params = {
+            "search": f"submissions.submission_class_code:{code}",
+            "limit": limit,
+            "skip": skip,
+        }
+        if self.api_key:
+            params["api_key"] = self.api_key
+
+        url = f"{self.BASE_URL}/drug/drugsfda.json?{urlencode(params)}"
+        return await self._request(url)
+
     async def _request(
         self,
         url: str,

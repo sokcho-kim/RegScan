@@ -8,6 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from regscan.api.routes import stats, drugs, scheduler as scheduler_routes
 from regscan.api.routes import dashboard as dashboard_routes
+from regscan.api.routes import changes as changes_routes
+from regscan.api.routes import pdufa as pdufa_routes
+from regscan.api.routes import briefings as briefing_routes
 from regscan.api.deps import get_data_store
 from regscan.config import settings
 
@@ -97,8 +100,11 @@ app.add_middleware(
 # 라우터 등록
 app.include_router(stats.router, prefix="/api/v1", tags=["Stats"])
 app.include_router(drugs.router, prefix="/api/v1/drugs", tags=["Drugs"])
+app.include_router(changes_routes.router, prefix="/api/v1/changes", tags=["Changes"])
 app.include_router(scheduler_routes.router, prefix="/api/v1/scheduler", tags=["Scheduler"])
 app.include_router(dashboard_routes.router, tags=["Dashboard"])
+app.include_router(pdufa_routes.router, prefix="/api/v1/pdufa", tags=["PDUFA"])
+app.include_router(briefing_routes.router, prefix="/api/v1/briefings", tags=["Briefings"])
 
 
 @app.get("/")

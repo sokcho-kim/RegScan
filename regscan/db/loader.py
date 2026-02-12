@@ -3,10 +3,16 @@
 DomesticImpact 분석 결과와 BriefingReport를 정규화 테이블에 적재.
 PostgreSQL / SQLite 모두 지원 (ORM upsert 패턴 사용).
 
+v2.1: 변경 감지(Change Detection) 추가 — changed_drug_ids 반환.
+
 사용법:
     loader = DBLoader()
     summary = await loader.upsert_impacts(impacts)
     await loader.save_briefing(report)
+
+    # 변경 감지 모드
+    summary = await loader.upsert_impacts(impacts, pipeline_run_id="...")
+    changed_ids = summary["changed_drug_ids"]
 """
 
 from __future__ import annotations
@@ -26,6 +32,7 @@ from regscan.db.models import (
     ClinicalTrialDB,
     BriefingReportDB,
     ScanSnapshotDB,
+    DrugChangeLogDB,
 )
 from regscan.report.llm_generator import BriefingReport
 from regscan.scan.domestic import DomesticImpact
@@ -55,29 +62,54 @@ class DBLoader:
         self._session_factory = get_async_session()
 
     # ------------------------------------------------------------------ #
-    #  1. upsert_impacts — 메인 적재 메서드
+    #  1. upsert_impacts — 메인 적재 메서드 (변경 감지 통합)
     # ------------------------------------------------------------------ #
 
-    async def upsert_impacts(self, impacts: list[DomesticImpact]) -> dict:
+    async def upsert_impacts(
+        self,
+        impacts: list[DomesticImpact],
+        pipeline_run_id: str | None = None,
+    ) -> dict:
         """DomesticImpact 리스트를 DB에 upsert.
 
         Args:
             impacts: DomesticImpactAnalyzer.analyze_batch() 결과
+            pipeline_run_id: 파이프라인 실행 ID (변경 감지용, None이면 감지 안 함)
 
         Returns:
-            {"drugs": N, "events": N, "hira": N, "trials": N} 카운트 딕셔너리
+            {"drugs": N, "events": N, "hira": N, "trials": N,
+             "changed_drug_ids": set[int], "changes": N}
         """
-        counts = {"drugs": 0, "events": 0, "hira": 0, "trials": 0}
+        counts = {
+            "drugs": 0, "events": 0, "hira": 0, "trials": 0,
+            "changed_drug_ids": set(), "changes": 0,
+        }
 
         async with self._session_factory() as session:
             async with session.begin():
                 for impact in impacts:
-                    drug = await self._upsert_drug(session, impact)
+                    if pipeline_run_id:
+                        drug, is_changed = await self._upsert_drug_with_changes(
+                            session, impact, pipeline_run_id
+                        )
+                        if is_changed:
+                            counts["changed_drug_ids"].add(drug.id)
+                    else:
+                        drug = await self._upsert_drug(session, impact)
                     counts["drugs"] += 1
 
-                    counts["events"] += await self._upsert_events(
-                        session, drug.id, impact
-                    )
+                    if pipeline_run_id:
+                        evt_count, evt_changed = await self._upsert_events_with_changes(
+                            session, drug.id, impact, pipeline_run_id
+                        )
+                        counts["events"] += evt_count
+                        if evt_changed:
+                            counts["changed_drug_ids"].add(drug.id)
+                    else:
+                        counts["events"] += await self._upsert_events(
+                            session, drug.id, impact
+                        )
+
                     counts["hira"] += await self._upsert_hira(
                         session, drug.id, impact
                     )
@@ -85,12 +117,15 @@ class DBLoader:
                         session, drug.id, impact
                     )
 
+        counts["changes"] = len(counts["changed_drug_ids"])
+
         logger.info(
-            "DB upsert 완료: drugs=%d, events=%d, hira=%d, trials=%d",
+            "DB upsert 완료: drugs=%d, events=%d, hira=%d, trials=%d, changed=%d",
             counts["drugs"],
             counts["events"],
             counts["hira"],
             counts["trials"],
+            counts["changes"],
         )
         return counts
 
@@ -222,7 +257,7 @@ class DBLoader:
         )
 
     # ================================================================== #
-    #  Private helpers
+    #  Private helpers — 기존 메서드 (하위 호환)
     # ================================================================== #
 
     async def _upsert_drug(
@@ -237,6 +272,7 @@ class DBLoader:
 
         if drug:
             drug.global_score = impact.global_score
+            drug.korea_relevance_score = impact.korea_relevance_score
             drug.hot_issue_level = level
             drug.hot_issue_reasons = impact.hot_issue_reasons
             drug.domestic_status = impact.domestic_status.value
@@ -245,6 +281,7 @@ class DBLoader:
             drug = DrugDB(
                 inn=impact.inn,
                 global_score=impact.global_score,
+                korea_relevance_score=impact.korea_relevance_score,
                 hot_issue_level=level,
                 hot_issue_reasons=impact.hot_issue_reasons,
                 domestic_status=impact.domestic_status.value,
@@ -397,3 +434,190 @@ class DBLoader:
         session.add(drug)
         await session.flush()
         return drug.id
+
+    # ================================================================== #
+    #  Change Detection helpers
+    # ================================================================== #
+
+    async def _upsert_drug_with_changes(
+        self,
+        session: AsyncSession,
+        impact: DomesticImpact,
+        pipeline_run_id: str,
+    ) -> tuple[DrugDB, bool]:
+        """drugs 테이블 upsert + 변경 감지. 변경 시 change_log INSERT.
+
+        Returns:
+            (DrugDB, is_changed) — 변경 여부
+        """
+        stmt = select(DrugDB).where(DrugDB.inn == impact.inn)
+        result = await session.execute(stmt)
+        drug: Optional[DrugDB] = result.scalar_one_or_none()
+
+        level = _hot_issue_level(impact.global_score)
+        changed = False
+
+        if drug:
+            # score_change 감지 (global_score)
+            if drug.global_score != impact.global_score:
+                self._add_change(
+                    session, drug.id, "score_change", "global_score",
+                    str(drug.global_score), str(impact.global_score),
+                    pipeline_run_id,
+                )
+                changed = True
+
+            # score_change 감지 (korea_relevance_score)
+            if (drug.korea_relevance_score or 0) != impact.korea_relevance_score:
+                self._add_change(
+                    session, drug.id, "score_change", "korea_relevance_score",
+                    str(drug.korea_relevance_score or 0),
+                    str(impact.korea_relevance_score),
+                    pipeline_run_id,
+                )
+                changed = True
+
+            # status_change 감지 (hot_issue_level)
+            if drug.hot_issue_level != level:
+                self._add_change(
+                    session, drug.id, "status_change", "hot_issue_level",
+                    drug.hot_issue_level, level,
+                    pipeline_run_id,
+                )
+                changed = True
+
+            # status_change 감지 (domestic_status)
+            if drug.domestic_status != impact.domestic_status.value:
+                self._add_change(
+                    session, drug.id, "status_change", "domestic_status",
+                    drug.domestic_status, impact.domestic_status.value,
+                    pipeline_run_id,
+                )
+                changed = True
+
+            # 실제 업데이트
+            drug.global_score = impact.global_score
+            drug.korea_relevance_score = impact.korea_relevance_score
+            drug.hot_issue_level = level
+            drug.hot_issue_reasons = impact.hot_issue_reasons
+            drug.domestic_status = impact.domestic_status.value
+            drug.updated_at = datetime.utcnow()
+        else:
+            # 새 약물 → new_drug
+            drug = DrugDB(
+                inn=impact.inn,
+                global_score=impact.global_score,
+                korea_relevance_score=impact.korea_relevance_score,
+                hot_issue_level=level,
+                hot_issue_reasons=impact.hot_issue_reasons,
+                domestic_status=impact.domestic_status.value,
+            )
+            session.add(drug)
+            await session.flush()
+
+            self._add_change(
+                session, drug.id, "new_drug", "inn",
+                None, impact.inn,
+                pipeline_run_id,
+            )
+            changed = True
+
+        return drug, changed
+
+    async def _upsert_events_with_changes(
+        self,
+        session: AsyncSession,
+        drug_id: int,
+        impact: DomesticImpact,
+        pipeline_run_id: str,
+    ) -> tuple[int, bool]:
+        """regulatory_events upsert + 변경 감지.
+
+        Returns:
+            (count, is_changed)
+        """
+        count = 0
+        changed = False
+
+        agencies = [
+            ("fda", impact.fda_approved, impact.fda_date),
+            ("ema", impact.ema_approved, impact.ema_date),
+            ("mfds", impact.mfds_approved, impact.mfds_date),
+        ]
+
+        designation_fields = [
+            "is_orphan", "is_breakthrough", "is_accelerated",
+            "is_priority", "is_prime", "is_conditional", "is_fast_track",
+        ]
+
+        for agency, approved, approval_date in agencies:
+            if not approved:
+                continue
+
+            stmt = select(RegulatoryEventDB).where(
+                RegulatoryEventDB.drug_id == drug_id,
+                RegulatoryEventDB.agency == agency,
+            )
+            result = await session.execute(stmt)
+            event: Optional[RegulatoryEventDB] = result.scalar_one_or_none()
+
+            status = "approved" if approved else "pending"
+
+            if event:
+                # status 변경 감지
+                if event.status != status:
+                    self._add_change(
+                        session, drug_id, "status_change",
+                        f"{agency}_status", event.status, status,
+                        pipeline_run_id,
+                    )
+                    changed = True
+
+                event.status = status
+                event.approval_date = approval_date
+                if agency == "mfds" and impact.mfds_brand_name:
+                    event.brand_name = impact.mfds_brand_name
+            else:
+                # 새 이벤트
+                event = RegulatoryEventDB(
+                    drug_id=drug_id,
+                    agency=agency,
+                    status=status,
+                    approval_date=approval_date,
+                    brand_name=(
+                        impact.mfds_brand_name if agency == "mfds" else None
+                    ),
+                )
+                session.add(event)
+
+                self._add_change(
+                    session, drug_id, "new_event",
+                    f"{agency}_approval", None, status,
+                    pipeline_run_id,
+                )
+                changed = True
+
+            count += 1
+
+        return count, changed
+
+    @staticmethod
+    def _add_change(
+        session: AsyncSession,
+        drug_id: int,
+        change_type: str,
+        field_name: str,
+        old_value: str | None,
+        new_value: str | None,
+        pipeline_run_id: str,
+    ) -> None:
+        """change_log에 변경 기록 추가."""
+        log = DrugChangeLogDB(
+            drug_id=drug_id,
+            change_type=change_type,
+            field_name=field_name,
+            old_value=old_value,
+            new_value=new_value,
+            pipeline_run_id=pipeline_run_id,
+        )
+        session.add(log)

@@ -36,8 +36,10 @@ class DrugSummary(BaseModel):
     hira_reimbursed: bool
     hira_price: Optional[float] = None
     global_score: int
+    korea_relevance_score: int = 0
     hot_issue_level: str
     domestic_status: str
+    quadrant: str = "normal"  # top_priority / watch / track / normal
 
     _normalize_price = field_validator("hira_price", mode="before")(_nan_to_none)
 
@@ -72,9 +74,11 @@ class DrugDetail(BaseModel):
 
     # 분석
     global_score: int
+    korea_relevance_score: int = 0
     hot_issue_level: str
     hot_issue_reasons: list[str] = []
     domestic_status: str
+    quadrant: str = "normal"
     analysis_notes: list[str] = []
     summary: str = ""
 
@@ -226,3 +230,16 @@ class ArticleResponse(BaseModel):
     tags: list[str] = []
     writer_model: str = ""
     generated_at: Optional[datetime] = None
+
+
+class ChangeLogResponse(BaseModel):
+    """변경 감지 로그 응답"""
+    id: int
+    drug_id: int
+    inn: str = ""
+    change_type: str
+    field_name: Optional[str] = None
+    old_value: Optional[str] = None
+    new_value: Optional[str] = None
+    pipeline_run_id: Optional[str] = None
+    detected_at: Optional[datetime] = None

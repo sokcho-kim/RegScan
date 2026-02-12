@@ -44,8 +44,12 @@ class V2Loader:
     #  Preprint (bioRxiv/medRxiv)
     # ------------------------------------------------------------------ #
 
-    async def upsert_preprint(self, drug_id: int, data: dict) -> PreprintDB:
-        """프리프린트 논문 upsert. DOI가 unique key."""
+    async def upsert_preprint(self, drug_id: int, data: dict) -> tuple[PreprintDB, bool]:
+        """프리프린트 논문 upsert. DOI가 unique key.
+
+        Returns:
+            (PreprintDB, is_new) — is_new=True면 새로 INSERT된 프리프린트
+        """
         async with self._session_factory() as session:
             async with session.begin():
                 stmt = select(PreprintDB).where(PreprintDB.doi == data["doi"])
@@ -62,6 +66,7 @@ class V2Loader:
                     existing.published_date = data.get("published_date", existing.published_date)
                     existing.pdf_url = data.get("pdf_url", existing.pdf_url)
                     row = existing
+                    is_new = False
                 else:
                     row = PreprintDB(
                         drug_id=drug_id,
@@ -76,9 +81,10 @@ class V2Loader:
                     )
                     session.add(row)
                     await session.flush()
+                    is_new = True
 
-                logger.debug("프리프린트 upsert: %s", data["doi"])
-                return row
+                logger.debug("프리프린트 upsert: %s (new=%s)", data["doi"], is_new)
+                return row, is_new
 
     # ------------------------------------------------------------------ #
     #  Market Report (ASTI/KISTI)

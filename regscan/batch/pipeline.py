@@ -1,17 +1,27 @@
 """Cloud Run Jobs 배치 파이프라인
 
-매일 실행: 수집 → GCS 아카이브 → DB 적재 → (v2) 신규 소스 수집
-          → (v2) Gemini PDF → LLM 브리핑 → (v2) AI 파이프라인 → HTML
+v3: 3-Stream Top-Down Architecture
+  --stream therapeutic|innovation|external  특정 스트림만 실행
+  --area oncology                           특정 치료영역만 실행
+  --legacy                                  기존 DailyScanner 모드 유지
 
-실행:
-    python -m regscan.batch.pipeline
-    python -m regscan.batch.pipeline --days-back 7
+기본 모드: 3-stream 전체 실행
+레거시 모드: 기존 v2 파이프라인 (DailyScanner → DB → AI)
+
+실행 예시:
+    python -m regscan.batch.pipeline                            # 전체 3-stream
+    python -m regscan.batch.pipeline --stream therapeutic       # Stream 1만
+    python -m regscan.batch.pipeline --stream innovation        # Stream 2만
+    python -m regscan.batch.pipeline --stream external          # Stream 3만
+    python -m regscan.batch.pipeline --stream therapeutic --area oncology
+    python -m regscan.batch.pipeline --legacy --days-back 7     # 기존 모드
 """
 
 import asyncio
 import json
 import logging
 import sys
+import uuid
 from argparse import ArgumentParser
 from datetime import datetime
 from pathlib import Path
@@ -21,17 +31,339 @@ from regscan.config import settings
 logger = logging.getLogger(__name__)
 
 
-async def run_pipeline(days_back: int = 7) -> dict:
-    """배치 파이프라인 메인 로직
+# ═══════════════════════════════════════════════
+# v3: 3-Stream Pipeline
+# ═══════════════════════════════════════════════
+
+async def run_stream_pipeline(
+    streams: list[str] | None = None,
+    area: str | None = None,
+    force: bool = False,
+) -> dict:
+    """v3 스트림 기반 파이프라인
+
+    Args:
+        streams: 실행할 스트림 목록 (None이면 settings에서 읽음)
+        area: 치료영역 필터 (therapeutic 스트림 전용)
+        force: True면 변경 감지 무시
 
     Returns:
         실행 결과 요약 dict
     """
     started_at = datetime.now()
-    logger.info("=== 배치 파이프라인 시작 ===")
+    pipeline_run_id = str(uuid.uuid4())
+
+    stream_label = ", ".join(streams) if streams else "all"
+    area_label = area or "all"
+    logger.info(
+        "=== v3 스트림 파이프라인 시작 (run_id=%s, streams=%s, area=%s) ===",
+        pipeline_run_id, stream_label, area_label,
+    )
 
     result = {
         "started_at": started_at.isoformat(),
+        "pipeline_run_id": pipeline_run_id,
+        "mode": "v3_stream",
+        "streams": streams or "all",
+        "area": area,
+        "force": force,
+        "status": "running",
+        "steps": {},
+    }
+
+    try:
+        # Step 1: DB 초기화
+        logger.info("[1/6] DB 초기화...")
+        from regscan.db.database import init_db
+        await init_db()
+        result["steps"]["init_db"] = "ok"
+
+        # Step 2: 스트림 오케스트레이터 실행
+        logger.info("[2/6] 스트림 수집 실행...")
+        from regscan.stream.orchestrator import StreamOrchestrator
+
+        areas_list = [area] if area else None
+        orchestrator = StreamOrchestrator(
+            enabled_streams=streams,
+            areas=areas_list,
+        )
+        stream_results = await orchestrator.run_all()
+
+        # 스트림별 결과 요약
+        stream_summary = {}
+        for sname, sresults in stream_results.items():
+            total_drugs = sum(r.drug_count for r in sresults)
+            total_signals = sum(r.signal_count for r in sresults)
+            total_errors = sum(len(r.errors) for r in sresults)
+            stream_summary[sname] = {
+                "result_count": len(sresults),
+                "drugs": total_drugs,
+                "signals": total_signals,
+                "errors": total_errors,
+                "categories": [r.sub_category for r in sresults if r.sub_category],
+            }
+        result["steps"]["stream_collect"] = stream_summary
+
+        # Step 3: 결과 병합 + GlobalRegulatoryStatus 빌드
+        logger.info("[3/6] 결과 병합...")
+        merged = orchestrator.merge_results(stream_results)
+        global_statuses = orchestrator.build_global_statuses(merged)
+
+        result["steps"]["merge"] = {
+            "total_unique_drugs": len(merged),
+            "global_statuses_built": len(global_statuses),
+        }
+        logger.info("  병합 완료: %d개 고유 약물", len(merged))
+
+        # Step 4: DB 적재
+        logger.info("[4/6] DB 적재...")
+        from regscan.db.loader import DBLoader
+
+        loader = DBLoader()
+
+        # GlobalRegulatoryStatus → DomesticImpact 변환 (기존 분석기 재사용)
+        try:
+            from regscan.scan.domestic import DomesticImpactAnalyzer
+            analyzer = DomesticImpactAnalyzer()
+            impacts = analyzer.analyze_batch(global_statuses)
+        except Exception:
+            # 분석기 사용 불가 시 직접 변환
+            impacts = global_statuses
+
+        qualified = [
+            d for d in impacts
+            if getattr(d, "global_score", 0) >= settings.MIN_SCORE_FOR_DB
+        ]
+        skipped_count = len(impacts) - len(qualified)
+
+        if qualified:
+            load_result = await loader.upsert_impacts(
+                qualified, pipeline_run_id=pipeline_run_id
+            )
+            result["steps"]["db_load"] = {
+                "drugs": load_result.get("drugs", 0),
+                "events": load_result.get("events", 0),
+                "changed": load_result.get("changes", 0),
+                "skipped_low_score": skipped_count,
+            }
+        else:
+            result["steps"]["db_load"] = {
+                "drugs": 0,
+                "skipped_low_score": skipped_count,
+                "note": "No drugs met MIN_SCORE_FOR_DB threshold",
+            }
+        logger.info(
+            "  DB 적재 완료: %d건 적재, %d건 제외 (score<%d)",
+            len(qualified), skipped_count, settings.MIN_SCORE_FOR_DB,
+        )
+
+        # Step 4.5: 스트림 스냅샷 저장
+        try:
+            await _save_stream_snapshots(stream_results, pipeline_run_id)
+            result["steps"]["stream_snapshots"] = "ok"
+        except Exception as e:
+            logger.warning("  스트림 스냅샷 저장 실패: %s", e)
+            result["steps"]["stream_snapshots"] = f"error: {e}"
+
+        # Step 5: 스트림별 브리핑 생성
+        if settings.ENABLE_STREAM_BRIEFINGS:
+            logger.info("[5/6] 스트림 브리핑 생성...")
+            try:
+                briefing_result = await _generate_stream_briefings(
+                    stream_results, pipeline_run_id,
+                )
+                result["steps"]["stream_briefings"] = briefing_result
+            except Exception as e:
+                logger.warning("  스트림 브리핑 실패: %s", e)
+                result["steps"]["stream_briefings"] = f"error: {e}"
+        else:
+            logger.info("[5/6] 스트림 브리핑 건너뜀 (ENABLE_STREAM_BRIEFINGS=false)")
+            result["steps"]["stream_briefings"] = "skipped"
+
+        # Step 6: 결과 JSON 저장 (로컬)
+        logger.info("[6/6] 결과 JSON 저장...")
+        output_dir = settings.BASE_DIR / "output" / "stream_results"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        json_path = output_dir / f"stream_{date_str}_{pipeline_run_id[:8]}.json"
+
+        # StreamResult는 직접 직렬화 필요
+        serializable = {}
+        for sname, sresults in stream_results.items():
+            serializable[sname] = [
+                {
+                    "stream_name": r.stream_name,
+                    "sub_category": r.sub_category,
+                    "drug_count": r.drug_count,
+                    "signal_count": r.signal_count,
+                    "inn_list": r.inn_list[:50],
+                    "errors": r.errors,
+                }
+                for r in sresults
+            ]
+
+        json_path.write_text(
+            json.dumps(serializable, ensure_ascii=False, indent=2, default=str),
+            encoding="utf-8",
+        )
+        result["steps"]["save_json"] = str(json_path)
+
+        # 완료
+        finished_at = datetime.now()
+        duration = (finished_at - started_at).total_seconds()
+        result["status"] = "success"
+        result["finished_at"] = finished_at.isoformat()
+        result["duration_seconds"] = round(duration, 1)
+        logger.info("=== v3 스트림 파이프라인 완료 (%.1f초) ===", duration)
+
+    except Exception as e:
+        finished_at = datetime.now()
+        duration = (finished_at - started_at).total_seconds()
+        result["status"] = "error"
+        result["error"] = str(e)
+        result["finished_at"] = finished_at.isoformat()
+        result["duration_seconds"] = round(duration, 1)
+        logger.error("=== v3 파이프라인 실패: %s (%.1f초) ===", e, duration, exc_info=True)
+
+    return result
+
+
+async def _save_stream_snapshots(
+    stream_results: dict,
+    pipeline_run_id: str,
+) -> None:
+    """스트림 스냅샷 DB 저장"""
+    try:
+        from regscan.db.database import get_async_session
+        from regscan.db.models import StreamSnapshotDB
+
+        async with get_async_session()() as session:
+            for sname, sresults in stream_results.items():
+                for sr in sresults:
+                    snap = StreamSnapshotDB(
+                        stream_name=sr.stream_name,
+                        sub_category=sr.sub_category,
+                        drug_count=sr.drug_count,
+                        signal_count=sr.signal_count,
+                        inn_list=sr.inn_list[:100],
+                        pipeline_run_id=pipeline_run_id,
+                    )
+                    session.add(snap)
+            await session.commit()
+    except Exception as e:
+        logger.debug("스트림 스냅샷 DB 저장 건너뜀: %s", e)
+
+
+async def _generate_stream_briefings(
+    stream_results: dict,
+    pipeline_run_id: str,
+) -> dict:
+    """스트림별 + 통합 브리핑 생성"""
+    from regscan.stream.briefing import StreamBriefingGenerator
+    from regscan.stream.therapeutic import TherapeuticAreaConfig
+
+    generator = StreamBriefingGenerator()
+    briefing_counts = {"stream": 0, "unified": 0, "failed": 0}
+    stream_briefings: list[dict] = []
+
+    # 스트림별 브리핑
+    for sname, sresults in stream_results.items():
+        for sr in sresults:
+            try:
+                if sname == "therapeutic_area":
+                    area_config = TherapeuticAreaConfig.get_area(sr.sub_category)
+                    area_ko = area_config.label_ko if area_config else sr.sub_category
+                    briefing = await generator.generate_therapeutic_briefing(
+                        sr.sub_category, area_ko, sr,
+                    )
+                elif sname == "innovation":
+                    briefing = await generator.generate_innovation_briefing(sr)
+                elif sname == "external":
+                    briefing = await generator.generate_external_briefing(sr)
+                else:
+                    continue
+
+                stream_briefings.append(briefing)
+                await _save_briefing_to_db(
+                    sname, sr.sub_category, "stream",
+                    briefing.get("headline", ""), briefing,
+                    pipeline_run_id,
+                )
+                briefing_counts["stream"] += 1
+            except Exception as e:
+                logger.warning("  스트림 브리핑 생성 실패 (%s/%s): %s", sname, sr.sub_category, e)
+                briefing_counts["failed"] += 1
+
+    # 통합 브리핑
+    if settings.ENABLE_UNIFIED_BRIEFING and stream_briefings:
+        try:
+            unified = await generator.generate_unified_briefing(
+                stream_results, stream_briefings,
+            )
+            await _save_briefing_to_db(
+                "unified", "", "unified",
+                unified.get("headline", ""), unified,
+                pipeline_run_id,
+            )
+            briefing_counts["unified"] = 1
+        except Exception as e:
+            logger.warning("  통합 브리핑 생성 실패: %s", e)
+            briefing_counts["failed"] += 1
+
+    return briefing_counts
+
+
+async def _save_briefing_to_db(
+    stream_name: str,
+    sub_category: str,
+    briefing_type: str,
+    headline: str,
+    content: dict,
+    pipeline_run_id: str,
+) -> None:
+    """브리핑 DB 저장"""
+    try:
+        from regscan.db.database import get_async_session
+        from regscan.db.models import StreamBriefingDB
+
+        async with get_async_session()() as session:
+            row = StreamBriefingDB(
+                stream_name=stream_name,
+                sub_category=sub_category,
+                briefing_type=briefing_type,
+                headline=headline,
+                content_json=content,
+                pipeline_run_id=pipeline_run_id,
+            )
+            session.add(row)
+            await session.commit()
+    except Exception as e:
+        logger.debug("브리핑 DB 저장 건너뜀: %s", e)
+
+
+# ═══════════════════════════════════════════════
+# Legacy v2 Pipeline
+# ═══════════════════════════════════════════════
+
+async def run_pipeline(days_back: int = 7, force: bool = False) -> dict:
+    """레거시 배치 파이프라인 (기존 DailyScanner 기반)
+
+    Args:
+        days_back: 최근 N일 수집
+        force: True면 변경 감지 무시, 모든 약물 AI 처리
+
+    Returns:
+        실행 결과 요약 dict
+    """
+    started_at = datetime.now()
+    pipeline_run_id = str(uuid.uuid4())
+    logger.info("=== 레거시 배치 파이프라인 시작 (run_id=%s, force=%s) ===", pipeline_run_id, force)
+
+    result = {
+        "started_at": started_at.isoformat(),
+        "pipeline_run_id": pipeline_run_id,
+        "mode": "legacy",
+        "force": force,
         "status": "running",
         "steps": {},
     }
@@ -91,12 +423,11 @@ async def run_pipeline(days_back: int = 7) -> dict:
             logger.info("[3/9] GCS 아카이브 건너뜀 (GCS_BUCKET 미설정)")
             result["steps"]["gcs"] = "skipped"
 
-        # Step 4: DB 적재
-        logger.info("[4/9] DB 적재...")
+        # Step 4: DB 적재 (변경 감지 포함)
+        logger.info("[4/9] DB 적재 (변경 감지)...")
         from regscan.api.deps import reload_data
         from regscan.db.loader import DBLoader
 
-        # DataStore를 통해 파싱+분석 실행 (기존 로직 재사용)
         store = reload_data()
 
         loader = DBLoader()
@@ -105,10 +436,21 @@ async def run_pipeline(days_back: int = 7) -> dict:
             if d.global_score >= settings.MIN_SCORE_FOR_DB
         ]
         skipped_count = len(store.impacts) - len(qualified)
-        load_result = await loader.upsert_impacts(qualified)
-        result["steps"]["db_load"] = load_result
+        load_result = await loader.upsert_impacts(
+            qualified, pipeline_run_id=pipeline_run_id
+        )
+
+        changed_drug_ids: set[int] = load_result["changed_drug_ids"]
+
+        result["steps"]["db_load"] = {
+            "drugs": load_result["drugs"],
+            "events": load_result["events"],
+            "hira": load_result["hira"],
+            "trials": load_result["trials"],
+            "changed": load_result["changes"],
+        }
         logger.info(
-            f"  DB 적재 완료: {load_result} "
+            f"  DB 적재 완료: drugs={load_result['drugs']}, changed={load_result['changes']} "
             f"(score<{settings.MIN_SCORE_FOR_DB} 제외: {skipped_count}건)"
         )
 
@@ -124,7 +466,7 @@ async def run_pipeline(days_back: int = 7) -> dict:
                 gcs_path = result["steps"].get("gcs", {}).get(source, "")
                 await loader.save_snapshot(source, scan_date_obj, count, gcs_path)
 
-        # Step 4.5: v2 신규 소스 수집 (ENABLE_* 플래그 체크)
+        # Step 4.5: v2 신규 소스 수집
         v2_data = {"asti": [], "healthkr": [], "biorxiv": []}
         any_v2_enabled = (
             settings.ENABLE_ASTI or settings.ENABLE_HEALTHKR or settings.ENABLE_BIORXIV
@@ -133,41 +475,6 @@ async def run_pipeline(days_back: int = 7) -> dict:
             logger.info("[4.5/9] v2 신규 소스 수집...")
             v2_counts = {}
 
-            # ASTI
-            if settings.ENABLE_ASTI:
-                try:
-                    from regscan.ingest.asti import ASTIIngestor
-                    from regscan.parse.asti_parser import ASTIReportParser
-
-                    async with ASTIIngestor() as ingestor:
-                        raw = await ingestor.fetch()
-                    parser = ASTIReportParser()
-                    v2_data["asti"] = parser.parse_many(raw)
-                    v2_counts["asti"] = len(v2_data["asti"])
-                    logger.info("  ASTI: %d건", v2_counts["asti"])
-                except Exception as e:
-                    logger.warning("  ASTI 수집 실패: %s", e)
-                    v2_counts["asti"] = f"error: {e}"
-
-            # Health.kr
-            if settings.ENABLE_HEALTHKR:
-                try:
-                    from regscan.ingest.healthkr import HealthKRIngestor
-                    from regscan.parse.healthkr_parser import HealthKRParser
-
-                    hot_inns = [d.inn for d in store.get_hot_issues(min_score=settings.MIN_SCORE_FOR_AI_PIPELINE)]
-                    ingestor = HealthKRIngestor(drug_names=hot_inns[:20])
-                    async with ingestor:
-                        raw = await ingestor.fetch()
-                    parser = HealthKRParser()
-                    v2_data["healthkr"] = parser.parse_many(raw)
-                    v2_counts["healthkr"] = len(v2_data["healthkr"])
-                    logger.info("  Health.kr: %d건", v2_counts["healthkr"])
-                except Exception as e:
-                    logger.warning("  Health.kr 수집 실패: %s", e)
-                    v2_counts["healthkr"] = f"error: {e}"
-
-            # bioRxiv
             if settings.ENABLE_BIORXIV:
                 try:
                     from regscan.ingest.biorxiv import BioRxivIngestor
@@ -188,73 +495,22 @@ async def run_pipeline(days_back: int = 7) -> dict:
                     v2_counts["biorxiv"] = f"error: {e}"
 
             result["steps"]["v2_ingest"] = v2_counts
-
-            # v2 데이터 DB 적재
-            try:
-                from regscan.db.v2_loader import V2Loader
-                v2_loader = V2Loader()
-
-                for report in v2_data["asti"]:
-                    try:
-                        drug_id = await v2_loader.get_drug_id(report.get("title", "unknown"))
-                        await v2_loader.upsert_market_report(drug_id, report)
-                    except Exception as e:
-                        logger.debug("ASTI DB 적재 오류: %s", e)
-
-                for review in v2_data["healthkr"]:
-                    try:
-                        inn = review.get("drug_name", review.get("title", "unknown"))
-                        drug_id = await v2_loader.get_drug_id(inn)
-                        await v2_loader.upsert_expert_opinion(drug_id, review)
-                    except Exception as e:
-                        logger.debug("Health.kr DB 적재 오류: %s", e)
-
-                for preprint in v2_data["biorxiv"]:
-                    try:
-                        inn = preprint.get("search_keyword", "unknown")
-                        drug_id = await v2_loader.get_drug_id(inn)
-                        await v2_loader.upsert_preprint(drug_id, preprint)
-                    except Exception as e:
-                        logger.debug("bioRxiv DB 적재 오류: %s", e)
-
-            except Exception as e:
-                logger.warning("  v2 DB 적재 실패: %s", e)
         else:
             logger.info("[4.5/9] v2 소스 수집 건너뜀 (ENABLE_*=false)")
             result["steps"]["v2_ingest"] = "skipped"
 
-        # Step 4.6: Gemini PDF 파싱 (ENABLE_GEMINI_PARSING 체크)
-        if settings.ENABLE_GEMINI_PARSING and v2_data["biorxiv"]:
-            logger.info("[4.6/9] Gemini PDF 파싱...")
-            try:
-                from regscan.ai.gemini_parser import GeminiParser
-                from regscan.db.v2_loader import V2Loader
-
-                gemini = GeminiParser()
-                v2_loader = V2Loader()
-                parsed_count = 0
-
-                # 핫이슈(score>=60) 논문만 파싱
-                for preprint in v2_data["biorxiv"]:
-                    if preprint.get("pdf_url") and parsed_count < 20:
-                        try:
-                            parse_result = await gemini.parse_pdf_url(preprint["pdf_url"])
-                            if parse_result.get("facts"):
-                                await v2_loader.update_preprint_gemini(
-                                    preprint["doi"], parse_result["facts"]
-                                )
-                                parsed_count += 1
-                        except Exception as e:
-                            logger.debug("Gemini 파싱 오류 (%s): %s", preprint.get("doi"), e)
-
-                result["steps"]["gemini_parse"] = {"parsed": parsed_count}
-                logger.info("  Gemini 파싱 완료: %d건", parsed_count)
-            except Exception as e:
-                logger.warning("  Gemini 파싱 실패: %s", e)
-                result["steps"]["gemini_parse"] = f"error: {e}"
+        # 변경 필터 결정
+        if force:
+            target_filter = None
+        elif changed_drug_ids:
+            target_filter = changed_drug_ids
         else:
-            logger.info("[4.6/9] Gemini 파싱 건너뜀")
-            result["steps"]["gemini_parse"] = "skipped"
+            target_filter = set()
+
+        result["steps"]["change_detection"] = {
+            "changed_count": len(changed_drug_ids),
+            "mode": "force" if force else "event_trigger",
+        }
 
         # Step 5: LLM 브리핑 생성
         logger.info("[5/9] 핫이슈 LLM 브리핑 생성...")
@@ -263,90 +519,33 @@ async def run_pipeline(days_back: int = 7) -> dict:
 
             generator = get_llm_generator()
             hot_issues = store.get_hot_issues(min_score=settings.MIN_SCORE_FOR_BRIEFING)
-            generated, failed = 0, 0
+            generated, failed, skipped_unchanged = 0, 0, 0
 
             for drug in hot_issues:
+                if target_filter is not None:
+                    drug_id = await _get_drug_id_by_inn(loader, drug.inn)
+                    if drug_id not in target_filter:
+                        skipped_unchanged += 1
+                        continue
+
                 try:
                     report = await generator.generate(drug)
-                    # DB에 저장
                     await loader.save_briefing(report)
-                    # 파일에도 저장 (호환)
                     report.save()
                     generated += 1
                 except Exception as e:
                     logger.warning(f"  브리핑 실패 ({drug.inn}): {e}")
                     failed += 1
 
-            result["steps"]["briefings"] = {"generated": generated, "failed": failed}
-            logger.info(f"  브리핑 {generated}건 생성, {failed}건 실패")
+            result["steps"]["briefings"] = {
+                "generated": generated, "failed": failed,
+                "skipped_unchanged": skipped_unchanged,
+            }
         except Exception as e:
             logger.warning(f"  브리핑 배치 실패: {e}")
             result["steps"]["briefings"] = f"error: {e}"
 
-        # Step 5.5: v2 AI 3단 파이프라인 (Reasoning→Verify→Write)
-        ai_enabled = (
-            settings.ENABLE_AI_REASONING
-            or settings.ENABLE_AI_VERIFIER
-            or settings.ENABLE_AI_WRITER
-        )
-        if ai_enabled:
-            logger.info("[5.5/9] AI 3단 파이프라인...")
-            try:
-                from regscan.ai.pipeline import AIIntelligencePipeline
-                from regscan.db.v2_loader import V2Loader
-
-                ai_pipeline = AIIntelligencePipeline()
-                v2_loader = V2Loader()
-                ai_generated, ai_failed = 0, 0
-
-                hot_issues = store.get_hot_issues(min_score=settings.MIN_SCORE_FOR_AI_PIPELINE)
-                for drug in hot_issues:
-                    try:
-                        drug_dict = {
-                            "inn": drug.inn,
-                            "fda_approved": drug.fda_approved,
-                            "fda_date": str(drug.fda_date) if drug.fda_date else None,
-                            "ema_approved": drug.ema_approved,
-                            "ema_date": str(drug.ema_date) if drug.ema_date else None,
-                            "mfds_approved": drug.mfds_approved,
-                            "mfds_date": str(drug.mfds_date) if drug.mfds_date else None,
-                            "hira_status": drug.hira_status.value if drug.hira_status else None,
-                            "hira_price": drug.hira_price,
-                            "global_score": drug.global_score,
-                        }
-
-                        insight, article = await ai_pipeline.run(
-                            drug=drug_dict,
-                            preprints=v2_data.get("biorxiv", []),
-                            market_reports=v2_data.get("asti", []),
-                            expert_opinions=v2_data.get("healthkr", []),
-                        )
-
-                        # DB 저장
-                        drug_id = await v2_loader.get_drug_id(drug.inn)
-                        if insight:
-                            await v2_loader.save_ai_insight(drug_id, insight)
-                        if article and article.get("headline"):
-                            await v2_loader.save_article(drug_id, article)
-
-                        ai_generated += 1
-                    except Exception as e:
-                        logger.warning("  AI 파이프라인 실패 (%s): %s", drug.inn, e)
-                        ai_failed += 1
-
-                result["steps"]["ai_pipeline"] = {
-                    "generated": ai_generated, "failed": ai_failed,
-                    "usage": ai_pipeline.get_daily_usage(),
-                }
-                logger.info("  AI 파이프라인 %d건 성공, %d건 실패", ai_generated, ai_failed)
-            except Exception as e:
-                logger.warning("  AI 파이프라인 실패: %s", e)
-                result["steps"]["ai_pipeline"] = f"error: {e}"
-        else:
-            logger.info("[5.5/9] AI 파이프라인 건너뜀 (ENABLE_AI_*=false)")
-            result["steps"]["ai_pipeline"] = "skipped"
-
-        # Step 6: 스캔 결과 JSON 저장 (로컬 호환)
+        # Step 6: 스캔 결과 JSON 저장
         logger.info("[6/9] 스캔 결과 JSON 저장...")
         output_dir = settings.BASE_DIR / "output" / "daily_scan"
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -356,7 +555,6 @@ async def run_pipeline(days_back: int = 7) -> dict:
             encoding="utf-8",
         )
         result["steps"]["save_json"] = str(scan_json_path)
-        logger.info(f"  저장: {scan_json_path}")
 
         # 완료
         finished_at = datetime.now()
@@ -364,7 +562,7 @@ async def run_pipeline(days_back: int = 7) -> dict:
         result["status"] = "success"
         result["finished_at"] = finished_at.isoformat()
         result["duration_seconds"] = round(duration, 1)
-        logger.info(f"=== 배치 파이프라인 완료 ({duration:.1f}초) ===")
+        logger.info(f"=== 레거시 파이프라인 완료 ({duration:.1f}초) ===")
 
     except Exception as e:
         finished_at = datetime.now()
@@ -373,16 +571,42 @@ async def run_pipeline(days_back: int = 7) -> dict:
         result["error"] = str(e)
         result["finished_at"] = finished_at.isoformat()
         result["duration_seconds"] = round(duration, 1)
-        logger.error(f"=== 배치 파이프라인 실패: {e} ({duration:.1f}초) ===", exc_info=True)
+        logger.error(f"=== 레거시 파이프라인 실패: {e} ({duration:.1f}초) ===", exc_info=True)
 
     return result
 
 
+async def _get_drug_id_by_inn(loader, inn: str) -> int | None:
+    """INN으로 drug_id를 조회하는 헬퍼."""
+    async with loader._session_factory() as session:
+        from sqlalchemy import select
+        from regscan.db.models import DrugDB
+        stmt = select(DrugDB.id).where(DrugDB.inn == inn)
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
+
+
 def main():
     """CLI 진입점"""
-    parser = ArgumentParser(description="RegScan 배치 파이프라인")
+    parser = ArgumentParser(description="RegScan 배치 파이프라인 (v3 3-Stream)")
     parser.add_argument("--days-back", type=int, default=settings.SCAN_DAYS_BACK)
     parser.add_argument("--log-level", default=settings.LOG_LEVEL)
+    parser.add_argument(
+        "--force", action="store_true",
+        help="변경 감지 무시, 전수 처리",
+    )
+    parser.add_argument(
+        "--stream", type=str, default=None,
+        help="특정 스트림만 실행 (therapeutic, innovation, external)",
+    )
+    parser.add_argument(
+        "--area", type=str, default=None,
+        help="특정 치료영역만 실행 (oncology, rare_disease, immunology, cardiovascular, metabolic)",
+    )
+    parser.add_argument(
+        "--legacy", action="store_true",
+        help="기존 DailyScanner 기반 레거시 모드",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -391,7 +615,17 @@ def main():
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    result = asyncio.run(run_pipeline(days_back=args.days_back))
+    if args.legacy:
+        # 레거시 모드
+        result = asyncio.run(run_pipeline(days_back=args.days_back, force=args.force))
+    else:
+        # v3 스트림 모드
+        streams = [args.stream] if args.stream else None
+        result = asyncio.run(run_stream_pipeline(
+            streams=streams,
+            area=args.area,
+            force=args.force,
+        ))
 
     # 결과 출력
     print(json.dumps(result, ensure_ascii=False, indent=2))
