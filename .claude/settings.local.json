@@ -129,7 +129,8 @@
       "Bash(del \"C:\\\\Jimin\\\\RegScan\\\\_temp_analyze.py\")",
       "Bash(set PYTHONUTF8=1:*)",
       "Bash(git status:*)",
-      "Bash(TaskStop:*)"
+      "Bash(TaskStop:*)",
+      "Bash(git -C C:JiminRegScan status -u)"
     ]
   }
 }
