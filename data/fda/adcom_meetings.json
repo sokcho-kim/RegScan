@@ -1,0 +1,92 @@
+[
+  {
+    "meeting_date": "2026-03-06",
+    "committee": "Oncologic Drugs Advisory Committee (ODAC)",
+    "inn": "datopotamab deruxtecan",
+    "brand_name": "",
+    "company": "Daiichi Sankyo/AstraZeneca",
+    "indication": "Non-small cell lung cancer (NSCLC)",
+    "status": "scheduled"
+  },
+  {
+    "meeting_date": "2026-03-20",
+    "committee": "Peripheral and Central Nervous System Drugs Advisory Committee",
+    "inn": "lecanemab",
+    "brand_name": "Leqembi",
+    "company": "Eisai/Biogen",
+    "indication": "Early Alzheimer's disease — subcutaneous formulation review",
+    "status": "scheduled"
+  },
+  {
+    "meeting_date": "2026-04-10",
+    "committee": "Endocrinologic and Metabolic Drugs Advisory Committee",
+    "inn": "resmetirom",
+    "brand_name": "Rezdiffra",
+    "company": "Madrigal Pharmaceuticals",
+    "indication": "MASH with fibrosis — conversion to full approval",
+    "status": "scheduled"
+  },
+  {
+    "meeting_date": "2026-04-24",
+    "committee": "Oncologic Drugs Advisory Committee (ODAC)",
+    "inn": "ivonescimab",
+    "brand_name": "",
+    "company": "Akeso/Summit",
+    "indication": "PD-L1-positive non-small cell lung cancer",
+    "status": "scheduled"
+  },
+  {
+    "meeting_date": "2026-05-08",
+    "committee": "Cardiovascular and Renal Drugs Advisory Committee",
+    "inn": "zilebesiran",
+    "brand_name": "",
+    "company": "Alnylam Pharmaceuticals",
+    "indication": "Hypertension (RNA interference therapy)",
+    "status": "scheduled"
+  },
+  {
+    "meeting_date": "2026-05-22",
+    "committee": "Oncologic Drugs Advisory Committee (ODAC)",
+    "inn": "cosibelimab",
+    "brand_name": "",
+    "company": "Fortress Biotech",
+    "indication": "Metastatic cutaneous squamous cell carcinoma",
+    "status": "scheduled"
+  },
+  {
+    "meeting_date": "2026-06-05",
+    "committee": "Antimicrobial Drugs Advisory Committee",
+    "inn": "cefepime/enmetazobactam",
+    "brand_name": "",
+    "company": "Allecra Therapeutics",
+    "indication": "Complicated urinary tract infections (cUTI)",
+    "status": "scheduled"
+  },
+  {
+    "meeting_date": "2026-06-19",
+    "committee": "Dermatologic and Ophthalmic Drugs Advisory Committee",
+    "inn": "bimekizumab",
+    "brand_name": "Bimzelx",
+    "company": "UCB",
+    "indication": "Hidradenitis suppurativa",
+    "status": "scheduled"
+  },
+  {
+    "meeting_date": "2026-07-10",
+    "committee": "Oncologic Drugs Advisory Committee (ODAC)",
+    "inn": "nemtabrutinib",
+    "brand_name": "",
+    "company": "MSD (Merck)",
+    "indication": "Chronic lymphocytic leukemia (CLL)",
+    "status": "scheduled"
+  },
+  {
+    "meeting_date": "2026-07-24",
+    "committee": "Endocrinologic and Metabolic Drugs Advisory Committee",
+    "inn": "orforglipron",
+    "brand_name": "",
+    "company": "Eli Lilly",
+    "indication": "Type 2 diabetes (oral GLP-1 receptor agonist)",
+    "status": "scheduled"
+  }
+]

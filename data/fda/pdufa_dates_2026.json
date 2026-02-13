@@ -1,0 +1,227 @@
+[
+  {
+    "inn": "lecanemab",
+    "brand_name": "Leqembi",
+    "company": "Eisai/Biogen",
+    "pdufa_date": "2026-03-01",
+    "indication": "Early Alzheimer's disease (subcutaneous formulation)",
+    "application_type": "sBLA",
+    "status": "pending"
+  },
+  {
+    "inn": "pirtobrutinib",
+    "brand_name": "Jaypirca",
+    "company": "Eli Lilly",
+    "pdufa_date": "2026-03-14",
+    "indication": "Chronic lymphocytic leukemia / small lymphocytic lymphoma (CLL/SLL)",
+    "application_type": "sNDA",
+    "status": "pending"
+  },
+  {
+    "inn": "datopotamab deruxtecan",
+    "brand_name": "",
+    "company": "Daiichi Sankyo/AstraZeneca",
+    "pdufa_date": "2026-03-22",
+    "indication": "Non-small cell lung cancer (NSCLC), 2nd line+",
+    "application_type": "BLA",
+    "status": "pending"
+  },
+  {
+    "inn": "ciltacabtagene autoleucel",
+    "brand_name": "Carvykti",
+    "company": "Johnson & Johnson",
+    "pdufa_date": "2026-04-05",
+    "indication": "Multiple myeloma (earlier line)",
+    "application_type": "sBLA",
+    "status": "pending"
+  },
+  {
+    "inn": "resmetirom",
+    "brand_name": "Rezdiffra",
+    "company": "Madrigal Pharmaceuticals",
+    "pdufa_date": "2026-04-10",
+    "indication": "MASH (metabolic dysfunction-associated steatohepatitis) with fibrosis — full approval",
+    "application_type": "NDA",
+    "status": "pending"
+  },
+  {
+    "inn": "trastuzumab deruxtecan",
+    "brand_name": "Enhertu",
+    "company": "Daiichi Sankyo/AstraZeneca",
+    "pdufa_date": "2026-04-18",
+    "indication": "HER2-low metastatic breast cancer (1st line)",
+    "application_type": "sBLA",
+    "status": "pending"
+  },
+  {
+    "inn": "surufatinib",
+    "brand_name": "",
+    "company": "HUTCHMED",
+    "pdufa_date": "2026-04-30",
+    "indication": "Neuroendocrine tumors (NET)",
+    "application_type": "NDA",
+    "status": "pending"
+  },
+  {
+    "inn": "talquetamab",
+    "brand_name": "Talvey",
+    "company": "Johnson & Johnson",
+    "pdufa_date": "2026-05-06",
+    "indication": "Relapsed/refractory multiple myeloma (combination)",
+    "application_type": "sBLA",
+    "status": "pending"
+  },
+  {
+    "inn": "imetelstat",
+    "brand_name": "Rytelo",
+    "company": "Geron",
+    "pdufa_date": "2026-05-15",
+    "indication": "Lower-risk myelodysplastic syndromes (MDS) with anemia",
+    "application_type": "NDA",
+    "status": "pending"
+  },
+  {
+    "inn": "ivonescimab",
+    "brand_name": "",
+    "company": "Akeso/Summit",
+    "pdufa_date": "2026-05-28",
+    "indication": "PD-L1-positive non-small cell lung cancer",
+    "application_type": "BLA",
+    "status": "pending"
+  },
+  {
+    "inn": "cosibelimab",
+    "brand_name": "",
+    "company": "Fortress Biotech",
+    "pdufa_date": "2026-06-02",
+    "indication": "Metastatic or locally advanced cutaneous squamous cell carcinoma",
+    "application_type": "BLA",
+    "status": "pending"
+  },
+  {
+    "inn": "capivasertib",
+    "brand_name": "Truqap",
+    "company": "AstraZeneca",
+    "pdufa_date": "2026-06-12",
+    "indication": "HR+/HER2- advanced breast cancer (full approval)",
+    "application_type": "NDA",
+    "status": "pending"
+  },
+  {
+    "inn": "epcoritamab",
+    "brand_name": "Epkinly",
+    "company": "AbbVie/Genmab",
+    "pdufa_date": "2026-06-20",
+    "indication": "Diffuse large B-cell lymphoma (2nd line+)",
+    "application_type": "sBLA",
+    "status": "pending"
+  },
+  {
+    "inn": "nemtabrutinib",
+    "brand_name": "",
+    "company": "MSD (Merck)",
+    "pdufa_date": "2026-07-01",
+    "indication": "Chronic lymphocytic leukemia (CLL)",
+    "application_type": "NDA",
+    "status": "pending"
+  },
+  {
+    "inn": "zanzalintinib",
+    "brand_name": "",
+    "company": "Exelixis",
+    "pdufa_date": "2026-07-14",
+    "indication": "Advanced renal cell carcinoma (RCC)",
+    "application_type": "NDA",
+    "status": "pending"
+  },
+  {
+    "inn": "elranatamab",
+    "brand_name": "Elrexfio",
+    "company": "Pfizer",
+    "pdufa_date": "2026-07-22",
+    "indication": "Relapsed/refractory multiple myeloma (full approval)",
+    "application_type": "sBLA",
+    "status": "pending"
+  },
+  {
+    "inn": "lifileucel",
+    "brand_name": "Amtagvi",
+    "company": "Iovance",
+    "pdufa_date": "2026-08-01",
+    "indication": "Advanced melanoma (confirmatory trial)",
+    "application_type": "sBLA",
+    "status": "pending"
+  },
+  {
+    "inn": "suzetrigine",
+    "brand_name": "Journavx",
+    "company": "Vertex Pharmaceuticals",
+    "pdufa_date": "2026-08-15",
+    "indication": "Acute pain (additional indication)",
+    "application_type": "sNDA",
+    "status": "pending"
+  },
+  {
+    "inn": "bimekizumab",
+    "brand_name": "Bimzelx",
+    "company": "UCB",
+    "pdufa_date": "2026-09-01",
+    "indication": "Psoriatic arthritis",
+    "application_type": "sBLA",
+    "status": "pending"
+  },
+  {
+    "inn": "donanemab",
+    "brand_name": "Kisunla",
+    "company": "Eli Lilly",
+    "pdufa_date": "2026-09-15",
+    "indication": "Early symptomatic Alzheimer's disease (additional data)",
+    "application_type": "sBLA",
+    "status": "pending"
+  },
+  {
+    "inn": "orforglipron",
+    "brand_name": "",
+    "company": "Eli Lilly",
+    "pdufa_date": "2026-10-01",
+    "indication": "Type 2 diabetes mellitus (oral GLP-1)",
+    "application_type": "NDA",
+    "status": "pending"
+  },
+  {
+    "inn": "crovalimab",
+    "brand_name": "Piasky",
+    "company": "Roche",
+    "pdufa_date": "2026-10-15",
+    "indication": "Paroxysmal nocturnal hemoglobinuria (PNH)",
+    "application_type": "BLA",
+    "status": "pending"
+  },
+  {
+    "inn": "pucotenlimab",
+    "brand_name": "",
+    "company": "CStone Pharmaceuticals",
+    "pdufa_date": "2026-11-01",
+    "indication": "Non-small cell lung cancer (1st line, PD-L1 high)",
+    "application_type": "BLA",
+    "status": "pending"
+  },
+  {
+    "inn": "fruquintinib",
+    "brand_name": "Fruzaqla",
+    "company": "Takeda",
+    "pdufa_date": "2026-11-15",
+    "indication": "Metastatic colorectal cancer (additional data)",
+    "application_type": "sNDA",
+    "status": "pending"
+  },
+  {
+    "inn": "glofitamab",
+    "brand_name": "Columvi",
+    "company": "Roche",
+    "pdufa_date": "2026-12-01",
+    "indication": "Diffuse large B-cell lymphoma (2nd line, full approval)",
+    "application_type": "sBLA",
+    "status": "pending"
+  }
+]

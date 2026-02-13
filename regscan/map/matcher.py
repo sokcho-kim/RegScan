@@ -28,13 +28,47 @@ class IngredientMatcher:
         r"\s*,.*$",  # 콤마 이후
     ]
 
-    # 알려진 유의어
+    # 알려진 유의어 (brand → INN 매핑 포함)
     SYNONYMS = {
-        "pembrolizumab": ["keytruda", "펨브롤리주맙", "키트루다"],
-        "nivolumab": ["opdivo", "니볼루맙", "옵디보"],
-        "semaglutide": ["ozempic", "wegovy", "세마글루티드", "오젬픽"],
+        "pembrolizumab": ["keytruda", "펨브롤리주맙", "키트루다", "mk-3475"],
+        "nivolumab": ["opdivo", "니볼루맙", "옵디보", "bms-936558"],
+        "semaglutide": ["ozempic", "wegovy", "rybelsus", "세마글루티드", "오젬픽"],
         "belumosudil": ["rezurock", "벨루모수딜", "레주록"],
         "trastuzumab": ["herceptin", "트라스투주맙", "허셉틴"],
+        "atezolizumab": ["tecentriq", "아테졸리주맙", "테센트릭"],
+        "durvalumab": ["imfinzi", "더발루맙", "임핀지"],
+        "avelumab": ["bavencio", "아벨루맙", "바벤시오"],
+        "ipilimumab": ["yervoy", "이필리무맙", "여보이"],
+        "lenvatinib": ["lenvima", "렌바티닙", "렌비마"],
+        "sorafenib": ["nexavar", "소라페닙", "넥사바"],
+        "osimertinib": ["tagrisso", "오시머티닙", "타그리소"],
+        "adalimumab": ["humira", "아달리무맙", "휴미라"],
+        "ustekinumab": ["stelara", "우스테키누맙", "스텔라라"],
+        "secukinumab": ["cosentyx", "세쿠키누맙", "코센틱스"],
+        "dupilumab": ["dupixent", "두필루맙", "듀피센트"],
+        "tofacitinib": ["xeljanz", "토파시티닙", "젤잔즈"],
+        "baricitinib": ["olumiant", "바리시티닙", "올루미언트"],
+        "ruxolitinib": ["jakafi", "jakavi", "룩소리티닙", "자카피"],
+        "empagliflozin": ["jardiance", "엠파글리플로진", "자디앙스"],
+        "dapagliflozin": ["farxiga", "forxiga", "다파글리플로진", "포시가"],
+        "tirzepatide": ["mounjaro", "zepbound", "티르제파티드", "마운자로"],
+        "sacubitril/valsartan": ["entresto", "사쿠비트릴발사르탄", "엔트레스토"],
+        "rivaroxaban": ["xarelto", "리바록사반", "자렐토"],
+        "apixaban": ["eliquis", "아픽사반", "엘리퀴스"],
+        "olaparib": ["lynparza", "올라파립", "린파자"],
+        "rucaparib": ["rubraca", "루카파립", "루브라카"],
+        "venetoclax": ["venclexta", "베네토클락스", "벤클렉스타"],
+        "ibrutinib": ["imbruvica", "이브루티닙", "임브루비카"],
+        "acalabrutinib": ["calquence", "아칼라브루티닙", "칼퀀스"],
+        "zanubrutinib": ["brukinsa", "자누브루티닙", "브루킨사"],
+        "elotuzumab": ["empliciti", "엘로투주맙", "엠플리시티"],
+        "daratumumab": ["darzalex", "다라투무맙", "다잘렉스"],
+        "enfortumab vedotin": ["padcev", "엔포르투맙 베도틴", "패드세브"],
+        "tucatinib": ["tukysa", "투카티닙", "투키사"],
+        "nusinersen": ["spinraza", "누시너센", "스핀라자"],
+        "onasemnogene abeparvovec": ["zolgensma", "졸겐스마"],
+        "risdiplam": ["evrysdi", "리스디플람", "에브리스디"],
+        "voxelotor": ["oxbryta", "복셀로토르"],
     }
 
     def normalize(self, name: str) -> str:
@@ -83,6 +117,70 @@ class IngredientMatcher:
                     return canonical
 
         return normalized
+
+    def fuzzy_match(
+        self,
+        name: str,
+        candidates: set[str] | list[str],
+        threshold: float = 0.85,
+    ) -> str | None:
+        """
+        퍼지 매칭으로 가장 유사한 후보 반환
+
+        검색 순서: canonical lookup → prefix match → token overlap → SequenceMatcher
+
+        Args:
+            name: 매칭할 이름
+            candidates: 후보 이름 목록 (정규화된)
+            threshold: SequenceMatcher 최소 유사도 (0~1)
+
+        Returns:
+            매칭된 후보 또는 None
+        """
+        from difflib import SequenceMatcher
+
+        if not name or not candidates:
+            return None
+
+        # 1) canonical lookup
+        canonical = self.find_canonical(name)
+        if canonical in candidates:
+            return canonical
+
+        normalized = self.normalize(name)
+        if normalized in candidates:
+            return normalized
+
+        # 2) prefix match (처음 6자 이상 일치)
+        if len(normalized) >= 6:
+            prefix = normalized[:6]
+            for c in candidates:
+                if c.startswith(prefix):
+                    return c
+
+        # 3) token overlap (공백/하이픈 분리 후 겹치는 토큰 비율)
+        name_tokens = set(re.split(r'[\s\-/]+', normalized))
+        for c in candidates:
+            c_tokens = set(re.split(r'[\s\-/]+', c))
+            if name_tokens and c_tokens:
+                overlap = len(name_tokens & c_tokens)
+                max_len = max(len(name_tokens), len(c_tokens))
+                if overlap / max_len >= 0.5 and overlap >= 1:
+                    return c
+
+        # 4) SequenceMatcher
+        best_match = None
+        best_ratio = 0.0
+        for c in candidates:
+            ratio = SequenceMatcher(None, normalized, c).ratio()
+            if ratio > best_ratio:
+                best_ratio = ratio
+                best_match = c
+
+        if best_ratio >= threshold:
+            return best_match
+
+        return None
 
     def match(self, name1: str, name2: str) -> bool:
         """

@@ -154,6 +154,52 @@ class FDAClient:
         url = f"{self.BASE_URL}/drug/drugsfda.json?{urlencode(params)}"
         return await self._request(url)
 
+    async def search_by_generic_name(
+        self,
+        name: str,
+        limit: int = 5,
+    ) -> dict[str, Any]:
+        """FDA generic_name(INN) 기반 검색
+
+        EMA에서만 수집된 약물의 FDA 교차참조용.
+
+        Args:
+            name: 성분명 (e.g. "tisagenlecleucel")
+            limit: 최대 결과 수
+        """
+        params = {
+            "search": f'openfda.generic_name:"{name}"',
+            "limit": limit,
+        }
+        if self.api_key:
+            params["api_key"] = self.api_key
+
+        url = f"{self.BASE_URL}/drug/drugsfda.json?{urlencode(params)}"
+        return await self._request(url)
+
+    async def search_by_substance_name(
+        self,
+        name: str,
+        limit: int = 5,
+    ) -> dict[str, Any]:
+        """FDA substance_name 기반 검색
+
+        generic_name으로 안 나올 때 폴백.
+
+        Args:
+            name: 성분명 (e.g. "TISAGENLECLEUCEL")
+            limit: 최대 결과 수
+        """
+        params = {
+            "search": f'openfda.substance_name:"{name}"',
+            "limit": limit,
+        }
+        if self.api_key:
+            params["api_key"] = self.api_key
+
+        url = f"{self.BASE_URL}/drug/drugsfda.json?{urlencode(params)}"
+        return await self._request(url)
+
     async def search_by_submission_class(
         self,
         code: str,
@@ -169,6 +215,33 @@ class FDAClient:
         """
         params = {
             "search": f"submissions.submission_class_code:{code}",
+            "limit": limit,
+            "skip": skip,
+        }
+        if self.api_key:
+            params["api_key"] = self.api_key
+
+        url = f"{self.BASE_URL}/drug/drugsfda.json?{urlencode(params)}"
+        return await self._request(url)
+
+    async def search_by_submission_class_description(
+        self,
+        keyword: str,
+        limit: int = 100,
+        skip: int = 0,
+    ) -> dict[str, Any]:
+        """FDA submission_class_code_description 기반 검색
+
+        openFDA의 submission_class_code 값이 문자열 description인 경우 사용.
+        예: "Breakthrough" 검색 시 submissions.submission_class_code_description:"Breakthrough"
+
+        Args:
+            keyword: 설명 키워드 (e.g. "Breakthrough Therapy")
+            limit: 최대 결과 수
+            skip: 건너뛸 결과 수
+        """
+        params = {
+            "search": f'submissions.submission_class_code_description:"{keyword}"',
             "limit": limit,
             "skip": skip,
         }

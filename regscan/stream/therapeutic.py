@@ -279,7 +279,24 @@ class TherapeuticAreaStream(BaseStream):
             logger.warning("  EMA 필터 실패 (%s): %s", area.name, e)
             errors.append(f"EMA therapeutic_area filter failed: {e}")
 
-        # 3) ATC 기반 그룹핑 (같은 ATC 3단계 약물 태깅)
+        # 3) FDA 교차참조 보강 — EMA에서만 수집된 약물을 FDA generic_name으로 검색
+        try:
+            fda_xref_count = await self._enrich_with_fda_crossref(drugs_by_inn)
+            if fda_xref_count > 0:
+                logger.info("  FDA 교차참조: %d개 보강", fda_xref_count)
+        except Exception as e:
+            logger.debug("  FDA 교차참조 실패: %s", e)
+
+        # 4) MFDS 보강 (Stream 1에서 수집된 INN으로 MFDS API 조회)
+        if settings.ENABLE_MFDS_ENRICHMENT:
+            try:
+                mfds_count = await self._enrich_with_mfds(drugs_by_inn)
+                if mfds_count > 0:
+                    logger.info("  MFDS 매칭: %d개", mfds_count)
+            except Exception as e:
+                logger.debug("  MFDS 보강 실패: %s", e)
+
+        # 5) ATC 기반 그룹핑 (같은 ATC 3단계 약물 태깅)
         atc_groups = self._group_by_atc(drugs_by_inn, area.atc_prefixes)
 
         drugs_list = list(drugs_by_inn.values())
@@ -409,11 +426,137 @@ class TherapeuticAreaStream(BaseStream):
                     "is_conditional": _bool_field(med, "conditionalApproval", "is_conditional", "conditional_approval"),
                     "is_accelerated": _bool_field(med, "acceleratedAssessment", "is_accelerated", "accelerated_assessment"),
                     "ema_product_number": med.get("emaProductNumber", "") or med.get("ema_product_number", ""),
+                    "therapeutic_indication": (
+                        med.get("therapeuticIndication", "") or
+                        med.get("therapeutic_indication", "") or ""
+                    ),
                     "raw": med,
                 },
             })
 
         return all_drugs
+
+    async def _enrich_with_fda_crossref(self, drugs_by_inn: dict[str, dict]) -> int:
+        """EMA에서만 수집된 약물을 FDA generic_name/substance_name으로 교차검색
+
+        pharm_class_epc 검색에서 누락된 약물(CAR-T, 이중특이항체 등)을 보강.
+
+        Args:
+            drugs_by_inn: 정규화된 INN → drug dict
+
+        Returns:
+            FDA 교차참조로 보강된 약물 수
+        """
+        import asyncio as _aio
+        from regscan.ingest.fda import FDAClient
+
+        # EMA 있고 FDA 없는 약물 필터
+        targets = [
+            (norm, drug) for norm, drug in drugs_by_inn.items()
+            if drug.get("ema_data") and not drug.get("fda_data")
+        ]
+        if not targets:
+            return 0
+
+        count = 0
+        async with FDAClient() as client:
+            for norm, drug in targets:
+                inn = drug.get("inn", "")
+                if not inn or len(inn) < 3:
+                    continue
+
+                fda_result = None
+                try:
+                    # 1차: generic_name 검색
+                    response = await client.search_by_generic_name(inn, limit=3)
+                    results = response.get("results", [])
+                    if results:
+                        fda_result = results[0]
+                except Exception:
+                    pass
+
+                if not fda_result:
+                    try:
+                        # 2차: substance_name 검색 (대문자 변환)
+                        response = await client.search_by_substance_name(
+                            inn.upper(), limit=3
+                        )
+                        results = response.get("results", [])
+                        if results:
+                            fda_result = results[0]
+                    except Exception:
+                        pass
+
+                if fda_result:
+                    openfda = fda_result.get("openfda", {})
+                    generic_names = openfda.get("generic_name", [])
+                    brand_names = openfda.get("brand_name", [])
+                    submissions = fda_result.get("submissions", [])
+
+                    # 최신 승인 submission 찾기
+                    submission_status_date = ""
+                    for sub in submissions:
+                        if sub.get("submission_status") == "AP":
+                            sub_date = sub.get("submission_status_date", "")
+                            if sub_date > submission_status_date:
+                                submission_status_date = sub_date
+
+                    drug["fda_data"] = {
+                        "generic_name": generic_names[0] if generic_names else inn,
+                        "brand_name": brand_names[0] if brand_names else "",
+                        "application_number": fda_result.get("application_number", ""),
+                        "submission_status_date": submission_status_date,
+                        "submission_status": "AP" if submission_status_date else "",
+                        "submissions": submissions,
+                        "pharm_class_epc": openfda.get("pharm_class_epc", []),
+                        "raw": fda_result,
+                    }
+                    if "fda" not in drug.get("sources", []):
+                        drug.setdefault("sources", []).append("fda")
+                    count += 1
+
+                # Rate limit (0.3초 — FDA API 제한 준수)
+                await _aio.sleep(0.3)
+
+        return count
+
+    async def _enrich_with_mfds(self, drugs_by_inn: dict[str, dict]) -> int:
+        """Stream 1에서 수집된 INN으로 MFDS API 조회하여 데이터 보강
+
+        Args:
+            drugs_by_inn: 정규화된 INN → drug dict
+
+        Returns:
+            MFDS 매칭된 약물 수
+        """
+        import asyncio as _aio
+        from regscan.ingest.mfds import MFDSClient
+        from regscan.parse.mfds_parser import MFDSPermitParser
+
+        count = 0
+        parser = MFDSPermitParser()
+
+        async with MFDSClient() as client:
+            for norm, drug in drugs_by_inn.items():
+                inn = drug.get("inn", "")
+                if not inn or len(inn) < 3:
+                    continue
+
+                try:
+                    response = await client.search_permits(item_name=inn, num_of_rows=5)
+                    items = response.get("body", {}).get("items", [])
+                    if items:
+                        parsed = parser.parse_many(items)
+                        if parsed:
+                            drug["mfds_data"] = parsed[0]
+                            count += 1
+                except Exception:
+                    pass
+
+                # Rate limit (0.2초 간격)
+                await _aio.sleep(0.2)
+
+        return count
 
     def _group_by_atc(
         self,

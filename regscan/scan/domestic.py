@@ -88,6 +88,10 @@ class DomesticImpact:
     hot_issue_reasons: list[str] = field(default_factory=list)
     analysis_notes: list[str] = field(default_factory=list)
 
+    # 스트림 메타데이터
+    therapeutic_areas: list[str] = field(default_factory=list)
+    stream_sources: list[str] = field(default_factory=list)
+
     @property
     def quadrant(self) -> str:
         """2축 분류 4분면 결정"""
@@ -371,6 +375,8 @@ class DomesticImpactAnalyzer:
             domestic_status=DomesticStatus.NOT_APPLICABLE,
             global_score=status.global_score,
             hot_issue_reasons=status.hot_issue_reasons.copy(),
+            therapeutic_areas=getattr(status, 'therapeutic_areas', []).copy(),
+            stream_sources=getattr(status, 'stream_sources', []).copy(),
         )
 
         # FDA

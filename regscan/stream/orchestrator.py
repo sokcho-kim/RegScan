@@ -57,7 +57,8 @@ class StreamOrchestrator:
             return InnovationStream()
         elif name == "external":
             from .external import ExternalSignalStream
-            return ExternalSignalStream()
+            # 초기 target_inns는 빈 set, run_all에서 동적 주입
+            return ExternalSignalStream(target_inns=[])
         else:
             logger.warning("알 수 없는 스트림: %s", name)
             return None
@@ -65,13 +66,54 @@ class StreamOrchestrator:
     async def run_all(self) -> dict[str, list[StreamResult]]:
         """모든 활성 스트림 실행
 
+        Stream 1/2 먼저 실행 → 수집된 INN을 Stream 3에 주입 후 실행.
+
         Returns:
             {stream_name: [StreamResult, ...]}
         """
         all_results: dict[str, list[StreamResult]] = {}
 
-        for stream in self._streams:
+        # 스트림을 external과 non-external로 분리
+        prior_streams = [s for s in self._streams if s.stream_name != "external"]
+        external_streams = [s for s in self._streams if s.stream_name == "external"]
+
+        # 1) Stream 1/2 먼저 실행
+        collected_inns: set[str] = set()
+        for stream in prior_streams:
             logger.info("=== 스트림 실행: %s ===", stream.stream_name)
+            try:
+                results = await stream.collect()
+                all_results[stream.stream_name] = results
+
+                total_drugs = sum(r.drug_count for r in results)
+                total_signals = sum(r.signal_count for r in results)
+                logger.info(
+                    "  스트림 '%s' 완료: %d개 결과, 총 %d개 약물, %d개 시그널",
+                    stream.stream_name, len(results), total_drugs, total_signals,
+                )
+
+                # INN 수집
+                for r in results:
+                    for drug in r.drugs_found:
+                        inn = drug.get("inn", "")
+                        if inn:
+                            collected_inns.add(inn)
+            except Exception as e:
+                logger.error("스트림 '%s' 실행 실패: %s", stream.stream_name, e)
+                all_results[stream.stream_name] = [
+                    StreamResult(
+                        stream_name=stream.stream_name,
+                        errors=[str(e)],
+                    )
+                ]
+
+        # 2) 수집된 INN을 Stream 3에 주입 후 실행
+        for stream in external_streams:
+            logger.info("=== 스트림 실행: %s (교차참조 INN %d개 주입) ===",
+                        stream.stream_name, len(collected_inns))
+            # target_inns 동적 주입
+            stream._target_inns = collected_inns
+
             try:
                 results = await stream.collect()
                 all_results[stream.stream_name] = results
@@ -130,6 +172,9 @@ class StreamOrchestrator:
                         # ATC 코드 병합
                         if drug.get("atc_code") and not existing.get("atc_code"):
                             existing["atc_code"] = drug["atc_code"]
+                        # MFDS 데이터 병합
+                        if drug.get("mfds_data") and not existing.get("mfds_data"):
+                            existing["mfds_data"] = drug["mfds_data"]
                         # 시그널 병합
                         for sig in drug.get("signals", []):
                             existing.setdefault("signals", []).append(sig)
@@ -141,6 +186,7 @@ class StreamOrchestrator:
                             "stream_sources": [stream_name],
                             "fda_data": drug.get("fda_data"),
                             "ema_data": drug.get("ema_data"),
+                            "mfds_data": drug.get("mfds_data"),
                             "atc_code": drug.get("atc_code", ""),
                             "signals": list(drug.get("signals", [])),
                         }
@@ -160,11 +206,16 @@ class StreamOrchestrator:
         for drug in merged:
             fda_data = drug.get("fda_data")
             ema_data = drug.get("ema_data")
-            status = builder.build_from_fda_ema(fda_data, ema_data)
+            mfds_data = drug.get("mfds_data")
+
+            if mfds_data:
+                status = builder.build_from_all(fda_data, ema_data, mfds_data)
+            else:
+                status = builder.build_from_fda_ema(fda_data, ema_data)
 
             # 스트림 메타 주입
-            status._therapeutic_areas = drug.get("therapeutic_areas", [])
-            status._stream_sources = drug.get("stream_sources", [])
+            status.therapeutic_areas = drug.get("therapeutic_areas", [])
+            status.stream_sources = drug.get("stream_sources", [])
 
             statuses.append(status)
 

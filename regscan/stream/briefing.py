@@ -227,7 +227,7 @@ class StreamBriefingGenerator:
         }
 
     async def _call_llm(self, prompt: str) -> str:
-        """LLM 호출"""
+        """LLM 호출 (Anthropic → OpenAI → Gemini 순 시도)"""
         if settings.ANTHROPIC_API_KEY:
             try:
                 import anthropic
@@ -254,7 +254,19 @@ class StreamBriefingGenerator:
             except Exception as e:
                 logger.debug("OpenAI 브리핑 호출 실패: %s", e)
 
-        raise RuntimeError("LLM API 키 미설정")
+        if settings.GEMINI_API_KEY:
+            try:
+                from google import genai
+                client = genai.Client(api_key=settings.GEMINI_API_KEY)
+                response = client.models.generate_content(
+                    model=settings.GEMINI_MODEL,
+                    contents=prompt,
+                )
+                return response.text or ""
+            except Exception as e:
+                logger.debug("Gemini 브리핑 호출 실패: %s", e)
+
+        raise RuntimeError("LLM API 키 미설정 (ANTHROPIC/OPENAI/GEMINI)")
 
     def _parse_json_response(self, text: str, fallback_headline: str = "") -> dict:
         """LLM JSON 응답 파싱"""

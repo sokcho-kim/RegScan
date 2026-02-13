@@ -50,8 +50,9 @@ class BriefingReport:
 
     def save(self, directory: Path = BRIEFINGS_DIR) -> Path:
         """JSON 파일로 저장"""
+        import re as _re
         directory.mkdir(parents=True, exist_ok=True)
-        safe_name = self.inn.replace(" ", "_").replace("/", "_")
+        safe_name = _re.sub(r'[^\w\-]', '_', self.inn)[:80]
         path = directory / f"{safe_name}.json"
         path.write_text(
             json.dumps(self.to_dict(), ensure_ascii=False, indent=2),
@@ -145,13 +146,14 @@ class LLMBriefingGenerator:
 
     # 지원 모델 목록
     SUPPORTED_MODELS = {
-        "openai": ["gpt-4o-mini", "gpt-4o", "gpt-4-turbo", "o1-mini"],
+        "openai": ["gpt-4o-mini", "gpt-4o", "gpt-5", "o1-mini"],
         "anthropic": ["claude-sonnet-4-20250514", "claude-3-haiku-20240307"],
+        "gemini": ["gemini-2.0-flash", "gemini-2.5-pro", "gemini-2.5-flash"],
     }
 
     def __init__(
         self,
-        provider: str = "openai",  # "openai" or "anthropic"
+        provider: str = "openai",  # "openai", "anthropic", or "gemini"
         model: Optional[str] = None,
         api_key: Optional[str] = None,
     ):
@@ -161,6 +163,9 @@ class LLMBriefingGenerator:
         if provider == "anthropic":
             self.model = model or "claude-sonnet-4-20250514"
             self.api_key = api_key or settings.ANTHROPIC_API_KEY
+        elif provider == "gemini":
+            self.model = model or settings.GEMINI_MODEL
+            self.api_key = api_key or settings.GEMINI_API_KEY
         else:
             self.model = model or "gpt-4o-mini"
             self.api_key = api_key or settings.OPENAI_API_KEY
@@ -173,10 +178,35 @@ class LLMBriefingGenerator:
             if self.provider == "anthropic":
                 import anthropic
                 self._client = anthropic.Anthropic(api_key=self.api_key)
+            elif self.provider == "gemini":
+                from google import genai
+                self._client = genai.Client(api_key=self.api_key)
             else:
                 import openai
                 self._client = openai.OpenAI(api_key=self.api_key)
         return self._client
+
+    @staticmethod
+    def _estimate_mfds_timeline(impact: DomesticImpact) -> str | None:
+        """글로벌 승인 경과일 기반 MFDS 허가 타임라인 예측"""
+        if impact.mfds_approved:
+            return "already_approved"
+        days = impact.days_since_global_approval
+        if days is None:
+            return None
+        if impact.has_active_trial or len(impact.cris_trials) > 0:
+            if days < 365:
+                return "1~2년 내 허가 가능 (국내 임상 진행 중, 글로벌 승인 1년 미만)"
+            else:
+                return f"허가 임박 가능 (글로벌 승인 후 {days}일 경과, 국내 임상 진행 중)"
+        if days < 365:
+            return f"글로벌 승인 후 {days}일 — 통상 허가 신청 준비 단계 (1~3년 소요)"
+        elif days < 730:
+            return f"글로벌 승인 후 {days}일 — 허가 신청 진행 중일 가능성 (통상 1~2년)"
+        elif days < 1095:
+            return f"글로벌 승인 후 {days}일 — 허가 지연 (국내 판매권자 확보 지연 가능성)"
+        else:
+            return f"글로벌 승인 후 {days}일 경과 — 장기 미허가 (판매권자 부재 또는 시장성 판단 보류)"
 
     def _prepare_drug_data(self, impact: DomesticImpact) -> str:
         """DomesticImpact를 LLM 입력 형식으로 변환"""
@@ -210,10 +240,32 @@ class LLMBriefingGenerator:
             "analysis": {
                 "domestic_status": impact.domestic_status.value,
                 "global_score": impact.global_score,
+                "korea_relevance_score": impact.korea_relevance_score,
+                "korea_relevance_reasons": impact.korea_relevance_reasons,
+                "quadrant": impact.quadrant,
                 "hot_issue_reasons": impact.hot_issue_reasons,
                 "notes": impact.analysis_notes,
             },
+            "context": {
+                "therapeutic_areas": impact.therapeutic_areas,
+                "stream_sources": impact.stream_sources,
+                "days_since_global_approval": impact.days_since_global_approval,
+                "mfds_timeline_estimate": self._estimate_mfds_timeline(impact),
+            },
         }
+
+        # 경쟁약 데이터가 주입되었으면 포함
+        if hasattr(impact, '_competitors') and impact._competitors:
+            data["competitors"] = impact._competitors
+
+        # 적응증 텍스트가 있으면 포함
+        if hasattr(impact, '_indication_text') and impact._indication_text:
+            data["indication"] = impact._indication_text
+
+        # 약리학적 분류 (기전 이해에 활용)
+        if hasattr(impact, '_pharmacotherapeutic_group') and impact._pharmacotherapeutic_group:
+            data["pharmacotherapeutic_group"] = impact._pharmacotherapeutic_group
+
         return json.dumps(data, ensure_ascii=False, indent=2)
 
     async def generate(self, impact: DomesticImpact) -> BriefingReport:
@@ -257,7 +309,7 @@ class LLMBriefingGenerator:
         if self.provider == "anthropic":
             response = client.messages.create(
                 model=self.model,
-                max_tokens=2000,
+                max_tokens=3000,
                 system=SYSTEM_PROMPT,
                 messages=[{"role": "user", "content": prompt}],
             )
@@ -265,14 +317,30 @@ class LLMBriefingGenerator:
                 logger.warning("Anthropic API returned empty content list")
                 return ""
             return response.content[0].text
+        elif self.provider == "gemini":
+            full_prompt = f"{SYSTEM_PROMPT}\n\n{prompt}"
+            response = client.models.generate_content(
+                model=self.model,
+                contents=full_prompt,
+            )
+            if not response.text:
+                logger.warning("Gemini API returned empty text")
+                return ""
+            return response.text
         else:
+            # GPT-5 등 최신 모델은 max_completion_tokens 사용
+            token_param = (
+                {"max_completion_tokens": 3000}
+                if "gpt-5" in self.model or "o1" in self.model or "o3" in self.model or "o4" in self.model
+                else {"max_tokens": 3000}
+            )
             response = client.chat.completions.create(
                 model=self.model,
-                max_tokens=2000,
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": prompt},
                 ],
+                **token_param,
             )
             if not response.choices:
                 logger.warning("OpenAI API returned empty choices list")
@@ -605,7 +673,8 @@ async def compare_models(
     if models is None:
         models = [
             ("openai", "gpt-4o-mini"),
-            ("openai", "gpt-4o"),
+            ("openai", "gpt-5"),
+            ("gemini", settings.GEMINI_MODEL),
         ]
 
     results = {}

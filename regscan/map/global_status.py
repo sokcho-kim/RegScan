@@ -99,6 +99,10 @@ class GlobalRegulatoryStatus:
     hot_issue_level: HotIssueLevel = HotIssueLevel.LOW
     hot_issue_reasons: list[str] = field(default_factory=list)
 
+    # 스트림 메타데이터
+    therapeutic_areas: list[str] = field(default_factory=list)
+    stream_sources: list[str] = field(default_factory=list)
+
     # 메타데이터
     last_updated: datetime = field(default_factory=datetime.now)
 
@@ -474,23 +478,32 @@ class GlobalStatusBuilder:
 
     def _build_ema_approval(self, data: dict) -> RegulatoryApproval:
         """EMA 데이터에서 RegulatoryApproval 생성"""
-        # 날짜 파싱
+        # 날짜 파싱 (다중 형식 지원: DD/MM/YYYY, YYYY-MM-DD)
         approval_date = None
         date_str = data.get("marketing_authorisation_date") or data.get("approval_date", "")
         if date_str:
-            try:
-                approval_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-            except ValueError:
-                pass
+            for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%Y%m%d"):
+                try:
+                    approval_date = datetime.strptime(date_str, fmt).date()
+                    break
+                except ValueError:
+                    continue
 
-        # 상태 결정
-        medicine_status = data.get("medicine_status", "").lower()
-        if medicine_status == "authorised":
+        # 상태 결정 — medicine_status 또는 authorisationStatus 필드
+        medicine_status = (
+            data.get("medicine_status", "") or
+            data.get("authorisationStatus", "") or
+            data.get("authorisation_status", "") or ""
+        ).lower()
+        if medicine_status in ("authorised", "authorized"):
             status = ApprovalStatus.APPROVED
         elif medicine_status == "withdrawn":
             status = ApprovalStatus.WITHDRAWN
         elif "pending" in medicine_status or "under" in medicine_status:
             status = ApprovalStatus.PENDING
+        elif approval_date:
+            # 날짜가 있으면 승인으로 간주
+            status = ApprovalStatus.APPROVED
         else:
             status = ApprovalStatus.UNKNOWN
 

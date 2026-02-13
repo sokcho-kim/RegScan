@@ -1,0 +1,18 @@
+# 'allogeneic umbilical cord-derived CD34- cells, non-expanded;dorocubicel' 규제 동향 브리핑
+*EMA PRIME(우선심사) 지정 · 급여 현황: 급여 정보 없음*
+
+## 핵심 요약
+1. 규제 특이사항: EMA PRIME(우선심사) 지정, EMA 조건부 허가, 희귀의약품 지정
+2. 국내 미허가 — 허가·급여 등재 동향 모니터링 필요
+
+## 글로벌 승인 현황
+allogeneic umbilical cord-derived CD34- cells, non-expanded;dorocubicel에 대한 글로벌 주요 규제기관(FDA, EMA)의 승인 이력은 현재 확인되지 않는다. 특히 EMA PRIME(우선심사) 지정, EMA 조건부 허가, 희귀의약품 지정 이력이 확인되어, 규제 당국이 해당 약물의 임상적 가치를 높게 평가한 것으로 해석된다.
+
+## 국내 도입 전망
+현재 식약처(MFDS)에 allogeneic umbilical cord-derived CD34- cells, non-expanded;dorocubicel 품목허가 이력은 확인되지 않는다. 국내 임상시험 등록도 확인되지 않아 단기간 내 도입은 불투명하다. HIRA 급여 정보는 확인되지 않는다.
+
+## 메드클레임 시사점
+국내 미허가 약물로, 현 시점에서 보험 청구는 불가하다. 다만 희소질환·항암제 등 특정 적응증의 경우 사전승인 비급여 또는 긴급도입 경로가 존재하므로, 허가·급여 등재 동향을 지속 모니터링할 필요가 있다. 희귀의약품으로 지정되어, 급여 적용 시 산정특례(본인부담률 10%) 대상이 될 수 있다. 희귀질환자 의료비 지원사업 대상 여부도 확인이 필요하다.
+
+---
+*생성: 2026-02-13 13:50 | RegScan AI*

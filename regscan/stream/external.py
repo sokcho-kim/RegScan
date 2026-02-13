@@ -62,10 +62,18 @@ class ExternalSignalStream(BaseStream):
 
         # 3) 교차 참조 (CT.gov INN이 Stream 1/2에도 있으면 강조)
         cross_ref_count = 0
+        target_norms = self._target_inns_normalized()
         for norm, drug in drugs_by_inn.items():
-            if norm in self._target_inns_normalized():
+            if norm in target_norms:
                 drug["cross_referenced"] = True
                 cross_ref_count += 1
+            else:
+                # fuzzy_match fallback
+                fuzzy_hit = self._matcher.fuzzy_match(norm, target_norms)
+                if fuzzy_hit:
+                    drug["cross_referenced"] = True
+                    drug["fuzzy_matched_to"] = fuzzy_hit
+                    cross_ref_count += 1
 
         drugs_list = list(drugs_by_inn.values())
         logger.info(
@@ -169,8 +177,10 @@ class ExternalSignalStream(BaseStream):
         return len(papers)
 
     def _add_inns_to_drugs(self, drugs: dict, study: dict) -> None:
-        """파싱된 임상시험에서 INN을 약물 목록에 추가"""
-        for inn in study.get("extracted_inns", []):
+        """파싱된 임상시험에서 INN을 약물 목록에 추가 (brand→INN 변환 선행)"""
+        for raw_inn in study.get("extracted_inns", []):
+            # brand name → canonical INN 변환
+            inn = self._matcher.find_canonical(raw_inn)
             norm = self._matcher.normalize(inn)
             if norm not in drugs:
                 drugs[norm] = {

@@ -100,6 +100,11 @@ class Settings(BaseSettings):
     CT_GOV_MONTHS_BACK: int = 6
     MEDRXIV_DAYS_BACK: int = 30
 
+    # Phase 2: 데이터 소스 보강 토글
+    ENABLE_FDA_SAFETY: bool = True
+    ENABLE_FDA_ADCOM: bool = True
+    ENABLE_MFDS_ENRICHMENT: bool = True
+
     ENABLE_STREAM_BRIEFINGS: bool = True
     ENABLE_UNIFIED_BRIEFING: bool = True
 

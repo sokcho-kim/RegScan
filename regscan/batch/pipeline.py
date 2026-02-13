@@ -78,6 +78,30 @@ async def run_stream_pipeline(
         await init_db()
         result["steps"]["init_db"] = "ok"
 
+        # Step 1.5: PDUFA 시드 데이터 자동 투입
+        try:
+            from regscan.db.models import PdufaDateDB
+            from sqlalchemy import select, func
+            from regscan.db.database import get_async_session as _gas
+
+            async with _gas()() as _sess:
+                cnt_result = await _sess.execute(select(func.count(PdufaDateDB.id)))
+                pdufa_count = cnt_result.scalar() or 0
+
+            if pdufa_count == 0:
+                seed_file = settings.DATA_DIR / "fda" / "pdufa_dates_2026.json"
+                if seed_file.exists():
+                    from regscan.scripts.seed_pdufa import seed_pdufa
+                    seeded = await seed_pdufa(seed_file)
+                    logger.info("[1.5/6] PDUFA 자동 시드: %d건", seeded)
+                    result["steps"]["pdufa_seed"] = seeded
+                else:
+                    logger.debug("[1.5/6] PDUFA 시드 파일 없음, 건너뜀")
+            else:
+                logger.debug("[1.5/6] PDUFA 데이터 이미 존재 (%d건), 시드 건너뜀", pdufa_count)
+        except Exception as e:
+            logger.debug("[1.5/6] PDUFA 자동 시드 건너뜀: %s", e)
+
         # Step 2: 스트림 오케스트레이터 실행
         logger.info("[2/6] 스트림 수집 실행...")
         from regscan.stream.orchestrator import StreamOrchestrator

@@ -80,6 +80,24 @@ class InnovationStream(BaseStream):
             logger.warning("[Stream2] PDUFA 조회 실패: %s", e)
             errors.append(f"PDUFA: {e}")
 
+        # 7) FDA Safety (Boxed Warning + Enforcement)
+        if settings.ENABLE_FDA_SAFETY:
+            try:
+                safety_count = await self._collect_fda_safety(drugs_by_inn, signals)
+                logger.info("[Stream2] FDA Safety: %d건", safety_count)
+            except Exception as e:
+                logger.warning("[Stream2] FDA Safety 수집 실패: %s", e)
+                errors.append(f"FDA Safety: {e}")
+
+        # 8) FDA Advisory Committee
+        if settings.ENABLE_FDA_ADCOM:
+            try:
+                adcom_count = await self._collect_fda_adcom(signals)
+                logger.info("[Stream2] FDA AdCom: %d건", adcom_count)
+            except Exception as e:
+                logger.warning("[Stream2] FDA AdCom 수집 실패: %s", e)
+                errors.append(f"FDA AdCom: {e}")
+
         drugs_list = list(drugs_by_inn.values())
         logger.info(
             "[Stream2] 혁신지표 완료: %d개 약물, %d개 시그널",
@@ -128,13 +146,24 @@ class InnovationStream(BaseStream):
         drugs: dict[str, dict],
         signals: list[dict],
     ) -> int:
-        """FDA Breakthrough Therapy (submission_class_code=5)"""
+        """FDA Breakthrough Therapy — description 기반 검색 + code fallback"""
         from regscan.ingest.fda import FDAClient
 
         count = 0
         async with FDAClient() as client:
-            response = await client.search_by_submission_class("5", limit=100)
-            for r in response.get("results", []):
+            # 1차: submission_class_code_description 기반 검색
+            response = await client.search_by_submission_class_description(
+                "Breakthrough", limit=100,
+            )
+            results = response.get("results", [])
+
+            # 2차 fallback: 결과 없으면 기존 code 방식
+            if not results:
+                logger.debug("[Stream2] Breakthrough description 검색 0건, code fallback 시도")
+                response = await client.search_by_submission_class("5", limit=100)
+                results = response.get("results", [])
+
+            for r in results:
                 inn = self._extract_inn_from_fda(r)
                 if not inn:
                     continue
@@ -331,3 +360,90 @@ class InnovationStream(BaseStream):
                 "ema_data": ema_data,
                 "atc_code": "",
             }
+
+    async def _collect_fda_safety(
+        self,
+        drugs: dict[str, dict],
+        signals: list[dict],
+    ) -> int:
+        """FDA Safety Alert (Boxed Warning + Enforcement) 수집"""
+        from regscan.ingest.fda_safety import FDASafetyClient
+        from regscan.parse.fda_safety_parser import FDASafetyParser
+
+        parser = FDASafetyParser()
+        count = 0
+
+        async with FDASafetyClient() as client:
+            # 1) Boxed Warning 라벨
+            try:
+                label_response = await client.search_label_changes(
+                    days_back=settings.COLLECT_DAYS_BACK, has_boxed_warning=True,
+                )
+                raw_labels = label_response.get("results", [])
+                parsed_labels = parser.parse_many(raw_labels=raw_labels)
+
+                for item in parsed_labels:
+                    inn = item.get("inn", "")
+                    if not inn:
+                        continue
+                    norm = self._matcher.normalize(inn)
+                    self._upsert_drug(drugs, norm, inn, None, designation="boxed_warning")
+                    signals.append({
+                        "type": "fda_boxed_warning",
+                        "inn": inn,
+                        "brand_name": item.get("brand_name", ""),
+                        "boxed_warning_text": item.get("boxed_warning_text", "")[:200],
+                    })
+                    count += 1
+            except Exception as e:
+                logger.debug("FDA Label 수집 건너뜀: %s", e)
+
+            # 2) Enforcement (리콜)
+            try:
+                enforcement_response = await client.search_enforcement(
+                    days_back=settings.COLLECT_DAYS_BACK,
+                )
+                raw_enforcements = enforcement_response.get("results", [])
+                parsed_enforcements = parser.parse_many(raw_enforcements=raw_enforcements)
+
+                for item in parsed_enforcements:
+                    inn = item.get("inn", "")
+                    if not inn:
+                        continue
+                    norm = self._matcher.normalize(inn)
+                    self._upsert_drug(drugs, norm, inn, None, designation="recall")
+                    signals.append({
+                        "type": "fda_enforcement",
+                        "inn": inn,
+                        "recall_number": item.get("recall_number", ""),
+                        "classification": item.get("classification", ""),
+                        "reason": item.get("reason", "")[:200],
+                    })
+                    count += 1
+            except Exception as e:
+                logger.debug("FDA Enforcement 수집 건너뜀: %s", e)
+
+        return count
+
+    async def _collect_fda_adcom(self, signals: list[dict]) -> int:
+        """FDA Advisory Committee 미팅 일정 조회 (시드 데이터 기반)"""
+        try:
+            from regscan.ingest.fda_adcom import FDAAdComClient
+
+            client = FDAAdComClient()
+            upcoming = client.get_upcoming_meetings()
+
+            for meeting in upcoming:
+                signals.append({
+                    "type": "adcom_upcoming",
+                    "inn": meeting.get("inn", ""),
+                    "meeting_date": meeting.get("meeting_date", ""),
+                    "committee": meeting.get("committee", ""),
+                    "indication": meeting.get("indication", ""),
+                    "status": meeting.get("status", "scheduled"),
+                })
+
+            return len(upcoming)
+        except Exception as e:
+            logger.debug("FDA AdCom 조회 건너뜀: %s", e)
+            return 0

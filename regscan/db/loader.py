@@ -270,12 +270,21 @@ class DBLoader:
 
         level = _hot_issue_level(impact.global_score)
 
+        # therapeutic_areas / stream_sources 추출
+        ta_list = getattr(impact, 'therapeutic_areas', []) or []
+        ta_str = ",".join(ta_list) if ta_list else ""
+        ss_list = getattr(impact, 'stream_sources', []) or []
+
         if drug:
             drug.global_score = impact.global_score
             drug.korea_relevance_score = impact.korea_relevance_score
             drug.hot_issue_level = level
             drug.hot_issue_reasons = impact.hot_issue_reasons
             drug.domestic_status = impact.domestic_status.value
+            if ta_str:
+                drug.therapeutic_areas = ta_str
+            if ss_list:
+                drug.stream_sources = ss_list
             drug.updated_at = datetime.utcnow()
         else:
             drug = DrugDB(
@@ -285,6 +294,8 @@ class DBLoader:
                 hot_issue_level=level,
                 hot_issue_reasons=impact.hot_issue_reasons,
                 domestic_status=impact.domestic_status.value,
+                therapeutic_areas=ta_str,
+                stream_sources=ss_list,
             )
             session.add(drug)
             # flush 로 id 확보
@@ -457,6 +468,11 @@ class DBLoader:
         level = _hot_issue_level(impact.global_score)
         changed = False
 
+        # therapeutic_areas / stream_sources 추출
+        ta_list = getattr(impact, 'therapeutic_areas', []) or []
+        ta_str = ",".join(ta_list) if ta_list else ""
+        ss_list = getattr(impact, 'stream_sources', []) or []
+
         if drug:
             # score_change 감지 (global_score)
             if drug.global_score != impact.global_score:
@@ -501,6 +517,10 @@ class DBLoader:
             drug.hot_issue_level = level
             drug.hot_issue_reasons = impact.hot_issue_reasons
             drug.domestic_status = impact.domestic_status.value
+            if ta_str:
+                drug.therapeutic_areas = ta_str
+            if ss_list:
+                drug.stream_sources = ss_list
             drug.updated_at = datetime.utcnow()
         else:
             # 새 약물 → new_drug
@@ -511,6 +531,8 @@ class DBLoader:
                 hot_issue_level=level,
                 hot_issue_reasons=impact.hot_issue_reasons,
                 domestic_status=impact.domestic_status.value,
+                therapeutic_areas=ta_str,
+                stream_sources=ss_list,
             )
             session.add(drug)
             await session.flush()

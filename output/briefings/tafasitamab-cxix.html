@@ -7,75 +7,34 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
-
-        body {
-            font-family: 'Noto Serif KR', serif;
-            background: #fafafa;
-        }
-
-        .report-title {
-            font-family: 'Noto Serif KR', serif;
-            font-weight: 700;
-        }
-
-        .report-body {
-            font-family: 'Noto Serif KR', serif;
-            line-height: 1.9;
-            font-size: 17px;
-        }
-
-        .meta-text {
-            font-family: 'Inter', sans-serif;
-        }
-
-        .highlight-box {
-            border-left: 4px solid #dc2626;
-            background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%);
-        }
-
-        .timeline-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
+        body { font-family: 'Noto Serif KR', serif; background: #fafafa; }
+        .report-title { font-family: 'Noto Serif KR', serif; font-weight: 700; }
+        .report-body { font-family: 'Noto Serif KR', serif; line-height: 1.9; font-size: 17px; }
+        .meta-text { font-family: 'Inter', sans-serif; }
+        .highlight-box { border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
+        .timeline-dot { width: 12px; height: 12px; border-radius: 50%; }
     </style>
 </head>
 <body class="min-h-screen">
-    <!-- Header -->
     <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <span class="text-xl font-bold text-gray-900">MedClaim</span>
+                    <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-indigo-600">MedClaim</a>
                     <span class="text-gray-300">|</span>
                     <span class="text-sm text-gray-500 meta-text">RegScan 브리핑</span>
                 </div>
-                <div class="meta-text text-sm text-gray-500">
-                    2026년 02월 05일
-                </div>
+                <div class="meta-text text-sm text-gray-500">2026년 02월 13일</div>
             </div>
         </div>
     </header>
-
-    <!-- Main Content -->
     <main class="max-w-4xl mx-auto px-6 py-10">
-        <!-- Category & Tags -->
         <div class="flex items-center space-x-3 mb-6 meta-text">
-            <span class="px-3 py-1 bg-orange-500 text-white text-xs font-semibold rounded">HIGH</span>
-            <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded">희귀의약품</span>
+            <span class="px-3 py-1 bg-yellow-500 text-white text-xs font-semibold rounded">MEDIUM</span>
+            
         </div>
-
-        <!-- Title -->
-        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">
-            희귀의약품 TAFAKITAMAB, 국제 승인 현황 확보
-        </h1>
-
-        <!-- Subtitle -->
-        <p class="text-xl text-gray-600 mb-8 leading-relaxed">
-            FDA·EMA·MFDS 승인, 국내 급여 미적용
-        </p>
-
-        <!-- Author & Date -->
+        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">TAFASITAMAB-CXIX, 희귀의약품 분야의 새로운 희망</h1>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">글로벌 승인 완료, 국내 도입 불확실성 지속</p>
         <div class="flex items-center space-x-4 mb-10 pb-10 border-b border-gray-200 meta-text">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -83,94 +42,40 @@
                 </div>
                 <span class="text-sm text-gray-600">RegScan AI 리포터</span>
             </div>
-            <span class="text-gray-300">·</span>
-            <span class="text-sm text-gray-500">Hot Issue Score: 65</span>
+            <span class="text-gray-300">&middot;</span>
+            <span class="text-sm text-gray-500">Hot Issue Score: 50</span>
         </div>
-
-        <!-- Key Points Box -->
         <div class="highlight-box p-6 rounded-r-lg mb-10">
             <h3 class="font-bold text-gray-900 mb-3 meta-text text-sm">핵심 요약</h3>
             <ul class="space-y-2 text-gray-800">
                 <li class="flex items-start">
-                    <span class="text-red-500 mr-2">▸</span>
-                    <span>FDA 및 EMA 승인 완료, MFDS도 2023년 허가</span>
+                    <span class="text-red-500 mr-2">&#x25B8;</span>
+                    <span>B세포 표적 항체, 재발성 혈액암 치료에 주목</span>
                 </li>
                 <li class="flex items-start">
-                    <span class="text-red-500 mr-2">▸</span>
-                    <span>현재 HIRA에 급여 등재되지 않음</span>
+                    <span class="text-red-500 mr-2">&#x25B8;</span>
+                    <span>FDA 2025년 6월, EMA 2021년 8월 승인</span>
                 </li>
                 <li class="flex items-start">
-                    <span class="text-red-500 mr-2">▸</span>
-                    <span>글로벌 스코어 65로 주요 질환 치료제</span>
+                    <span class="text-red-500 mr-2">&#x25B8;</span>
+                    <span>HIRA 급여 미등록, 가격 미제공 상태</span>
                 </li>
                 <li class="flex items-start">
-                    <span class="text-red-500 mr-2">▸</span>
-                    <span>비급여 상태로 환자 전액 부담 예상</span>
-                </li>
-            </ul>
+                    <span class="text-red-500 mr-2">&#x25B8;</span>
+                    <span>국내 허가 전망 불확실, 희귀의약품 효과 기대</span>
+                </li></ul>
         </div>
-
-        <!-- Article Body -->
         <article class="report-body text-gray-800">
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
-
-            <p class="mb-6">
-                TAFASITAMAB-CXIX는 2021년 EMA, 2023년 MFDS, 2025년 FDA에서 승인되었습니다. 이 약물은 희귀의약품으로서 주요 질환에 효과적인 치료로 주목받고 있습니다.
-            </p>
-
-            <!-- Timeline Visual -->
-            <div class="my-10 p-6 bg-gray-50 rounded-xl">
-                <h4 class="meta-text text-sm font-semibold text-gray-500 mb-6">승인 타임라인</h4>
-                <div class="relative">
-                    <div class="absolute left-2 top-0 bottom-0 w-0.5 bg-gray-300"></div>
-
-                    <div class="relative flex items-center mb-6">
-                        <div class="timeline-dot bg-yellow-500 z-10"></div>
-                        <div class="ml-6">
-                            <div class="meta-text text-xs text-yellow-600 font-semibold">2021-08-26</div>
-                            <div class="font-medium ">🇪🇺 EMA 승인</div>
-                            <div class="text-sm text-gray-500">Authorised</div>
-                        </div>
-                    </div>
-                    <div class="relative flex items-center mb-6">
-                        <div class="timeline-dot bg-green-500 z-10"></div>
-                        <div class="ml-6">
-                            <div class="meta-text text-xs text-green-600 font-semibold">2023-06-09</div>
-                            <div class="font-medium ">🇰🇷 MFDS 허가</div>
-                            <div class="text-sm text-gray-500">민쥬비주(타파시타맙)</div>
-                        </div>
-                    </div>
-                    <div class="relative flex items-center mb-6">
-                        <div class="timeline-dot bg-blue-500 z-10"></div>
-                        <div class="ml-6">
-                            <div class="meta-text text-xs text-blue-600 font-semibold">2025-06-18</div>
-                            <div class="font-medium ">🇺🇸 FDA 승인</div>
-                            <div class="text-sm text-gray-500">Approved</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
-
-            <p class="mb-6">
-                국내에서는 MFDS에 의해 허가되었으나, HIRA에서 급여가 적용되지 않고 있습니다. 현재 CRIS에 등록된 임상시험은 없습니다.
-            </p>
-
-            <!-- MedClaim Box -->
-            <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
-                <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">💡 메드클레임 시사점</h4>
-                <div class="space-y-3 text-gray-800">
-                    <p>급여가 적용되지 않는 비급여 약제로, 전액 환자부담이 예상됩니다. 급여 적용 시 희귀질환 산정특례를 통해 본인부담이 10%로 줄어들 수 있으나, 현재 상태로는 해당되지 않습니다.</p>
-
-                </div>
-            </div>
-
-            <!-- CRIS Trials -->
+            <p class="mb-6">TAFASITAMAB-CXIX는 말초혈액의 B세포를 표적으로 하는 이중특이항체로, 주로 비호지킨 림프종과 같은 재발성 혈액암을 치료하는 데 사용된다. 이 약물은 B세포의 CD19 및 CD3를 동시에 표적하여 T세포의 항종양 반응을 유도한다. TAFASITAMAB-CXIX는 2021년 8월 EMA로부터 정식 승인을 받았으며, FDA는 2025년 6월에 최종 승인을 위한 논의를 예정하고 있다. 이는 암 치료에 있어 새로운 치료 옵션으로 주목받고 있으며, 특히 희귀의약품으로 분류되어 그 중요성이 더욱 강조되고 있다.</p>
             
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
+            <p class="mb-6">현재 TAFASITAMAB-CXIX는 MFDS의 승인 여부가 불확실하며, 아직 국내에서 공식 제품명이나 판매가 이루어지지 않고 있다. HIRA에서도 해당 약물의 급여 등록이 이루어지지 않았으며, 가격 정보 또한 제공되지 않고 있는 상황이다. CRIS 데이터베이스에서는 TAFASITAMAB-CXIX에 대한 임상시험 데이터가 확인되지 않아, 국내에서의 추가 연구나 개발 계획이 보이지 않는 상태이다. 이러한 이유로 국내 시장에 도입되는 시점은 불투명하다.</p>
+            <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
+                <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
+                <div class="space-y-3 text-gray-800"><p>현재 TAFASITAMAB-CXIX는 MFDS의 허가가 이루어지지 않아, 건강보험 급여 적용이 불가한 상황이다. 향후 국내 승인이 이루어질 경우, 고가약제로 지정될 가능성이 높으며, 이때 본인부담률이 일반 급여 30%로 예상된다. 현재 이 약물이 희귀의약품으로 분류된 점을 고려할 때, 희귀질환 산정특례에 따라 본인부담률이 10%로 적용될 가능성도 있으며, 암환자 산정특례에 따라 5%로 부담이 경감될 여지도 존재한다. 허가 후 치료 접근성이 개선될 수 있으므로, 규제 당국의 후속 조치에 주목해야 한다.</p></div>
+            </div>
         </article>
-
-        <!-- Source & Disclaimer -->
         <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
             <div class="mb-4">
                 <strong>데이터 출처:</strong> FDA Drug Approvals Database, EMA Public Assessment Reports,
@@ -179,7 +84,7 @@
             <div class="text-xs text-gray-400">
                 본 리포트는 RegScan AI가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
                 의사결정에 활용 시 원문 확인을 권장합니다.
-                마지막 업데이트: 2026-02-05
+                마지막 업데이트: 2026-02-13
             </div>
         </footer>
     </main>
