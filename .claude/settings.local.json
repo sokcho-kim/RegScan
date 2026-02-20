@@ -130,7 +130,9 @@
       "Bash(set PYTHONUTF8=1:*)",
       "Bash(git status:*)",
       "Bash(TaskStop:*)",
-      "Bash(git -C C:JiminRegScan status -u)"
+      "Bash(git -C C:JiminRegScan status -u)",
+      "WebFetch(domain:maily.so)",
+      "Bash(PYTHONIOENCODING=utf-8 python:*)"
     ]
   }
 }
