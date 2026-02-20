@@ -676,9 +676,18 @@ async def load_drugs_from_db(
                     approval_date=ev.approval_date,
                     brand_name=ev.brand_name or "",
                 )
-                # source_url 수집
+                # source_url: DB 값 우선, 없으면 raw_data에서 결정적 생성
                 if ev.source_url:
                     source_urls[ev.agency] = ev.source_url
+                elif ev.raw_data and isinstance(ev.raw_data, dict):
+                    if ev.agency == "fda":
+                        app_no = ev.raw_data.get("application_number", "")
+                        if app_no:
+                            source_urls["fda"] = f"https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo={app_no.replace('BLA', '').replace('NDA', '')}"
+                    elif ev.agency == "ema":
+                        ema_name = ev.raw_data.get("name_of_medicine", "")
+                        if ema_name:
+                            source_urls["ema"] = f"https://www.ema.europa.eu/en/medicines/human/EPAR/{ema_name.lower().replace(' ', '-')}"
                 if ev.agency == "fda":
                     status.fda = approval
                 elif ev.agency == "ema":
