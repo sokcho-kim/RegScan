@@ -31,13 +31,15 @@ class BriefingReport:
     global_section: str
     domestic_section: str
     medclaim_section: str
+    global_heading: str = ""
+    domestic_heading: str = ""
     generated_at: datetime = field(default_factory=datetime.now)
 
     # 원본 데이터
     source_data: Optional[dict] = None
 
     def to_dict(self) -> dict:
-        return {
+        d = {
             "inn": self.inn,
             "headline": self.headline,
             "subtitle": self.subtitle,
@@ -47,6 +49,11 @@ class BriefingReport:
             "medclaim_section": self.medclaim_section,
             "generated_at": self.generated_at.isoformat(),
         }
+        if self.global_heading:
+            d["global_heading"] = self.global_heading
+        if self.domestic_heading:
+            d["domestic_heading"] = self.domestic_heading
+        return d
 
     def save(self, directory: Path = BRIEFINGS_DIR) -> Path:
         """JSON 파일로 저장"""
@@ -317,6 +324,8 @@ class LLMBriefingGenerator:
                 global_section=parsed.get("global_section", ""),
                 domestic_section=parsed.get("domestic_section", ""),
                 medclaim_section=parsed.get("medclaim_section", ""),
+                global_heading=parsed.get("global_heading", ""),
+                domestic_heading=parsed.get("domestic_heading", ""),
                 source_data=impact.to_dict(),
             )
         except Exception as e:

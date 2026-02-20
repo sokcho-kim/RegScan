@@ -5,6 +5,7 @@
     python -m regscan.scripts.publish_articles --top 50       # 상위 50개
     python -m regscan.scripts.publish_articles --min-score 60 # score>=60만
     python -m regscan.scripts.publish_articles --skip-llm     # LLM 건너뜀 (기존 JSON만 HTML 변환)
+    python -m regscan.scripts.publish_articles --render-only  # HTML만 재렌더 (LLM·DB 없이, ~2초)
 """
 
 import asyncio
@@ -82,37 +83,188 @@ ABBR_DICT: dict[str, tuple[str | None, str]] = {
 }
 
 
-def _inject_abbr_tags(text: str, seen: set[str] | None = None) -> str:
-    """텍스트에서 알려진 약어를 <abbr> 태그로 감싸기.
+def _md_to_html(text: str) -> str:
+    """섹션 본문의 마크다운 문법을 HTML로 변환.
 
-    - 규제기관(MFDS, HIRA): 첫 등장 → 식약처(MFDS), 이후 → 식약처
-    - 의학 약어(DLBCL, ADC 등): <abbr title="...">ABBR</abbr>
-    - ASCII 단어 경계 사용 (한글 뒤 약어도 정상 매칭)
-    - 이미 괄호 안에 있는 약어 (예: "식약처(MFDS)")는 건드리지 않음
+    지원: 불릿 리스트(- ), 마크다운 표(| |), bold(**), 줄바꿈(\\n\\n → <p>)
+    """
+    if not text:
+        return text
+
+    lines = text.split('\n')
+    result = []
+    in_list = False
+    in_table = False
+    table_header_done = False
+
+    for line in lines:
+        stripped = line.strip()
+
+        # 마크다운 표
+        if stripped.startswith('|') and stripped.endswith('|'):
+            if not in_table:
+                in_table = True
+                table_header_done = False
+                if in_list:
+                    result.append('</ul>')
+                    in_list = False
+                result.append('<table class="w-full text-sm my-4 border-collapse">')
+            cells = [c.strip() for c in stripped.strip('|').split('|')]
+            # 구분선(---|---) 건너뛰기
+            if all(c.replace('-', '').replace(':', '') == '' for c in cells):
+                table_header_done = True
+                continue
+            tag = 'th' if not table_header_done else 'td'
+            cls = ' class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50"' if tag == 'th' else ' class="px-3 py-2 border-b border-gray-100"'
+            row = ''.join(f'<{tag}{cls}>{c}</{tag}>' for c in cells)
+            result.append(f'<tr>{row}</tr>')
+            continue
+        elif in_table:
+            result.append('</table>')
+            in_table = False
+            table_header_done = False
+
+        # 불릿 리스트
+        if stripped.startswith('- '):
+            if not in_list:
+                in_list = True
+                result.append('<ul class="list-disc list-inside space-y-1 my-4 text-gray-700">')
+            content = stripped[2:]
+            # bold 처리
+            content = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', content)
+            result.append(f'<li>{content}</li>')
+            continue
+        elif in_list:
+            result.append('</ul>')
+            in_list = False
+
+        # 일반 텍스트
+        if stripped == '':
+            continue
+        # bold 처리
+        stripped = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', stripped)
+        result.append(stripped)
+
+    if in_list:
+        result.append('</ul>')
+    if in_table:
+        result.append('</table>')
+
+    return ' '.join(result)
+
+
+def _inject_abbr_tags(text: str, seen: set[str] | None = None) -> str:
+    """텍스트에서 알려진 약어를 처리.
+
+    - 규제기관(MFDS, HIRA): 첫 등장 → 식약처(MFDS), 이후 → 식약처 (일반 텍스트, 태그 없음)
+    - 의학 약어(DLBCL, ADC 등): 첫 등장만 <abbr> 툴팁, 이후 일반 텍스트
     """
     if seen is None:
         seen = set()
 
     for abbr_key, (kr_short, tooltip) in ABBR_DICT.items():
-        # ASCII-only 단어 경계: 한글 뒤/앞의 약어도 매칭
-        # 괄호 안 (이미 현지화된 텍스트)은 제외
         pattern = re.compile(
             r'(?<![A-Za-z0-9_(])' + re.escape(abbr_key) + r'(?![A-Za-z0-9_)>"])',
         )
 
         def _replace(m: re.Match, _key=abbr_key, _kr=kr_short, _tip=tooltip) -> str:
             if _key in seen:
-                # 이후 등장: 규제기관은 한국어 약칭만, 의학 약어는 abbr
-                if _kr and _kr != _key:
-                    return f'<abbr title="{_tip}">{_kr}</abbr>'
-                return f'<abbr title="{_tip}">{_key}</abbr>'
+                # 이후 등장: 일반 텍스트만
+                return _kr if (_kr and _kr != _key) else _key
             seen.add(_key)
             # 첫 등장
             if _kr and _kr != _key:
-                return f'<abbr title="{_tip}">{_kr}({_key})</abbr>'
+                # 규제기관: 식약처(MFDS) 일반 텍스트
+                return f'{_kr}({_key})'
+            # 의학 약어: 첫 등장만 abbr 툴팁
             return f'<abbr title="{_tip}">{_key}</abbr>'
 
         text = pattern.sub(_replace, text)
+
+    return text
+
+
+def _inject_outlinks(
+    text: str,
+    inn: str = "",
+    source_urls: dict[str, str] | None = None,
+    nct_id: str = "",
+    seen: set[str] | None = None,
+) -> str:
+    """본문 텍스트에 FDA/EMA/CT.gov 아웃링크 삽입.
+
+    - INN 약물명 → FDA 또는 EMA 승인 페이지 (첫 등장만)
+    - "FDA...승인" 컨텍스트 → FDA 출처 (첫 등장만)
+    - "EMA...허가" 컨텍스트 → EMA 출처 (첫 등장만)
+    - 임상시험 키워드 → CT.gov 페이지 (첫 등장만)
+
+    seen set을 섹션 간 공유하여 전체 기사에서 각 링크 1회만 삽입.
+    """
+    if seen is None:
+        seen = set()
+    urls = source_urls or {}
+    link_cls = 'class="text-indigo-600 hover:underline"'
+
+    # 1) INN 약물명 → FDA or EMA 페이지 (첫 등장만, bold+link)
+    if "inn" not in seen and inn and (urls.get("fda") or urls.get("ema")):
+        url = urls.get("fda") or urls["ema"]
+        # INN의 Title Case / uppercase / original 형태 모두 매칭
+        variants = [re.escape(inn)]
+        if inn.upper() != inn:
+            variants.append(re.escape(inn.upper()))
+        pattern = '|'.join(variants)
+        match = re.search(pattern, text)
+        if match:
+            seen.add("inn")
+            link = (
+                f'<a href="{url}" target="_blank" '
+                f'{link_cls}><strong>{match.group(0)}</strong></a>'
+            )
+            text = text[:match.start()] + link + text[match.end():]
+
+    # 2) "FDA...승인" 컨텍스트 → FDA 출처 링크
+    if "fda" not in seen and urls.get("fda"):
+        pat = (
+            r'(?:미국\s*)?(?:식품의약국\s*\(?\s*)?'
+            r'FDA\)?(?:가|에서|이|의)?'
+            r'(?:\s*\d{4}년?\s*\d{1,2}월(?:\s*\d{1,2}일)?)?'
+            r'(?:\s*(?:정식\s*|가속\s*)?(?:승인|허가)(?:를\s*(?:완료|부여))?)?'
+        )
+        match = re.search(pat, text)
+        if match and '<a ' not in text[max(0, match.start()-50):match.start()]:
+            seen.add("fda")
+            link = f'<a href="{urls["fda"]}" target="_blank" {link_cls}>{match.group(0)}</a>'
+            text = text[:match.start()] + link + text[match.end():]
+
+    # 3) "EMA...허가" 컨텍스트 → EMA 출처 링크
+    if "ema" not in seen and urls.get("ema"):
+        pat = (
+            r'(?:유럽\s*)?(?:의약품청\s*\(?\s*)?'
+            r'EMA\)?(?:가|에서|이|도|의)?'
+            r'(?:\s*\d{4}년?\s*\d{1,2}월(?:\s*\d{1,2}일)?)?'
+            r'(?:\s*(?:조건부\s*)?(?:승인|허가)(?:를\s*(?:완료|부여))?)?'
+        )
+        match = re.search(pat, text)
+        if match and '<a ' not in text[max(0, match.start()-50):match.start()]:
+            seen.add("ema")
+            link = f'<a href="{urls["ema"]}" target="_blank" {link_cls}>{match.group(0)}</a>'
+            text = text[:match.start()] + link + text[match.end():]
+
+    # 4) 임상시험 키워드 → CT.gov 페이지
+    if "ctgov" not in seen and nct_id:
+        ct_url = f"https://clinicaltrials.gov/study/{nct_id}"
+        patterns = [
+            r'3상\s*(?:\S+\s+)?(?:임상시험|시험)',
+            r'Phase\s*(?:III|3)\s*(?:\S+\s+)?(?:trial|study|시험)',
+            r'임상시험\s*결과',
+            r'pivotal\s*(?:trial|study)',
+        ]
+        combined = '|'.join(f'(?:{p})' for p in patterns)
+        match = re.search(combined, text, re.IGNORECASE)
+        if match and '<a ' not in text[max(0, match.start()-50):match.start()]:
+            seen.add("ctgov")
+            link = f'<a href="{ct_url}" target="_blank" {link_cls}>{match.group(0)}</a>'
+            text = text[:match.start()] + link + text[match.end():]
 
     return text
 
@@ -134,7 +286,7 @@ ARTICLE_HTML_TEMPLATE = """<!DOCTYPE html>
         .meta-text {{ font-family: 'Inter', sans-serif; }}
         .highlight-box {{ border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }}
         .timeline-dot {{ width: 12px; height: 12px; border-radius: 50%; }}
-        abbr {{ text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }}
+        abbr {{ text-decoration: none; border-bottom: 1px dashed #9ca3af; cursor: help; }}
     </style>
 </head>
 <body class="min-h-screen">
@@ -172,11 +324,11 @@ ARTICLE_HTML_TEMPLATE = """<!DOCTYPE html>
             <ul class="space-y-2 text-gray-800">{key_points_html}</ul>
         </div>
         <article class="report-body text-gray-800">
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
-            <p class="mb-6">{global_section}</p>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">{global_heading}</h2>
+            <div class="mb-6">{global_section}</div>
             {timeline_html}
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
-            <p class="mb-6">{domestic_section}</p>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">{domestic_heading}</h2>
+            <div class="mb-6">{domestic_section}</div>
             <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
                 <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
                 <div class="space-y-3 text-gray-800"><p>{medclaim_section}</p></div>
@@ -278,9 +430,20 @@ def _build_timeline_html(source_data: dict | None, source_urls: dict[str, str] |
     urls = source_urls or {}
 
     entries = []
-    fda = source_data.get("fda", {})
-    ema = source_data.get("ema", {})
-    mfds = source_data.get("mfds", {})
+    # 호환 레이어: 플랫 구조(fda_approved)도 중첩 구조(fda.approved)로 변환
+    fda = source_data.get("fda") or {
+        "approved": source_data.get("fda_approved"),
+        "date": source_data.get("fda_date"),
+    }
+    ema = source_data.get("ema") or {
+        "approved": source_data.get("ema_approved"),
+        "date": source_data.get("ema_date"),
+    }
+    mfds = source_data.get("mfds") or {
+        "approved": source_data.get("mfds_approved"),
+        "date": source_data.get("mfds_date"),
+        "brand_name": source_data.get("mfds_brand_name"),
+    }
 
     if fda.get("approved") and fda.get("date"):
         entries.append(("blue", fda["date"], "FDA 승인", "Approved", urls.get("fda", "")))
@@ -346,12 +509,16 @@ def _build_sources_html(source_urls: dict[str, str] | None = None, nct_id: str =
 def _build_flags_html(source_data: dict | None) -> str:
     if not source_data:
         return ""
+    # 호환 레이어: 플랫 구조도 지원
+    fda = source_data.get("fda") or {"approved": source_data.get("fda_approved")}
+    ema = source_data.get("ema") or {"approved": source_data.get("ema_approved")}
+    mfds = source_data.get("mfds") or {"approved": source_data.get("mfds_approved")}
     parts = []
-    if source_data.get("fda", {}).get("approved"):
+    if fda.get("approved"):
         parts.append('<span>FDA</span>')
-    if source_data.get("ema", {}).get("approved"):
+    if ema.get("approved"):
         parts.append('<span class="mx-2">EMA</span>')
-    if source_data.get("mfds", {}).get("approved"):
+    if mfds.get("approved"):
         parts.append('<span>MFDS</span>')
     return " ".join(parts)
 
@@ -406,6 +573,8 @@ def generate_article_html(
     global_section = report_data.get("global_section", "")
     domestic_section = report_data.get("domestic_section", "")
     medclaim_section = report_data.get("medclaim_section", "")
+    global_heading = report_data.get("global_heading", "글로벌 승인 현황")
+    domestic_heading = report_data.get("domestic_heading", "국내 도입 전망")
     source_data = report_data.get("source_data")
 
     badge_class, score_label, _ = _score_badge(score)
@@ -444,6 +613,26 @@ def generate_article_html(
     domestic_section = _inject_abbr_tags(domestic_section, abbr_seen)
     medclaim_section = _inject_abbr_tags(medclaim_section, abbr_seen)
 
+    # 본문 인라인 아웃링크 (INN→FDA/EMA, FDA/EMA 컨텍스트→출처, 임상시험→CT.gov)
+    outlink_seen: set[str] = set()
+    global_section = _inject_outlinks(
+        global_section, inn=inn, source_urls=source_urls,
+        nct_id=nct_id, seen=outlink_seen,
+    )
+    domestic_section = _inject_outlinks(
+        domestic_section, inn=inn, source_urls=source_urls,
+        nct_id=nct_id, seen=outlink_seen,
+    )
+    medclaim_section = _inject_outlinks(
+        medclaim_section, inn=inn, source_urls=source_urls,
+        nct_id=nct_id, seen=outlink_seen,
+    )
+
+    # 마크다운 → HTML 변환 (표, 불릿 등)
+    global_section = _md_to_html(global_section)
+    domestic_section = _md_to_html(domestic_section)
+    medclaim_section = _md_to_html(medclaim_section)
+
     timeline_html = _build_timeline_html(source_data, source_urls=source_urls)
     tag_badges = _build_tag_badges(source_data)
     sources_html = _build_sources_html(source_urls=source_urls, nct_id=nct_id)
@@ -459,7 +648,9 @@ def generate_article_html(
         headline=headline,
         subtitle=subtitle,
         key_points_html=key_points_html,
+        global_heading=global_heading,
         global_section=global_section,
+        domestic_heading=domestic_heading,
         domestic_section=domestic_section,
         medclaim_section=medclaim_section,
         timeline_html=timeline_html,
@@ -781,14 +972,105 @@ async def load_drugs_from_db(
     return impacts
 
 
+async def _run_render_only():
+    """기존 JSON 파일에서 HTML만 재렌더링 (LLM·DB 호출 없음, ~2초)"""
+    logger.info("=== HTML 재렌더 모드 (render-only) ===")
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    json_files = sorted(OUTPUT_DIR.glob("*.json"))
+    # hot_issues_*.json, all_articles_*.json 등 비 브리핑 파일 제외
+    json_files = [
+        f for f in json_files
+        if not f.name.startswith("hot_issues_") and not f.name.startswith("all_articles_")
+    ]
+
+    if not json_files:
+        logger.error("재렌더할 JSON 파일 없음: %s", OUTPUT_DIR)
+        return
+
+    articles_meta = []
+    rendered = 0
+
+    for jf in json_files:
+        try:
+            data = json.loads(jf.read_text(encoding="utf-8"))
+        except Exception as e:
+            logger.warning("  JSON 파싱 실패 (%s): %s", jf.name, e)
+            continue
+
+        if not isinstance(data, dict):
+            continue
+
+        inn = data.get("inn", "")
+        if not inn:
+            continue
+
+        # 저장된 메타데이터 복원 (없으면 기본값)
+        score = data.get("_score", 0)
+        source_urls = data.get("_source_urls") or {}
+        nct_id = data.get("_nct_id", "")
+        hot_issue_reasons = data.get("_hot_issue_reasons", [])
+        therapeutic_areas = data.get("_therapeutic_areas", [])
+        known_inns = data.get("_known_inns", [])
+
+        # source_data 복원
+        source_data = data.get("source_data") or {}
+        source_data["analysis"] = {"hot_issue_reasons": hot_issue_reasons}
+        source_data["therapeutic_areas"] = therapeutic_areas
+
+        report_data = {
+            "inn": inn,
+            "headline": data.get("headline", ""),
+            "subtitle": data.get("subtitle", ""),
+            "key_points": data.get("key_points", []),
+            "global_section": data.get("global_section", ""),
+            "domestic_section": data.get("domestic_section", ""),
+            "medclaim_section": data.get("medclaim_section", ""),
+            "source_data": source_data,
+        }
+
+        html_content = generate_article_html(
+            report_data, score=score,
+            source_urls=source_urls, nct_id=nct_id,
+            known_inns=known_inns,
+        )
+        html_path = OUTPUT_DIR / f"{_safe_filename(inn)}.html"
+        html_path.write_text(html_content, encoding="utf-8")
+        rendered += 1
+
+        # 인덱스용 메타
+        articles_meta.append({
+            "inn": inn,
+            "score": score,
+            "headline": data.get("headline", ""),
+            "key_points": data.get("key_points", []),
+            "status_label": "",
+            "source_data": source_data,
+            "html_file": str(html_path.name),
+        })
+
+    # 인덱스 페이지 재생성
+    articles_meta.sort(key=lambda x: x["score"], reverse=True)
+    index_html = generate_index_html(articles_meta)
+    (OUTPUT_DIR / "index.html").write_text(index_html, encoding="utf-8")
+
+    logger.info("=== 재렌더 완료: %d건 HTML 생성 ===", rendered)
+    print(f"\n  render-only 완료: {rendered}건 HTML 재생성")
+
+
 async def run_publish(
     top_n: int = 20,
     min_score: int = 40,
     skip_llm: bool = False,
+    render_only: bool = False,
 ):
     """기사 발행 메인 로직"""
     from regscan.report.llm_generator import LLMBriefingGenerator, BriefingReport
     from regscan.db.loader import DBLoader
+
+    # ── render-only 모드: 기존 JSON → HTML 재렌더 (LLM·DB 없이) ──
+    if render_only:
+        return await _run_render_only()
 
     logger.info("=== 기사 발행 시작 ===")
     logger.info("  대상: score >= %d, 최대 %d건", min_score, top_n)
@@ -861,8 +1143,6 @@ async def run_publish(
                 logger.info("  [%d/%d] %s (score=%d) — LLM 브리핑 생성 중...",
                            i, len(impacts), impact.inn, impact.global_score)
                 report = await generator.generate(impact)
-                # JSON 저장
-                report.save(OUTPUT_DIR)
                 # DB 저장
                 try:
                     await loader.save_briefing(report)
@@ -876,7 +1156,14 @@ async def run_publish(
 
         # HTML 기사 생성
         report_data = report.to_dict()
-        report_data["source_data"] = report.source_data
+        # source_data: impact 객체의 to_dict()를 항상 base로 사용 (DB 기준)
+        report_data["source_data"] = impact.to_dict()
+        report_data["source_data"]["analysis"] = {
+            "hot_issue_reasons": getattr(impact, 'hot_issue_reasons', []) or [],
+        }
+        report_data["source_data"]["therapeutic_areas"] = (
+            getattr(impact, 'therapeutic_areas', []) or []
+        )
         _urls = getattr(impact, '_source_urls', None) or {}
         _nct = getattr(impact, 'clinical_results_nct_id', '') or ''
         _comp_inns = [c["inn"] for c in getattr(impact, '_competitors', []) or []]
@@ -886,6 +1173,20 @@ async def run_publish(
             known_inns=_comp_inns,
         )
         html_path.write_text(html_content, encoding="utf-8")
+
+        # JSON 메타데이터 보강 (render-only 모드용, 양 경로 공통)
+        _enriched = report.to_dict()
+        _enriched["source_data"] = report_data["source_data"]
+        _enriched["_source_urls"] = _urls
+        _enriched["_nct_id"] = _nct
+        _enriched["_score"] = impact.global_score
+        _enriched["_hot_issue_reasons"] = getattr(impact, 'hot_issue_reasons', []) or []
+        _enriched["_therapeutic_areas"] = getattr(impact, 'therapeutic_areas', []) or []
+        _enriched["_known_inns"] = _comp_inns
+        json_path.write_text(
+            json.dumps(_enriched, ensure_ascii=False, indent=2, default=str),
+            encoding="utf-8",
+        )
 
         # 인덱스용 메타
         status_label = ""
@@ -967,6 +1268,7 @@ def main():
     parser.add_argument("--top", type=int, default=20, help="상위 N개 약물 (기본 20)")
     parser.add_argument("--min-score", type=int, default=40, help="최소 점수 (기본 40)")
     parser.add_argument("--skip-llm", action="store_true", help="LLM 건너뜀 (기존 JSON만 HTML 변환)")
+    parser.add_argument("--render-only", action="store_true", help="HTML만 재렌더 (LLM·DB 없이, ~2초)")
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -975,7 +1277,10 @@ def main():
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    asyncio.run(run_publish(top_n=args.top, min_score=args.min_score, skip_llm=args.skip_llm))
+    asyncio.run(run_publish(
+        top_n=args.top, min_score=args.min_score,
+        skip_llm=args.skip_llm, render_only=args.render_only,
+    ))
 
 
 if __name__ == "__main__":
