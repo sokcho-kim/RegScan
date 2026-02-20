@@ -269,6 +269,100 @@ def _inject_outlinks(
     return text
 
 
+def _inject_competitor_links(
+    text: str,
+    own_inn: str,
+    competitor_inns: list[str],
+    seen: set[str] | None = None,
+) -> str:
+    """경쟁약 INN의 첫 등장에 해당 브리핑 페이지 내부 링크 삽입.
+
+    1순위: competitor_inns (DB 기반 경쟁약 목록)
+    2순위: 전체 브리핑 파일 인덱스 (LLM이 언급했지만 DB 경쟁약 목록에 없는 약물)
+
+    own_inn은 이미 FDA/EMA 링크가 걸려 있으므로 제외.
+    각 경쟁약은 전체 기사에서 1회만 링크 (seen set 공유).
+    """
+    if seen is None:
+        seen = set()
+
+    link_cls = 'class="text-indigo-600 hover:underline"'
+    own_lower = own_inn.lower() if own_inn else ""
+
+    # 전체 브리핑 인덱스에서 확장된 INN 목록 구축
+    all_index = _get_all_inns_index()
+    # competitor_inns + 전체 인덱스에서 Title Case 복원
+    all_candidates: list[tuple[str, str]] = []  # (display_inn, filename)
+    added_lowers: set[str] = set()
+
+    # 1순위: 명시적 경쟁약
+    for comp_inn in (competitor_inns or []):
+        if not comp_inn:
+            continue
+        cl = comp_inn.lower()
+        if cl == own_lower or cl in added_lowers:
+            continue
+        added_lowers.add(cl)
+        fn = all_index.get(cl, _safe_filename(comp_inn) + ".html")
+        all_candidates.append((comp_inn, fn))
+
+    # 2순위: 전체 인덱스 (본문에 등장할 수 있는 모든 약물)
+    for inn_lower, fn in all_index.items():
+        if inn_lower == own_lower or inn_lower in added_lowers:
+            continue
+        added_lowers.add(inn_lower)
+        display = to_display_case(inn_lower)
+        all_candidates.append((display, fn))
+
+    # 3순위: 본문에서 ALL CAPS 약물명 패턴 탐지 (브리핑 파일 없어도 CT.gov 검색 링크)
+    # 패턴: 대문자 6자 이상 단어 (약물명 특징)
+    caps_pattern = re.compile(
+        r'\b([A-Z][A-Z]{5,}(?:\s+[A-Z]{3,})*(?:-[a-z]{2,})?)\b'
+    )
+    for m in caps_pattern.finditer(text):
+        candidate = m.group(1)
+        cl = candidate.lower()
+        if cl == own_lower or cl in added_lowers:
+            continue
+        # 약물명이 아닌 일반 약어(DLBCL, NSCLC 등) 제외
+        if cl in {a.lower() for a in ABBR_DICT} or len(candidate.replace(' ', '')) < 7:
+            continue
+        added_lowers.add(cl)
+        # CT.gov 검색 링크로 연결
+        ct_search = f"https://clinicaltrials.gov/search?intr={candidate.replace(' ', '+')}"
+        all_candidates.append((candidate, ct_search))
+
+    for comp_inn, comp_filename in all_candidates:
+        comp_lower = comp_inn.lower()
+        if comp_lower in seen:
+            continue
+
+        # Title Case / UPPER CASE / lowercase 모두 매칭
+        display = to_display_case(comp_inn)
+        variants = {re.escape(display)}
+        if comp_inn.upper() != display:
+            variants.add(re.escape(comp_inn.upper()))
+        if comp_inn != display:
+            variants.add(re.escape(comp_inn))
+        pattern = '|'.join(variants)
+
+        match = re.search(pattern, text)
+        if match:
+            # 이미 <a> 태그 안에 있으면 건너뛰기
+            pre = text[max(0, match.start() - 80):match.start()]
+            if '<a ' in pre and '</a>' not in pre:
+                continue
+            seen.add(comp_lower)
+            # 외부 URL(https://)이면 target="_blank", 내부 파일이면 그냥 링크
+            if comp_filename.startswith("http"):
+                link = f'<a href="{comp_filename}" target="_blank" {link_cls}>{match.group(0)}</a>'
+            else:
+                link = f'<a href="{comp_filename}" {link_cls}>{match.group(0)}</a>'
+            text = text[:match.start()] + link + text[match.end():]
+
+    return text
+
+
 # ── HTML 템플릿 ──
 
 ARTICLE_HTML_TEMPLATE = """<!DOCTYPE html>
@@ -558,6 +652,38 @@ def _normalize_inn_in_text(text: str, inn_variants: list[str], display: str) -> 
     return text
 
 
+def _build_all_inns_index() -> dict[str, str]:
+    """출력 디렉토리의 모든 브리핑 JSON에서 INN→파일명 인덱스 구축.
+
+    Returns: {inn_lower: safe_filename.html}
+    """
+    index: dict[str, str] = {}
+    for jf in OUTPUT_DIR.glob("*.json"):
+        if jf.name.startswith("hot_issues_") or jf.name.startswith("all_articles_"):
+            continue
+        try:
+            data = json.loads(jf.read_text(encoding="utf-8"))
+            if not isinstance(data, dict):
+                continue
+            inn = data.get("inn", "")
+            if inn:
+                index[inn.lower()] = _safe_filename(inn) + ".html"
+        except Exception:
+            continue
+    return index
+
+
+# 모듈 레벨 캐시 (render-only 시 1회만 구축)
+_ALL_INNS_INDEX: dict[str, str] | None = None
+
+
+def _get_all_inns_index() -> dict[str, str]:
+    global _ALL_INNS_INDEX
+    if _ALL_INNS_INDEX is None:
+        _ALL_INNS_INDEX = _build_all_inns_index()
+    return _ALL_INNS_INDEX
+
+
 def generate_article_html(
     report_data: dict,
     score: int = 0,
@@ -627,6 +753,12 @@ def generate_article_html(
         medclaim_section, inn=inn, source_urls=source_urls,
         nct_id=nct_id, seen=outlink_seen,
     )
+
+    # 경쟁약 내부 링크 (경쟁약 INN → 해당 브리핑 페이지)
+    comp_seen: set[str] = set()
+    global_section = _inject_competitor_links(global_section, inn, known_inns or [], comp_seen)
+    domestic_section = _inject_competitor_links(domestic_section, inn, known_inns or [], comp_seen)
+    medclaim_section = _inject_competitor_links(medclaim_section, inn, known_inns or [], comp_seen)
 
     # 마크다운 → HTML 변환 (표, 불릿 등)
     global_section = _md_to_html(global_section)
