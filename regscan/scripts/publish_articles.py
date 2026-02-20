@@ -379,11 +379,24 @@ def _build_tag_badges(source_data: dict | None) -> str:
     return html
 
 
+def _normalize_inn_in_text(text: str, inn_variants: list[str], display: str) -> str:
+    """텍스트에서 INN의 ALL CAPS/lowercase 변형을 Title Case로 강제 치환.
+
+    inn_variants: [원본 INN, uppercase, lowercase] 등 가능한 변형 목록
+    display: 표시할 Title Case 문자열
+    """
+    for variant in inn_variants:
+        if variant != display and variant in text:
+            text = text.replace(variant, display)
+    return text
+
+
 def generate_article_html(
     report_data: dict,
     score: int = 0,
     source_urls: dict[str, str] | None = None,
     nct_id: str = "",
+    known_inns: list[str] | None = None,
 ) -> str:
     """BriefingReport JSON → HTML 기사"""
     inn = to_display_case(report_data.get("inn", ""))
@@ -396,6 +409,22 @@ def generate_article_html(
     source_data = report_data.get("source_data")
 
     badge_class, score_label, _ = _score_badge(score)
+
+    # INN 대소문자 강제 정규화 (LLM 출력 불신)
+    all_inns = set(known_inns or [])
+    all_inns.add(report_data.get("inn", ""))
+    for inn_raw in all_inns:
+        if not inn_raw:
+            continue
+        display = to_display_case(inn_raw)
+        variants = {inn_raw, inn_raw.upper(), inn_raw.lower()}
+        variants.discard(display)
+        headline = _normalize_inn_in_text(headline, list(variants), display)
+        subtitle = _normalize_inn_in_text(subtitle, list(variants), display)
+        global_section = _normalize_inn_in_text(global_section, list(variants), display)
+        domestic_section = _normalize_inn_in_text(domestic_section, list(variants), display)
+        medclaim_section = _normalize_inn_in_text(medclaim_section, list(variants), display)
+        key_points = [_normalize_inn_in_text(kp, list(variants), display) for kp in key_points]
 
     # 약어 → <abbr> 태그 주입 (콘텐츠 섹션에만, seen 공유로 첫등장 추적)
     abbr_seen: set[str] = set()
@@ -732,8 +761,10 @@ async def load_drugs_from_db(
                         seen.add(comp["inn"])
                         competitors.append(comp)
 
-            # score 내림차순 정렬 후 상위 5개
+            # score 내림차순 정렬 후 상위 5개, INN Title Case 정규화
             competitors.sort(key=lambda x: x["score"], reverse=True)
+            for comp in competitors:
+                comp["inn"] = to_display_case(comp["inn"])
             impact._competitors = competitors[:5]
 
             impacts.append(impact)
@@ -839,9 +870,11 @@ async def run_publish(
         report_data["source_data"] = report.source_data
         _urls = getattr(impact, '_source_urls', None) or {}
         _nct = getattr(impact, 'clinical_results_nct_id', '') or ''
+        _comp_inns = [c["inn"] for c in getattr(impact, '_competitors', []) or []]
         html_content = generate_article_html(
             report_data, score=impact.global_score,
             source_urls=_urls, nct_id=_nct,
+            known_inns=_comp_inns,
         )
         html_path.write_text(html_content, encoding="utf-8")
 
