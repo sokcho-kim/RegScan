@@ -1,15 +1,36 @@
 {
   "inn": "Talquetamab",
-  "headline": "희귀 다발골수종 혁신요법, Talquetamab FDA·EMA 승인",
-  "subtitle": "국내 허가는 미확정, 경쟁 선택지 부족한 상황",
+  "headline": "재발성 다발골수종 치료, Talquetamab FDA·EMA 승인 — 국내 허가는 불투명",
+  "subtitle": "희귀의약품으로 주목받지만 국내 도입 지연",
   "key_points": [
-    "Talquetamab은 CD3 표적 T세포 활성화를 통해 다발골수종 치료에 사용되는 첫 번째 경구 항체-약물 접합체(ADC)이다.",
-    "FDA는 2025년 10월 2일 정식 승인을 예정하고 있으며, EMA는 2023년 8월 21일 승인했다.",
-    "현재 Talquetamab는 MFDS에 미허가로 HIRA에서 비급여 상태이며, 국내 도입에 대한 불확실성이 존재한다.",
-    "Talquetamab은 Polatuzumab vedotin, Zanidatamab-hrii와 함께 다발골수종 치료의 주요 경쟁 제품 시장을 형성하고 있다."
+    "Talquetamab은 재발성 다발골수종 환자를 위한 단일요법으로, CD3와 BCMA 표적을 통해 면역세포의 항암 효능을 활성화하는 기전",
+    "FDA는 2025년 10월 승인 예정이며, EMA는 2023년 8월 조건부 승인을 획득",
+    "현재 MFDS 미허가이며, HIRA 비급여 상태 — 글로벌 승인 후 2년 이상 지연",
+    "경쟁약으로 Polatuzumab Vedotin과 Zanidatamab-hrii가 있으며, 국내 시장에서의 경쟁 구도가 관심을 끌고 있음"
   ],
-  "global_section": "Talquetamab은 재발 및 불응성 다발골수종 치료에서 중요한 역할을 할 것으로 기대되는 약물이다. 작용기전은 T세포를 활성화하여 암세포에 대한 면역 반응을 증진하는 것이다. 이는 기존의 치료 방법에 한계를 가진 환자들에게 새로운 가능성을 제시한다. FDA와 EMA의 승인은 이 약물의 임상적 유효성과 안전성을 인정받은 결과로, 치료 기준이 변경될 가능성이 높다. 특히, Talquetamab은 기존 치료를 실패한 환자들에게 맞춤형 솔루션으로 주목받고 있다.",
-  "domestic_section": "현재 Talquetamab은 MFDS에 미허가 상태이며, HIRA의 급여 목록에도 포함되어 있지 않다. 최근 2년 동안 글로벌 승인 이후 여전히 국내 도입이 진행되지 않아, 판매권자 확보의 지연 가능성이 높다고 평가된다. 경쟁약인 Polatuzumab vedotin과 Zanidatamab-hrii 역시 허가가 진행 중이나, Talquetamab은 임상적 차별점으로 시장에서 우위를 점할 수 있다. 약제팀은 이 약물의 국내 도입 경과를 지속적으로 모니터링해야 한다.",
-  "medclaim_section": "Talquetamab은 현재 MFDS 미허가로 인해 보험 청구가 불가하며, 전체 비용은 환자의 전액 부담이다. HIRA에서 급여가 등재되면, 암환자 특례에 따라 본인부담률이 5%로 적용될 수 있어 상당한 비용 절감이 가능하다. 하지만, 비급여 상태인 만큼 긴급도입이나 제약사의 EAP(확대접근프로그램) 참여가 필요할 것이다. 치료비용은 아직 확정되지 않았으나, 비급여 약제로서는 고가 약제에 속할 가능성이 높아, 약제팀에서는 초기 도입 시 후속 조치를 고려해야 한다.",
-  "generated_at": "2026-02-20T13:02:24.209137"
+  "global_section": "Talquetamab은 재발성 다발골수종 치료의 새로운 대안으로 떠오르고 있다. 이 약물은 CD3와 B세포 성분 항원(BCMA)에 결합하여 T세포의 항종양 효과를 증대시키는 작용기전을 가지고 있다. 최근 진행된 임상시험에서 효과적인 치료 성과를 나타냈으며, 이로 인해 FDA는 2025년 10월 승인을 예정하고 있고, EMA에서는 2023년 8월 조건부 승인을 부여하였다. 같은 치료영역에서 Polatuzumab Vedotin과 Zanidatamab-hrii가 존재하지만, Talquetamab의 혁신적인 기전은 기존 치료와 비교해 차별화된 이점을 제공하고 있다.",
+  "domestic_section": "현재 Talquetamab은 MFDS 미허가 상태로, HIRA에서 비급여로 등록되어 있다. 글로벌 승인 후 914일이 경과했으며, 이로 인해 예상되는 MFDS 허가는 약 2026년으로 미루어 볼 수 있다. 경쟁약인 Polatuzumab Vedotin은 국내 기대 허가 상태이며, Zanidatamab-hrii도 허가가 예상되고 있다. 이처럼 Talquetamab의 도입이 지연되면, 병원 약제팀은 환자에게 제공할 수 있는 다른 선택지를 고려해야 할 필요성이 높아진다.",
+  "medclaim_section": "현재 Talquetamab은 미허가 상태로 청구가 불가능하다. 만약 향후 HIRA에서 급여로 등재된다면, 일반 급여 기준으로 본인부담률은 30%가 적용되어 약물비의 약 30%가 환자 부담이 될 것이다. 고가 약제에 해당하므로 사전심사(PA) 대상으로 설정될 가능성이 있으며, 비급여 치료로 진행할 경우, 긴급도입 또는 임상시험 참여 등의 대안이 고려될 수 있다. 약제팀에서는 Talquetamab의 국내 허가 동향을 지속적으로 모니터링하고, 환자들에게 대체 치료 경로를 안내하는 것이 필요하다.",
+  "generated_at": "2026-02-20T14:01:58.608428",
+  "source_data": {
+    "inn": "Talquetamab",
+    "fda_approved": false,
+    "fda_date": null,
+    "ema_approved": false,
+    "ema_date": null,
+    "mfds_approved": false,
+    "mfds_date": null,
+    "mfds_brand_name": "",
+    "domestic_status": "",
+    "hira_status": "",
+    "global_score": 0,
+    "analysis": {
+      "hot_issue_reasons": []
+    },
+    "therapeutic_areas": []
+  },
+  "_source_urls": {},
+  "_score": 0,
+  "_hot_issue_reasons": [],
+  "_therapeutic_areas": []
 }

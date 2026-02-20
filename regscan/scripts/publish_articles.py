@@ -319,6 +319,8 @@ def _inject_competitor_links(
     caps_pattern = re.compile(
         r'\b([A-Z][A-Z]{5,}(?:\s+[A-Z]{3,})*(?:-[a-z]{2,})?)\b'
     )
+    # 임상시험 이름 감지용 컨텍스트 (POLARIX, KEYNOTE 등은 약물이 아님)
+    trial_context = re.compile(r'시험|trial|study|임상|연구', re.IGNORECASE)
     for m in caps_pattern.finditer(text):
         candidate = m.group(1)
         cl = candidate.lower()
@@ -326,6 +328,12 @@ def _inject_competitor_links(
             continue
         # 약물명이 아닌 일반 약어(DLBCL, NSCLC 등) 제외
         if cl in {a.lower() for a in ABBR_DICT} or len(candidate.replace(' ', '')) < 7:
+            continue
+        # 임상시험 이름 제외: 앞뒤 30자에 "시험/trial/study" 있으면 스킵
+        ctx_start = max(0, m.start() - 30)
+        ctx_end = min(len(text), m.end() + 30)
+        context = text[ctx_start:m.start()] + text[m.end():ctx_end]
+        if trial_context.search(context):
             continue
         added_lowers.add(cl)
         # CT.gov 검색 링크로 연결

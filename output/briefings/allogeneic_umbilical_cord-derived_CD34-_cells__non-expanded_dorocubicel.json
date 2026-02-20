@@ -1,15 +1,36 @@
 {
   "inn": "Allogeneic Umbilical Cord-derived Cd34- Cells, Non-expanded;dorocubicel",
-  "headline": "희귀의약품으로 주목받는 dorocubicel, EMA 승인 — 국내 도입 기미 살펴봐야",
-  "subtitle": "모든 적합한 기증자가 없는 혈액암 환자 대안 | 국내 허가 상황 불확실",
+  "headline": "EMA 승인받은 CD34 세포 유래 약물, 희귀혈액질환 치료 새 전환점",
+  "subtitle": "국내 허가·급여 미비, 비급여로 환자부담 지속",
   "key_points": [
-    "모든 적합한 기증자가 없는 성인 혈액암 환자를 위한 조혈모세포 이식 치료제로, 제대혈 유래 CD34+ 세포를 활용한 혁신적 접근",
-    "EMA가 2025년 8월 25일 조건부 승인 — 희귀질환과 관련해 신속 심사 절차 PRIME 적용",
-    "MFDS 미허가 및 HIRA 미등록 상태, 현재 국내 도입은 불확실 — 약물의 유효성과 대안 제시가 주된 관심사",
-    "글로벌 승인 이후 179일 경과, 국내 도입은 통상적으로 1~3년 소요될 것으로 예상되며 경쟁약과 상황 비교를 통한 전략 마련 필요"
+    "Allogeneic Umbilical Cord-derived Cd34- Cells, Non-expanded; dorocubicel은 혈액암 환자에 사용되는 희귀의약품으로, 조혈모세포 이식이 필요한 환자에게 적응증을 갖고 있다.",
+    "유럽 의약청(EMA)이 2025년 8월 25일 최초 허가를 예정하고 있어, 이를 통해 혈액암 치료 패러다임에 변화를 줄 것으로 기대된다.",
+    "현재 MFDS 및 HIRA의 데이터에 따르면 국내에서는 허가가 이루어지지 않았으며, 가격 및 급여 등재도 현재 확인되지 않고 있다.",
+    "국내 시장에서 dorocubicel의 경쟁제인 Polatuzumab Vedotin, Zanidatamab-hrii는 각각 60점의 경쟁력을 보이며 예상 승인을 기대하고 있다."
   ],
-  "global_section": "dorocubicel은 모든 적합한 기증자가 없는 성인 혈액암 환자에게 조혈모세포 이식의 혁신적인 대안을 제공할 수 있는 약물로, 제대혈 유래 CD34+ 세포를 사용하여 재생의학 분야에 중요한 진전을 이루었다. 제대혈 기증자 없이도 치료를 가능하게 하여 임상에서의 적응증은 상당히 유망하다. EMA의 조건부 승인은 이 약물이 적응증과 함께 시장 진입에 대한 갈증을 해소할 수 있는 가능성을 보여주고 있으며, FDA 승인은 경쟁시장에서 더욱 주목받는 이유이다. 그러나 경쟁약으로는 polatuzumab vedotin, zanidatamab-hrii가 있으며, 최신 치료 모델에 비해 안정성과 효과 측면에서 비교 검토가 필요하다.",
-  "domestic_section": "현재 dorocubicel은 MFDS에서 미허가 상태이며, HIRA에 등록되지 않은 상태로 실질적 국내 도입 일정이 불확실하다. EMA의 조건부 승인 이후 약 179일이 경과하였으며, 대개 허가는 1~3년 이내에 이루어지는 점을 감안하면, 향후 허가 신청 준비 단계에 접어들 것이라는 기대가 필요하다. 경쟁약 polatuzumab vedotin과 zanidatamab-hrii는 현재 국내 승인에 대한 기대가 있으며, 차별적인 환자 맞춤형 치료 옵션으로 자리 잡을 가능성이 있다. 약제팀에서는 이러한 경쟁 구도와 함께 할 수 있는 진단 및 치료 옵션에 대한 대안을 마련해야 한다.",
-  "medclaim_section": "현재 dorocubicel은 국내에서 미허가로 건강보험 적용이 불가하다. 허가 및 급여 등재 시, 희귀 의약품으로 지정되면 본인부담률 10% 적용 가능성이 있다. 고가약제 범주에 해당되므로, 1회 투여 비용이 100만원을 초과할 경우 사전심사(PA) 대상이 될 수 있다. 비급여 처방이 진행될 경우, 제약사 EAP에 참여하거나 KODC 긴급도입을 선택할 수 있으며, 이를 통해 특정 환자군에 대한 접근이 가능할 것이다. 따라서 약제팀은 안정성 및 유효성을 면밀히 검사하고, 해당 가능성을 지속적으로 모니터링할 필요가 있다.",
-  "generated_at": "2026-02-20T13:03:23.339215"
+  "global_section": "dorocubicel은 희귀의약품으로, 조혈모세포 이식이 필요한 성인 환자에게 사용되는 세포 기반 치료제이다. 이 약물은 제대혈에서 유래한 CD34+ 세포로, 이식 가능 적합한 세포가 없는 경우에 생명을 구할 수 있는 임상적 해결책이 된다. dorocubicel의 작용기전은 세포 이식 후 재생능력을 통해 환자의 면역계를 회복시키는 것으로, 현재는 EMA의 조건부 승인을 위한 준비가 첫 발을 내딛게 된다. 특히, 같은 혈액암 치료 분야의 경쟁약인 Polatuzumab Vedotin과 비교하여 새로운 치료 혁신의 가능성을 보이고 있다.",
+  "domestic_section": "현재 dorocubicel은 MFDS에서 미허가 상태이며, HIRA의 급여 등재도 이루어지지 않은 상태이다. 글로벌 승인 후 현재까지 179일이 경과하였으며, 통상적으로 허가 신청이 통과되는 데에는 약 1~3년 정도가 소요된다. 사업적인 조건 때문인지, 경쟁약인 Polatuzumab Vedotin과 Zanidatamab-hrii은 예상 승인을 기대하고 있어 차별화된 가격 경쟁력이 있을 것으로 분석된다. 이에 따라 국내 약제팀은 해당 약물의 허가 일정과 개발 상황을 지속적으로 모니터링해야 한다.",
+  "medclaim_section": "현재 dorocubicel은 미허가 및 비급여 상태로 청구가 불가능하다. 허가 후 급여가 인정되면 희귀질환 산정특례를 통해 본인부담률이 10%로 낮아질 가능성이 높지만, 비급여로 환자부담의 경우 전액 부담이 발생한다. 또한, 시장에 공급될 경우 고가약제 사전심사 수립이 필요할 것으로 예상된다. 환자들은 긴급도입 프로그램이나 임상시험 참여를 통해 접근할 수 있는 대안 경로를 고려해야 하며, 약제팀은 이러한 절차를 프레임 작업에 포함시켜야 한다.",
+  "generated_at": "2026-02-20T14:03:02.122325",
+  "source_data": {
+    "inn": "Allogeneic Umbilical Cord-derived Cd34- Cells, Non-expanded;dorocubicel",
+    "fda_approved": false,
+    "fda_date": null,
+    "ema_approved": false,
+    "ema_date": null,
+    "mfds_approved": false,
+    "mfds_date": null,
+    "mfds_brand_name": "",
+    "domestic_status": "",
+    "hira_status": "",
+    "global_score": 0,
+    "analysis": {
+      "hot_issue_reasons": []
+    },
+    "therapeutic_areas": []
+  },
+  "_source_urls": {},
+  "_score": 0,
+  "_hot_issue_reasons": [],
+  "_therapeutic_areas": []
 }

@@ -1,15 +1,36 @@
 {
   "inn": "Axicabtagene Ciloleucel",
-  "headline": "재발성 DLBCL 치료의 혁신, Axicabtagene Ciloleucel – EMA 승인",
-  "subtitle": "희귀의약품 지정 및 국내 도입 현황 주목",
+  "headline": "주목받는 DLBCL 치료제 Axicabtagene Ciloleucel, EMA 승인에도 국내 미허가",
+  "subtitle": "희귀의약품 지정 | 경쟁약 대비 저조한 국내 현황",
   "key_points": [
-    "CAR-T 셀 치료제로, 재발성 또는 불응성 미만성 거대 B세포 림프종(DLBCL) 치료에 사용",
-    "EMA에서 2018년 8월 승인, 여러 국가에서 사용 허가 진행 중",
-    "MFDS 미허가, HIRA 비급여 상태 – 글로벌 승인 후 2738일 경과",
-    "Zanidatamab-hrii, Polatuzumab vedotin 등 같은 적응증의 경쟁약과 비교 시 도입 지연 우려"
+    "Axicabtagene Ciloleucel은 재발성 및 불응성 미만성 거대 B세포 림프종(DLBCL) 환자 치료에 사용되는 CAR-T 세포 치료제",
+    "EMA 2018년 8월 승인, DLBCL 치료 패러다임 전환을 예고",
+    "MFDS 미허가 및 HIRA 비급여 상태 — 글로벌 승인 후 7년 이상 경과",
+    "경쟁약 Polatuzumab Vedotin과 Zanidatamab-hrii가 국내 기대 중, 치료 선택권 부재"
   ],
-  "global_section": "Axicabtagene Ciloleucel은 재발성 및 불응성 미만성 거대 B세포 림프종(DLBCL) 환자에게 혁신적인 치료옵션을 제공할 것으로 기대된다. 이 CAR-T 세포 치료제는 환자의 T세포를 이용해 암세포를 타겟팅하도록 설계되어 있으며, 임상 시험에서 기존 표준 치료 대비 우수한 결과를 나타냈다. 특히 3상 ZUMA-1 임상에서 무진행 생존기간(8.3개월)과 객관적 반응률(83%)을 기록하여 기존 표준요법 대비 두 배 이상 개선된 반응률을 보였다. 2018년 8월 EMA로부터 승인을 받아 유럽에서는 사용이 가능하나, 미국 FDA 승인은 아직 이루어지지 않았다.",
-  "domestic_section": "현재 Axicabtagene Ciloleucel은 한국에서 MFDS 허가가 이루어지지 않은 상태로, 2738일간의 긴 미허가 기간을 겪고 있다. 국내 도입 전망은 불확실한 상황이며, 경쟁약물인 Polatuzumab Vedotin과 Zanidatamab-hrii는 각각 다소 높은 평가 점수를 받고 있어 시장에서의 경쟁이 치열할 것으로 예상된다. 이러한 긴급한 상황에서 Axicabtagene Ciloleucel의 개발과정을 주의 깊게 모니터링하여 약제팀과 심사자는 향후 발생할 수 있는 보험약가 협상이나 심사 과정을 고려해야 할 필요가 있다.",
-  "medclaim_section": "현재 Axicabtagene Ciloleucel은 미허가 약물로 HIRA 급여 적용이 불가하다. 만약 허가 및 급여가 확정될 경우, 암환자 산정특례로 5%의 본인부담률이 적용될 가능성이 높지만, 급여국가의 가격 설정 과정에 따라 가격은 추후 논의가 필요하다. 비급여 상황에서는 긴급도입이나 임상 참여는 가능하지만, 일반적으로 비급여인 만큼 환자 부담 비용이 상당할 것으로 보인다. 약제팀에서는 같은 적응증의 경쟁약물 동향을 세심히 살피고, 향후 허가 시 실질적인 영향을 줄 수 있는 치료 옵션들을 대비해야 한다.",
-  "generated_at": "2026-02-20T13:07:24.143318"
+  "global_section": "Axicabtagene Ciloleucel(Yescarta)은 재발성 및 불응성 미만성 거대 B세포 림프종(DLBCL) 환자에게 혁신적인 치료 옵션으로 자리잡고 있다. 이 약물은 환자의 T세포를 유전자 변형하여 암 세포를 표적하여, 효과적으로 파괴하는 CAR-T 세포 치료제이다. 3상 ZUMA-1 시험에서는 Axicabtagene Ciloleucel 치료군에서 이벤트 없이 생존(EFS) 기간이 8.3개월로 기존 표준 치료군 2.0개월에 비해 유의미한 차이를 보여주었다(p<0.0001). EMA는 2018년 8월 conditional approval(조건부 승인)을 부여하며, DLBCL 치료에 대한 새로운 패러다임을 제시하였다.",
+  "domestic_section": "현재 Axicabtagene Ciloleucel은 MFDS에서 허가받지 못한 상태로, HIRA에 비급여로 등록되어 있다. 글로벌 승인 후 약 2,738일이 경과하였으며, 이는 판매권자 부재 또는 시장성 판단 보류가 원인으로 해석된다. 경쟁 약물인 Polatuzumab Vedotin과 Zanidatamab-hrii는 국내 허가가 예상되고 있어 상황이 더욱 복잡해지고 있다. Axicabtagene Ciloleucel은 DLBCL 치료제의 선택지가 부재한 국내에서 중요한 대안으로 여겨지나, 도입이 지연됨에 따라 환자들에게 선택권이 부족한 상황이다.",
+  "medclaim_section": "현재 Axicabtagene Ciloleucel은 국내에서 청구할 수 없는 상태이며, 환자들은 전액 부담해야 한다. 추후 허가 및 급여가 이루어질 경우, 재발성 DLBCL 환자는 암환자 산정특례에 따라 본인부담률이 5%로 경감될 가능성이 있다. 비급여 처방 시, 고가약제로서 약 100만원 이상의 수가가 예상되며, 실손보험 청구 가능성도 있으나 비급여 약물의 경우 청구 제한이 있을 수 있다. 따라서 약제팀은 GIFT 신청을 포함하여 Axicabtagene Ciloleucel의 도입 및 사용 가능성을 지속적으로 추적해야 한다.",
+  "generated_at": "2026-02-20T14:05:49.703831",
+  "source_data": {
+    "inn": "Axicabtagene Ciloleucel",
+    "fda_approved": false,
+    "fda_date": null,
+    "ema_approved": false,
+    "ema_date": null,
+    "mfds_approved": false,
+    "mfds_date": null,
+    "mfds_brand_name": "",
+    "domestic_status": "",
+    "hira_status": "",
+    "global_score": 0,
+    "analysis": {
+      "hot_issue_reasons": []
+    },
+    "therapeutic_areas": []
+  },
+  "_source_urls": {},
+  "_score": 0,
+  "_hot_issue_reasons": [],
+  "_therapeutic_areas": []
 }
