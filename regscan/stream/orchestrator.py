@@ -175,6 +175,10 @@ class StreamOrchestrator:
                         # MFDS 데이터 병합
                         if drug.get("mfds_data") and not existing.get("mfds_data"):
                             existing["mfds_data"] = drug["mfds_data"]
+                        # 임상 결과 병합
+                        if drug.get("clinical_results") and not existing.get("clinical_results"):
+                            existing["clinical_results"] = drug["clinical_results"]
+                            existing["clinical_results_nct_id"] = drug.get("clinical_results_nct_id", "")
                         # 시그널 병합
                         for sig in drug.get("signals", []):
                             existing.setdefault("signals", []).append(sig)
@@ -189,7 +193,19 @@ class StreamOrchestrator:
                             "mfds_data": drug.get("mfds_data"),
                             "atc_code": drug.get("atc_code", ""),
                             "signals": list(drug.get("signals", [])),
+                            "clinical_results": drug.get("clinical_results"),
+                            "clinical_results_nct_id": drug.get("clinical_results_nct_id", ""),
                         }
+
+                # StreamResult.signals → 개별 약물에 연결 (INN 기반)
+                for sig in result.signals:
+                    sig_inns = sig.get("inns", [])
+                    for sig_inn in sig_inns:
+                        norm = self._matcher.normalize(
+                            self._matcher.find_canonical(sig_inn)
+                        )
+                        if norm in merged:
+                            merged[norm].setdefault("signals", []).append(sig)
 
         return list(merged.values())
 
@@ -213,9 +229,34 @@ class StreamOrchestrator:
             else:
                 status = builder.build_from_fda_ema(fda_data, ema_data)
 
+            # INN 보정: 스트림 병합 데이터에 INN이 있는데 status에 없으면 채움
+            if not status.inn and drug.get("inn"):
+                status.inn = drug["inn"]
+                status.normalized_name = drug.get("normalized_name", "")
+
+            # 외부시그널 점수 보정: CT.gov Phase 3 데이터가 있으면 최소 점수 보장
+            signals = drug.get("signals", [])
+            if signals and status.global_score < 10:
+                ct_signals = [s for s in signals if s.get("type", "").startswith("ctgov_")]
+                if ct_signals:
+                    # Phase 3 임상시험 존재 시 최소 10점 부여
+                    status.global_score = max(status.global_score, 10)
+                    fail_signals = [s for s in ct_signals if s.get("verdict") == "FAIL"]
+                    if fail_signals:
+                        # 실패한 임상시험은 더 높은 점수 (뉴스 가치)
+                        status.global_score = max(status.global_score, 15)
+                        status.hot_issue_reasons.append("Phase 3 임상시험 중단/실패")
+                    else:
+                        status.hot_issue_reasons.append("Phase 3 임상시험 진행")
+
             # 스트림 메타 주입
             status.therapeutic_areas = drug.get("therapeutic_areas", [])
             status.stream_sources = drug.get("stream_sources", [])
+
+            # 임상 결과 주입 (CT.gov resultsSection)
+            if drug.get("clinical_results"):
+                status.clinical_results = drug["clinical_results"]
+                status.clinical_results_nct_id = drug.get("clinical_results_nct_id", "")
 
             statuses.append(status)
 

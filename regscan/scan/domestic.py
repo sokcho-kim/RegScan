@@ -92,6 +92,15 @@ class DomesticImpact:
     therapeutic_areas: list[str] = field(default_factory=list)
     stream_sources: list[str] = field(default_factory=list)
 
+    # 원본 데이터 (DB raw_data 저장용)
+    fda_raw_data: dict = field(default_factory=dict)
+    ema_raw_data: dict = field(default_factory=dict)
+    mfds_raw_data: dict = field(default_factory=dict)
+
+    # CT.gov 임상 결과 (resultsSection 파싱)
+    clinical_results: Optional[dict] = None
+    clinical_results_nct_id: str = ""
+
     @property
     def quadrant(self) -> str:
         """2축 분류 4분면 결정"""
@@ -383,17 +392,25 @@ class DomesticImpactAnalyzer:
         if status.fda and status.fda.status == ApprovalStatus.APPROVED:
             impact.fda_approved = True
             impact.fda_date = status.fda.approval_date
+            impact.fda_raw_data = status.fda.raw_data
 
         # EMA
         if status.ema and status.ema.status == ApprovalStatus.APPROVED:
             impact.ema_approved = True
             impact.ema_date = status.ema.approval_date
+            impact.ema_raw_data = status.ema.raw_data
 
         # MFDS
         if status.mfds and status.mfds.status == ApprovalStatus.APPROVED:
             impact.mfds_approved = True
             impact.mfds_date = status.mfds.approval_date
             impact.mfds_brand_name = status.mfds.brand_name
+            impact.mfds_raw_data = status.mfds.raw_data
+
+        # CT.gov 임상 결과
+        if hasattr(status, 'clinical_results') and status.clinical_results:
+            impact.clinical_results = status.clinical_results
+            impact.clinical_results_nct_id = getattr(status, 'clinical_results_nct_id', '')
 
         # HIRA (새로 추가!)
         self._enrich_hira(impact, status)

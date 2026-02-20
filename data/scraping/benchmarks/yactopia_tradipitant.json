@@ -1,0 +1,85 @@
+{
+  "source": "yactopia",
+  "source_name": "약디의 뉴스레터",
+  "url": "https://maily.so/yactopia/posts/10z30n6vzlw",
+  "scraped_at": "2026-02-19",
+  "title": "46년 만에 등장한 새로운 멀미약, Tradipitant",
+  "author": "약디의 뉴스레터",
+  "publish_date": "2026-02-09",
+  "views": 577,
+  "drug": "Tradipitant",
+  "brand_name": "NEREUS",
+  "company": "Vanda Pharmaceuticals",
+  "indication": "멀미 구토 예방",
+  "structure": {
+    "sections": [
+      "핵심 요약",
+      "왜 그동안 새로운 멀미약이 없었나?",
+      "개발 과정",
+      "작용기전",
+      "임상 3상: Motion Syros (핵심 연구)",
+      "안전성",
+      "연구 한계점",
+      "최종 정리"
+    ],
+    "has_tables": true,
+    "has_clinical_data": true,
+    "has_timeline": true,
+    "has_moa": true,
+    "has_limitations": true
+  },
+  "content": {
+    "headline": "46년 만에 등장한 새로운 멀미약, Tradipitant",
+    "core_summary": "2025년 12월 30일, FDA가 트라디피탄트(Tradipitant, 상품명 NEREUS™)를 성인 멀미 구토 예방 치료제로 승인. 1979년 스코폴라민 패치 이후 46년 만의 신규 기전 멀미약이다. 개발사: Vanda Pharmaceuticals (미국 워싱턴 D.C.)",
+    "market_context": "기존 옵션(항히스타민제, 스코폴라민)이 이미 시장 점유. 스코폴라민 패치: 효과 강력하나 동공산대·입마름 부작용. 디멘히드리네이트: H1 차단으로 졸림·진정 유발. 멀미 임상시험 설계의 어려움 + 낮은 상업적 유인. Tradipitant의 포지셔닝: 졸림이 허용되지 않는 상황, 기존 부작용 때문에 복용이 어려웠던 환자, 구토 예방이 핵심 목표인 환자 대상",
+    "development_history": [
+      {"stage": "원개발사", "detail": "Eli Lilly (알코올 의존증·사회공포증 대상)"},
+      {"stage": "라이선스 인", "detail": "2012년 Vanda가 선급금 100만 달러에 확보"},
+      {"stage": "방향 전환", "detail": "NK-1 길항 기전 활용 → 가려움증·위마비·멀미로 전환"},
+      {"stage": "위기", "detail": "2018년 FDA 부분 임상 보류 (비설치류 9개월 독성 데이터 부재)"},
+      {"stage": "소송", "detail": "Vanda FDA 상대 소송 → 패소"},
+      {"stage": "돌파구", "detail": "멀미는 만성 질환이 아닌 급성 질환 논리 → 2025년 12월 4일 보류 해제"}
+    ],
+    "mechanism_of_action": "멀미 시 Substance P 분비 → 뇌간 NK-1 수용체 결합 → 구토 중추 자극. Tradipitant: NK-1 수용체에 먼저 결합 → Substance P 신호 차단. 기존 약과 달리 각성·인지 경로를 건드리지 않아 졸음 부담 감소",
+    "clinical_trial": {
+      "name": "Motion Syros",
+      "design": "다기관·무작위·이중맹검·위약대조 / 실제 해상 환경(약 4시간 보트 항해)",
+      "population": "멀미 병력 있는 18-75세 성인 366명",
+      "arms": [
+        {"group": "Tradipitant 170mg", "n": 121},
+        {"group": "Tradipitant 85mg", "n": 123},
+        {"group": "위약", "n": 122}
+      ],
+      "primary_endpoint": {
+        "metric": "구토 발생률",
+        "placebo": "44.3%",
+        "170mg": "18.3% (RRR 59%, p<0.0001)",
+        "85mg": "19.5% (RRR 56%, p<0.0001)"
+      },
+      "subgroup_rough_sea": {
+        "placebo": "49.5%",
+        "170mg": "20.4%",
+        "85mg": "22.0%"
+      }
+    },
+    "safety": "중대한 이상반응(SAE)·사망: 없음. TEAE 발생률: 170mg군 28.3% / 85mg군 26.8% / 위약군 9.0%. 5% 이상 보고된 이상반응: 두통, 졸음, 피로 (모두 경증). 졸음은 전 용량군에서 10% 미만",
+    "limitations": [
+      "환경 변동성: 파고·바람 등 멀미 자극 강도가 항차별로 상이",
+      "오심 단독 평가의 민감도 한계: 오심 scale 단독 분석에서 위약 대비 유의한 차이 미확인",
+      "하위군 표본 제한: 남성, BMI≥30, 소아·청소년 등 일부 집단 적용 한계"
+    ]
+  },
+  "writing_patterns": {
+    "hook": "46년이라는 시간 프레임으로 뉴스 가치 강조",
+    "structure_type": "역사적 맥락 → 기전 → 임상 데이터 → 한계",
+    "data_presentation": "표 형식으로 임상 결과 정리, RRR/p-value 명시",
+    "differentiators": [
+      "기존 치료제 대비 포지셔닝 명확",
+      "개발 과정의 위기/돌파구 스토리라인",
+      "임상 설계의 독특함 강조 (실제 해상 환경)",
+      "한계점을 솔직하게 서술",
+      "작용기전을 비전문가도 이해 가능하게 설명"
+    ],
+    "tone": "전문적이면서 스토리텔링, 과도한 형용사 없음"
+  }
+}

@@ -465,25 +465,38 @@ class TherapeuticAreaStream(BaseStream):
                 if not inn or len(inn) < 3:
                     continue
 
-                fda_result = None
-                try:
-                    # 1차: generic_name 검색
-                    response = await client.search_by_generic_name(inn, limit=3)
-                    results = response.get("results", [])
-                    if results:
-                        fda_result = results[0]
-                except Exception:
-                    pass
+                # 복합성분명 분리 (세미콜론/슬래시 → 첫 번째 성분으로 검색)
+                search_names = [inn]
+                if ";" in inn:
+                    search_names = [p.strip() for p in inn.split(";") if p.strip()]
+                elif " / " in inn:
+                    search_names = [p.strip() for p in inn.split(" / ") if p.strip()]
 
-                if not fda_result:
+                fda_result = None
+                for search_name in search_names:
+                    if not search_name or len(search_name) < 3:
+                        continue
                     try:
-                        # 2차: substance_name 검색 (대문자 변환)
-                        response = await client.search_by_substance_name(
-                            inn.upper(), limit=3
+                        # 1차: generic_name 검색
+                        response = await client.search_by_generic_name(
+                            search_name, limit=3,
                         )
                         results = response.get("results", [])
                         if results:
                             fda_result = results[0]
+                            break
+                    except Exception:
+                        pass
+
+                    try:
+                        # 2차: substance_name 검색 (대문자 변환)
+                        response = await client.search_by_substance_name(
+                            search_name.upper(), limit=3,
+                        )
+                        results = response.get("results", [])
+                        if results:
+                            fda_result = results[0]
+                            break
                     except Exception:
                         pass
 

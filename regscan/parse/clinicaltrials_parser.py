@@ -2,6 +2,7 @@
 
 v2 API의 nested protocolSection 구조를 평탄화하고,
 DRUG/BIOLOGICAL intervention만 필터하여 INN 추출.
+resultsSection에서 primary endpoint, 통계 분석, 안전성 데이터 추출.
 """
 
 from __future__ import annotations
@@ -108,6 +109,11 @@ class ClinicalTrialsGovParser:
         # WhyStopped
         why_stopped = status_mod.get("whyStopped", "")
 
+        # resultsSection 파싱 (있으면)
+        clinical_results = None
+        if has_results and raw.get("resultsSection"):
+            clinical_results = self.parse_results_section(raw["resultsSection"])
+
         return {
             "nct_id": nct_id,
             "title": title,
@@ -123,6 +129,7 @@ class ClinicalTrialsGovParser:
             "sponsor": sponsor_name,
             "enrollment": enrollment,
             "search_condition": raw.get("_search_condition", ""),
+            "clinical_results": clinical_results,
         }
 
     def parse_many(self, studies: list[dict]) -> list[dict]:
@@ -136,6 +143,163 @@ class ClinicalTrialsGovParser:
             except Exception as e:
                 logger.debug("CT.gov 파싱 실패: %s", e)
         return results
+
+    def parse_results_section(self, results: dict) -> dict[str, Any]:
+        """resultsSection에서 임상 결과 데이터 추출
+
+        Args:
+            results: CT.gov v2 resultsSection dict
+
+        Returns:
+            {
+                "primary_outcomes": [...],
+                "secondary_outcomes": [...],
+                "adverse_events": {...},
+            }
+        """
+        parsed: dict[str, Any] = {
+            "primary_outcomes": [],
+            "secondary_outcomes": [],
+            "adverse_events": None,
+        }
+
+        # 1) Outcome Measures
+        outcome_mod = results.get("outcomeMeasuresModule", {})
+        for measure in outcome_mod.get("outcomeMeasures", []):
+            outcome = self._parse_outcome_measure(measure)
+            if not outcome:
+                continue
+            if outcome["type"] == "PRIMARY":
+                parsed["primary_outcomes"].append(outcome)
+            else:
+                parsed["secondary_outcomes"].append(outcome)
+
+        # secondary는 최대 3개만
+        parsed["secondary_outcomes"] = parsed["secondary_outcomes"][:3]
+
+        # 2) Adverse Events
+        ae_mod = results.get("adverseEventsModule", {})
+        if ae_mod:
+            parsed["adverse_events"] = self._parse_adverse_events(ae_mod)
+
+        return parsed
+
+    def _parse_outcome_measure(self, measure: dict) -> dict[str, Any] | None:
+        """단일 outcome measure 파싱"""
+        title = measure.get("title", "")
+        otype = measure.get("type", "").upper()  # PRIMARY, SECONDARY, OTHER
+        if otype not in ("PRIMARY", "SECONDARY"):
+            return None
+
+        time_frame = measure.get("timeFrame", "")
+        param_type = measure.get("paramType", "")  # e.g. "Number", "Mean", "Median"
+        unit = measure.get("unitOfMeasure", "")
+
+        # 그룹 정의
+        groups_def = {
+            g["id"]: g.get("title", "")
+            for g in measure.get("groups", [])
+        }
+
+        # 측정값
+        group_values: list[dict] = []
+        for cls in measure.get("classes", []):
+            cls_title = cls.get("title", "")
+            for cat in cls.get("categories", []):
+                for meas in cat.get("measurements", []):
+                    gid = meas.get("groupId", "")
+                    val = meas.get("value", "")
+                    spread = meas.get("spread", "")
+                    if val:
+                        group_values.append({
+                            "group": groups_def.get(gid, gid),
+                            "value": val,
+                            "spread": spread,
+                            "class": cls_title,
+                        })
+
+        # 통계 분석
+        analyses: list[dict] = []
+        for analysis in measure.get("analyses", []):
+            p_val = analysis.get("pValue", "")
+            stat_method = analysis.get("statisticalMethod", "")
+            param_type_a = analysis.get("paramType", "")
+            param_value = analysis.get("paramValue", "")
+            ci_lower = analysis.get("ciLowerLimit", "")
+            ci_upper = analysis.get("ciUpperLimit", "")
+            ci_pct = analysis.get("ciPctValue", "")
+            groups_compared = [
+                groups_def.get(gid, gid)
+                for gid in analysis.get("groupIds", [])
+            ]
+
+            entry: dict[str, Any] = {}
+            if p_val:
+                entry["p_value"] = p_val
+            if stat_method:
+                entry["method"] = stat_method
+            if param_type_a and param_value:
+                entry["param_type"] = param_type_a  # e.g. "Hazard Ratio (HR)"
+                entry["param_value"] = param_value
+            if ci_lower and ci_upper:
+                entry["ci"] = f"{ci_pct or '95'}% CI [{ci_lower}, {ci_upper}]"
+            if groups_compared:
+                entry["groups_compared"] = groups_compared
+            if entry:
+                analyses.append(entry)
+
+        return {
+            "type": otype,
+            "title": title,
+            "time_frame": time_frame,
+            "param_type": param_type,
+            "unit": unit,
+            "group_values": group_values,
+            "analyses": analyses,
+        }
+
+    def _parse_adverse_events(self, ae_mod: dict) -> dict[str, Any]:
+        """adverseEventsModule 파싱"""
+        # 이벤트 그룹 (각 arm)
+        groups_def = {
+            g["id"]: g.get("title", "")
+            for g in ae_mod.get("eventGroups", [])
+        }
+
+        group_summary: list[dict] = []
+        for g in ae_mod.get("eventGroups", []):
+            group_summary.append({
+                "group": g.get("title", ""),
+                "serious_affected": g.get("seriousNumAffected", 0),
+                "serious_at_risk": g.get("seriousNumAtRisk", 0),
+                "other_affected": g.get("otherNumAffected", 0),
+                "other_at_risk": g.get("otherNumAtRisk", 0),
+            })
+
+        # 상위 심각한 이상반응 (빈도순)
+        serious_events: list[dict] = []
+        for event_cat in ae_mod.get("seriousEvents", []):
+            term = event_cat.get("term", "")
+            for stat in event_cat.get("stats", []):
+                gid = stat.get("groupId", "")
+                n_affected = stat.get("numAffected", 0)
+                if n_affected and n_affected > 0:
+                    serious_events.append({
+                        "term": term,
+                        "group": groups_def.get(gid, gid),
+                        "n_affected": n_affected,
+                    })
+
+        # 상위 10건만
+        serious_events.sort(key=lambda x: x["n_affected"], reverse=True)
+        serious_events = serious_events[:10]
+
+        return {
+            "group_summary": group_summary,
+            "top_serious_events": serious_events,
+            "frequency_threshold": ae_mod.get("frequencyThreshold", ""),
+            "description": ae_mod.get("description", ""),
+        }
 
     def _extract_inn(self, name: str) -> str:
         """약물명에서 INN 추출 (용량/salt 제거)"""

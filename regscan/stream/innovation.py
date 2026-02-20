@@ -116,29 +116,29 @@ class InnovationStream(BaseStream):
         drugs: dict[str, dict],
         signals: list[dict],
     ) -> int:
-        """FDA NME (submission_class_code=1, Type 1)"""
+        """FDA NME (submission_class_code="TYPE 1")"""
         from regscan.ingest.fda import FDAClient
 
         count = 0
         async with FDAClient() as client:
-            # Type 1: New Molecular Entity
-            for code in ["1", "TYPE 1"]:
-                try:
-                    response = await client.search_by_submission_class(code, limit=100)
-                    for r in response.get("results", []):
-                        inn = self._extract_inn_from_fda(r)
-                        if not inn:
-                            continue
-                        norm = self._matcher.normalize(inn)
-                        self._upsert_drug(drugs, norm, inn, r, designation="NME")
-                        signals.append({
-                            "type": "fda_nme",
-                            "inn": inn,
-                            "application_number": r.get("application_number", ""),
-                        })
-                        count += 1
-                except Exception:
-                    continue
+            try:
+                response = await client.search_by_submission_class(
+                    '"TYPE 1"', limit=100,
+                )
+                for r in response.get("results", []):
+                    inn = self._extract_inn_from_fda(r)
+                    if not inn:
+                        continue
+                    norm = self._matcher.normalize(inn)
+                    self._upsert_drug(drugs, norm, inn, r, designation="NME")
+                    signals.append({
+                        "type": "fda_nme",
+                        "inn": inn,
+                        "application_number": r.get("application_number", ""),
+                    })
+                    count += 1
+            except Exception as e:
+                logger.debug("FDA NME 검색 실패: %s", e)
         return count
 
     async def _collect_fda_breakthrough(
@@ -146,35 +146,37 @@ class InnovationStream(BaseStream):
         drugs: dict[str, dict],
         signals: list[dict],
     ) -> int:
-        """FDA Breakthrough Therapy — description 기반 검색 + code fallback"""
+        """FDA Breakthrough Therapy
+
+        NOTE: openFDA drugsfda.json에 Breakthrough Therapy Designation 데이터가
+        존재하지 않음. submission_class_code에는 TYPE 1/TYPE 3/EFFICACY 등만 있음.
+        대안으로 Accelerated Approval ("TYPE 5") 약물을 수집.
+        """
         from regscan.ingest.fda import FDAClient
 
         count = 0
         async with FDAClient() as client:
-            # 1차: submission_class_code_description 기반 검색
-            response = await client.search_by_submission_class_description(
-                "Breakthrough", limit=100,
-            )
-            results = response.get("results", [])
-
-            # 2차 fallback: 결과 없으면 기존 code 방식
-            if not results:
-                logger.debug("[Stream2] Breakthrough description 검색 0건, code fallback 시도")
-                response = await client.search_by_submission_class("5", limit=100)
-                results = response.get("results", [])
-
-            for r in results:
-                inn = self._extract_inn_from_fda(r)
-                if not inn:
+            # Accelerated Approval (TYPE 5) — Breakthrough와 종종 겹침
+            for code in ['"TYPE 5"', '"TYPE 4"']:
+                try:
+                    response = await client.search_by_submission_class(
+                        code, limit=100,
+                    )
+                    for r in response.get("results", []):
+                        inn = self._extract_inn_from_fda(r)
+                        if not inn:
+                            continue
+                        norm = self._matcher.normalize(inn)
+                        designation = "accelerated" if "5" in code else "priority"
+                        self._upsert_drug(drugs, norm, inn, r, designation=designation)
+                        signals.append({
+                            "type": f"fda_{designation}",
+                            "inn": inn,
+                            "application_number": r.get("application_number", ""),
+                        })
+                        count += 1
+                except Exception:
                     continue
-                norm = self._matcher.normalize(inn)
-                self._upsert_drug(drugs, norm, inn, r, designation="breakthrough")
-                signals.append({
-                    "type": "fda_breakthrough",
-                    "inn": inn,
-                    "application_number": r.get("application_number", ""),
-                })
-                count += 1
         return count
 
     async def _collect_ema_prime(

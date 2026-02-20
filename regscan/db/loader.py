@@ -310,24 +310,12 @@ class DBLoader:
         count = 0
 
         agencies = [
-            (
-                "fda",
-                impact.fda_approved,
-                impact.fda_date,
-            ),
-            (
-                "ema",
-                impact.ema_approved,
-                impact.ema_date,
-            ),
-            (
-                "mfds",
-                impact.mfds_approved,
-                impact.mfds_date,
-            ),
+            ("fda", impact.fda_approved, impact.fda_date, impact.fda_raw_data),
+            ("ema", impact.ema_approved, impact.ema_date, impact.ema_raw_data),
+            ("mfds", impact.mfds_approved, impact.mfds_date, impact.mfds_raw_data),
         ]
 
-        for agency, approved, approval_date in agencies:
+        for agency, approved, approval_date, raw_data in agencies:
             if not approved:
                 continue
 
@@ -343,6 +331,8 @@ class DBLoader:
             if event:
                 event.status = status
                 event.approval_date = approval_date
+                if raw_data:
+                    event.raw_data = raw_data
                 if agency == "mfds" and impact.mfds_brand_name:
                     event.brand_name = impact.mfds_brand_name
             else:
@@ -351,6 +341,7 @@ class DBLoader:
                     agency=agency,
                     status=status,
                     approval_date=approval_date,
+                    raw_data=raw_data or None,
                     brand_name=(
                         impact.mfds_brand_name if agency == "mfds" else None
                     ),
@@ -562,17 +553,12 @@ class DBLoader:
         changed = False
 
         agencies = [
-            ("fda", impact.fda_approved, impact.fda_date),
-            ("ema", impact.ema_approved, impact.ema_date),
-            ("mfds", impact.mfds_approved, impact.mfds_date),
+            ("fda", impact.fda_approved, impact.fda_date, impact.fda_raw_data),
+            ("ema", impact.ema_approved, impact.ema_date, impact.ema_raw_data),
+            ("mfds", impact.mfds_approved, impact.mfds_date, impact.mfds_raw_data),
         ]
 
-        designation_fields = [
-            "is_orphan", "is_breakthrough", "is_accelerated",
-            "is_priority", "is_prime", "is_conditional", "is_fast_track",
-        ]
-
-        for agency, approved, approval_date in agencies:
+        for agency, approved, approval_date, raw_data in agencies:
             if not approved:
                 continue
 
@@ -597,6 +583,8 @@ class DBLoader:
 
                 event.status = status
                 event.approval_date = approval_date
+                if raw_data:
+                    event.raw_data = raw_data
                 if agency == "mfds" and impact.mfds_brand_name:
                     event.brand_name = impact.mfds_brand_name
             else:
@@ -606,6 +594,7 @@ class DBLoader:
                     agency=agency,
                     status=status,
                     approval_date=approval_date,
+                    raw_data=raw_data or None,
                     brand_name=(
                         impact.mfds_brand_name if agency == "mfds" else None
                     ),

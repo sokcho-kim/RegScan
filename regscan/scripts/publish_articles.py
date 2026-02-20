@@ -21,8 +21,100 @@ from regscan.config import settings
 logger = logging.getLogger(__name__)
 
 OUTPUT_DIR = settings.BASE_DIR / "output" / "briefings"
+
+
+def to_display_case(inn: str) -> str:
+    """INN을 표시용 Title Case로 변환.
+
+    Rules:
+    - 메인 단어: 첫 글자 대문자 (Polatuzumab Vedotin)
+    - 하이픈 뒤 USAN 생물학적 접미사: 소문자 (-piiq, -hrii, -csrk)
+
+    Examples:
+        "POLATUZUMAB VEDOTIN-PIIQ" → "Polatuzumab Vedotin-piiq"
+        "ZANIDATAMAB-HRII" → "Zanidatamab-hrii"
+        "polatuzumab vedotin" → "Polatuzumab Vedotin"
+    """
+    if not inn:
+        return inn
+    words = inn.split()
+    result = []
+    for word in words:
+        if '-' in word:
+            parts = word.split('-')
+            result.append(
+                parts[0].capitalize() + '-' + '-'.join(p.lower() for p in parts[1:])
+            )
+        else:
+            result.append(word.capitalize())
+    return ' '.join(result)
 TODAY = datetime.now().strftime("%Y-%m-%d")
 TODAY_KR = datetime.now().strftime("%Y년 %m월 %d일")
+
+
+# ── 약어 사전 (한국어 현지화 + 의학 약어 툴팁) ──
+
+# (한국어_약칭 또는 None, 툴팁_풀네임)
+ABBR_DICT: dict[str, tuple[str | None, str]] = {
+    # 규제기관 — 한국어 약칭 우선 표기
+    "MFDS": ("식약처", "식품의약품안전처, Ministry of Food and Drug Safety"),
+    "HIRA": ("심평원", "건강보험심사평가원, Health Insurance Review & Assessment Service"),
+    "CRIS": ("CRIS", "임상연구정보서비스, Clinical Research Information Service"),
+    # 의학 약어 — 툴팁만
+    "DLBCL": (None, "미만성 거대 B세포 림프종, Diffuse Large B-Cell Lymphoma"),
+    "ADC": (None, "항체-약물 접합체, Antibody-Drug Conjugate"),
+    "PFS": (None, "무진행생존기간, Progression-Free Survival"),
+    "OS": (None, "전체생존기간, Overall Survival"),
+    "ORR": (None, "객관적 반응률, Objective Response Rate"),
+    "NSCLC": (None, "비소세포폐암, Non-Small Cell Lung Cancer"),
+    "CAR-T": (None, "키메라 항원 수용체 T세포, Chimeric Antigen Receptor T-cell"),
+    "AML": (None, "급성 골수성 백혈병, Acute Myeloid Leukemia"),
+    "PAH": (None, "폐동맥 고혈압, Pulmonary Arterial Hypertension"),
+    "MCL": (None, "외투세포 림프종, Mantle Cell Lymphoma"),
+    "ALL": (None, "급성 림프구 백혈병, Acute Lymphoblastic Leukemia"),
+    "HER2": (None, "인간 표피성장인자 수용체 2, Human Epidermal Growth Factor Receptor 2"),
+    "NTRK": (None, "신경영양성 티로신 수용체 키나제, Neurotrophic Tyrosine Receptor Kinase"),
+    "DMD": (None, "뒤센형 근디스트로피, Duchenne Muscular Dystrophy"),
+    "PBC": (None, "원발성 담즙성 담관염, Primary Biliary Cholangitis"),
+    "NME": (None, "신규 분자 실체, New Molecular Entity"),
+    "BLA": (None, "생물학적 제제 허가 신청, Biologics License Application"),
+    "NDA": (None, "신약 허가 신청, New Drug Application"),
+}
+
+
+def _inject_abbr_tags(text: str, seen: set[str] | None = None) -> str:
+    """텍스트에서 알려진 약어를 <abbr> 태그로 감싸기.
+
+    - 규제기관(MFDS, HIRA): 첫 등장 → 식약처(MFDS), 이후 → 식약처
+    - 의학 약어(DLBCL, ADC 등): <abbr title="...">ABBR</abbr>
+    - ASCII 단어 경계 사용 (한글 뒤 약어도 정상 매칭)
+    - 이미 괄호 안에 있는 약어 (예: "식약처(MFDS)")는 건드리지 않음
+    """
+    if seen is None:
+        seen = set()
+
+    for abbr_key, (kr_short, tooltip) in ABBR_DICT.items():
+        # ASCII-only 단어 경계: 한글 뒤/앞의 약어도 매칭
+        # 괄호 안 (이미 현지화된 텍스트)은 제외
+        pattern = re.compile(
+            r'(?<![A-Za-z0-9_(])' + re.escape(abbr_key) + r'(?![A-Za-z0-9_)>"])',
+        )
+
+        def _replace(m: re.Match, _key=abbr_key, _kr=kr_short, _tip=tooltip) -> str:
+            if _key in seen:
+                # 이후 등장: 규제기관은 한국어 약칭만, 의학 약어는 abbr
+                if _kr and _kr != _key:
+                    return f'<abbr title="{_tip}">{_kr}</abbr>'
+                return f'<abbr title="{_tip}">{_key}</abbr>'
+            seen.add(_key)
+            # 첫 등장
+            if _kr and _kr != _key:
+                return f'<abbr title="{_tip}">{_kr}({_key})</abbr>'
+            return f'<abbr title="{_tip}">{_key}</abbr>'
+
+        text = pattern.sub(_replace, text)
+
+    return text
 
 
 # ── HTML 템플릿 ──
@@ -42,6 +134,7 @@ ARTICLE_HTML_TEMPLATE = """<!DOCTYPE html>
         .meta-text {{ font-family: 'Inter', sans-serif; }}
         .highlight-box {{ border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }}
         .timeline-dot {{ width: 12px; height: 12px; border-radius: 50%; }}
+        abbr {{ text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }}
     </style>
 </head>
 <body class="min-h-screen">
@@ -91,8 +184,7 @@ ARTICLE_HTML_TEMPLATE = """<!DOCTYPE html>
         </article>
         <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
             <div class="mb-4">
-                <strong>데이터 출처:</strong> FDA Drug Approvals Database, EMA Public Assessment Reports,
-                MFDS 의약품통합정보시스템, CRIS 임상연구정보서비스, HIRA 건강보험심사평가원
+                <strong>데이터 출처:</strong> {sources_html}
             </div>
             <div class="text-xs text-gray-400">
                 본 리포트는 RegScan AI가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
@@ -179,10 +271,11 @@ def _score_badge(score: int) -> tuple[str, str, str]:
         return "bg-gray-400", "LOW", "bg-gray-100 text-gray-700"
 
 
-def _build_timeline_html(source_data: dict | None) -> str:
-    """승인 타임라인 HTML 생성"""
+def _build_timeline_html(source_data: dict | None, source_urls: dict[str, str] | None = None) -> str:
+    """승인 타임라인 HTML 생성 (출처 하이퍼링크 포함)"""
     if not source_data:
         return ""
+    urls = source_urls or {}
 
     entries = []
     fda = source_data.get("fda", {})
@@ -190,24 +283,28 @@ def _build_timeline_html(source_data: dict | None) -> str:
     mfds = source_data.get("mfds", {})
 
     if fda.get("approved") and fda.get("date"):
-        entries.append(("blue", fda["date"], "FDA 승인", "Approved"))
+        entries.append(("blue", fda["date"], "FDA 승인", "Approved", urls.get("fda", "")))
     if ema.get("approved") and ema.get("date"):
-        entries.append(("yellow", ema["date"], "EMA 승인", "Authorised"))
+        entries.append(("yellow", ema["date"], "EMA 승인", "Authorised", urls.get("ema", "")))
     if mfds.get("approved") and mfds.get("date"):
         brand = mfds.get("brand_name", "")
-        entries.append(("green", mfds["date"], "MFDS 허가", brand or "Approved"))
+        entries.append(("green", mfds["date"], "식약처(MFDS) 허가", brand or "Approved", urls.get("mfds", "")))
 
     if not entries:
         return ""
 
     items_html = ""
-    for color, date, label, desc in entries:
+    for color, date, label, desc, url in entries:
+        if url:
+            label_html = f'<a href="{url}" target="_blank" class="hover:underline">{label}</a>'
+        else:
+            label_html = label
         items_html += f"""
                     <div class="relative flex items-center mb-6">
                         <div class="timeline-dot bg-{color}-500 z-10"></div>
                         <div class="ml-6">
                             <div class="meta-text text-xs text-{color}-600 font-semibold">{date}</div>
-                            <div class="font-medium">{label}</div>
+                            <div class="font-medium">{label_html}</div>
                             <div class="text-sm text-gray-500">{desc}</div>
                         </div>
                     </div>"""
@@ -219,6 +316,31 @@ def _build_timeline_html(source_data: dict | None) -> str:
                     <div class="absolute left-2 top-0 bottom-0 w-0.5 bg-gray-300"></div>{items_html}
                 </div>
             </div>"""
+
+
+def _build_sources_html(source_urls: dict[str, str] | None = None, nct_id: str = "") -> str:
+    """동적 출처 링크 HTML 생성"""
+    urls = source_urls or {}
+    links = []
+
+    if urls.get("fda"):
+        links.append(f'<a href="{urls["fda"]}" target="_blank" class="text-indigo-500 hover:underline">FDA Drug Approval</a>')
+    else:
+        links.append("FDA Drug Approvals Database")
+
+    if urls.get("ema"):
+        links.append(f'<a href="{urls["ema"]}" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>')
+    else:
+        links.append("EMA Public Assessment Reports")
+
+    if nct_id:
+        ct_url = f"https://clinicaltrials.gov/study/{nct_id}"
+        links.append(f'<a href="{ct_url}" target="_blank" class="text-indigo-500 hover:underline">ClinicalTrials.gov ({nct_id})</a>')
+
+    links.append("식약처(MFDS) 의약품통합정보시스템")
+    links.append("심평원(HIRA) 건강보험심사평가원")
+
+    return ", ".join(links)
 
 
 def _build_flags_html(source_data: dict | None) -> str:
@@ -257,9 +379,14 @@ def _build_tag_badges(source_data: dict | None) -> str:
     return html
 
 
-def generate_article_html(report_data: dict, score: int = 0) -> str:
+def generate_article_html(
+    report_data: dict,
+    score: int = 0,
+    source_urls: dict[str, str] | None = None,
+    nct_id: str = "",
+) -> str:
     """BriefingReport JSON → HTML 기사"""
-    inn = report_data.get("inn", "")
+    inn = to_display_case(report_data.get("inn", ""))
     headline = report_data.get("headline", f"{inn} 규제 동향 브리핑")
     subtitle = report_data.get("subtitle", "")
     key_points = report_data.get("key_points", [])
@@ -270,16 +397,27 @@ def generate_article_html(report_data: dict, score: int = 0) -> str:
 
     badge_class, score_label, _ = _score_badge(score)
 
+    # 약어 → <abbr> 태그 주입 (콘텐츠 섹션에만, seen 공유로 첫등장 추적)
+    abbr_seen: set[str] = set()
+    headline = _inject_abbr_tags(headline, abbr_seen)
+    subtitle = _inject_abbr_tags(subtitle, abbr_seen)
+
     key_points_html = ""
     for kp in key_points:
+        kp = _inject_abbr_tags(kp, abbr_seen)
         key_points_html += f"""
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
                     <span>{kp}</span>
                 </li>"""
 
-    timeline_html = _build_timeline_html(source_data)
+    global_section = _inject_abbr_tags(global_section, abbr_seen)
+    domestic_section = _inject_abbr_tags(domestic_section, abbr_seen)
+    medclaim_section = _inject_abbr_tags(medclaim_section, abbr_seen)
+
+    timeline_html = _build_timeline_html(source_data, source_urls=source_urls)
     tag_badges = _build_tag_badges(source_data)
+    sources_html = _build_sources_html(source_urls=source_urls, nct_id=nct_id)
 
     return ARTICLE_HTML_TEMPLATE.format(
         inn=inn,
@@ -296,6 +434,7 @@ def generate_article_html(report_data: dict, score: int = 0) -> str:
         domestic_section=domestic_section,
         medclaim_section=medclaim_section,
         timeline_html=timeline_html,
+        sources_html=sources_html,
     )
 
 
@@ -303,7 +442,7 @@ def generate_index_html(articles: list[dict]) -> str:
     """인덱스 페이지 HTML 생성"""
     cards = ""
     for art in articles:
-        inn = art["inn"]
+        inn = to_display_case(art["inn"])
         score = art.get("score", 0)
         _, _, card_badge = _score_badge(score)
         filename = _safe_filename(inn) + ".html"
@@ -384,9 +523,49 @@ async def _fetch_ema_indication_index() -> dict[str, dict]:
     return index
 
 
+async def _fetch_ctgov_results_batch(inns: list[str]) -> dict:
+    """CT.gov에서 약물 INN 목록의 임상 결과를 배치 조회
+
+    Returns:
+        {normalized_inn: {"clinical_results": {...}, "nct_id": "..."}}
+    """
+    from regscan.ingest.clinicaltrials import ClinicalTrialsGovClient
+    from regscan.parse.clinicaltrials_parser import ClinicalTrialsGovParser
+    from regscan.map.matcher import IngredientMatcher
+
+    cache: dict[str, dict] = {}
+    matcher = IngredientMatcher()
+    parser = ClinicalTrialsGovParser()
+
+    async with ClinicalTrialsGovClient(timeout=15.0) as client:
+        for inn in inns:
+            norm = matcher.normalize(inn)
+            if norm in cache:
+                continue
+            try:
+                studies = await client.search_by_intervention(
+                    inn, phase="PHASE3", has_results=True, page_size=3,
+                )
+                for s in studies:
+                    parsed = parser.parse_study(s)
+                    cr = parsed.get("clinical_results")
+                    if cr and cr.get("primary_outcomes"):
+                        cache[norm] = {
+                            "clinical_results": cr,
+                            "nct_id": parsed["nct_id"],
+                        }
+                        break
+            except Exception as e:
+                logger.debug("CT.gov 조회 실패 (%s): %s", inn, e)
+
+    logger.info("CT.gov 임상 결과 조회: %d/%d건 확보", len(cache), len(inns))
+    return cache
+
+
 async def load_drugs_from_db(
     top_n: int = 20,
     min_score: int = 40,
+    ctgov_results_cache: dict | None = None,
 ):
     """DB에서 상위 약물 → DomesticImpact 리스트 (경쟁약·적응증 포함)"""
     from regscan.db.database import init_db, get_async_session
@@ -457,8 +636,9 @@ async def load_drugs_from_db(
             )
             status.stream_sources = drug.stream_sources or []
 
-            # ── 3) 이벤트 → RegulatoryApproval + 적응증 추출 ──
+            # ── 3) 이벤트 → RegulatoryApproval + 적응증 추출 + source_url ──
             indication_parts = []
+            source_urls: dict[str, str] = {}  # agency → source_url
             for ev in drug.events:
                 approval = RegulatoryApproval(
                     agency=ev.agency.upper(),
@@ -467,6 +647,9 @@ async def load_drugs_from_db(
                     approval_date=ev.approval_date,
                     brand_name=ev.brand_name or "",
                 )
+                # source_url 수집
+                if ev.source_url:
+                    source_urls[ev.agency] = ev.source_url
                 if ev.agency == "fda":
                     status.fda = approval
                 elif ev.agency == "ema":
@@ -485,6 +668,9 @@ async def load_drugs_from_db(
                             indication_parts.append(ind[:300])
 
             impact = analyzer.analyze(status)
+
+            # source_url을 impact에 전달
+            impact._source_urls = source_urls
 
             # ── 4) 적응증 텍스트 주입 (EMA API 우선, DB raw_data 폴백) ──
             norm_inn = matcher.normalize(drug.inn)
@@ -508,6 +694,11 @@ async def load_drugs_from_db(
             # pharmacotherapeutic_group도 전달 (기전 정보)
             if ema_ptg:
                 impact._pharmacotherapeutic_group = ema_ptg
+
+            # ── 4.5) CT.gov 임상 결과 조회 ──
+            if ctgov_results_cache is not None and norm_inn in ctgov_results_cache:
+                impact.clinical_results = ctgov_results_cache[norm_inn]["clinical_results"]
+                impact.clinical_results_nct_id = ctgov_results_cache[norm_inn]["nct_id"]
 
             # ── 5) 경쟁약 주입 ──
             # EMA therapeutic_area가 있으면 이를 우선 사용 (더 구체적)
@@ -562,7 +753,29 @@ async def run_publish(
     logger.info("=== 기사 발행 시작 ===")
     logger.info("  대상: score >= %d, 최대 %d건", min_score, top_n)
 
-    impacts = await load_drugs_from_db(top_n=top_n, min_score=min_score)
+    # CT.gov 임상 결과 사전 조회 (기사 품질 향상)
+    logger.info("  CT.gov 임상 결과 사전 조회...")
+    from regscan.db.database import init_db, get_async_session
+    from regscan.db.models import DrugDB
+    from sqlalchemy import select as _sel
+
+    await init_db()
+    async with get_async_session()() as _sess:
+        _stmt = (
+            _sel(DrugDB.inn)
+            .where(DrugDB.global_score >= min_score)
+            .order_by(DrugDB.global_score.desc())
+            .limit(top_n)
+        )
+        _res = await _sess.execute(_stmt)
+        _inns = [r[0] for r in _res.all()]
+
+    ctgov_cache = await _fetch_ctgov_results_batch(_inns)
+
+    impacts = await load_drugs_from_db(
+        top_n=top_n, min_score=min_score,
+        ctgov_results_cache=ctgov_cache,
+    )
     if not impacts:
         logger.error("발행 대상 약물 없음")
         return
@@ -624,7 +837,12 @@ async def run_publish(
         # HTML 기사 생성
         report_data = report.to_dict()
         report_data["source_data"] = report.source_data
-        html_content = generate_article_html(report_data, score=impact.global_score)
+        _urls = getattr(impact, '_source_urls', None) or {}
+        _nct = getattr(impact, 'clinical_results_nct_id', '') or ''
+        html_content = generate_article_html(
+            report_data, score=impact.global_score,
+            source_urls=_urls, nct_id=_nct,
+        )
         html_path.write_text(html_content, encoding="utf-8")
 
         # 인덱스용 메타
@@ -669,7 +887,7 @@ async def run_publish(
         f"",
     ]
     for art in articles_meta:
-        md_lines.append(f"## [{art['score']}점] {art['inn']}")
+        md_lines.append(f"## [{art['score']}점] {to_display_case(art['inn'])}")
         md_lines.append(f"**{art['headline']}**")
         if art.get("key_points"):
             for kp in art["key_points"][:3]:
@@ -696,7 +914,7 @@ async def run_publish(
     print(f"  인덱스: {index_path}")
     print(f"\n  상위 5건:")
     for art in articles_meta[:5]:
-        print(f"    [{art['score']}] {art['inn']}")
+        print(f"    [{art['score']}] {to_display_case(art['inn'])}")
         headline = art['headline'][:60].encode('ascii', 'replace').decode('ascii')
         print(f"         {headline}")
     print(f"{'='*60}")

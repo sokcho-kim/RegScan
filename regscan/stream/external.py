@@ -118,7 +118,7 @@ class ExternalSignalStream(BaseStream):
 
         # FAIL → 즉시 시그널
         for study in triaged["fail"]:
-            signals.append({
+            sig = {
                 "type": "ctgov_trial_fail",
                 "nct_id": study.get("nct_id"),
                 "title": study.get("title"),
@@ -126,29 +126,38 @@ class ExternalSignalStream(BaseStream):
                 "verdict": "FAIL",
                 "why_stopped": study.get("why_stopped", ""),
                 "verdict_summary": study.get("verdict_summary", ""),
-            })
+            }
+            if study.get("clinical_results"):
+                sig["clinical_results"] = study["clinical_results"]
+            signals.append(sig)
             self._add_inns_to_drugs(drugs, study)
 
         # PENDING → 워치리스트
         for study in triaged["pending"]:
-            signals.append({
+            sig = {
                 "type": "ctgov_trial_pending",
                 "nct_id": study.get("nct_id"),
                 "title": study.get("title"),
                 "inns": study.get("extracted_inns", []),
                 "verdict": "PENDING",
-            })
+            }
+            if study.get("clinical_results"):
+                sig["clinical_results"] = study["clinical_results"]
+            signals.append(sig)
             self._add_inns_to_drugs(drugs, study)
 
         # NEEDS_AI → AI 판독 대기 시그널
         for study in triaged["needs_ai"]:
-            signals.append({
+            sig = {
                 "type": "ctgov_trial_needs_ai",
                 "nct_id": study.get("nct_id"),
                 "title": study.get("title"),
                 "inns": study.get("extracted_inns", []),
                 "verdict": "NEEDS_AI",
-            })
+            }
+            if study.get("clinical_results"):
+                sig["clinical_results"] = study["clinical_results"]
+            signals.append(sig)
             self._add_inns_to_drugs(drugs, study)
 
         return len(parsed)
@@ -196,6 +205,11 @@ class ExternalSignalStream(BaseStream):
                 nct_id = study.get("nct_id")
                 if nct_id and nct_id not in ncts:
                     ncts.append(nct_id)
+
+            # clinical_results 저장 (첫 번째 결과 우선)
+            if study.get("clinical_results") and "clinical_results" not in drugs[norm]:
+                drugs[norm]["clinical_results"] = study["clinical_results"]
+                drugs[norm]["clinical_results_nct_id"] = study.get("nct_id")
 
     def _target_inns_normalized(self) -> set[str]:
         """교차 참조용 INN 정규화"""

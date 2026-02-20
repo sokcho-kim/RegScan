@@ -208,10 +208,27 @@ class LLMBriefingGenerator:
         else:
             return f"글로벌 승인 후 {days}일 경과 — 장기 미허가 (판매권자 부재 또는 시장성 판단 보류)"
 
+    @staticmethod
+    def _to_display_case(inn: str) -> str:
+        """INN을 Title Case로 변환 (USAN 접미사는 lowercase)"""
+        if not inn:
+            return inn
+        words = inn.split()
+        result = []
+        for word in words:
+            if '-' in word:
+                parts = word.split('-')
+                result.append(
+                    parts[0].capitalize() + '-' + '-'.join(p.lower() for p in parts[1:])
+                )
+            else:
+                result.append(word.capitalize())
+        return ' '.join(result)
+
     def _prepare_drug_data(self, impact: DomesticImpact) -> str:
         """DomesticImpact를 LLM 입력 형식으로 변환"""
         data = {
-            "inn": impact.inn,
+            "inn": self._to_display_case(impact.inn),
             "fda": {
                 "approved": impact.fda_approved,
                 "date": impact.fda_date.isoformat() if impact.fda_date else None,
@@ -266,6 +283,21 @@ class LLMBriefingGenerator:
         if hasattr(impact, '_pharmacotherapeutic_group') and impact._pharmacotherapeutic_group:
             data["pharmacotherapeutic_group"] = impact._pharmacotherapeutic_group
 
+        # CT.gov 임상 결과 (resultsSection)
+        if impact.clinical_results:
+            cr = impact.clinical_results
+            clinical_data: dict = {}
+            if impact.clinical_results_nct_id:
+                clinical_data["nct_id"] = impact.clinical_results_nct_id
+            if cr.get("primary_outcomes"):
+                clinical_data["primary_outcomes"] = cr["primary_outcomes"]
+            if cr.get("secondary_outcomes"):
+                clinical_data["secondary_outcomes"] = cr["secondary_outcomes"]
+            if cr.get("adverse_events"):
+                clinical_data["adverse_events"] = cr["adverse_events"]
+            if clinical_data:
+                data["clinical_trial_results"] = clinical_data
+
         return json.dumps(data, ensure_ascii=False, indent=2)
 
     async def generate(self, impact: DomesticImpact) -> BriefingReport:
@@ -278,8 +310,8 @@ class LLMBriefingGenerator:
             parsed = self._parse_json_response(response_text)
 
             return BriefingReport(
-                inn=impact.inn,
-                headline=parsed.get("headline", f"{impact.inn} 규제 동향"),
+                inn=self._to_display_case(impact.inn),
+                headline=parsed.get("headline", f"{self._to_display_case(impact.inn)} 규제 동향"),
                 subtitle=parsed.get("subtitle", ""),
                 key_points=parsed.get("key_points", []),
                 global_section=parsed.get("global_section", ""),
@@ -443,7 +475,7 @@ class LLMBriefingGenerator:
         """LLM 실패 시 기사톤 템플릿 기반 리포트"""
         from regscan.map.ingredient_bridge import ReimbursementStatus
 
-        inn = impact.inn
+        inn = self._to_display_case(impact.inn)
         brand = impact.mfds_brand_name or ""
         # 표시용 이름: 국내 브랜드명이 있으면 "브랜드명(INN)" 형태
         display_name = f"{brand.split('(')[0]}({inn})" if brand else inn
@@ -575,23 +607,23 @@ class LLMBriefingGenerator:
         if impact.hira_status:
             if impact.hira_status == ReimbursementStatus.REIMBURSED:
                 price_str = f" 현행 상한가는 ₩{impact.hira_price:,.0f}이다." if impact.hira_price else ""
-                domestic_section += f" 건강보험심사평가원(HIRA) 급여 목록에 등재되어 있다.{price_str}"
+                domestic_section += f" 심평원(HIRA) 급여 목록에 등재되어 있다.{price_str}"
             elif impact.hira_status == ReimbursementStatus.DELETED:
                 domestic_section += (
-                    " 과거 HIRA 급여 목록에 등재된 이력이 있으나 현재는 삭제된 상태다. "
+                    " 과거 심평원(HIRA) 급여 목록에 등재된 이력이 있으나 현재는 삭제된 상태다. "
                     "급여 재등재 여부를 모니터링할 필요가 있다."
                 )
             elif impact.hira_status == ReimbursementStatus.NOT_COVERED:
-                domestic_section += " HIRA 급여 목록에 미등재 상태로, 사용 시 전액 환자 부담이다."
+                domestic_section += " 심평원(HIRA) 급여 목록에 미등재 상태로, 사용 시 전액 환자 부담이다."
             elif impact.hira_status == ReimbursementStatus.NOT_FOUND:
                 if impact.mfds_approved:
                     domestic_section += (
-                        " HIRA 급여 정보는 현재 미확인 상태다. "
+                        " 심평원(HIRA) 급여 정보는 현재 미확인 상태다. "
                         "허가 후 급여 등재까지는 통상 6개월~2년이 소요되며, "
                         "약가 협상 결과에 따라 환자 접근성이 결정된다."
                     )
                 else:
-                    domestic_section += " HIRA 급여 정보는 확인되지 않는다."
+                    domestic_section += " 심평원(HIRA) 급여 정보는 확인되지 않는다."
 
         # ── 메드클레임 섹션 ──
         if impact.hira_status == ReimbursementStatus.REIMBURSED:
@@ -630,7 +662,7 @@ class LLMBriefingGenerator:
             )
 
         return BriefingReport(
-            inn=impact.inn,
+            inn=inn,
             headline=headline,
             subtitle=subtitle,
             key_points=key_points[:5],

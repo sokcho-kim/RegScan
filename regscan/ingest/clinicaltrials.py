@@ -70,6 +70,7 @@ class ClinicalTrialsGovClient:
         date_range: tuple[str, str] | None = None,
         page_size: int = 100,
         page_token: str | None = None,
+        has_results: bool | None = None,
     ) -> dict[str, Any]:
         """임상시험 검색
 
@@ -80,6 +81,7 @@ class ClinicalTrialsGovClient:
             date_range: (start, end) 날짜 범위 YYYY-MM-DD
             page_size: 페이지 크기
             page_token: 다음 페이지 토큰
+            has_results: True면 결과 있는 연구만 필터
         """
         if statuses is None:
             statuses = ["COMPLETED", "TERMINATED", "SUSPENDED"]
@@ -95,7 +97,7 @@ class ClinicalTrialsGovClient:
 
         params["filter.overallStatus"] = ",".join(statuses)
 
-        # Phase + Date를 filter.advanced에 결합
+        # Phase + Date + hasResults를 filter.advanced에 결합
         advanced_parts = []
         if phase:
             advanced_parts.append(f"AREA[Phase]{phase}")
@@ -103,6 +105,8 @@ class ClinicalTrialsGovClient:
             advanced_parts.append(
                 f"AREA[CompletionDate]RANGE[{date_range[0]},{date_range[1]}]"
             )
+        if has_results is True:
+            advanced_parts.append("AREA[ResultsFirstPostDate]RANGE[MIN,MAX]")
         if advanced_parts:
             params["filter.advanced"] = " AND ".join(advanced_parts)
 
@@ -112,6 +116,47 @@ class ClinicalTrialsGovClient:
         response = await self.client.get(CT_GOV_BASE_URL, params=params)
         response.raise_for_status()
         return response.json()
+
+    async def search_by_intervention(
+        self,
+        drug_name: str,
+        phase: str = "PHASE3",
+        has_results: bool = True,
+        page_size: int = 10,
+    ) -> list[dict[str, Any]]:
+        """특정 약물명으로 resultsSection이 있는 임상시험 검색
+
+        Args:
+            drug_name: 약물 INN
+            phase: 임상 단계
+            has_results: 결과 있는 연구만
+            page_size: 최대 반환 건수
+
+        Returns:
+            study dict 리스트
+        """
+        params: dict[str, Any] = {
+            "format": "json",
+            "query.intr": drug_name,
+            "pageSize": page_size,
+        }
+
+        advanced_parts = []
+        if phase:
+            advanced_parts.append(f"AREA[Phase]{phase}")
+        if has_results:
+            advanced_parts.append("AREA[ResultsFirstPostDate]RANGE[MIN,MAX]")
+        if advanced_parts:
+            params["filter.advanced"] = " AND ".join(advanced_parts)
+
+        try:
+            response = await self.client.get(CT_GOV_BASE_URL, params=params)
+            response.raise_for_status()
+            data = response.json()
+            return data.get("studies", [])
+        except Exception as e:
+            logger.debug("CT.gov 약물 검색 실패 (%s): %s", drug_name, e)
+            return []
 
     async def search_all(
         self,
