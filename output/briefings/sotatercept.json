@@ -1,19 +1,19 @@
 {
   "inn": "Sotatercept",
-  "headline": "희귀의약품으로 주목받는 Sotatercept, EMA 승인에도 국내는 제자리",
-  "subtitle": "Pulmonary Arterial Hypertension 치료의 새로운 가능성 제시 | 경쟁약도 미허가 상태",
+  "headline": "PAH 병용 ‘혈관 재형성’ 첫 약, sotatercept",
+  "subtitle": "EMA 승인 확인됐지만 FDA·식약처·심평원은 공백—청구는 ‘제로’에서 시작",
   "key_points": [
-    "Sotatercept는 Pulmonary Arterial Hypertension(PAH) 환자에서 혈관 저항도와 운동 능력을 개선하는 기전의 약물",
-    "2023년 현재 EMA 승인 상태로, PAH 환자의 운동 능력 향상에 기여하는 등 효능이 입증됨",
-    "국내에서는 MFDS 미허가 및 HIRA 비급여 상태로, 시장 진입이 지연되고 있음",
-    "석유자원자원(Sotatercept-csrk) 및 Treprostinil 등 경쟁약도 국내에서 승인되지 않아 치료 옵션 부족"
+    "Sotatercept(제품명 Winrevair)은 성인 폐동맥고혈압(PAH) WHO 기능분류 II–III에서 기존 PAH 치료와 병용해 운동능력 개선을 목표로 하는 생물의약품으로, 혈관수축을 넘어 ‘혈관 리모델링(재형성)’ 축을 겨냥한 기전으로 분류된다(AT1R/TGF-β 계열 신호 균형 조절 컨셉).",
+    "입력 데이터상 EMA는 승인(approved=true) 상태이나 승인일은 제공되지 않았다. 반면 FDA는 approved=false로, 승인 여부가 확인되지 않는(approval_timeline tense=unknown) 상태로 정리돼 글로벌 규제 지형 자체가 ‘EMA 단독 확인’으로 읽힌다.",
+    "국내는 식약처(MFDS) 미허가(brand_name 공란)이며, 심평원(HIRA) 급여 등재는 not_found로 약가·급여기준 데이터가 없다. CRIS 국내 임상 등록도 0건으로, ‘허가-급여’로 이어지는 국내 진입 트랙이 현재 데이터로는 보이지 않는다.",
+    "경쟁 구도에서 treprostinil(프로스타사이클린 계열) 등 기존 혈관확장제 계열이 PAH 표준을 구성하는 가운데, sotatercept는 병용 적응증을 전면에 내세운 만큼 국내 도입 시에도 ‘기존 치료 실패/불충분 반응’ 환자에서의 급여 기준 설계가 비용·PA(사전심사)와 함께 핵심 변수가 된다."
   ],
-  "global_section": "Sotatercept는 Pulmonary Arterial Hypertension(PAH) 치료에 있어 중요한 혁신 약물로, EMA의 가속 승인을 통해 주목받고 있다. 이 약물은 선택적 Activin-receptor 제어를 통해 혈관 저항도 감소와 운동 능력을 개선하며, WHO Functional Class II 및 III의 환자에게 적합하다.\n\n| 기관 | 승인 상태 | 완료 일수 |\n|---|---|---|\n| EMA | 승인 | - |\n| FDA | 미승인 | - |\n\n3상 임상 데이터에 따르면 Sotatercept는 기존 치료법에 비해 혈관 저항도를 평균 99.2 dynes*sec/cm² 감소시키고 6분 보행 거리(6MWD)를 41.8m 향상시켰다. 경쟁약인 Treprostinil과 비교해 Sotatercept는 일회 투여로 보다 효과적인 혈관 개선을 나타내는 강점을 가지고 있다.",
-  "domestic_section": "현재 Sotatercept는 MFDS에서 허가를 받지 못해 건강보험 급여가 적용되지 않고 있다. 경쟁약인 Sotatercept-csrk와 Treprostinil도 국내에서 미허가 상태이며, PAH 환자들은 치료 접근성이 크게 제한되고 있다.\n\n- **Sotatercept**: MFDS 미허가, HIRA 비급여\n- **Sotatercept-csrk**: MFDS 미허가, HIRA 비급여\n- **Treprostinil**: MFDS 미허가, HIRA 비급여\n\n적어도 3년 이상 소요될 것으로 예상되는 MFDS 허가 절차에 따라, Sotatercept의 시장 진입은 여전히 불투명하다. 경쟁약도 없는 상황에서 PAH 환자들의 치료 기회가 축소되고 있다는 점은 심각한 시사점을 던진다.",
-  "medclaim_section": "현재 Sotatercept는 국내에서 미허가 상태로 건강보험 급여 적용이 불가능하다.\n\n| 시나리오 | 본인부담률 | 예상 비용 |\n|---|---|---|\n| 일반 급여 | 30% | - |\n| 비급여 | 100% | 수천만원 예상 |\n| KODC 긴급도입 | 전액 환자 부담 | - |\n\n현재 Sotatercept가 급여 등재되기 전까지 환자는 전액 비용을 부담해야 하며, 비급여로 사용할 경우 수백에서 수천만 원의 비용이 예상된다. 환자들은 긴급도입 프로그램(KODC)을 이용할 수 있으나, 추가적인 지원이나 약제팀의 적극적인 정보제공이 필요한 상황이다.",
-  "generated_at": "2026-02-23T11:21:46.161959",
-  "global_heading": "Pulmonary Arterial Hypertension 치료의 새로운 시대를 열다",
-  "domestic_heading": "6년째 허가 지연 — 국내 PAH 치료의 심각한 공백",
+  "global_section": "폐동맥고혈압(PAH)은 endothelin/NO/prostacyclin 축을 표적하는 혈관확장제만으로는 질병 진행을 완전히 묶기 어려워, ‘혈관 재형성’을 직접 건드리는 약물이 시장의 다음 질문이 됐다. Sotatercept(Winrevair)는 성인 PAH(WHO FC II–III)에서 다른 PAH 치료와 병용해 운동능력(6MWD) 개선을 적응증으로 내세운다.\n\n- **임상 결과(입력 데이터, NCT05818137)**\n  - PVR(24주): 변화 추정치 **-99.2 dynes*sec/cm^5** (95% CI **[-129.6, -68.4]**)\n  - 6MWD(24주): 변화 추정치 **+41.8 m** (95% CI **[27.8, 55.5]**)\n  - AE로 인한 중단: **0명**(~24주)\n\n경쟁 약물군으로는 treprostinil 같은 프로스타사이클린 계열이 대표적인데, 이들 약제는 ‘혈관확장+증상 개선’에 강점이 있는 반면 sotatercept는 병용 하에서 혈역학(PVR)과 기능지표(6MWD)를 함께 끌어올리는 포지셔닝이 핵심이다. 규제 측면에서 입력 데이터는 EMA approved=true로 유럽 허가가 확인되지만, 승인일은 제공되지 않았다. FDA는 approved=false이며 approval_timeline의 tense가 모두 unknown이라, 최소한 ‘EMA에서 먼저 길을 연’ 상태라는 점이 이 약의 현재 뉴스 가치다.",
+  "domestic_section": "현재 sotatercept는 식약처(MFDS) 허가가 확인되지 않으며(approved=false), 심평원(HIRA)에서도 등재 정보가 not_found로 잡혀 처방-청구 경로가 성립하지 않는다. 더 직접적인 신호는 CRIS 국내 임상 0건으로, 적응증 확장이나 허가 자료 축적을 국내에서 병행하는 움직임도 데이터상 없다.\n\n| 항목 | 상태 | 입력 데이터 근거 |\n|---|---|---|\n| 식약처 허가 | 미확인(실질적으로 미허가) | mfds.approved=false, brand_name 공란 |\n| 심평원 등재/약가 | 조회되지 않음 | hira.status=not_found, price=null |\n| 국내 임상(CRIS) | 0건 | cris.trial_count=0 |\n\ncompetitors 목록에서도 sotatercept(동일 성분) 및 treprostinil이 ‘domestic_status: uncertain’로 잡혀, PAH 핵심 약물군의 국내 상태를 이 데이터만으로는 확정하기 어렵다. 다만 국내 급여 설계가 이뤄진다 해도 PAH는 복합 병용이 표준인 영역이어서, 약제팀/심사부서는 ‘기존 병용요법 유지 + 추가 투여’ 형태의 비용 증가를 어떻게 통제할지가 핵심 쟁점이 된다. 특히 입력 데이터에 희귀의약품 지정이 언급(korea_relevance_reasons)돼 있어, 국내 진입 시에는 희귀질환 산정특례(10%) 적용 가능성이 실무 프레임으로 먼저 검토될 가능성이 높다(단, 현 시점에서는 허가·급여 자체가 없어 적용 단계가 아니다).",
+  "medclaim_section": "현 시점에서 sotatercept는 심평원 등재 정보가 not_found이고 식약처 허가도 확인되지 않아, 통상적인 건강보험 청구는 성립하지 않는다. 따라서 병원 약제팀 관점에서 지금 할 수 있는 것은 ‘청구 설계’가 아니라, 도입 전제조건(허가→등재)과 환자 접근 대안을 정리하는 일이다.\n\n| 시나리오 | 본인부담률 | 환자 부담 | 비고 |\n|---|---:|---:|---|\n| 향후 일반 급여 | 30% | 약가 정보 없음(산출 불가) | 외래 기준, 등재 후 가능 |\n| 향후 희귀질환 산정특례 | 10% | 약가 정보 없음(산출 불가) | 입력 데이터: ‘희귀질환 산정특례 10%’ |\n| 현재(미등재/미허가) | 100% | 청구 불가(처방 경로 제한) | HIRA not_found, MFDS 미확인 |\n\n비급여 ‘가격 추정’은 입력 데이터에 약가가 없어 기사에서 산출하면 오보가 되므로 배제해야 한다. 실무적으로는 (1) 환자/진료과 문의 시 ‘현 단계에선 등재 약가·기준이 없어 청구 불가’임을 명확히 안내하고, (2) 해외 치료 지속 환자라면 병원 내 수입·공급 가능 경로(제도적 절차) 유무를 별도 트랙으로 확인하는 방식이 안전하다. 심사 담당자는 향후 등재 논의가 시작될 경우 병용요법 전제의 급여 기준(선행 치료, WHO FC, 병용 약제 범위)과 사전심사(PA) 적용 여부가 비용 통제의 실질 레버가 된다는 점을 사전에 체크리스트화할 필요가 있다.",
+  "generated_at": "2026-02-23T16:14:11.505259",
+  "global_heading": "혈관확장 넘어 ‘재형성’ 겨냥",
+  "domestic_heading": "국내는 허가·급여 ‘빈칸’",
   "source_data": {
     "inn": "sotatercept",
     "domestic_status": "uncertain",

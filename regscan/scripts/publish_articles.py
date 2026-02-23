@@ -820,6 +820,235 @@ def generate_article_html(
     )
 
 
+# ═══════════════════════════════════════════════════════
+# V4: Jinja2 HTML 템플릿 — 팩트/인사이트 분리 렌더링
+# ═══════════════════════════════════════════════════════
+
+ARTICLE_TEMPLATE_V4 = """<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegScan 브리핑 - {{ inn }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+        body { font-family: 'Noto Serif KR', serif; background: #fafafa; }
+        .report-title { font-family: 'Noto Serif KR', serif; font-weight: 700; }
+        .report-body { font-family: 'Noto Serif KR', serif; line-height: 1.9; font-size: 17px; }
+        .meta-text { font-family: 'Inter', sans-serif; }
+        .highlight-box { border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
+        .timeline-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .fact-table { width: 100%; text-align: left; font-size: 0.875rem; margin: 1rem 0; border-collapse: collapse; }
+        .fact-table th { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600; background: #f9fafb; }
+        .fact-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
+        abbr { text-decoration: none; border-bottom: 1px dashed #9ca3af; cursor: help; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-indigo-600">MedClaim</a>
+                    <span class="text-gray-300">|</span>
+                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑 V4</span>
+                </div>
+                <div class="meta-text text-sm text-gray-500">{{ date_kr }}</div>
+            </div>
+        </div>
+    </header>
+    <main class="max-w-4xl mx-auto px-6 py-10">
+        <div class="flex items-center space-x-3 mb-6 meta-text">
+            <span class="px-3 py-1 {{ score_badge_class }} text-white text-xs font-semibold rounded">{{ score_label }}</span>
+            {{ tag_badges }}
+        </div>
+        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">{{ headline }}</h1>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">{{ subtitle }}</p>
+        <div class="flex items-center space-x-4 mb-10 pb-10 border-b border-gray-200 meta-text">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <span class="text-indigo-600 text-xs font-bold">AI</span>
+                </div>
+                <span class="text-sm text-gray-600">RegScan AI 리포터</span>
+            </div>
+            <span class="text-gray-300">&middot;</span>
+            <span class="text-sm text-gray-500">Hot Issue Score: {{ score }}</span>
+        </div>
+
+        <!-- 핵심 요약 (인사이트) -->
+        <div class="highlight-box p-6 rounded-r-lg mb-10">
+            <h3 class="font-bold text-gray-900 mb-3 meta-text text-sm">핵심 요약</h3>
+            <ul class="space-y-2 text-gray-800">{{ key_points_html }}</ul>
+        </div>
+
+        <article class="report-body text-gray-800">
+            <!-- 글로벌 섹션: 팩트 테이블 + 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
+            {% if approval_summary_table_html %}
+            <div class="my-4">{{ approval_summary_table_html }}</div>
+            {% endif %}
+            <div class="mb-6">{{ global_insight_text }}</div>
+
+            <!-- 타임라인 (팩트) -->
+            {{ timeline_html }}
+
+            <!-- 국내 섹션: 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
+            {% if d_day_text %}
+            <div class="my-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 meta-text">
+                <strong>경과:</strong> {{ d_day_text }}
+            </div>
+            {% endif %}
+            <div class="mb-6">{{ domestic_insight_text }}</div>
+
+            <!-- 메드클레임: 비용표(팩트) + 인사이트 -->
+            <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
+                <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
+                {% if cost_scenario_table_html %}
+                <div class="my-4">{{ cost_scenario_table_html }}</div>
+                {% endif %}
+                <div class="space-y-3 text-gray-800"><p>{{ medclaim_action_text }}</p></div>
+            </div>
+        </article>
+
+        <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
+            <div class="mb-4">
+                <strong>데이터 출처:</strong> {{ sources_html }}
+            </div>
+            <div class="text-xs text-gray-400">
+                본 리포트는 RegScan AI V4가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
+                팩트(날짜·금액·상태)는 Python이 사전 계산하였으며, 인사이트(분석)는 LLM이 생성했습니다.
+                마지막 업데이트: {{ date }}
+            </div>
+        </footer>
+    </main>
+</body>
+</html>"""
+
+
+def generate_article_html_v4(
+    facts: dict,
+    insights: dict,
+    score: int = 0,
+    source_urls: dict[str, str] | None = None,
+    nct_id: str = "",
+    known_inns: list[str] | None = None,
+) -> str:
+    """V4: 팩트(Python) + 인사이트(LLM) → Jinja2 렌더링 HTML 기사"""
+    from jinja2 import Environment, BaseLoader
+
+    inn = to_display_case(facts.get("inn", ""))
+
+    # ── 인사이트 텍스트 후처리 (abbr, outlink, competitor, md→html) ──
+    abbr_seen: set[str] = set()
+    outlink_seen: set[str] = set()
+    comp_seen: set[str] = set()
+    comp_inns = known_inns or []
+
+    headline = insights.get("headline", f"{inn} 규제 동향 브리핑")
+    subtitle = insights.get("subtitle", "")
+
+    # INN 대소문자 정규화
+    all_inns = set(comp_inns)
+    all_inns.add(facts.get("inn", ""))
+    for inn_raw in all_inns:
+        if not inn_raw:
+            continue
+        display = to_display_case(inn_raw)
+        variants = {inn_raw, inn_raw.upper(), inn_raw.lower()}
+        variants.discard(display)
+        headline = _normalize_inn_in_text(headline, list(variants), display)
+        subtitle = _normalize_inn_in_text(subtitle, list(variants), display)
+
+    headline = _inject_abbr_tags(headline, abbr_seen)
+    subtitle = _inject_abbr_tags(subtitle, abbr_seen)
+
+    # key_points
+    key_points = insights.get("key_points", [])
+    key_points_html = ""
+    for kp in key_points:
+        for inn_raw in all_inns:
+            if not inn_raw:
+                continue
+            display = to_display_case(inn_raw)
+            variants = {inn_raw, inn_raw.upper(), inn_raw.lower()}
+            variants.discard(display)
+            kp = _normalize_inn_in_text(kp, list(variants), display)
+        kp = _inject_abbr_tags(kp, abbr_seen)
+        key_points_html += f"""
+                <li class="flex items-start">
+                    <span class="text-red-500 mr-2">&#x25B8;</span>
+                    <span>{kp}</span>
+                </li>"""
+
+    # 인사이트 텍스트 필드 후처리
+    processed_insights = {}
+    for field in ("global_insight_text", "domestic_insight_text", "medclaim_action_text"):
+        text = insights.get(field, "")
+        # INN 정규화
+        for inn_raw in all_inns:
+            if not inn_raw:
+                continue
+            display = to_display_case(inn_raw)
+            variants = {inn_raw, inn_raw.upper(), inn_raw.lower()}
+            variants.discard(display)
+            text = _normalize_inn_in_text(text, list(variants), display)
+        text = _inject_abbr_tags(text, abbr_seen)
+        text = _inject_outlinks(
+            text, inn=inn, source_urls=source_urls,
+            nct_id=nct_id, seen=outlink_seen,
+        )
+        text = _inject_competitor_links(text, inn, comp_inns, comp_seen)
+        text = _md_to_html(text)
+        processed_insights[field] = text
+
+    # ── 팩트 HTML 생성 ──
+    # 승인 요약 테이블 (마크다운→HTML)
+    approval_table_md = facts.get("approval_summary_table", "")
+    approval_summary_table_html = _md_to_html(approval_table_md) if approval_table_md else ""
+
+    # 비용 시나리오 테이블 (마크다운→HTML)
+    cost_table_md = facts.get("cost_scenario_table", "")
+    cost_scenario_table_html = _md_to_html(cost_table_md) if cost_table_md else ""
+
+    # 타임라인 HTML (기존 함수 활용)
+    source_data = facts.get("source_data") or {}
+    timeline_html = _build_timeline_html(source_data, source_urls=source_urls)
+
+    # d_day_text
+    d_day_text = facts.get("d_day_text", "")
+
+    # 스코어 배지
+    badge_class, score_label, _ = _score_badge(score)
+    tag_badges = _build_tag_badges(source_data)
+    sources_html = _build_sources_html(source_urls=source_urls, nct_id=nct_id)
+
+    # ── Jinja2 렌더링 ──
+    env = Environment(loader=BaseLoader(), autoescape=False)
+    template = env.from_string(ARTICLE_TEMPLATE_V4)
+    return template.render(
+        inn=inn,
+        date_kr=TODAY_KR,
+        date=TODAY,
+        score_badge_class=badge_class,
+        score_label=score_label,
+        score=score,
+        tag_badges=tag_badges,
+        headline=headline,
+        subtitle=subtitle,
+        key_points_html=key_points_html,
+        approval_summary_table_html=approval_summary_table_html,
+        global_insight_text=processed_insights.get("global_insight_text", ""),
+        timeline_html=timeline_html,
+        d_day_text=d_day_text,
+        domestic_insight_text=processed_insights.get("domestic_insight_text", ""),
+        cost_scenario_table_html=cost_scenario_table_html,
+        medclaim_action_text=processed_insights.get("medclaim_action_text", ""),
+        sources_html=sources_html,
+    )
+
+
 def generate_index_html(articles: list[dict]) -> str:
     """인덱스 페이지 HTML 생성"""
     cards = ""
@@ -1235,6 +1464,7 @@ async def run_publish(
     min_score: int = 40,
     skip_llm: bool = False,
     render_only: bool = False,
+    use_v4: bool = False,
 ):
     """기사 발행 메인 로직"""
     from regscan.report.llm_generator import LLMBriefingGenerator, BriefingReport
@@ -1244,7 +1474,8 @@ async def run_publish(
     if render_only:
         return await _run_render_only()
 
-    logger.info("=== 기사 발행 시작 ===")
+    pipeline_ver = "V4 (팩트/인사이트 분리)" if use_v4 else "V3"
+    logger.info("=== 기사 발행 시작 [%s] ===", pipeline_ver)
     logger.info("  대상: score >= %d, 최대 %d건", min_score, top_n)
 
     # CT.gov 임상 결과 사전 조회 (기사 품질 향상)
@@ -1313,9 +1544,13 @@ async def run_publish(
 
         async with sem:
             try:
-                logger.info("  [%d/%d] %s (score=%d) — LLM 브리핑 생성 중...",
-                           idx, len(impacts), impact.inn, impact.global_score)
-                report = await generator.generate(impact)
+                logger.info("  [%d/%d] %s (score=%d) — LLM 브리핑 생성 중... [%s]",
+                           idx, len(impacts), impact.inn, impact.global_score,
+                           pipeline_ver)
+                if use_v4:
+                    report = await generator.generate_v4(impact)
+                else:
+                    report = await generator.generate(impact)
                 try:
                     await loader.save_briefing(report)
                 except Exception as e:
@@ -1357,11 +1592,35 @@ async def run_publish(
         _urls = getattr(impact, '_source_urls', None) or {}
         _nct = getattr(impact, 'clinical_results_nct_id', '') or ''
         _comp_inns = [c["inn"] for c in getattr(impact, '_competitors', []) or []]
-        html_content = generate_article_html(
-            report_data, score=impact.global_score,
-            source_urls=_urls, nct_id=_nct,
-            known_inns=_comp_inns,
-        )
+
+        if use_v4:
+            # V4: 팩트/인사이트 분리 Jinja2 렌더링
+            facts = {
+                "inn": impact.inn,
+                "source_data": report_data["source_data"],
+                "d_day_text": generator._compute_d_day_text(impact),
+                "approval_summary_table": generator._compute_approval_summary_table(impact),
+                "cost_scenario_table": generator._compute_cost_scenario_table(impact),
+            }
+            insights = {
+                "headline": report.headline,
+                "subtitle": report.subtitle,
+                "key_points": report.key_points,
+                "global_insight_text": report.global_section,
+                "domestic_insight_text": report.domestic_section,
+                "medclaim_action_text": report.medclaim_section,
+            }
+            html_content = generate_article_html_v4(
+                facts, insights, score=impact.global_score,
+                source_urls=_urls, nct_id=_nct,
+                known_inns=_comp_inns,
+            )
+        else:
+            html_content = generate_article_html(
+                report_data, score=impact.global_score,
+                source_urls=_urls, nct_id=_nct,
+                known_inns=_comp_inns,
+            )
         html_path.write_text(html_content, encoding="utf-8")
 
         # JSON 메타데이터 보강
@@ -1373,6 +1632,7 @@ async def run_publish(
         _enriched["_hot_issue_reasons"] = getattr(impact, 'hot_issue_reasons', []) or []
         _enriched["_therapeutic_areas"] = getattr(impact, 'therapeutic_areas', []) or []
         _enriched["_known_inns"] = _comp_inns
+        _enriched["_pipeline_version"] = "v4" if use_v4 else "v3"
         json_path.write_text(
             json.dumps(_enriched, ensure_ascii=False, indent=2, default=str),
             encoding="utf-8",
@@ -1459,6 +1719,7 @@ def main():
     parser.add_argument("--min-score", type=int, default=40, help="최소 점수 (기본 40)")
     parser.add_argument("--skip-llm", action="store_true", help="LLM 건너뜀 (기존 JSON만 HTML 변환)")
     parser.add_argument("--render-only", action="store_true", help="HTML만 재렌더 (LLM·DB 없이, ~2초)")
+    parser.add_argument("--v4", action="store_true", help="V4 파이프라인 사용 (팩트/인사이트 분리 + Jinja2 + 툴콜링)")
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -1470,6 +1731,7 @@ def main():
     asyncio.run(run_publish(
         top_n=args.top, min_score=args.min_score,
         skip_llm=args.skip_llm, render_only=args.render_only,
+        use_v4=args.v4,
     ))
 
 

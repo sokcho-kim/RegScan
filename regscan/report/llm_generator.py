@@ -14,6 +14,8 @@ from regscan.scan.domestic import DomesticImpact
 from regscan.report.prompts import (
     SYSTEM_PROMPT,
     BRIEFING_REPORT_PROMPT,
+    SYSTEM_PROMPT_V4,
+    BRIEFING_REPORT_PROMPT_V4,
     MEDCLAIM_INSIGHT_PROMPT,
     QUICK_SUMMARY_PROMPT,
 )
@@ -345,6 +347,373 @@ class LLMBriefingGenerator:
                 data["clinical_trial_results"] = clinical_data
 
         return json.dumps(data, ensure_ascii=False, indent=2)
+
+    # ═══════════════════════════════════════════════════════
+    # V4: FactComputer — 사전 계산 팩트 필드 생성
+    # ═══════════════════════════════════════════════════════
+
+    # OpenAI Function Calling 툴 정의
+    V4_TOOLS = [
+        {
+            "type": "function",
+            "function": {
+                "name": "get_regulatory_status",
+                "description": "약물의 규제기관별 승인 상태/날짜/경과일 조회",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "inn": {"type": "string"},
+                        "agency": {
+                            "type": "string",
+                            "enum": ["fda", "ema", "mfds"],
+                        },
+                    },
+                    "required": ["inn", "agency"],
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "calculate_patient_cost",
+                "description": "시나리오별 환자 본인부담금 계산",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "drug_price": {"type": "number"},
+                        "scenario": {
+                            "type": "string",
+                            "enum": [
+                                "general",
+                                "cancer_special",
+                                "rare_special",
+                                "out_of_pocket",
+                            ],
+                        },
+                    },
+                    "required": ["drug_price", "scenario"],
+                },
+            },
+        },
+    ]
+
+    def _compute_status_text(self, approved: bool, d, brand_name: str = "") -> str:
+        """단일 기관 승인 상태 텍스트 생성"""
+        if not approved:
+            return "미허가 (not_approved)"
+        if d is None:
+            suffix = f" ({brand_name})" if brand_name else ""
+            return f"허가 완료{suffix}"
+        date_str = d.isoformat() if hasattr(d, 'isoformat') else str(d)
+        suffix = f", {brand_name}" if brand_name else ""
+        return f"승인 완료 ({date_str}{suffix})"
+
+    def _compute_d_day_text(self, impact: DomesticImpact) -> str:
+        """글로벌 승인 경과일 + 해석 텍스트"""
+        days = impact.days_since_global_approval
+        if days is None:
+            return "글로벌 승인 정보 없음"
+        estimate = self._estimate_mfds_timeline(impact)
+        if estimate and estimate != "already_approved":
+            return f"글로벌 승인 후 {days}일 경과 — {estimate}"
+        if estimate == "already_approved":
+            return f"글로벌 승인 후 {days}일 경과 (국내 허가 완료)"
+        return f"글로벌 승인 후 {days}일 경과"
+
+    def _compute_copay_scenario_text(self, impact: DomesticImpact) -> str:
+        """급여 시나리오 텍스트 생성"""
+        copay = getattr(impact, '_copay_exemption', None)
+        price = impact.hira_price
+
+        from regscan.map.ingredient_bridge import ReimbursementStatus
+        if impact.hira_status == ReimbursementStatus.REIMBURSED and price:
+            parts = [f"HIRA 등재 약제 (상한가 ₩{price:,.0f})."]
+            parts.append(f"일반 급여 시 본인부담 약 ₩{price * 0.3:,.0f} (30%).")
+            if copay:
+                rate = copay["rate"]
+                label = copay["label"]
+                parts.append(
+                    f"{label}({int(rate*100)}%) 적용 시 본인부담 약 ₩{price * rate:,.0f}."
+                )
+            return " ".join(parts)
+
+        if not impact.mfds_approved:
+            if copay:
+                label = copay["label"]
+                rate = copay["rate"]
+                return (
+                    f"향후 급여 등재 시 {label}({int(rate*100)}%) 적용 가능. "
+                    f"현재는 전액 비급여."
+                )
+            return "국내 미허가 — 급여 적용 불가. 전액 환자 부담."
+
+        # 허가 완료, 급여 미등재
+        if copay:
+            label = copay["label"]
+            rate = copay["rate"]
+            return (
+                f"국내 허가 완료, 급여 미등재. "
+                f"향후 등재 시 {label}({int(rate*100)}%) 적용 가능."
+            )
+        return "국내 허가 완료, 급여 미등재. 비급여 처방 시 전액 환자 부담."
+
+    def _compute_approval_summary_table(self, impact: DomesticImpact) -> str:
+        """마크다운 승인 요약 표"""
+        rows = []
+        for agency, approved, d in [
+            ("FDA", impact.fda_approved, impact.fda_date),
+            ("EMA", impact.ema_approved, impact.ema_date),
+            ("MFDS(식약처)", impact.mfds_approved, impact.mfds_date),
+        ]:
+            status = "승인" if approved else "미허가"
+            date_str = d.isoformat() if d else "-"
+            rows.append(f"| {agency} | {status} | {date_str} |")
+        header = "| 기관 | 상태 | 날짜 |\n|---|---|---|"
+        return header + "\n" + "\n".join(rows)
+
+    def _compute_cost_scenario_table(self, impact: DomesticImpact) -> str:
+        """마크다운 비용 시나리오 표"""
+        copay = getattr(impact, '_copay_exemption', None)
+        price = impact.hira_price
+
+        from regscan.map.ingredient_bridge import ReimbursementStatus
+        rows = []
+
+        if impact.hira_status == ReimbursementStatus.REIMBURSED and price:
+            rows.append(
+                f"| 일반 급여 | 30% | ₩{price * 0.3:,.0f} |"
+            )
+            if copay:
+                rate = copay["rate"]
+                label = copay["label"]
+                rows.append(
+                    f"| {label} | {int(rate*100)}% | ₩{price * rate:,.0f} |"
+                )
+            rows.append(f"| 비급여(급여외 적응증) | 100% | ₩{price:,.0f} |")
+        else:
+            if copay:
+                label = copay["label"]
+                rate = copay["rate"]
+                rows.append(f"| 향후 급여 ({label}) | {int(rate*100)}% | 등재 후 결정 |")
+            rows.append("| 비급여 | 100% | 전액 환자 부담 |")
+            rows.append("| KODC 긴급도입 | 전액 | 개별 신청 |")
+
+        if not rows:
+            return ""
+        header = "| 시나리오 | 본인부담률 | 비고 |\n|---|---|---|"
+        return header + "\n" + "\n".join(rows)
+
+    def _compute_valid_competitors(self, impact: DomesticImpact) -> list[dict]:
+        """경쟁약 목록을 간결한 형태로 변환"""
+        raw = getattr(impact, '_competitors', []) or []
+        result = []
+        for comp in raw[:5]:
+            entry = {"inn": comp.get("inn", "")}
+            ds = comp.get("domestic_status", "")
+            if ds:
+                entry["domestic_status"] = ds
+            if comp.get("indication"):
+                entry["reason"] = comp["indication"][:100]
+            result.append(entry)
+        return result
+
+    def _prepare_drug_data_v4(self, impact: DomesticImpact) -> str:
+        """V4 FactComputer: 기존 데이터 + 사전 계산 팩트 필드"""
+        # 기존 V3 데이터를 기반으로 구축
+        data = json.loads(self._prepare_drug_data(impact))
+
+        # V4 사전 계산 팩트 필드 추가
+        data["d_day_text"] = self._compute_d_day_text(impact)
+        data["fda_status_text"] = self._compute_status_text(
+            impact.fda_approved, impact.fda_date,
+        )
+        data["ema_status_text"] = self._compute_status_text(
+            impact.ema_approved, impact.ema_date,
+        )
+        data["mfds_status_text"] = self._compute_status_text(
+            impact.mfds_approved, impact.mfds_date, impact.mfds_brand_name,
+        )
+        data["copay_scenario_text"] = self._compute_copay_scenario_text(impact)
+        data["valid_competitors"] = self._compute_valid_competitors(impact)
+        data["approval_summary_table"] = self._compute_approval_summary_table(impact)
+        data["cost_scenario_table"] = self._compute_cost_scenario_table(impact)
+
+        return json.dumps(data, ensure_ascii=False, indent=2)
+
+    def _execute_tool(self, name: str, arguments: dict, impact: DomesticImpact) -> dict:
+        """V4 툴콜링 핸들러: LLM이 요청한 tool을 Python이 즉시 계산"""
+        if name == "get_regulatory_status":
+            agency = arguments.get("agency", "").lower()
+            if agency == "fda":
+                return {
+                    "approved": impact.fda_approved,
+                    "date": impact.fda_date.isoformat() if impact.fda_date else None,
+                    "status_text": self._compute_status_text(
+                        impact.fda_approved, impact.fda_date,
+                    ),
+                }
+            elif agency == "ema":
+                return {
+                    "approved": impact.ema_approved,
+                    "date": impact.ema_date.isoformat() if impact.ema_date else None,
+                    "status_text": self._compute_status_text(
+                        impact.ema_approved, impact.ema_date,
+                    ),
+                }
+            elif agency == "mfds":
+                return {
+                    "approved": impact.mfds_approved,
+                    "date": impact.mfds_date.isoformat() if impact.mfds_date else None,
+                    "brand_name": impact.mfds_brand_name,
+                    "status_text": self._compute_status_text(
+                        impact.mfds_approved, impact.mfds_date,
+                        impact.mfds_brand_name,
+                    ),
+                }
+            return {"error": f"Unknown agency: {agency}"}
+
+        elif name == "calculate_patient_cost":
+            drug_price = arguments.get("drug_price", 0)
+            scenario = arguments.get("scenario", "")
+            rates = {
+                "general": 0.30,
+                "cancer_special": 0.05,
+                "rare_special": 0.10,
+                "out_of_pocket": 1.0,
+            }
+            rate = rates.get(scenario, 1.0)
+            return {
+                "scenario": scenario,
+                "rate": rate,
+                "patient_cost": round(drug_price * rate),
+                "drug_price": drug_price,
+            }
+
+        return {"error": f"Unknown tool: {name}"}
+
+    async def _call_llm_v4(
+        self, prompt: str, impact: DomesticImpact,
+    ) -> str:
+        """V4 LLM 호출 (툴콜링 지원, 스레드풀 기반)"""
+        import asyncio
+        return await asyncio.to_thread(
+            self._call_llm_v4_sync, prompt, impact,
+        )
+
+    def _call_llm_v4_sync(self, prompt: str, impact: DomesticImpact) -> str:
+        """V4 LLM 동기 호출 — OpenAI 툴콜링 지원, 나머지 프로바이더는 직접 호출"""
+        client = self._get_client()
+
+        if self.provider == "openai":
+            return self._call_llm_v4_openai(client, prompt, impact)
+        elif self.provider == "anthropic":
+            response = client.messages.create(
+                model=self.model,
+                max_tokens=3000,
+                system=SYSTEM_PROMPT_V4,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            if not response.content:
+                return ""
+            return response.content[0].text
+        elif self.provider == "gemini":
+            full_prompt = f"{SYSTEM_PROMPT_V4}\n\n{prompt}"
+            response = client.models.generate_content(
+                model=self.model,
+                contents=full_prompt,
+            )
+            return response.text if response.text else ""
+        else:
+            return self._call_llm_v4_openai(client, prompt, impact)
+
+    def _call_llm_v4_openai(
+        self, client, prompt: str, impact: DomesticImpact,
+    ) -> str:
+        """OpenAI V4 호출 — 툴콜링 루프"""
+        token_param = (
+            {"max_completion_tokens": 3000}
+            if "gpt-5" in self.model or "o1" in self.model
+               or "o3" in self.model or "o4" in self.model
+            else {"max_tokens": 3000}
+        )
+
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT_V4},
+            {"role": "user", "content": prompt},
+        ]
+
+        response = client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            tools=self.V4_TOOLS,
+            response_format={"type": "json_object"},
+            **token_param,
+        )
+
+        if not response.choices:
+            return ""
+
+        # 툴콜링 루프 (최대 3회)
+        max_rounds = 3
+        for _ in range(max_rounds):
+            msg = response.choices[0].message
+            if not msg.tool_calls:
+                break
+
+            messages.append(msg)
+            for tc in msg.tool_calls:
+                try:
+                    args = json.loads(tc.function.arguments)
+                except json.JSONDecodeError:
+                    args = {}
+                result = self._execute_tool(
+                    tc.function.name, args, impact,
+                )
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc.id,
+                    "content": json.dumps(result, ensure_ascii=False),
+                })
+
+            response = client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                tools=self.V4_TOOLS,
+                response_format={"type": "json_object"},
+                **token_param,
+            )
+            if not response.choices:
+                return ""
+
+        return response.choices[0].message.content or ""
+
+    async def generate_v4(self, impact: DomesticImpact) -> BriefingReport:
+        """V4 브리핑 리포트 생성 — 팩트/인사이트 분리"""
+        drug_data = self._prepare_drug_data_v4(impact)
+        prompt = BRIEFING_REPORT_PROMPT_V4.format(drug_data=drug_data)
+
+        try:
+            response_text = await self._call_llm_v4(prompt, impact)
+            parsed = self._parse_json_response(response_text)
+
+            return BriefingReport(
+                inn=self._to_display_case(impact.inn),
+                headline=parsed.get(
+                    "headline",
+                    f"{self._to_display_case(impact.inn)} 규제 동향",
+                ),
+                subtitle=parsed.get("subtitle", ""),
+                key_points=parsed.get("key_points", []),
+                global_section=parsed.get("global_insight_text", ""),
+                domestic_section=parsed.get("domestic_insight_text", ""),
+                medclaim_section=parsed.get("medclaim_action_text", ""),
+                global_heading=parsed.get("global_heading", ""),
+                domestic_heading=parsed.get("domestic_heading", ""),
+                source_data=impact.to_dict(),
+            )
+        except Exception as e:
+            logger.error("V4 리포트 생성 실패: %s", e)
+            return self._generate_fallback(impact)
 
     async def generate(self, impact: DomesticImpact) -> BriefingReport:
         """브리핑 리포트 생성"""
@@ -752,6 +1121,12 @@ async def generate_briefing(impact: DomesticImpact, provider: str = "openai") ->
     """브리핑 리포트 생성 편의 함수"""
     generator = LLMBriefingGenerator(provider=provider)
     return await generator.generate(impact)
+
+
+async def generate_briefing_v4(impact: DomesticImpact, provider: str = "openai") -> BriefingReport:
+    """V4 브리핑 리포트 생성 편의 함수 (팩트/인사이트 분리)"""
+    generator = LLMBriefingGenerator(provider=provider)
+    return await generator.generate_v4(impact)
 
 
 async def compare_models(

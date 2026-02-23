@@ -1,19 +1,19 @@
 {
   "inn": "Setmelanotide",
-  "headline": "희귀의약품으로 주목받는 Setmelanotide, EMA 승인과 임상 적응증 확대",
-  "subtitle": "국내 허가 미비로 진료 현장에 공백 — 동급 경쟁약도 미허가",
+  "headline": "유전성 비만 MC4R 작용제 setmelanotide, 국내는 ‘0’",
+  "subtitle": "EMA 승인·희귀의약품 축에도 MFDS·심평원 데이터 부재",
   "key_points": [
-    "Setmelanotide는 POMC 및 LEPR 결핍에 따른 비만 치료에 사용되는 혁신적 약물로, 대사질환 치료군에 속한다.",
-    "EMA에서 2023년 9월 승인이 예정되어 있으며, 글로벌 시리즈에 안착한 EMA PRIME으로 지정받았다.",
-    "MFDS 미허가 상태로 국내 진입이 지연되고 있으며, HIRA에선 급여 상태가 확인되지 않고 있다.",
-    "국내 도입 가능성은 희귀의약품 지정으로 향후 2년간 허가가 이루어질 것으로 기대된다."
+    "Setmelanotide(IMCIVREE)는 MC4R(melanocortin-4 receptor) 경로를 활성화해 포만 신호를 복원하는 ‘유전성 비만’ 표적 치료제로, BBS·POMC/PCSK1 결핍·LEPR 결핍(2세 이상)에서 과식(hyperphagia) 조절과 체중 감소를 적응증으로 한다",
+    "입력 데이터 기준 EMA는 승인(승인일자 미제공)했으나, FDA 승인 여부는 ‘확인되지 않는다’로 정리돼 글로벌 규제 포지션이 ‘유럽 중심’으로 기울어 있다",
+    "국내는 식약처(MFDS) 허가가 확인되지 않고(제품명 공란), 심평원(HIRA) 등재 정보도 not_found로 약가·급여기준이 전무하며, CRIS 국내 임상 등록도 0건이다",
+    "희귀질환 산정특례(본인부담 10%) 라벨이 붙어 ‘급여 등재’가 성사될 경우 환자부담이 구조적으로 낮아질 여지는 있으나, 현 단계에서는 허가·등재의 출발점(신청/코드) 자체가 관측되지 않는다"
   ],
-  "global_section": "Setmelanotide는 유전적으로 확인된 Bardet Biedl 증후군 및 POMC와 LEPR 결핍에 의한 비만을 치료하는 혁신적 약물로, 대사제어의 새로운 기준으로 자리잡고 있다. 최근 EMA에서 승인된 것이 큰 이정표로 여겨지며, 이 약물이 목표하는 환자군의 치료 접근성을 높일 예정이다.\n\n| 기관 | 승인 예정일 | 여타 경쟁약 | 경쟁현황 |\n|---|---|---|---|\n| EMA | 2023-09 | Metreleptin | 미허가 | \n|   |   | Semaglutide | 미허가 | \n|   |   | Parathyroid Hormone | 미허가 | \n\nSetmelanotide의 혁신성은 고갈된 비만 치료 옵션을 환자들에게 제시할 가능성을 불러일으키는 데 충분하다. 또한 POMC 결핍 환자에 대한 표준치료의 새로운 패러다임 전환을 이끌 것으로 예측된다.",
-  "domestic_section": "Setmelanotide는 MFDS에서 아직 미허가 상태로, 이는 국내 환자들에게 치료의 공백을 안기고 있다. HIRA 인벤토리에서는 이 약물에 대한 급여등재 정보가 존재하지 않아 환자 접근에 심각한 영향을 미친다.\n\n- **경쟁약 현황**: \n- Metreleptin: MFDS 미허가\n- Semaglutide: MFDS 미허가\n- Parathyroid Hormone: MFDS 미허가\n\n국내에서 이러한 경쟁약들이 미허가 상태로 남아있어, Setmelanotide의 시장 진입이 더욱 절실하다. 현재 MFDS 허가에 대한 타임라인 추정에 따르면 최대 2년의 기간이 소요될 수 있으며, 이는 의료진과 환자들이 직면할 문제다.",
-  "medclaim_section": "현재 Setmelanotide는 MFDS 미허가로 건강보험 급여가 적용될 수 없다.\n\n| 시나리오 | 본인부담률 | 예상 비용 |\n|---|---|---|\n| 희귀질환 산정특례 | 10% | 수천만원 |\n| 비급여 사용 | 100% | 수천만원 |\n\n비급여 상황에서 환자는 전액 부담해야 하며, 약제팀에서는 KODC 긴급도입이나 제약사 EAP를 통해 접근할 수 있는 가능성을 탐색할 필요가 있다. 환자들에게는 실손보험을 통한 부분적인 환급을 고려할 수 있도록 안내해야 하며, 치료 옵션에 대한 명확한 정보 제공이 중요하다.",
-  "generated_at": "2026-02-23T13:17:06.423018",
-  "global_heading": "Setmelanotide가 바꿀 비만 치료의 패러다임",
-  "domestic_heading": "Setmelanotide의 국내 허가 지연되며 공백 존재",
+  "global_section": "Setmelanotide는 일반 비만 치료제(GLP-1 계열)와 달리, 시상하부 MC4R 경로의 결함으로 발생하는 ‘유전성 비만’에서 과식과 체중 문제를 직접 겨냥하는 약물이다. 적응증은 유전자 확인(genetically confirmed)을 전제로 하며, BBS와 POMC(PCSK1 포함) 결핍, LEPR 결핍 환자(성인 및 2세 이상 소아)의 비만 치료 및 식욕 조절을 겨냥한다.\n\n| 항목 | 내용 |\n|---|---|\n| 약물군 | Antiobesity preparations (식이제품 제외) |\n| EMA | 승인(승인일자: 입력 데이터 없음) |\n| FDA | 승인 여부가 확인되지 않는다(일자 없음) |\n\n임상적으로는 52주 평가에서 BMI 개선 신호가 뚜렷했다. NCT04966741 결과에서 **BMI Z-score 0.2 이상 감소 비율**이 PPL 그룹 85.7%, BBS 그룹 80.0%였고, **BMI 평균 변화율**은 PPL -25.597%(SD 11.4911), BBS -9.719%(SD 8.8383)로 집단 간 효과 크기 차이도 확인된다. 경쟁 구도에서 ‘비만 치료’ 축의 대표 약물인 semaglutide가 체중감량 시장을 주도하지만, setmelanotide는 “유전자 진단-표적 치료”로 시장 정의 자체가 다르다. 입력 데이터의 핫이슈 사유(EMA 승인, EMA PRIME, 희귀의약품)는 바로 이 ‘희귀·정밀의학’ 포지셔닝에서 나온다.",
+  "domestic_section": "국내에서는 setmelanotide의 식약처(MFDS) 허가가 확인되지 않으며, 시판 제품명도 입력돼 있지 않아 상업화 트랙이 포착되지 않는다. 심평원(HIRA)에서도 status가 not_found로, 등재 자체가 성립되지 않아 약가·급여기준을 논의할 실무 데이터가 없다.\n\n- MFDS: 승인 여부 미확인(approved=false, 브랜드명 공란)\n- HIRA: not_found(약가 null, 급여기준 공란)\n- CRIS: 국내 임상 0건(병원 기반 도입 채널도 부재)\n\n경쟁 비교에서도 ‘국내 대체 옵션’이 선명하지 않다. 입력된 경쟁약 목록 중 semaglutide(대사/비만 영역)는 국내에서 비만/당뇨 치료 맥락으로 이미 임상 사용 경험이 축적된 계열이지만, **유전성 비만의 과식 조절을 적응증으로 한 국내 허가·급여 대체제**를 이 데이터만으로는 확인할 수 없다.\n\n| 비교 축 | Setmelanotide | Semaglutide |\n|---|---|---|\n| 타깃 질환 | BBS·POMC/PCSK1·LEPR 결핍 비만 | 일반 비만/당뇨 중심(계열) |\n| 국내 규제·급여(입력) | MFDS 미확인, HIRA not_found | 경쟁약으로만 등재(국내 상태는 ‘uncertain’) |\n\n결국 병원 약제팀 관점에서 지금 필요한 정보는 ‘허가 신청 주체(판매권자) 존재 여부’와 ‘유전자 진단-투약 연계 경로’인데, 입력 데이터에서는 둘 다 관측되지 않는다.",
+  "medclaim_section": "현 시점에서 HIRA 등재가 not_found이므로, 건강보험 청구(급여 청구) 실무로 바로 이어질 수 없다. 또한 MFDS 허가가 확인되지 않아 원내 처방 프로세스 자체가 성립하기 어렵다(허가-등재 선행 필요).\n\n| 시나리오 | 본인부담률 | 청구/접근 현실 |\n|---|---:|---|\n| 향후 급여 등재 + 희귀질환 산정특례 | 10% | 입력 데이터상 산정특례 라벨 존재(‘희귀질환 산정특례’)이나, 약가/기준 미제공으로 금액 산정 불가 |\n| 비급여 | 100% | HIRA 등재 정보 부재로 급여 청구 불가(비급여 비용은 입력 데이터에 없음) |\n\n허가 전 단계에서 환자 접근은 통상 ‘긴급도입(개별 수입)’ 또는 ‘해외 치료 연계/임상 참여’ 같은 우회 경로로 논의되지만, CRIS 임상 0건이어서 국내 임상 참여 루트도 데이터로는 확인되지 않는다. 실무적으로는 (1) 유전자 확진(BBS, POMC/PCSK1, LEPR) 검사 체계 보유 여부, (2) 희귀질환 산정특례 적용을 위한 질환 등록 가능성, (3) 향후 등재 시 사전심사(PA) 가능성(고가약제 여부 판단에 필요한 ‘1회 투여비’ 데이터는 입력에 없음)을 분리해 체크리스트로 관리하는 편이 안전하다.",
+  "generated_at": "2026-02-23T16:14:06.426006",
+  "global_heading": "‘다이어트약’이 아닌 유전자 치료 영역",
+  "domestic_heading": "허가·급여 ‘흔적’이 아직 없다",
   "source_data": {
     "inn": "setmelanotide",
     "domestic_status": "uncertain",
@@ -34,10 +34,20 @@
     "korea_relevance_score": 10,
     "quadrant": "normal",
     "summary": "글로벌: EMA | MFDS: 미허가",
-    "analysis_notes": []
+    "analysis_notes": [],
+    "analysis": {
+      "hot_issue_reasons": [
+        "EMA 승인",
+        "EMA PRIME",
+        "희귀의약품"
+      ]
+    },
+    "therapeutic_areas": [
+      "metabolic"
+    ]
   },
   "_source_urls": {},
-  "_nct_id": "",
+  "_nct_id": "NCT04966741",
   "_score": 40,
   "_hot_issue_reasons": [
     "EMA 승인",
@@ -53,9 +63,5 @@
     "Semaglutide",
     "Palopegteriparatide",
     "Metreleptin"
-  ],
-  "_copay_exemption": {
-    "label": "희귀질환 산정특례",
-    "rate": 0.1
-  }
+  ]
 }

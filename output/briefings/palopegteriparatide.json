@@ -1,0 +1,72 @@
+{
+  "inn": "Palopegteriparatide",
+  "headline": "만성 부갑상선기능저하증 PTH 대체, palopegteriparatide의 급여 변수",
+  "subtitle": "FDA(2025-10-16)·EMA(2023-11-17) 승인에도 국내는 허가·급여 ‘공백’",
+  "key_points": [
+    "palopegteriparatide(Yorvipath)는 성인 만성 부갑상선기능저하증의 ‘부갑상선호르몬(PTH) 대체요법’으로, 칼슘 항상성 회복을 목표로 하는 칼슘대사 치료제",
+    "EMA가 2023-11-17에 승인했고, FDA도 2025-10-16에 승인을 완료해(approval_timeline 기준 과거형) 글로벌 규제기관의 문턱은 넘었다",
+    "국내는 식약처(MFDS) 허가가 확인되지 않고, 심평원(HIRA)에서도 등재·약가 정보를 찾을 수 없어(미등재/미확인) 처방·청구 경로가 열려 있지 않다",
+    "글로벌 승인 후 829일 경과한 ‘허가 지연’ 구간으로, 통상적인 FDA 승인→식약처 허가(1~3년), 식약처→심평원 등재(6개월~2년) 흐름을 감안하면 국내 판매권자 확보 및 허가 신청 여부가 도입 속도를 좌우한다"
+  ],
+  "global_section": "만성 부갑상선기능저하증 치료는 그동안 경구 칼슘·활성형 비타민D 보충에 기대며 ‘대증적 조절’에 머무는 경우가 많았고, 여기에 PTH 자체를 보충하는 접근이 치료 목표를 바꿔놓았다. palopegteriparatide(Yorvipath)는 PTH replacement therapy로 칼슘 항상성(calcium homeostasis)을 근본 축에서 복원하는 약물군에 속한다. 임상 근거는 26주 눈가림 구간에서 1차 평가변수 달성률이 위약 대비 큰 격차를 보였다는 점이 핵심이다.\n\n| 임상(NCT04701203) | 평가시점 | TransCon PTH | 위약 | p-value |\n|---|---:|---:|---:|---:|\n| 1차 평가지표 달성 | 26주 | 78.7% | 4.8% | <0.0001 |\n| HPES 증상-신체 점수 변화(LS mean) | 26주 | -21.01 | -4.81 | 0.0038 |\n\n안전성에서는 전체 TransCon PTH 기간 기준 중대한 이상반응이 80명 중 20명에서 보고됐고, 중대한 저칼슘혈증(5건)·고칼슘혈증(2건)이 상위 항목으로 확인돼 ‘칼슘 조절’ 자체가 안전성 관리의 중심이 된다. 같은 ‘대사’ 영역 경쟁 축으로는 competitors 목록의 Parathyroid Hormone(동일 축의 호르몬 치료 접근)이 직접 비교 대상으로 거론된다. 규제 측면에서 EMA는 2023-11-17에 승인을 완료했고, FDA도 2025-10-16에 승인을 완료해 글로벌 양대 축에서 허가를 확보했다.",
+  "domestic_section": "국내에서는 palopegteriparatide가 식약처(MFDS) 허가 여부가 확인되지 않으며, 심평원(HIRA)에서도 등재 상태가 not_found로 확인돼 ‘허가-급여’ 어느 쪽도 레일에 올라와 있지 않다. 데이터 기준 글로벌 승인 후 829일이 경과했고, 입력된 해석은 “허가 지연(국내 판매권자 확보 지연 가능성)”으로 정리돼 있다.\n\n| 구분 | 상태 | 데이터 근거 |\n|---|---|---|\n| 식약처(MFDS) | 승인 여부 확인되지 않는다 | approved=false, date=null |\n| 심평원(HIRA) | 등재/약가 정보 없음 | status=not_found |\n| 국내 임상(CRIS) | 등록 0건 | trial_count=0 |\n\n경쟁 환경도 ‘국내 도입의 촉진 요인’이 뚜렷하지 않다. competitors로 제시된 setmelanotide, Parathyroid Hormone, semaglutide, metreleptin 역시 domestic_status가 모두 uncertain으로, 특정 경쟁약의 국내 선진입이 palopegteriparatide의 급여·심사 프레임을 먼저 열어주는 구조가 확인되지 않는다. 약제팀 관점에서는 허가 신청(판매권자 확정) 소식이 나오기 전까지는 도입 준비보다 ‘희귀질환 산정특례(본인부담 10%) 적용을 전제로 한 등재 시나리오’에서 환자 접근성/사전심사 가능성을 검토하는 단계다.",
+  "medclaim_section": "현재 국내에서는 심평원 급여 청구가 불가능한 상태다. 심평원 등재가 not_found이고 식약처 허가도 확인되지 않아, 통상적인 처방-청구 프로세스(코드/상한가/기준)가 성립하지 않는다. 다만 입력 데이터에 희귀질환 산정특례가 명시돼 있어, 향후 급여 등재 시 환자 본인부담은 10%로 설계될 가능성이 전제 조건으로 깔린다.\n\n| 시나리오 | 본인부담률 | 청구/처방 현실 |\n|---|---:|---|\n| 현재(국내 미등재·미허가 확인 불가) | 100% | 급여 청구 불가(등재 정보 없음) |\n| 향후 급여 등재 | 일반 급여 30% | 외래 기준 본인부담 30% 적용 |\n| 향후 희귀질환 산정특례 적용 | 10% | 희귀질환 산정특례(본인부담 10%) |\n\n비급여로 비용을 산정할 ‘국내 약가(price)’ 데이터가 없어, 환자 부담액을 원화로 환산해 제시할 수는 없다. 실무적으로는 ① 국내 판매권자/허가 신청 여부 확인(공급 가능성 판단) ② 등재 시 고가약제 해당 여부(1회 100만원 초과 시 사전심사(PA) 적용 가능) ③ 희귀질환 산정특례 등록 요건 충족 여부를 동시에 점검하는 것이 약제팀·심사 담당자의 핵심 체크리스트가 된다.",
+  "generated_at": "2026-02-23T16:14:42.690348",
+  "global_heading": "PTH ‘대체요법’이 만든 치료의 재정의",
+  "domestic_heading": "829일 지났지만, 국내 문은 아직 닫혔다",
+  "source_data": {
+    "inn": "PALOPEGTERIPARATIDE",
+    "domestic_status": "uncertain",
+    "fda_approved": true,
+    "fda_date": "2025-10-16",
+    "ema_approved": true,
+    "ema_date": "2023-11-17",
+    "mfds_approved": false,
+    "mfds_date": null,
+    "mfds_brand_name": "",
+    "hira_status": "not_found",
+    "hira_code": "",
+    "hira_criteria": "",
+    "hira_price": null,
+    "cris_trial_count": 0,
+    "has_active_trial": false,
+    "global_score": 35,
+    "korea_relevance_score": 10,
+    "quadrant": "normal",
+    "summary": "글로벌: FDA+EMA | MFDS: 미허가",
+    "analysis_notes": [
+      "글로벌 승인 후 2년 경과, 국내 미허가"
+    ],
+    "analysis": {
+      "hot_issue_reasons": [
+        "FDA 승인",
+        "EMA 승인",
+        "희귀의약품"
+      ]
+    },
+    "therapeutic_areas": [
+      "metabolic"
+    ]
+  },
+  "_source_urls": {
+    "fda": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=216490",
+    "ema": "https://www.ema.europa.eu/en/medicines/human/EPAR/yorvipath"
+  },
+  "_nct_id": "NCT04701203",
+  "_score": 35,
+  "_hot_issue_reasons": [
+    "FDA 승인",
+    "EMA 승인",
+    "희귀의약품"
+  ],
+  "_therapeutic_areas": [
+    "metabolic"
+  ],
+  "_known_inns": [
+    "Setmelanotide",
+    "Parathyroid Hormone",
+    "Semaglutide",
+    "Palopegteriparatide",
+    "Metreleptin"
+  ]
+}
