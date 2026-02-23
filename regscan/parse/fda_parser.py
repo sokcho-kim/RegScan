@@ -101,26 +101,44 @@ class FDADrugParser:
         self, submissions: list[dict]
     ) -> dict[str, Any]:
         """
-        가장 최근 승인된 submission 추출
+        최초 승인(ORIG+AP) 우선으로 submission 추출.
+
+        우선순위:
+          1) ORIG + AP (최초 승인) — 날짜 내림차순
+          2) 아무 AP (sNDA 승인 등) — 날짜 내림차순
+          3) 가장 최근 submission (fallback)
         """
         if not submissions:
             return {}
 
-        # 날짜로 정렬 (최신 먼저)
-        sorted_subs = sorted(
+        by_date_desc = sorted(
             submissions,
             key=lambda x: x.get("submission_status_date", ""),
             reverse=True,
         )
 
-        latest = sorted_subs[0]
+        # 1차: ORIG + AP
+        for sub in by_date_desc:
+            if sub.get("submission_type") == "ORIG" and sub.get("submission_status") == "AP":
+                return self._format_submission(sub)
 
+        # 2차: 아무 AP
+        for sub in by_date_desc:
+            if sub.get("submission_status") == "AP":
+                return self._format_submission(sub)
+
+        # 3차: fallback (가장 최근)
+        return self._format_submission(by_date_desc[0])
+
+    @staticmethod
+    def _format_submission(sub: dict) -> dict[str, Any]:
+        """단일 submission → 표준 dict"""
         return {
-            "submission_type": latest.get("submission_type"),
-            "submission_status": latest.get("submission_status"),
-            "submission_status_date": latest.get("submission_status_date"),
-            "submission_class_code": latest.get("submission_class_code"),
-            "submission_class_code_description": latest.get("submission_class_code_description"),
+            "submission_type": sub.get("submission_type"),
+            "submission_status": sub.get("submission_status"),
+            "submission_status_date": sub.get("submission_status_date"),
+            "submission_class_code": sub.get("submission_class_code"),
+            "submission_class_code_description": sub.get("submission_class_code_description"),
         }
 
     def _build_source_url(self, app_number: str) -> str:

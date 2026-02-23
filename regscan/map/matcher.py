@@ -26,6 +26,7 @@ class IngredientMatcher:
         r"\s*(micronized|anhydrous|hydrate|dihydrate)\s*",
         r"\s*\(.*\)\s*",  # 괄호 내용
         r"\s*,.*$",  # 콤마 이후
+        r"-[a-z]{3,5}$",  # USAN 접미사 (-hrii, -piiq, -bcmm 등)
     ]
 
     # 알려진 유의어 (brand → INN 매핑 포함)

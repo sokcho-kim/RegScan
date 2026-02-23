@@ -637,6 +637,60 @@ class GlobalStatusBuilder:
         return status
 
 
+def _select_best(candidates: list[dict], agency: str = "fda") -> dict:
+    """
+    같은 INN의 여러 제품 중 best 선택.
+
+    기준 (우선순위):
+      1. 승인 상태: Approved/Authorised > Pending > Withdrawn
+      2. 단독 제품 우선: active_ingredients가 1개인 것 선호
+      3. 가장 이른 승인일: 최초 승인 (ORIG) 날짜가 빠른 것
+    """
+    if not candidates:
+        return {}
+    if len(candidates) == 1:
+        return candidates[0]
+
+    STATUS_PRIORITY = {"ap": 0, "approved": 0, "authorised": 0, "authorized": 0,
+                       "pending": 1, "withdrawn": 2}
+
+    def _sort_key(item: dict):
+        # 승인 상태 우선순위
+        if agency == "fda":
+            raw_status = (item.get("submission_status") or "").lower()
+        else:
+            raw_status = (
+                item.get("medicine_status")
+                or item.get("authorisationStatus")
+                or item.get("authorisation_status")
+                or ""
+            ).lower()
+        status_rank = STATUS_PRIORITY.get(raw_status, 9)
+
+        # 단독 vs 복합 — raw 데이터의 products→active_ingredients 수
+        n_ingredients = 1
+        raw = item.get("raw", {})
+        products = raw.get("products", [])
+        if products:
+            ai = products[0].get("active_ingredients", [])
+            n_ingredients = len(ai) if ai else 1
+
+        # 승인 날짜 (이른 것이 우선 = 작은 문자열)
+        if agency == "fda":
+            date_str = item.get("submission_status_date") or "99999999"
+        else:
+            date_str = (
+                item.get("marketing_authorisation_date")
+                or item.get("approval_date")
+                or "99999999"
+            )
+
+        return (status_rank, n_ingredients, date_str)
+
+    candidates_sorted = sorted(candidates, key=_sort_key)
+    return candidates_sorted[0]
+
+
 def merge_by_inn(
     fda_list: list[dict],
     ema_list: list[dict],
@@ -654,28 +708,31 @@ def merge_by_inn(
     matcher = IngredientMatcher()
     builder = GlobalStatusBuilder()
 
-    # EMA 데이터를 정규화된 INN으로 인덱싱
-    ema_by_inn: dict[str, dict] = {}
+    # EMA 데이터를 정규화된 INN으로 인덱싱 (list 수집 → best 선택)
+    ema_by_inn_all: dict[str, list[dict]] = {}
     for ema_data in ema_list:
         inn = ema_data.get("inn", "") or ema_data.get("active_substance", "")
         if inn:
             normalized = matcher.normalize(inn)
-            ema_by_inn[normalized] = ema_data
+            ema_by_inn_all.setdefault(normalized, []).append(ema_data)
+    ema_by_inn = {k: _select_best(v, "ema") for k, v in ema_by_inn_all.items()}
+
+    # FDA 데이터도 list 수집 → best 선택
+    fda_by_inn_all: dict[str, list[dict]] = {}
+    for fda_data in fda_list:
+        inn = fda_data.get("generic_name", "") or ""
+        if isinstance(fda_data.get("substance_name"), list):
+            inn = fda_data["substance_name"][0] if fda_data["substance_name"] else inn
+        if inn:
+            normalized = matcher.normalize(inn)
+            fda_by_inn_all.setdefault(normalized, []).append(fda_data)
+    fda_by_inn = {k: _select_best(v, "fda") for k, v in fda_by_inn_all.items()}
 
     # FDA 데이터와 매칭
     results = []
     matched_ema_inns = set()
 
-    for fda_data in fda_list:
-        inn = fda_data.get("generic_name", "") or ""
-        if isinstance(fda_data.get("substance_name"), list):
-            inn = fda_data["substance_name"][0] if fda_data["substance_name"] else inn
-
-        if not inn:
-            continue
-
-        normalized = matcher.normalize(inn)
-
+    for normalized, fda_data in fda_by_inn.items():
         # EMA 매칭
         ema_data = ema_by_inn.get(normalized)
         if ema_data:
@@ -712,22 +769,24 @@ def merge_global_status(
     matcher = IngredientMatcher()
     builder = GlobalStatusBuilder()
 
-    # 각 데이터를 정규화된 INN으로 인덱싱
-    fda_by_inn: dict[str, dict] = {}
+    # 각 데이터를 정규화된 INN으로 인덱싱 (list 수집 → best 선택)
+    fda_by_inn_all: dict[str, list[dict]] = {}
     for fda_data in fda_list:
         inn = fda_data.get("generic_name", "") or ""
         if isinstance(fda_data.get("substance_name"), list):
             inn = fda_data["substance_name"][0] if fda_data["substance_name"] else inn
         if inn:
             normalized = matcher.normalize(inn)
-            fda_by_inn[normalized] = fda_data
+            fda_by_inn_all.setdefault(normalized, []).append(fda_data)
+    fda_by_inn = {k: _select_best(v, "fda") for k, v in fda_by_inn_all.items()}
 
-    ema_by_inn: dict[str, dict] = {}
+    ema_by_inn_all: dict[str, list[dict]] = {}
     for ema_data in ema_list:
         inn = ema_data.get("inn", "") or ema_data.get("active_substance", "")
         if inn:
             normalized = matcher.normalize(inn)
-            ema_by_inn[normalized] = ema_data
+            ema_by_inn_all.setdefault(normalized, []).append(ema_data)
+    ema_by_inn = {k: _select_best(v, "ema") for k, v in ema_by_inn_all.items()}
 
     mfds_by_inn: dict[str, dict] = {}
     for mfds_data in mfds_list:
