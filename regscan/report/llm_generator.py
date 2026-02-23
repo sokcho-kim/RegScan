@@ -3,7 +3,7 @@
 import json
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Optional, Any
 
@@ -153,7 +153,7 @@ class LLMBriefingGenerator:
 
     # 지원 모델 목록
     SUPPORTED_MODELS = {
-        "openai": ["gpt-4o-mini", "gpt-4o", "gpt-5", "o1-mini"],
+        "openai": ["gpt-5.2", "gpt-5.2-pro", "gpt-5", "gpt-4o-mini", "gpt-4o", "o1-mini"],
         "anthropic": ["claude-sonnet-4-20250514", "claude-3-haiku-20240307"],
         "gemini": ["gemini-2.0-flash", "gemini-2.5-pro", "gemini-2.5-flash"],
     }
@@ -174,7 +174,7 @@ class LLMBriefingGenerator:
             self.model = model or settings.GEMINI_MODEL
             self.api_key = api_key or settings.GEMINI_API_KEY
         else:
-            self.model = model or "gpt-4o-mini"
+            self.model = model or "gpt-5.2"
             self.api_key = api_key or settings.OPENAI_API_KEY
 
         self._client = None
@@ -214,6 +214,39 @@ class LLMBriefingGenerator:
             return f"글로벌 승인 후 {days}일 — 허가 지연 (국내 판매권자 확보 지연 가능성)"
         else:
             return f"글로벌 승인 후 {days}일 경과 — 장기 미허가 (판매권자 부재 또는 시장성 판단 보류)"
+
+    @staticmethod
+    def _build_approval_timeline(impact: DomesticImpact) -> list[dict]:
+        """승인 타임라인을 사전 계산된 구조체로 반환.
+
+        각 항목: {agency, status, date, tense}
+        tense: "past" / "future" / "unknown" — LLM이 시제를 자체 판단하지 않도록.
+        """
+        today = date.today()
+        entries = []
+        for agency, approved, d in [
+            ("FDA", impact.fda_approved, impact.fda_date),
+            ("EMA", impact.ema_approved, impact.ema_date),
+            ("MFDS", impact.mfds_approved, impact.mfds_date),
+        ]:
+            if d is None:
+                entries.append({
+                    "agency": agency, "status": "미확인",
+                    "date": None, "tense": "unknown",
+                })
+            elif d > today:
+                entries.append({
+                    "agency": agency, "status": "승인 예정",
+                    "date": d.isoformat(), "tense": "future",
+                })
+            else:
+                days = (today - d).days
+                entries.append({
+                    "agency": agency,
+                    "status": f"승인 완료 (D+{days}일)",
+                    "date": d.isoformat(), "tense": "past",
+                })
+        return entries
 
     @staticmethod
     def _to_display_case(inn: str) -> str:
@@ -277,6 +310,12 @@ class LLMBriefingGenerator:
                 "mfds_timeline_estimate": self._estimate_mfds_timeline(impact),
             },
         }
+
+        # 산정특례 카테고리 (없으면 null → LLM은 산정특례 시나리오 생략)
+        data["copay_exemption"] = getattr(impact, '_copay_exemption', None)
+
+        # 승인 타임라인 (시제 사전 계산 — LLM이 날짜 계산하지 않도록)
+        data["approval_timeline"] = self._build_approval_timeline(impact)
 
         # 경쟁약 데이터가 주입되었으면 포함
         if hasattr(impact, '_competitors') and impact._competitors:
@@ -344,7 +383,12 @@ class LLMBriefingGenerator:
             return impact.summary
 
     async def _call_llm(self, prompt: str) -> str:
-        """LLM API 호출"""
+        """LLM API 호출 (스레드풀 기반 병렬 지원)"""
+        import asyncio
+        return await asyncio.to_thread(self._call_llm_sync, prompt)
+
+    def _call_llm_sync(self, prompt: str) -> str:
+        """LLM API 동기 호출"""
         client = self._get_client()
 
         if self.provider == "anthropic":
@@ -381,6 +425,7 @@ class LLMBriefingGenerator:
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": prompt},
                 ],
+                response_format={"type": "json_object"},
                 **token_param,
             )
             if not response.choices:
@@ -389,22 +434,42 @@ class LLMBriefingGenerator:
             return response.choices[0].message.content
 
     def _parse_json_response(self, text: str) -> dict:
-        """LLM 응답에서 JSON 추출"""
-        # JSON 블록 추출 시도
+        """LLM 응답에서 JSON 추출 (다단계 시도)"""
+        candidates: list[str] = []
+
+        # 1) ```json ... ``` 코드 펜스 추출
         if "```json" in text:
             start = text.find("```json") + 7
             end = text.find("```", start)
-            text = text[start:end].strip()
-        elif "```" in text:
+            if end > start:
+                candidates.append(text[start:end].strip())
+
+        # 2) ``` ... ``` 일반 코드 펜스
+        if "```" in text and not candidates:
             start = text.find("```") + 3
             end = text.find("```", start)
-            text = text[start:end].strip()
+            if end > start:
+                candidates.append(text[start:end].strip())
 
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError:
-            logger.warning("JSON 파싱 실패, 원본 텍스트 사용")
-            return {"global_section": text}
+        # 3) 원본 텍스트 그대로
+        candidates.append(text.strip())
+
+        # 4) 가장 바깥쪽 { ... } 브레이스 매칭
+        first_brace = text.find("{")
+        last_brace = text.rfind("}")
+        if first_brace != -1 and last_brace > first_brace:
+            candidates.append(text[first_brace:last_brace + 1].strip())
+
+        for candidate in candidates:
+            try:
+                parsed = json.loads(candidate)
+                if isinstance(parsed, dict):
+                    return parsed
+            except (json.JSONDecodeError, ValueError):
+                continue
+
+        logger.warning("JSON 파싱 실패, 원본 텍스트 사용")
+        return {"global_section": text}
 
     # HIRA 상태 한글 매핑
     HIRA_STATUS_KR = {

@@ -1,36 +1,76 @@
 {
   "inn": "Zolbetuximab",
-  "headline": "Zolbetuximab, HER2 음성 위암 치료의 새로운 대안 — FDA·EMA 승인 완료",
-  "subtitle": "국내 승인 지연, 경쟁약과의 비교로 급여 등재 전망 주목",
+  "headline": "HER2 음성 위선암 치료에 주목받는 Zolbetuximab — FDA·EMA 승인",
+  "subtitle": "국내 미허가로 환자 접근 제한 — 경쟁약 Polatuzumab은 기대효과를 보인다",
   "key_points": [
-    "HER2 음성 위암 환자에서 초기 치료제로서 fluoropyrimidine와 platinum 기반 화학요법과 병용해 사용",
-    "FDA 2025년 6월 승인, EMA는 2024년 9월 승인 — 주요 치료 옵션으로 자리잡을 전망",
-    "MFDS 미허가 및 HIRA의 비급여 상태 — 현재 한국 시장 진입 불확실",
-    "글로벌 승인 후 519일 경과 — 비슷한 적응증의 경쟁약과 비교 시 연내 허가 가능성"
+    "Zolbetuximab은 HER2 음성 위선암 환자에서 Claudin 18.2 양성 종양을 겨냥한 경구 치료제로, fluoropyrimidine 및 플래티넘 화학요법과 병용하여 사용.",
+    "FDA는 2025년 6월 승인을 결정했으며, EMA는 2024년 9월 승인하여 위암 치료제의 새로운 기준 가능성을 시사.",
+    "현재 MFDS에서 미허가 상태이며, HIRA에서 비급여로 분류됨 — 환자 접근이 제한적임.",
+    "경쟁약인 Polatuzumab Vedotin 및 Zanidatamab-hrii는 각각 60점으로 예측되며, 치료적 포지션 확장을 위한 경쟁이 치열할 전망."
   ],
-  "global_section": "Zolbetuximab은 HER2 음성 위암 치료에 혁신적인 가능성을 제시하는 약물이다. Claudin 18.2 양성 종양에 대한 첫 번째 치료제로, fluoropyrimidine과 platinum 계열 화학요법과 병용하여 사용된다. 3상 임상시험에서 Zolbetuximab을 포함한 치료 군이 기존 치료 대비 생존 기간을 유의미하게 연장하는 효과를 나타냈다. 이 약물은 FDA에서 2025년 6월, EMA에서 2024년 9월에 각각 승인을 받으면서 주목받고 있다. 현재 동일 적응증의 경쟁약으로 Polatuzumab vedotin과 Zanidatamab-hrii가 있으며, 이미 국내 승인 가능성이 높아지고 있다.",
-  "domestic_section": "현재 MFDS에서 Zolbetuximab은 미허가 상태이다. 지난 519일 간 글로벌 승인이 이루어진 반면에 국내 진입은 지연되고 있으며, 시장성에 대한 판단이 불확실하다. 경쟁약인 Polatuzumab vedotin과 Zanidatamab-hrii는 예상대로 국내 시장에서 허가될 것으로 보인다. 이러한 경쟁 상황 속에서 Zolbetuximab이 최대한 빠르게 허가를 받을 경우, 위암 환자들에게 새로운 치료 옵션을 제공할 수 있는 기회가 될 것이다.",
-  "medclaim_section": "현재 Zolbetuximab은 국내에서 미허가이므로, 건강보험 급여 청구가 불가능하다. 향후 허가가 이루어질 경우 위암 환자에 대한 급여가 적용되면 HIRA의 기준에 따라 본인 부담이 약 30%에서 5%로 경감될 가능성이 있다. 비급여 상태에서 환자들은 1회 투여 시 수백만 원의 비용을 부담해야 하며, 실손보험 청구를 통한 부분적 보상이 가능할 수 있다. 약제팀은 향후 Zolbetuximab의 허가 진행 상황을 적극적으로 모니터링하여, 빠른 시일 내에 허가받을 경우 환자 관리 방안을 마련해야 할 것이다.",
-  "generated_at": "2026-02-20T14:01:07.434878",
+  "global_section": "Zolbetuximab은 Claudin 18.2 양성 환자에 대해 새로운 치료 옵션으로 주목받고 있다. 화학요법과 병용할 경우 종양 진행을 억제하는 메커니즘으로 PFS와 OS 모두에서 유의미한 개선을 보여줬다. 3상 연구 결과, Zolbetuximab을 투여 받은 환자는 중간 PFS가 8.21개월로 Placebo의 6.80개월에 비해 유의한 차이를 나타냈고, OS 역시 각각 14.32개월 대 12.16개월로 확인됐다. 이 약물의 FDA와 EMA 승인은 위암 치료 분야에서 중요한 진전을 나타내고 있다. \n\n| 지표 | Zolbetuximab | Polatuzumab Vedotin | Zanidatamab-hrii |\n|---|---|---|---|\n| 기전 |\nClaudin 18.2 표적 | CD79b 표적 | 이중 특이항체 |\n| 임상 결과 (PFS) |\n8.21개월 | - | - |\n| 임상 결과 (OS) |\n14.32개월 | - | - |\n| 승인 상태 |\nFDA(2025), EMA(2024) | FDA(2023) | 예상 (검토 중) |",
+  "domestic_section": "국내 상황에서 Zolbetuximab은 여전히 미허가 상태로, 환자 접근이 어려운 상황이다. 현재 HIRA는 비급여로 남아 있으며 치료 옵션 자체가 제한된다. \n\n- **Zolbetuximab**: MFDS 미허가, HIRA 비급여\n- **Polatuzumab Vedotin**: MFDS 예측 허가 예상\n- **Zanidatamab-hrii**: MFDS 예측 허가 예상\n\n현재 MFDS는 허가 신청을 진행 중일 가능성이 있으며, FDA 승인 이후 약 522일이 경과한 상태다. 이는 일반적으로 1~2년 내로 이루어지는 패턴이며, 실제 허가 시점은 더욱 불확실하다. 경쟁약들도 비슷한 상황에 있다는 점에서 Zolbetuximab의 향후 허가는 매우 중요한 이슈가 될 것이다.",
+  "medclaim_section": "현재 Zolbetuximab은 비급여 상태로, 환자에 대한 경제적 부담이 큰 상황이다. \n\n| 시나리오 | 본인부담률 | 예상 부담액 |\n|---|---|---|\n| 일반 급여 | 30% | 수백만 원 |\n| 비급여 | 100% | 수 천만 원 |\n| 희귀의약품 산정특례 | 10% | 수백만 원 |\n\nZolbetuximab의 비급여 처방 시 환자의 경제적 부담이 크며, 필요시 긴급도입을 통해 사용할 수 있는 제한적 경로도 있다. 약제팀은 Zolbetuximab의 허가 진행 상황을 주의 깊게 모니터링해야 한다.",
+  "generated_at": "2026-02-23T11:07:36.888416",
+  "global_heading": "다각화된 위암 치료가 필요하다",
+  "domestic_heading": "국내 접근권이 부재 — 위암 환자는 치료 옵션이 부족하다",
   "source_data": {
-    "inn": "Zolbetuximab",
-    "fda_approved": false,
-    "fda_date": null,
-    "ema_approved": false,
-    "ema_date": null,
+    "inn": "ZOLBETUXIMAB",
+    "domestic_status": "uncertain",
+    "fda_approved": true,
+    "fda_date": "2025-06-06",
+    "ema_approved": true,
+    "ema_date": "2024-09-19",
     "mfds_approved": false,
     "mfds_date": null,
     "mfds_brand_name": "",
-    "domestic_status": "",
-    "hira_status": "",
-    "global_score": 0,
+    "hira_status": "not_covered",
+    "hira_code": "738001BIJ",
+    "hira_criteria": "",
+    "hira_price": null,
+    "cris_trial_count": 0,
+    "has_active_trial": false,
+    "global_score": 55,
+    "korea_relevance_score": 10,
+    "quadrant": "normal",
+    "summary": "글로벌: FDA+EMA | MFDS: 미허가 | HIRA: 비급여",
+    "analysis_notes": [
+      "글로벌 승인 후 1년 경과, 국내 미허가"
+    ],
     "analysis": {
-      "hot_issue_reasons": []
+      "hot_issue_reasons": [
+        "FDA 승인",
+        "EMA 승인",
+        "FDA+EMA 근접 승인",
+        "희귀의약품",
+        "주요 질환 치료제"
+      ]
     },
-    "therapeutic_areas": []
+    "therapeutic_areas": [
+      "oncology"
+    ]
   },
-  "_source_urls": {},
-  "_score": 0,
-  "_hot_issue_reasons": [],
-  "_therapeutic_areas": []
+  "_source_urls": {
+    "fda": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761365",
+    "ema": "https://www.ema.europa.eu/en/medicines/human/EPAR/vyloy"
+  },
+  "_nct_id": "NCT03653507",
+  "_score": 55,
+  "_hot_issue_reasons": [
+    "FDA 승인",
+    "EMA 승인",
+    "FDA+EMA 근접 승인",
+    "희귀의약품",
+    "주요 질환 치료제"
+  ],
+  "_therapeutic_areas": [
+    "oncology"
+  ],
+  "_known_inns": [
+    "Polatuzumab Vedotin",
+    "Zanidatamab-hrii",
+    "Zolbetuximab",
+    "Ivosidenib",
+    "Talquetamab"
+  ]
 }

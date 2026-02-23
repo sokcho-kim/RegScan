@@ -1,36 +1,74 @@
 {
   "inn": "Vamorolone",
-  "headline": "드물고 효과적인 DMD 치료, Vamorolone FDA·EMA 잇따라 승인",
-  "subtitle": "국내 허가 지연, DMD 환자에 대한 접근 방안 필요",
+  "headline": "Duchenne 근위축증 치료의 새로운 가능성, Vamorolone — FDA·EMA 승인",
+  "subtitle": "희귀의약품으로 등록된 Vamorolone, 국내 허가는 난항",
   "key_points": [
-    "Vamorolone은 선택적 글루코코르티코이드로, Duchenne 근육병(DMD) 환자의 근육 약화 치료에 사용.",
-    "FDA는 2024년 6월 5일 승인, EMA는 2023년 12월 14일 승인 — 희귀질환 치료제에 대한 새로운 옵션.",
-    "현재 MFDS 미허가 상태이며, HIRA에서도 등록되지 않아 급여 적용 불가 — 허가 지연에 따른 환자 접근성 문제.",
-    "DMD 환자의 희귀약물로서의 지위와 FDA·EMA 승인 이후 국내 허가 가능성이 점차 증가할 것으로 보임."
+    "Vamorolone은 글루코코르티코이드 계열로, Duchenne 근위축증(DMD) 환자에서 근력 손실을 지연시키고 염증을 억제하는 기전을 가진다.",
+    "FDA 2024년 6월 정식 승인, 이어서 EMA도 2023년 12월 승인을 받아 글로벌 승인 완료.",
+    "국내는 현재 MFDS 미허가 — 글로벌 승인 후 약 802일이 경과, 국내 도입은 불투명.",
+    "경쟁약으로 Migalastat Hydrochloride(매우 유사한 희귀약)와 Elexacaftor, Tezacaftor, Ivacaftor 조합(근위축증 관련 치료)의 미허가 상황까지 겹쳐"
   ],
-  "global_section": "Vamorolone은 Duchenne 근육병(DMD) 환자에서의 근육 약化를 개선할 가능성으로 주목받고 있다. 선택적 글루코코르티코이드 작용으로 기존 치료제보다 부작용이 적으며 효과적인 점이 차별화 포인트다. 3상 임상시험에서 기존 치료제가 아닌 새로운 경로를 제시하며 의미 있는 결과를 도출한 바 있다. FDA와 EMA의 승인으로 기존 치료제와의 구분 가능성을 높이며, DMD 치료의 새로운 대안으로 부상하고 있다.",
-  "domestic_section": "현재 Vamorolone은 MFDS에서 허가받지 못한 상태이며, 지난 799일간 글로벌 승인 이후 국내 진입이 지연되고 있다. 이는 국내 시장에서의 판매권자 확보가 어려움을 겪고 있음을 시사한다. 경쟁 약물로는 Migalastat Hydrochloride와 같은 희귀의약품들이 있으나, 아직 권리 확보에 어려움을 겪고 있어 국내 DMD 치료 옵션이 부재한 상황이다. 약제팀은 이 약물의 가능성을 긍정적으로 보고 국내 실정에 맞는 통찰력을 가져야 한다.",
-  "medclaim_section": "현재 Vamorolone은 MFDS 미허가로 청구가 불가하다. 만약 허가 및 급여가 적용된다면, 일반 급여시 환자 본인부담률은 30%로 약 100만원 이상 예상되는 고가약제인 만큼 사전심사 대상이 된다. 비급여로 처방하더라도 고가약제에 해당하므로 실손보험 사용이 제한될 수 있어 환자들에게 실질적인 비용 부담이 클 것으로 보인다. 약제팀은 DMD 관련 약물에 대한 최신 동향을 파악하고, 향후 급여 등재 시나리오를 준비하는 것이 필요하다.",
-  "generated_at": "2026-02-20T14:06:20.144216",
+  "global_section": "Vamorolone은 Duchenne 근위축증(DMD) 치료에 있어 혁신적인 대안으로 주목받고 있다. 특정한 글루코코르티코이드 기전 작용을 통해 염증을 조절하며, 환자의 근육 기능을 유지시킬 수 있는 역할을 한다.\n\n| 기관 | 승인일 | 경과일 |\n|---|---|---|\n| FDA | 2024-06-05 | 802일 |\n| EMA | 2023-12-14 | 1일 |\n\nVamorolone은 염증을 조절하고 근육 기능을 보존하는 효과를 보여 경쟁약물들보다 대안으로 지명되고 있다. 이 약물의 FDA 및 EMA 승인은 DMD 치료의 새로운 이정표로 작용할 것으로 기대된다.",
+  "domestic_section": "현재 Vamorolone은 MFDS로부터 허가받지 못한 상태로, HIRA 본인부담률이나 급여 등이 확정되지 않았다. 글로벌 승인 후 약 802일이 경과하면서 국내 도입 전망이 불투명하다.\n\n- **Migalastat Hydrochloride**: 미허가 상태 \n- **Elexacaftor, Tezacaftor, Ivacaftor**: 미허가 상태 \n\n따라서, 국내에서 DMD 환자들은 여전히 Vamorolone과 비슷한 효과를 가진 치료제를 찾기가 힘든 상황이다. 향후 MFDS 허가는 1~3년 소요될 것으로 예상된다.",
+  "medclaim_section": "Vamorolone이 현재 MFDS 미허가 상태로 인해 청구는 불가능하다.\n\n| 시나리오 | 본인부담률 | 예상 부담액 |\n|---|---|---|\n| 비급여 사용 | 100% | ~수천만원 |\n| 산정특례(희귀질환 지원 시) | 10% | ~수백만원 |\n\n국내에서 DMD 치료제의 희귀약품으로 지정될 경우, 향후 산정특례를 통해 본인부담률이 줄어들 수 있지만, 현재는 비급여 상태로 전액 환자부담이 발생한다. 약제팀에서는 DMD 치료 약제 동향을 추적하고, 희귀의약품 지정 여부를 확인할 필요가 있다.",
+  "generated_at": "2026-02-23T11:13:27.509851",
+  "global_heading": "DMD 치료에 새로운 장을 열다",
+  "domestic_heading": "국내 허가는 험난한 여정 — 환자 접근권 막히다",
   "source_data": {
-    "inn": "Vamorolone",
-    "fda_approved": false,
-    "fda_date": null,
-    "ema_approved": false,
-    "ema_date": null,
+    "inn": "VAMOROLONE",
+    "domestic_status": "uncertain",
+    "fda_approved": true,
+    "fda_date": "2024-06-05",
+    "ema_approved": true,
+    "ema_date": "2023-12-14",
     "mfds_approved": false,
     "mfds_date": null,
     "mfds_brand_name": "",
-    "domestic_status": "",
-    "hira_status": "",
-    "global_score": 0,
+    "hira_status": "not_found",
+    "hira_code": "",
+    "hira_criteria": "",
+    "hira_price": null,
+    "cris_trial_count": 0,
+    "has_active_trial": false,
+    "global_score": 45,
+    "korea_relevance_score": 10,
+    "quadrant": "normal",
+    "summary": "글로벌: FDA+EMA | MFDS: 미허가",
+    "analysis_notes": [
+      "글로벌 승인 후 2년 경과, 국내 미허가"
+    ],
     "analysis": {
-      "hot_issue_reasons": []
+      "hot_issue_reasons": [
+        "FDA 승인",
+        "EMA 승인",
+        "FDA+EMA 근접 승인",
+        "희귀의약품"
+      ]
     },
-    "therapeutic_areas": []
+    "therapeutic_areas": [
+      "rare_disease"
+    ]
   },
-  "_source_urls": {},
-  "_score": 0,
-  "_hot_issue_reasons": [],
-  "_therapeutic_areas": []
+  "_source_urls": {
+    "fda": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=215239",
+    "ema": "https://www.ema.europa.eu/en/medicines/human/EPAR/agamree"
+  },
+  "_nct_id": "",
+  "_score": 45,
+  "_hot_issue_reasons": [
+    "FDA 승인",
+    "EMA 승인",
+    "FDA+EMA 근접 승인",
+    "희귀의약품"
+  ],
+  "_therapeutic_areas": [
+    "rare_disease"
+  ],
+  "_known_inns": [
+    "Migalastat Hydrochloride",
+    "Elexacaftor, Tezacaftor, And Ivacaftor",
+    "Vanzacaftor, Tezacaftor, And Deutivacaftor",
+    "Pegunigalsidase Alfa",
+    "Velaglucerase Alfa"
+  ]
 }

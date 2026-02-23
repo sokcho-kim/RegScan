@@ -1,36 +1,74 @@
 {
   "inn": "Tisagenlecleucel",
-  "headline": "B세포 암환자 치료에 혁신적 기전, Tisagenlecleucel — EMA 승인 후 국내 도입 불투명",
-  "subtitle": "고가 출력(JCAR) 약물, HIRA 등재로 환자 치료 기대",
+  "headline": "희귀의약품으로 주목받는 티사겐레클루셀, 유럽 승인 뒤 6년간 국내 미허가 상태",
+  "subtitle": "HIRA 급여 등재로 DLBCL 치료의 접근성은 높아졌지만 국내 허가는 여전히 불확실",
   "key_points": [
-    "CAR-T 세포 치료제로, B세포 림프종 및 ALL 환자에게 사용",
-    "EMA 2018년 8월 승인, 전 세계 최초 CAR-T 치료제 중 하나",
-    "MFDS 미허가 + HIRA 급여 상태, 상한가 ₩360,039,359 적용",
-    "글로벌 승인 후 2738일 경과, 국내 시장 시급한 접근 필요"
+    "티사겐레클루셀은 CAR-T 세포 치료제로, B세포 급성 림프구성 백혈병(ALL) 및 재발·불응성 미만성 거대 B세포 림프종(DLBCL) 치료에 사용",
+    "EMA 2018년 8월 승인 이후 6년이 지났지만, 국내 MFDS 허가는 이루어지지 않음 — 약 2,741일 경과",
+    "한국 HIRA에서 급여 등재가 되어 재발성 DLBCL 환자들은 본인 부담금 약 3600만원으로 치료 가능하지만 접근성은 제한적",
+    "경쟁약으로는 Polatuzumab Vedotin과 Zanidatamab-hrii가 있으며, 이들 역시 국내 미허가 상태"
   ],
-  "global_section": "Tisagenlecleucel은 B세포 림프종 및 급성 림프구성 백혈병(ALL) 치료에서 혁신적인 CAR-T 세포 치료제다. 세포가 환자 자신의 T세포를 유전자 조작하여 암세포를 공격하도록 하는 기전으로, 중증 환자에게서 높은 치료 반응률을 보였다. FDA는 아직 승인이 이루어지지 않았으나, EMA가 2018년 승인하면서 CAR-T 치료의 중요성을 입증했다. 이전 2회 이상의 치료에 실패한 질병에 대한 새로운 선택지로 자리 잡고 있다.",
-  "domestic_section": "현재 국내에서는 MFDS 허가가 이루어지지 않은 상태다. 글로벌 승인 후 2738일이 경과했으며, 판매권자 부재로 시장 진입이 지연되고 있다. 같은 적응증에서 경쟁하는 Zolbetuximab 및 Ivosidenib 등의 약물이 있으나, Tisagenlecleucel은 환자의 T세포를 이용한 개인 맞춤형 접근으로 차별화된다. 약제팀과 심사자들은 이러한 치료 접근법에 대해 깊이 이해하고, 미래의 급여 등재 가능성을 염두에 두어야 한다.",
-  "medclaim_section": "현재 Tisagenlecleucel은 HIRA에서 급여 등재 상태이나, MFDS 미허가로환자 처방은 이루어지지 않고 있다. 건강보험 급여가 적용될 경우, 암환자 산정특례로 본인부담률이 약 5%로 줄어들어 18,000만원 내외가 예상된다. 그러나 비급여로 처방될 시, 한 회 투여 비용이 3600만원을 초과하므로 실손보험을 통한 비용 지원 가능성이 있지만, 그 여지가 크지 않을 수 있다. 약제팀에서는 국내 최우선 치료 옵션에 대해 경쟁 약물 분석을 통해 지속적으로 전략을 구성할 필요가 있다.",
-  "generated_at": "2026-02-20T14:05:32.230109",
+  "global_section": "티사겐레클루셀은 CAR-T 세포 치료제로, B세포 아형 백혈병 및 DLBCL에 대한 효과를 발휘하며, 환자의 면역계를 활용하여 종양 세포를 제거하는 혁신적인 치료법이다. 2018년 8월 EMA에 의해 승인되었으나, 다음과 같은 저조한 글로벌 승인 일지로 인해 현재까지도 국내 허가는 이루어지지 않았다.\n\n| 기관 | 승인일 | 경과일 |\n|---|---|---|\n| EMA | 2018-08-23 | 2,741일 |\n| FDA | 미승인 | N/A |\n| MFDS | 미승인 | N/A |\n\n티사겐레클루셀은 재발성 DLBCL 환자의 치료에 있어 수술적 혹은 기존 화학요법 대안의 하나로 자리잡고 있다. EMA의 승인은 유럽 시장에서의 가능성을 의미하지만, 여전히 한국 시장에서는 경쟁약과 비교해 미허가로 인한 치료 공백이 존재한다.",
+  "domestic_section": "현재 티사겐레클루셀은 한국에서 MFDS의 허가를 받지 못했으나, HIRA에서 급여가 적용되어 환자들은 대당 약 3억 6천만원을 부담해야 한다.\n\n- HIRA 급여 상태: 적용 중\n- 급여 가격(상한가): ₩360,039,359\n\n국내 진입 추정 타임라인은 글로벌 승인 후 약 2,741일 경과한 현재 시점에서 상당히 불안정하다. 경쟁약인 Polatuzumab Vedotin과 Zanidatamab-hrii도 모두 MFDS 미허가 상태로, 적응증이 유사한 만큼 DLBCL 환자 치료의 접근성 강화가 필요하다.",
+  "medclaim_section": "티사겐레클루셀은 현재 HIRA에서 급여가 적용되는 의약품이지만, MFDS 미허가로 인해 처방 토대가 불확실하다.\n\n| 시나리오 | 본인부담률 | 예상 부담액 |\n|---|---|---|\n| 일반 급여 | 30% | 약 ₩108,012,000 |\n| 암환자 산정특례 | 5% | 약 ₩18,001,968 |\n| 비급여 | 100% | 약 ₩360,039,359 |\n\n약제팀에서는 환자가 급여 혜택을 최대한 받을 수 있도록 HIRA 급여 기준에 따른 적응증을 정확히 파악하고, MFDS 허가 결과를 예의주시해야 한다. 현재로서는 비급여 포함한 다각적인 접근 경로 대비가 필요한 상황이다.",
+  "generated_at": "2026-02-23T11:12:20.392714",
+  "global_heading": "EMA 승인 이후 6년, 여전히 국내 허가가 지연되고 있다",
+  "domestic_heading": "6년째 국내 허가 지연 — DLBCL 치료의 접근성이 위협받고 있다",
   "source_data": {
-    "inn": "Tisagenlecleucel",
+    "inn": "tisagenlecleucel",
+    "domestic_status": "uncertain",
     "fda_approved": false,
     "fda_date": null,
-    "ema_approved": false,
-    "ema_date": null,
+    "ema_approved": true,
+    "ema_date": "2018-08-23",
     "mfds_approved": false,
     "mfds_date": null,
     "mfds_brand_name": "",
-    "domestic_status": "",
-    "hira_status": "",
-    "global_score": 0,
+    "hira_status": "reimbursed",
+    "hira_code": "706201BIJ",
+    "hira_criteria": "급여",
+    "hira_price": 360039359.0,
+    "cris_trial_count": 0,
+    "has_active_trial": false,
+    "global_score": 50,
+    "korea_relevance_score": 30,
+    "quadrant": "normal",
+    "summary": "글로벌: EMA | MFDS: 미허가 | HIRA: 급여 (₩360,039,359)",
+    "analysis_notes": [
+      "글로벌 승인 후 7년 경과, 국내 미허가",
+      "고가 약물 (상한가 ₩360,039,359)"
+    ],
     "analysis": {
-      "hot_issue_reasons": []
+      "hot_issue_reasons": [
+        "EMA 승인",
+        "EMA PRIME",
+        "희귀의약품",
+        "주요 질환 치료제"
+      ]
     },
-    "therapeutic_areas": []
+    "therapeutic_areas": [
+      "oncology"
+    ]
   },
-  "_source_urls": {},
-  "_score": 0,
-  "_hot_issue_reasons": [],
-  "_therapeutic_areas": []
+  "_source_urls": {
+    "ema": "https://www.ema.europa.eu/en/medicines/human/EPAR/kymriah"
+  },
+  "_nct_id": "NCT03570892",
+  "_score": 50,
+  "_hot_issue_reasons": [
+    "EMA 승인",
+    "EMA PRIME",
+    "희귀의약품",
+    "주요 질환 치료제"
+  ],
+  "_therapeutic_areas": [
+    "oncology"
+  ],
+  "_known_inns": [
+    "Polatuzumab Vedotin",
+    "Zanidatamab-hrii",
+    "Zolbetuximab",
+    "Ivosidenib",
+    "Talquetamab"
+  ]
 }

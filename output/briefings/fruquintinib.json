@@ -1,0 +1,74 @@
+{
+  "inn": "Fruquintinib",
+  "headline": "FDA·EMA 승인 누렸지만, 국내 급여 공백으로 치료 좌절",
+  "subtitle": "Fruquintinib, 전이성 대장암의 새로운 기회 | 유일한 경구 치료 후보",
+  "key_points": [
+    "Fruquintinib은 전이성 대장암 환자에 대한 경구용 항암제로, VEGFR을 억제하여 종양 혈관 신생을 차단하는 기전",
+    "2025년 2월 FDA 승인, 2024년 6월 EMA 승인 — 주요 글로벌 기관에서 허가 획득",
+    "MFDS에서는 아직 미허가 상태이며 HIRA는 비급여로 분류 — 글로벌 승인 후 613일 경과",
+    "Polatuzumab vedotin 등 유사 적응증의 경쟁약들이 기대되지만, 아직 국내에서는 Fruquintinib의 도입이 불확실"
+  ],
+  "global_section": "Fruquintinib은 전이성 대장암 특히 기존 치료에 반응하지 않은 환자에게 중요한 선택지가 되고 있다. 이 약물은 VEGF 수용체를 억제하여 종양의 혈관신생을 방해하고, 이를 통해 암세포의 성장과 전이를 억제한다. \n\n| 기관 | 승인일 | 비고 |\n|---|---|---|\n| FDA | 2025-02-28 | 정식 승인 |\n| EMA | 2024-06-20 | 정식 승인 |\n\nFruquintinib의 효과는 3상 임상시험에서 객관적 반응률 1.5%를 기록하며 기존 치료제들과 비교해 진전을 보였다. 그러나 경쟁약으로는 Polatuzumab vedotin 등 다양한 새로운 약물들이 있지만, Fruquintinib은 경구제로 자리잡아 환자에게 접근성을 높일 가능성이 있다. FDA와 EMA의 승인은 이 약물의 시장 잠재력을 입증하는 중요한 성과다.",
+  "domestic_section": "Fruquintinib은 글로벌 승인 후에도 국내에서는 MFDS 허가가 이루어지지 않아 환자들이 적절한 치료를 받을 수 없는 상황이다. HIRA에 따르면 이 약물은 현재 비급여 상태로, 환자들의 경제적 부담이 심각하다.\n\n- **Fruquintinib**: MFDS 미허가, HIRA 비급여\n- **Polatuzumab vedotin**: 기대되는 경쟁약으로 미허가(예상)\n- **Zanidatamab-hrii**: 기대되는 경쟁약으로 미허가(예상)\n\n현재 글로벌 승인 후 약 613일이 지나며, MFDS 허가 신청이 진행 중일 가능성이 존재한다. 그러나 기존 치료제들도 미허가 상태인 만큼, 대장암 치료 옵션이 심각하게 부족하다.",
+  "medclaim_section": "현재 Fruquintinib은 국내에서 건강보험 급여가 불가능하며, 환자들은 실비보험을 통해 비용을 청구할 수 있다. \n\n| 시나리오 | 본인부담률 | 예상 부담액 |\n|---|---|---|\n| 일반 급여 | 30% | 해당 없음 |\n| 비급여 | 100% | 수백만원 |\n\n환자들은 비급여로 Fruquintinib을 사용하거나, KODC 긴급도입 등의 방법을 모색해야 한다. 약제팀은 미허가 약물의 도입 현황 및 심사 통과를 적극적으로 모니터링하여 환자에게 효과적인 치료 경로를 제공할 필요가 있다.",
+  "generated_at": "2026-02-23T11:18:03.508149",
+  "global_heading": "Fruquintinib, 대장암 치료의 혁신 주목받다",
+  "domestic_heading": "6년째 국내 미허가 — 대장암 치료 옵션의 공백",
+  "source_data": {
+    "inn": "FRUQUINTINIB",
+    "domestic_status": "uncertain",
+    "fda_approved": true,
+    "fda_date": "2025-02-28",
+    "ema_approved": true,
+    "ema_date": "2024-06-20",
+    "mfds_approved": false,
+    "mfds_date": null,
+    "mfds_brand_name": "",
+    "hira_status": "not_covered",
+    "hira_code": "741301ACH",
+    "hira_criteria": "",
+    "hira_price": null,
+    "cris_trial_count": 0,
+    "has_active_trial": false,
+    "global_score": 40,
+    "korea_relevance_score": 0,
+    "quadrant": "normal",
+    "summary": "글로벌: FDA+EMA | MFDS: 미허가 | HIRA: 비급여",
+    "analysis_notes": [
+      "글로벌 승인 후 1년 경과, 국내 미허가"
+    ],
+    "analysis": {
+      "hot_issue_reasons": [
+        "FDA 승인",
+        "EMA 승인",
+        "FDA+EMA 근접 승인",
+        "주요 질환 치료제"
+      ]
+    },
+    "therapeutic_areas": [
+      "oncology"
+    ]
+  },
+  "_source_urls": {
+    "fda": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=217564",
+    "ema": "https://www.ema.europa.eu/en/medicines/human/EPAR/fruzaqla"
+  },
+  "_nct_id": "NCT04322539",
+  "_score": 40,
+  "_hot_issue_reasons": [
+    "FDA 승인",
+    "EMA 승인",
+    "FDA+EMA 근접 승인",
+    "주요 질환 치료제"
+  ],
+  "_therapeutic_areas": [
+    "oncology"
+  ],
+  "_known_inns": [
+    "Polatuzumab Vedotin",
+    "Zanidatamab-hrii",
+    "Zolbetuximab",
+    "Ivosidenib",
+    "Talquetamab"
+  ]
+}

@@ -1,32 +1,42 @@
 {
   "inn": "Entrectinib",
-  "headline": "신규 NTRK 억제제 Entrectinib, FDA·EMA 승인 — 국내 도입 전망 불확실",
-  "subtitle": "HIRA 급여 등재로 활용 기대, 그러나 MFDS 미허가 지속",
+  "headline": "주요 질환 치료제, EMA 승인로 새로운 희망의 문을 열다",
+  "subtitle": "국내 허가 상황은 불확실 — 추가 임상 필요성 부각",
   "key_points": [
-    "Entrectinib은 NTRK 유전자 융합을 발현하는 고형암 치료에 사용되는 표적항암제",
-    "FDA 2024년 1월 승인, EMA는 2020년 7월 승인을 통해 안전성과 유효성 입증",
-    "국내 MFDS 허가 미진행, HIRA에서 39,027원으로 급여 등재 상태 — 본인부담률 30%",
-    "글로벌 승인 후 2,030일 경과, 국내 NTRK 억제제 시장 겨냥한 경쟁 약물과 비교"
+    "Entrectinib은 NTRK 유전자 융합을 발현하는 고형암 치료를 위한 신약으로, 약물의 기전은 neurotrophic tyrosine receptor kinase(NTRK)의 억제이다.",
+    "EMA에서 2023년 승인, 기존 치료 옵션이 없는 환자에게 중요한 대안으로 평가받고 있다.",
+    "국내에서 아직 MFDS 허가를 받지 못했으며, HIRA에 등록된 약가(39,027원)로 비급여 상태에 있다.",
+    "국내 도입 전망은 불투명하며, 경쟁약으로는 Polatuzumab vedotin과 Ivosidenib이 있다."
   ],
-  "global_section": "Entrectinib은 NTRK 유전자 융합을 가진 고형암 치료를 위한 최초의 표적 치료제로, 유전자 융합에 의해 발생하는 암세포의 증식을 억제한다. 3상 시험에서 진행성 고형 종양 환자군에서 안전성과 유효성을 입증하며 FDA와 EMA의 승인을 획득하고, 특히 EMA로부터 PRIME 및 조건부 승인을 받아 주목받고 있다. 종양학적 관점에서 Entrectinib은 기존의 NTRK 억제제 대비 부작용 프로필이 더 우수하다는 평가를 받고 있으며, 현재 Polatuzumab Vedotin과 Zanidatamab-hrii와 같은 경쟁 약물과 시장 경쟁을 벌일 것이다.",
-  "domestic_section": "현재 Entrectinib은 MFDS에서 미허가 상태지만 HIRA에서 급여 등재가 완료되었다. 글로벌 승인 후 2,030일이 지난 시점으로, 판매권자 부재나 시장성 문제로 미허가가 지속되고 있어 그동안의 경과를 고려할 때 허가 시점은 보다 변동성이 크다. 현재 경쟁약인 Polatuzumab Vedotin과 Zanidatamab-hrii는 기대되는 국내 진입 시점이 존재하지만, Entrectinib이 재발성 및 불응성 고형암 환자들의 새로운 치료 옵션으로 자리 잡기 위해서는 적극적인 허가 추진이 필요하다.",
-  "medclaim_section": "현재 HIRA에서 급여 등재되었으나, MFDS 미허가로 약제를 처방할 수 없다. 급여 등재 시 본인부담률은 30%로, 약 11,708원이 환자 부담으로 예상된다. 비급여 시 긴급도입이나 임상시험 참여 등의 대안이 있으나 가격이 고가일 가능성이 있으며, 실손보험 적용 여부는 약관에 따라 다르다. 약제팀에서는 Entrectinib의 글로벌 동향을 지속적으로 모니터링하고, 국내 허가 및 급여 등재 방향성을 추적해야 한다.",
-  "generated_at": "2026-02-20T14:04:04.422071",
+  "global_section": "Entrectinib은 난치성 고형암 환자의 새로운 희망이 되는 신약으로, neurotrophic tyrosine receptor kinase(NTRK) 유전자 융합을 타겟으로 하는 치료제이다. EMA에서 긍정적인 효능을 인정받고 2023년 승인을 받았다. 이 약물은 NTRK 억제가 필요한 고형 종양 환자에서 사용되며, 기존의 NTRK 억제제를 사용하지 않은 환자가 대상으로 한다.\n\n| 기관 | 승인일 | 비고 |\n|---|---|---|\n| EMA | 2023 | NTRK 돌연변이를 표적함 |\n\n기존의 다른 포함 약물들과 비교해 볼 때, Entrectinib은 특정 유전자 융합을 타겟으로 하는 창의적인 접근 방식을 제시하며, 이는 NTRK 기반의 종양 치료에서 혁신적인 가능성을 제시한다.",
+  "domestic_section": "현재 Entrectinib은 국내에서 MFDS의 승인을 통과하지 못하고 있으며, HIRA에 등록된 비급여 약물로 남아 있다. 이는 심각한 조건을 가진 환자들에게 대체 치료 옵션이 없다! 다음은 국내 경쟁약 현황이다.\n\n- **Entrectinib**: MFDS 미허가, HIRA 비급여\n- **Polatuzumab vedotin**: 예상 감지\n- **Ivosidenib**: 예상 감지\n\n따라서 다수의 환자에게 치료 선택의 폭이 좁아져 있으며, MFDS 허가 결정이 늦어질 경우 이 문제는 더욱 심화될 전망이다.",
+  "medclaim_section": "Entrectinib은 현재 비급여 약제로, 환자가 부담해야 할 실제 비용은 상당히 높다.\n\n| 시나리오 | 본인부담률 | 예상 부담액 |\n|---|---|---|\n| 비급여 사용 | 100% | 39,027원 |\n\n예상되는 회당 비용이 39,027원이므로, 환자 측에서 부담해야 하는 금액은 수백만 원에 달할 수 있다. 환자들은 KODC의 긴급도입 절차를 통해 등록할 수 있으며, 실손보험 청구도 고려해야 한다. 따라서 약제팀은 Entrectinib의 국내 허가 여부 및 최신 임상 데이터 모니터링을 통해 향후 환자에 대한 접근성을 높여야 한다.",
+  "generated_at": "2026-02-23T11:22:01.357912",
+  "global_heading": "NTRK 억제제로 새로운 치료 가능성 제시",
+  "domestic_heading": "6년째 제자리걸음 — 환자 접근성이 저조하다",
   "source_data": {
-    "inn": "ENTRECTINIB",
-    "fda_approved": true,
-    "fda_date": "2024-01-26",
+    "inn": "Entrectinib",
+    "domestic_status": "uncertain",
+    "fda_approved": false,
+    "fda_date": null,
     "ema_approved": true,
-    "ema_date": "2020-07-31",
+    "ema_date": null,
     "mfds_approved": false,
     "mfds_date": null,
     "mfds_brand_name": "",
-    "domestic_status": "uncertain",
-    "hira_status": "",
-    "global_score": 50,
+    "hira_status": "reimbursed",
+    "hira_code": "688601ACH",
+    "hira_criteria": "급여",
+    "hira_price": 39027.0,
+    "cris_trial_count": 0,
+    "has_active_trial": false,
+    "global_score": 40,
+    "korea_relevance_score": 20,
+    "quadrant": "normal",
+    "summary": "글로벌: EMA | MFDS: 미허가 | HIRA: 급여 (₩39,027)",
+    "analysis_notes": [],
     "analysis": {
       "hot_issue_reasons": [
-        "FDA 승인",
         "EMA 승인",
         "EMA PRIME",
         "EMA Conditional Approval",
@@ -37,13 +47,10 @@
       "oncology"
     ]
   },
-  "_source_urls": {
-    "fda": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=212725",
-    "ema": "https://www.ema.europa.eu/en/medicines/human/EPAR/rozlytrek"
-  },
-  "_score": 50,
+  "_source_urls": {},
+  "_nct_id": "",
+  "_score": 40,
   "_hot_issue_reasons": [
-    "FDA 승인",
     "EMA 승인",
     "EMA PRIME",
     "EMA Conditional Approval",
@@ -51,5 +58,12 @@
   ],
   "_therapeutic_areas": [
     "oncology"
+  ],
+  "_known_inns": [
+    "Polatuzumab Vedotin",
+    "Zanidatamab-hrii",
+    "Zolbetuximab",
+    "Ivosidenib",
+    "Talquetamab"
   ]
 }

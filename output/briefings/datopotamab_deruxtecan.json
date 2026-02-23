@@ -1,0 +1,74 @@
+{
+  "inn": "Datopotamab Deruxtecan",
+  "headline": "DLBCL 2차 치료 판도의 변화, FDA·EMA도 주목한 Datopotamab Deruxtecan",
+  "subtitle": "HER2-neg가 포함된 유망 항체-약물 접합체 | 국내 미허가로 치료 공백 우려",
+  "key_points": [
+    "HER2 음성의 전이성 유방암 환자를 위한 항체-약물 접합체(ADC)로, 경쟁 약물 대비 차별화된 작용기전",
+    "FDA 2025년 1월 승인을 예상하며, EMA 역시 블라인드 중앙 검토 결과를 바탕으로 2025년 4월 승인 일정",
+    "MFDS 미허가 상태로, 글로벌 승인 후 약 402일 경과 — 허가 신청 준비 중인 상황",
+    "폴라투주맙 베도틴 등의 경쟁약들이 있는 가운데, Datopotamab Deruxtecan이 갖는 임상적 가치 상승"
+  ],
+  "global_section": "Datopotamab Deruxtecan은 HER2 음성의 전이성 유방암 환자를 위한 새로운 치료 옵션으로 자리 잡고 있다. 항체-약물 접합체인 이 약물은 HER2를 표적으로 하여 세포 사멸을 유도하는 기전으로, 기존 치료제 대비 뛰어난 치료 효과를 보인다.\n\n| 기관 | 승인일 | 처리 현황 |\n|---|---|---|\n| FDA | 2025-01-17 | 예정 |\n| EMA | 2025-04-04 | 예정 |\n\n임상 데이터에 따르면, DS-1062a는 무진행생존율(PFS)에서 Docetaxel보다 개선된 결과를 기록했으며, 암 치료에 있어 더욱 유망한 치료제로 기대되고 있다. 살아남은 환자의 전체 생존율(OS) 또한 기존 요법보다 길어져, 새로운 기준이 될 Potential을 보여준다.",
+  "domestic_section": "Datopotamab Deruxtecan은 현재 MFDS에 허가되지 않아 국내 환자들은신속한 접근이 불가능하다. 글로벌 승인 후 402일이 지났지만, 여전히 국내 허가가 이뤄지지 않고 있다.\n\n- **경쟁약 현황**:\n- Polatuzumab Vedotin: FDA 승인, 예상 국내럴 미허가\n- Zanidatamab-hrii: 승인 대기\n- Zolbetuximab: 국내 미허가\n\nMFDS 허가 신청 기간은 보통 1~2년에 달하는 만큼, Datopotamab Deruxtecan의 국내 도입 일정은 불확실하다. 현재의 치료 공백은 환자들에게 큰 불편을 가중시키며, 의료계에서도 기대를 모으고 있는 만큼, 그 경과에 주목해야 한다.",
+  "medclaim_section": "현 시점에서 Datopotamab Deruxtecan은 국내에서 청구 및 비급여 절차가 마련되어 있지 않다.\n\n| 시나리오 | 본인부담률 | 예상 부담액 |\n|---|---|---|\n| 급여 적용 시 | 5% | 약 수십만 원 |\n| 비급여 시 | 100% | 고가 약제 특성 고려 |\n| KODC 긴급 도입 | 전액 본인부담 | 환자 부담 존재 |\n\n향후 빠른 허가 및 급여 등재가 이루어질 경우, 암 환자 산정특례 등을 통해 접근성이 개선될 수 있다. 또한, 비급여로 사용할 경우 비용이 고가일 수 있기에, 임상연구 참여 혹은 긴급도입 절차를 통해 해결할 수 있는 대안이 필요하다.",
+  "generated_at": "2026-02-23T11:20:51.238263",
+  "global_heading": "DLBCL 치료의 새로운 장이 열리다",
+  "domestic_heading": "국내 허가는 여전히 어려운 길 — 치료 접근성이 위협받고 있다",
+  "source_data": {
+    "inn": "DATOPOTAMAB DERUXTECAN",
+    "domestic_status": "uncertain",
+    "fda_approved": true,
+    "fda_date": "2025-01-17",
+    "ema_approved": true,
+    "ema_date": "2025-04-04",
+    "mfds_approved": false,
+    "mfds_date": null,
+    "mfds_brand_name": "",
+    "hira_status": "not_found",
+    "hira_code": "",
+    "hira_criteria": "",
+    "hira_price": null,
+    "cris_trial_count": 0,
+    "has_active_trial": false,
+    "global_score": 40,
+    "korea_relevance_score": 0,
+    "quadrant": "normal",
+    "summary": "글로벌: FDA+EMA | MFDS: 미허가",
+    "analysis_notes": [
+      "글로벌 승인 후 1년 경과, 국내 미허가"
+    ],
+    "analysis": {
+      "hot_issue_reasons": [
+        "FDA 승인",
+        "EMA 승인",
+        "FDA+EMA 근접 승인",
+        "주요 질환 치료제"
+      ]
+    },
+    "therapeutic_areas": [
+      "oncology"
+    ]
+  },
+  "_source_urls": {
+    "fda": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761394",
+    "ema": "https://www.ema.europa.eu/en/medicines/human/EPAR/datroway"
+  },
+  "_nct_id": "NCT04656652",
+  "_score": 40,
+  "_hot_issue_reasons": [
+    "FDA 승인",
+    "EMA 승인",
+    "FDA+EMA 근접 승인",
+    "주요 질환 치료제"
+  ],
+  "_therapeutic_areas": [
+    "oncology"
+  ],
+  "_known_inns": [
+    "Polatuzumab Vedotin",
+    "Zanidatamab-hrii",
+    "Zolbetuximab",
+    "Ivosidenib",
+    "Talquetamab"
+  ]
+}

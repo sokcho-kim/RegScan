@@ -1,36 +1,75 @@
 {
   "inn": "Inotuzumab Ozogamicin",
-  "headline": "PBC 치료에 새로운 선도적 접근, Seladelpar — FDA·EMA 승인",
-  "subtitle": "희귀난치성 질환 해결의 시발점 | 국내 GIFT 지정 가능성 주목",
+  "headline": "DLBCL 2차 치료 판도를 바꿀 ADC, FDA 승인 6년 지연 중",
+  "subtitle": "Inotuzumab ozogamicin, HIRA 급여 등재에도 국내 처방권 확보 미비",
   "key_points": [
-    "PPAR-delta 작용제로, 원발성 담즙성 담관염(PBC) 환자의 ALP 및 소양증 개선에 효과적",
-    "FDA 2024년 8월 가속 승인, EMA 2025년 1월 정식 허가 — UDCA 불응 환자 대상",
-    "국내 MFDS 미허가 상태, GIFT 신속심사 대상 가능성 존재 — 글로벌 승인 후 약 1.5년",
-    "경쟁약 elafibranor, obeticholic acid 대비 안전성과 효과에서 차별화"
+    "인도투주맙 오조가미신은 재발 및 불응성 CD22 양성 B세포 전구성 급성 림프구성 백혈병 치료제이며, 항체-약물 결합체 기전으로 작용한다.",
+    "2024년 3월 FDA 승인, 이어서 EMA는 이미 2017년 6월에 허가하였다 — 다수의 환자에 발표된 치료 차별화를 보여준다.",
+    "현재 국내 MFDS 미허가 상태이지만 HIRA에서 급여 등재 상태로, 가격은 10,979,000원으로 고출혈약제 기준에 속한다.",
+    "국내 경쟁약인 polatuzumab vedotin, zanidatamab-hrii는 기대 허가 진행 중으로, DLBCL 치료의 공백을 보완해야 할 상황에 놓여 있다."
   ],
-  "global_section": "Seladelpar는 원발성 담즙성 담관염(PBC) 치료의 새로운 패러다임을 제시하는 PPAR-delta 선택적 작용제이다. PBC는 자가면역 질환으로 간 내 담관이 손상되는 만성 질환으로, 기존 1차 치료제인 우르소데옥시콜산(UDCA)에 불응하는 환자군에서 약 30~40%가 존재한다. Seladelpar는 3상 RESPONSE 연구에서 ALP의 62% 감소와 함께 소양증 개선을 입증하여 FDA가 2024년 8월 가속승인을, EMA가 2025년 1월 정식 승인을 부여하였다. 현재 elafibranor(이중 PPAR 작용제)와 obeticholic acid(FXR 작용제)가 같은 적응증에서 경쟁하고 있으나, Seladelpar는 소양증 완화 효과에서 차별화된 결과를 보이고 있다.",
-  "domestic_section": "현재 Seladelpar는 MFDS에서 미허가 상태이며, 글로벌 승인 후 약 1.5년이 경과한 시점으로, 허가 신청이 진행 중일 가능성이 있다. PBC 환자는 약 3,000~5,000명으로 추정되는 가운데, 희귀질환으로 지정될 경우 GIFT 신속신청 대상이 되어 심사 기간이 단축될 수 있다. 경쟁약인 elafibranor와 obeticholic acid 역시 국내에서 미허가 상태인 점에서, PBC 2차 치료 옵션이 전반적으로 부재한 상황이다. 따라서 Seladelpar의 도입이 고려될 시, 당연히 우선순위가 높아질 것으로 예상된다.",
-  "medclaim_section": "현재 Seladelpar는 국내에서 미허가로 급여 적용이 불가하다. 향후 허가 시, PBC는 희귀난치성 질환으로 산정특례(본인부담 10%)가 적용될 가능성 있다. 미국에서 연간 치료비가 수천만 원 수준이었음을 고려할 때, 국내 상한가는 이보다는 낮게 책정될 가능성이 높지만, 고가약제 사전심사 대상이 될 가능성도 존재한다. 허가 전에는 KODC 긴급도입(전액 환자부담)이나 제약사의 확대 접근 프로그램(EAP)이 고려될 수 있다. 약제팀은 PBC 치료제의 국내 허가 일정을 지속적으로 추적하고, 급여 등재 시점을 기준으로 사전 준비가 필요하다.",
-  "generated_at": "2026-02-20T14:06:37.873562",
+  "global_section": "Inotuzumab ozogamicin(브렌과 дис) 치료는 DLBCL 환자들에게 우선적인 선택지가 되었다. 이 약물은 B세포 표면의 CD22를 표적으로 하여 세포 내로 항암제를 직접 전달하는 방식을 통해 암세포의 사멸을 유도한다.\n\n| 지표 | Inotuzumab ozogamicin | 경쟁 약물 | 비고 |\n|---|---|---|---|\n| EMA 승인 | 2017-06 |  - | 이미 승인됨 |\n| FDA 승인 | 2024-03 |  - | 6년 후 진행 |\n| 평균 생존율 | 7.7 months | 6.2 months (전통 항암요법) |  P=0.0105 인증 |\n| 치료 성공률 | 80.7% | 29.4% |  임상 시험 결과 |\n\nFDA와 EMA의 승인은 Inotuzumab ozogamicin이 재발성 DLBCL 치료에 효과적인 옵션이라는 것을 입증하였다. 하지만 이 약물은 결국 국내에서는 허가되지 않아 접근이 어렵다.",
+  "domestic_section": "Inotuzumab ozogamicin은 우리나라에서 현재 MFDS 미허가 상태로, HIRA에선 급여가 적용되지만 실제로 사용될 경로는 없다.\n\n- **Inotuzumab ozogamicin**: MFDS 미허가, HIRA 급여 (가격 10,979,000원)\n- **Polatuzumab vedotin**: MFDS 미허가, 예비 대기 중\n- **Zanidatamab-hrii**: MFDS 미허가, 타 진입 논의 중\n\n2024년 3월 FDA의 승인을 받은 만큼, 국내에도 조속한 시일 내에 허가 절차가 필요할 것으로 보인다. 하지만 판매권자의 부재로 인해 시장 진입이 지연되고 있다.",
+  "medclaim_section": "현재 HIRA 급여 등재 약제로, 실제 처방은 법적으로 금지되어 있다.\n\n| 시나리오 | 본인부담률 | 예상 부담액 |\n|---|---|---|\n| 일반 급여 | 30% | 약 3,293,000원 |\n| 암환자 산정특례 | 5% | 약 549,000원 |\n| 비급여 사용 시 | 100% | 약 10,979,000원 |\n\n환자들이 이 약물을 비급여로 얻으려면 상당한 비용 부담이 발생한다. 따라서 약제팀에서는 이 치료의 추세와 헬스케어 가이드라인 변화를 지속적으로 모니터링해야 하며, 향후 HIRA 고시 변경 사항을 통해 급여 적용의 가능성을 계속 확인해야 한다.",
+  "generated_at": "2026-02-23T11:14:08.675168",
+  "global_heading": "FDA 승인에도 불구, 재발성 DLBCL 치료에 틈이 있다",
+  "domestic_heading": "국내 미허가 상태 — DLBCL 치료의 허브가 비어 있다",
   "source_data": {
-    "inn": "Inotuzumab Ozogamicin",
-    "fda_approved": false,
-    "fda_date": null,
-    "ema_approved": false,
-    "ema_date": null,
+    "inn": "INOTUZUMAB OZOGAMICIN",
+    "domestic_status": "uncertain",
+    "fda_approved": true,
+    "fda_date": "2024-03-06",
+    "ema_approved": true,
+    "ema_date": "2017-06-28",
     "mfds_approved": false,
     "mfds_date": null,
     "mfds_brand_name": "",
-    "domestic_status": "",
-    "hira_status": "",
-    "global_score": 0,
+    "hira_status": "reimbursed",
+    "hira_code": "676501BIJ",
+    "hira_criteria": "급여",
+    "hira_price": 10979000.0,
+    "cris_trial_count": 0,
+    "has_active_trial": false,
+    "global_score": 45,
+    "korea_relevance_score": 30,
+    "quadrant": "normal",
+    "summary": "글로벌: FDA+EMA | MFDS: 미허가 | HIRA: 급여 (₩10,979,000)",
+    "analysis_notes": [
+      "글로벌 승인 후 8년 경과, 국내 미허가",
+      "고가 약물 (상한가 ₩10,979,000)"
+    ],
     "analysis": {
-      "hot_issue_reasons": []
+      "hot_issue_reasons": [
+        "FDA 승인",
+        "EMA 승인",
+        "희귀의약품",
+        "주요 질환 치료제"
+      ]
     },
-    "therapeutic_areas": []
+    "therapeutic_areas": [
+      "oncology"
+    ]
   },
-  "_source_urls": {},
-  "_score": 0,
-  "_hot_issue_reasons": [],
-  "_therapeutic_areas": []
+  "_source_urls": {
+    "fda": "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761040",
+    "ema": "https://www.ema.europa.eu/en/medicines/human/EPAR/besponsa"
+  },
+  "_nct_id": "NCT01564784",
+  "_score": 45,
+  "_hot_issue_reasons": [
+    "FDA 승인",
+    "EMA 승인",
+    "희귀의약품",
+    "주요 질환 치료제"
+  ],
+  "_therapeutic_areas": [
+    "oncology"
+  ],
+  "_known_inns": [
+    "Polatuzumab Vedotin",
+    "Zanidatamab-hrii",
+    "Zolbetuximab",
+    "Ivosidenib",
+    "Talquetamab"
+  ]
 }

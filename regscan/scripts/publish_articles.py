@@ -23,6 +23,28 @@ logger = logging.getLogger(__name__)
 
 OUTPUT_DIR = settings.BASE_DIR / "output" / "briefings"
 
+# ── 산정특례 매핑 (적응증 기반) ──
+COPAY_EXEMPTION_MAP = {
+    "oncology": {"label": "암환자 산정특례", "rate": 0.05},
+    "rare_disease": {"label": "희귀질환 산정특례", "rate": 0.10},
+}
+
+
+def _get_copay_exemption(impact) -> dict | None:
+    """적응증 기반 산정특례 카테고리 결정.
+
+    oncology → 암환자 산정특례(5%), rare_disease/희귀 → 희귀질환(10%), 그 외 → None.
+    """
+    areas = getattr(impact, 'therapeutic_areas', []) or []
+    reasons = getattr(impact, 'hot_issue_reasons', []) or []
+    is_orphan = any("희귀" in r or "Orphan" in r for r in reasons)
+
+    if "oncology" in areas:
+        return COPAY_EXEMPTION_MAP["oncology"]
+    if "rare_disease" in areas or is_orphan:
+        return COPAY_EXEMPTION_MAP["rare_disease"]
+    return None  # 산정특례 해당 없음
+
 
 def to_display_case(inn: str) -> str:
     """INN을 표시용 Title Case로 변환.
@@ -970,19 +992,19 @@ async def load_drugs_from_db(
         all_result = await session.execute(all_stmt)
         all_rows = all_result.all()
 
-        # area → [(inn, score, domestic_status)] 매핑
+        # area → [(inn, score, domestic_status)] 매핑 (primary area만 사용)
         area_index: dict[str, list[dict]] = {}
         for row in all_rows:
             areas = row.therapeutic_areas.split(",") if row.therapeutic_areas else []
-            for area in areas:
-                area = area.strip()
-                if not area:
-                    continue
-                area_index.setdefault(area, []).append({
-                    "inn": row.inn,
-                    "score": row.global_score,
-                    "domestic_status": row.domestic_status or "",
-                })
+            primary_area = areas[0].strip() if areas else ""
+            if not primary_area:
+                continue
+            area_index.setdefault(primary_area, []).append({
+                "inn": row.inn,
+                "score": row.global_score,
+                "domestic_status": row.domestic_status or "",
+                "therapeutic_areas": row.therapeutic_areas or "",
+            })
 
         analyzer = DomesticImpactAnalyzer()
         impacts = []
@@ -1091,21 +1113,31 @@ async def load_drugs_from_db(
                                             comp_with_indication["indication"] = comp_indication[:150]
                                         competitors.append(comp_with_indication)
 
-            # 5-b) DB therapeutic_area 폴백
-            if len(competitors) < 3:
-                for area in status.therapeutic_areas:
-                    area = area.strip()
-                    for comp in area_index.get(area, []):
-                        if comp["inn"] in seen:
-                            continue
-                        seen.add(comp["inn"])
-                        competitors.append(comp)
+            # 5-b) DB therapeutic_area 폴백 (primary area 기반)
+            target_primary = (
+                status.therapeutic_areas[0].strip()
+                if status.therapeutic_areas else ""
+            )
+            if len(competitors) < 3 and target_primary:
+                for comp in area_index.get(target_primary, []):
+                    if comp["inn"] in seen:
+                        continue
+                    # primary area가 동일한 약물만 매칭
+                    comp_areas = comp.get("therapeutic_areas", "").split(",")
+                    comp_primary = comp_areas[0].strip() if comp_areas else ""
+                    if comp_primary != target_primary:
+                        continue
+                    seen.add(comp["inn"])
+                    competitors.append(comp)
 
             # score 내림차순 정렬 후 상위 5개, INN Title Case 정규화
             competitors.sort(key=lambda x: x["score"], reverse=True)
             for comp in competitors:
                 comp["inn"] = to_display_case(comp["inn"])
             impact._competitors = competitors[:5]
+
+            # ── 6) 산정특례 카테고리 주입 ──
+            impact._copay_exemption = _get_copay_exemption(impact)
 
             impacts.append(impact)
 
@@ -1245,21 +1277,22 @@ async def run_publish(
     logger.info("  DB 로드: %d건", len(impacts))
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    generator = LLMBriefingGenerator(provider="openai", model="gpt-4o-mini")
+    generator = LLMBriefingGenerator(provider="openai", model="gpt-5.2")
     loader = DBLoader()
     articles_meta = []
     generated = 0
     failed = 0
     skipped = 0
 
-    for i, impact in enumerate(impacts, 1):
+    # ── 1단계: LLM 브리핑 병렬 생성 ──
+    sem = asyncio.Semaphore(10)
+    results: list[tuple] = []
+
+    async def _gen_one(idx: int, impact):
         safe_name = _safe_filename(impact.inn)
         json_path = OUTPUT_DIR / f"{safe_name}.json"
-        html_path = OUTPUT_DIR / f"{safe_name}.html"
 
-        # LLM 브리핑 생성
         if skip_llm and json_path.exists():
-            # 기존 JSON 로드
             try:
                 data = json.loads(json_path.read_text(encoding="utf-8"))
                 report = BriefingReport(
@@ -1272,31 +1305,48 @@ async def run_publish(
                     medclaim_section=data.get("medclaim_section", ""),
                     source_data=data.get("source_data"),
                 )
-                logger.info("  [%d/%d] %s — 기존 JSON 로드", i, len(impacts), impact.inn)
-                skipped += 1
+                logger.info("  [%d/%d] %s — 기존 JSON 로드", idx, len(impacts), impact.inn)
+                return impact, report, "skipped"
             except Exception as e:
-                logger.warning("  [%d/%d] %s — JSON 로드 실패: %s", i, len(impacts), impact.inn, e)
-                failed += 1
-                continue
-        else:
+                logger.warning("  [%d/%d] %s — JSON 로드 실패: %s", idx, len(impacts), impact.inn, e)
+                return impact, None, "failed"
+
+        async with sem:
             try:
                 logger.info("  [%d/%d] %s (score=%d) — LLM 브리핑 생성 중...",
-                           i, len(impacts), impact.inn, impact.global_score)
+                           idx, len(impacts), impact.inn, impact.global_score)
                 report = await generator.generate(impact)
-                # DB 저장
                 try:
                     await loader.save_briefing(report)
                 except Exception as e:
                     logger.debug("  DB 저장 건너뜀: %s", e)
-                generated += 1
+                return impact, report, "generated"
             except Exception as e:
-                logger.warning("  [%d/%d] %s — 브리핑 생성 실패: %s", i, len(impacts), impact.inn, e)
-                failed += 1
-                continue
+                logger.warning("  [%d/%d] %s — 브리핑 생성 실패: %s", idx, len(impacts), impact.inn, e)
+                return impact, None, "failed"
+
+    tasks = [_gen_one(i, imp) for i, imp in enumerate(impacts, 1)]
+    batch_results = await asyncio.gather(*tasks)
+
+    # ── 2단계: HTML/JSON 저장 (순차) ──
+    for impact, report, status in batch_results:
+        if status == "skipped":
+            skipped += 1
+        elif status == "generated":
+            generated += 1
+        else:
+            failed += 1
+            continue
+
+        if report is None:
+            continue
+
+        safe_name = _safe_filename(impact.inn)
+        json_path = OUTPUT_DIR / f"{safe_name}.json"
+        html_path = OUTPUT_DIR / f"{safe_name}.html"
 
         # HTML 기사 생성
         report_data = report.to_dict()
-        # source_data: impact 객체의 to_dict()를 항상 base로 사용 (DB 기준)
         report_data["source_data"] = impact.to_dict()
         report_data["source_data"]["analysis"] = {
             "hot_issue_reasons": getattr(impact, 'hot_issue_reasons', []) or [],
@@ -1314,7 +1364,7 @@ async def run_publish(
         )
         html_path.write_text(html_content, encoding="utf-8")
 
-        # JSON 메타데이터 보강 (render-only 모드용, 양 경로 공통)
+        # JSON 메타데이터 보강
         _enriched = report.to_dict()
         _enriched["source_data"] = report_data["source_data"]
         _enriched["_source_urls"] = _urls

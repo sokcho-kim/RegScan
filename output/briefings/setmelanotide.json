@@ -1,36 +1,61 @@
 {
   "inn": "Setmelanotide",
-  "headline": "고도 비만에 대한 새로운 솔루션, Setmelanotide FDA 승인",
-  "subtitle": "Bardet-Biedl 증후군 환자 대상 | 국내 현황은 불확실",
+  "headline": "희귀의약품으로 주목받는 Setmelanotide, EMA 승인과 임상 적응증 확대",
+  "subtitle": "국내 허가 미비로 진료 현장에 공백 — 동급 경쟁약도 미허가",
   "key_points": [
-    "Setmelanotide는 고유의 POMC 결핍 및 BBS 치료를 위한 선택적 희귀의약품으로, 식욕 조절과 비만 치료에 효과적",
-    "EMA 2021년 7월, FDA 2025년 8월 승인 — 심각한 비만 환자의 새로운 치료 가능성 제시",
-    "우리나라에서 식약처 미허가, HIRA에 급여 등록되지 않아 환자 접근성 문제 존재",
-    "FDA 승인 이후 4년이 경과했으나, 국내 판매권자 미확보로 인한 허가 지연 및 경쟁약과의 비교로 인해 진입이 불투명"
+    "Setmelanotide는 POMC 및 LEPR 결핍에 따른 비만 치료에 사용되는 혁신적 약물로, 대사질환 치료군에 속한다.",
+    "EMA에서 2023년 9월 승인이 예정되어 있으며, 글로벌 시리즈에 안착한 EMA PRIME으로 지정받았다.",
+    "MFDS 미허가 상태로 국내 진입이 지연되고 있으며, HIRA에선 급여 상태가 확인되지 않고 있다.",
+    "국내 도입 가능성은 희귀의약품 지정으로 향후 2년간 허가가 이루어질 것으로 기대된다."
   ],
-  "global_section": "Setmelanotide는 유전적으로 증명된 Bardet-Biedl 증후군(BBS) 및 프로옵티오멜라노코르틴(POMC) 결핍에 대한 치료제로, 비만과 관련된 식욕 조절에 혁신적 접근을 제공한다. 임상시험 결과에 따르면, Setmelanotide를 투여받은 환자들에서 BMI Z-Score가 감소하는 효과가 두드러지며, FDA 및 EMA의 승인은 이러한 효과를 바탕으로 이루어졌다. 기존의 비만 치료제들이 대안으로 자리잡고 있으나, Setmelanotide는 특히 특정 유전자 결함이 있는 환자에게 맞춤형 접근을 제공함으로써 경쟁력을 지닌다. 이러한 차별화된 작용기전과 효과는 향후 제약 시장에서 중요한 포지션을 확보하는 데 도움을 줄 것으로 기대된다.",
-  "domestic_section": "현재 Setmelanotide는 한국에서 식약처의 허가를 받지 못한 상태로, HIRA에 등재되지 않아 급여부터 접근성까지 모두 불확실한 상황이다. 글로벌 승인 후 1680일이 경과한 현재, 장기 미허가의 원인은 판매권자의 부재나 시장성 판단에 기인할 수 있다. 같은 적응증의 경쟁약인 Cabozantinib 및 Parathyroid Hormone 역시 국내에서의 상태가 불투명하지만, Setmelanotide는 특히 BBS와 관련된 복잡한 비만 관리에서 차별화된 후보로 여겨진다. 따라서 약제팀과 심사자는 이러한 경쟁 환경을 염두에 두고 약물의 특성과 필요성을 지속적으로 평가해야 한다.",
-  "medclaim_section": "현재 Setmelanotide는 국내에서 미허가 상태로, 건강보험 급여 청구가 불가능하다. 급여 등재가 이루어질 경우, 희귀의약품으로 지정될 가능성이 높아 본인부담률이 10%로 낮아질 수 있다. 그러나 시장에 도입되지 않으면 치료 هو間의 비급여 대안으로는 긴급도입이나 임상참여, 실손보험 청구 등의 경로가 있을 수 있다. 약제팀에서는 최신 허가 및 급여 변화에 대한 정보를 지속적으로 모니터링하고, 환자 접근성 문제를 해결하기 위한 방안을 마련해야 할 것이다.",
-  "generated_at": "2026-02-20T14:03:28.907215",
+  "global_section": "Setmelanotide는 유전적으로 확인된 Bardet Biedl 증후군 및 POMC와 LEPR 결핍에 의한 비만을 치료하는 혁신적 약물로, 대사제어의 새로운 기준으로 자리잡고 있다. 최근 EMA에서 승인된 것이 큰 이정표로 여겨지며, 이 약물이 목표하는 환자군의 치료 접근성을 높일 예정이다.\n\n| 기관 | 승인 예정일 | 여타 경쟁약 | 경쟁현황 |\n|---|---|---|---|\n| EMA | 2023-09 | Metreleptin | 미허가 | \n|   |   | Semaglutide | 미허가 | \n|   |   | Parathyroid Hormone | 미허가 | \n\nSetmelanotide의 혁신성은 고갈된 비만 치료 옵션을 환자들에게 제시할 가능성을 불러일으키는 데 충분하다. 또한 POMC 결핍 환자에 대한 표준치료의 새로운 패러다임 전환을 이끌 것으로 예측된다.",
+  "domestic_section": "Setmelanotide는 MFDS에서 아직 미허가 상태로, 이는 국내 환자들에게 치료의 공백을 안기고 있다. HIRA 인벤토리에서는 이 약물에 대한 급여등재 정보가 존재하지 않아 환자 접근에 심각한 영향을 미친다.\n\n- **경쟁약 현황**: \n- Metreleptin: MFDS 미허가\n- Semaglutide: MFDS 미허가\n- Parathyroid Hormone: MFDS 미허가\n\n국내에서 이러한 경쟁약들이 미허가 상태로 남아있어, Setmelanotide의 시장 진입이 더욱 절실하다. 현재 MFDS 허가에 대한 타임라인 추정에 따르면 최대 2년의 기간이 소요될 수 있으며, 이는 의료진과 환자들이 직면할 문제다.",
+  "medclaim_section": "현재 Setmelanotide는 MFDS 미허가로 건강보험 급여가 적용될 수 없다.\n\n| 시나리오 | 본인부담률 | 예상 비용 |\n|---|---|---|\n| 희귀질환 산정특례 | 10% | 수천만원 |\n| 비급여 사용 | 100% | 수천만원 |\n\n비급여 상황에서 환자는 전액 부담해야 하며, 약제팀에서는 KODC 긴급도입이나 제약사 EAP를 통해 접근할 수 있는 가능성을 탐색할 필요가 있다. 환자들에게는 실손보험을 통한 부분적인 환급을 고려할 수 있도록 안내해야 하며, 치료 옵션에 대한 명확한 정보 제공이 중요하다.",
+  "generated_at": "2026-02-23T13:17:06.423018",
+  "global_heading": "Setmelanotide가 바꿀 비만 치료의 패러다임",
+  "domestic_heading": "Setmelanotide의 국내 허가 지연되며 공백 존재",
   "source_data": {
-    "inn": "Setmelanotide",
+    "inn": "setmelanotide",
+    "domestic_status": "uncertain",
     "fda_approved": false,
     "fda_date": null,
-    "ema_approved": false,
+    "ema_approved": true,
     "ema_date": null,
     "mfds_approved": false,
     "mfds_date": null,
     "mfds_brand_name": "",
-    "domestic_status": "",
-    "hira_status": "",
-    "global_score": 0,
-    "analysis": {
-      "hot_issue_reasons": []
-    },
-    "therapeutic_areas": []
+    "hira_status": "not_found",
+    "hira_code": "",
+    "hira_criteria": "",
+    "hira_price": null,
+    "cris_trial_count": 0,
+    "has_active_trial": false,
+    "global_score": 40,
+    "korea_relevance_score": 10,
+    "quadrant": "normal",
+    "summary": "글로벌: EMA | MFDS: 미허가",
+    "analysis_notes": []
   },
   "_source_urls": {},
-  "_score": 0,
-  "_hot_issue_reasons": [],
-  "_therapeutic_areas": []
+  "_nct_id": "",
+  "_score": 40,
+  "_hot_issue_reasons": [
+    "EMA 승인",
+    "EMA PRIME",
+    "희귀의약품"
+  ],
+  "_therapeutic_areas": [
+    "metabolic"
+  ],
+  "_known_inns": [
+    "Setmelanotide",
+    "Parathyroid Hormone",
+    "Semaglutide",
+    "Palopegteriparatide",
+    "Metreleptin"
+  ],
+  "_copay_exemption": {
+    "label": "희귀질환 산정특례",
+    "rate": 0.1
+  }
 }
