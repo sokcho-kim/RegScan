@@ -13,6 +13,9 @@
         .meta-text { font-family: 'Inter', sans-serif; }
         .highlight-box { border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
         .timeline-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .fact-table { width: 100%; text-align: left; font-size: 0.875rem; margin: 1rem 0; border-collapse: collapse; }
+        .fact-table th { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600; background: #f9fafb; }
+        .fact-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
         abbr { text-decoration: none; border-bottom: 1px dashed #9ca3af; cursor: help; }
     </style>
 </head>
@@ -23,9 +26,9 @@
                 <div class="flex items-center space-x-3">
                     <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-indigo-600">MedClaim</a>
                     <span class="text-gray-300">|</span>
-                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑</span>
+                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑 V4</span>
                 </div>
-                <div class="meta-text text-sm text-gray-500">2026년 02월 23일</div>
+                <div class="meta-text text-sm text-gray-500">2026년 02월 24일</div>
             </div>
         </div>
     </header>
@@ -35,8 +38,8 @@
             <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded">EMA PRIME</span>
 
         </div>
-        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">동종 제대혈 CD34+ 세포치료제, 이식 공백 겨냥</h1>
-        <p class="text-xl text-gray-600 mb-8 leading-relaxed">EMA 조건부 승인 dorocubicel…국내 허가·급여는 ‘미확인’</p>
+        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">공여자 부재 HSCT 공백 겨냥한 비확장 CD34+ 세포치료제</h1>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">ema_status_text 기반 유럽 첫 발판, 국내는 mfds_status_text로 접근성 제약</p>
         <div class="flex items-center space-x-4 mb-10 pb-10 border-b border-gray-200 meta-text">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -47,29 +50,38 @@
             <span class="text-gray-300">&middot;</span>
             <span class="text-sm text-gray-500">Hot Issue Score: 55</span>
         </div>
+
+        <!-- 핵심 요약 (인사이트) -->
         <div class="highlight-box p-6 rounded-r-lg mb-10">
             <h3 class="font-bold text-gray-900 mb-3 meta-text text-sm">핵심 요약</h3>
             <ul class="space-y-2 text-gray-800">
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>Dorocubicel은 동종(타인) 제대혈 유래 CD34+ 조혈모세포(비확대) 기반의 세포치료제로, 골수파괴적 전처치 후 동종 조혈모세포이식이 필요하지만 ‘적합한 공여세포가 없는’ 성인 혈액암 환자를 대상으로 한다(분류: Other blood products).</span>
+                    <span>제대혈 유래 동종 CD34+ 조혈모세포(비확장) 기반 세포치료제로, 적절한 공여자 세포를 확보하지 못한 혈액암 환자의 동종 조혈모세포이식(HSCT)을 가능하게 하는 '세포 공급' 솔루션</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>유럽에서 EMA가 2025-08-25에 승인(조건부 승인, PRIME 포함)해 ‘공여세포 부재’라는 구조적 치료 공백을 규제적으로 인정받았다(글로벌 승인 D+182일).</span>
+                    <span>글로벌 측면에서는 ema_status_text가 의미하는 바가 크다: 표준 공여자 풀 밖 환자군(공여자 부재)에서 규제기관이 임상적 필요성과 위험-편익을 공식적으로 인정한 첫 이정표</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>국내에서는 식약처(MFDS) 허가 여부가 확인되지 않으며, 심평원(HIRA) 급여 등재 정보도 not_found로 확인된다(약가·급여기준 데이터 없음).</span>
+                    <span>국내는 mfds_status_text이며 심평원(HIRA)도 not_found로 확인돼, 현 시점에서는 제도권 치료 경로(허가·급여)로 환자 접근성이 열려 있지 않다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>EMA 승인 후 182일 경과 시점으로, 입력된 추정치(‘통상 허가 신청 준비 단계, 1~3년 소요’)에 따르면 국내는 당장 등재 논의보다 판매권자/자료 패키지 확보가 선행돼야 하는 구간이다.</span>
+                    <span>d_day_text가 시사하듯 국내 도입은 아직 '허가 신청 준비' 국면 해석이 합리적이며, 실제 진입을 좌우하는 변수는 이식센터 운영 적합성(세포 핸들링/공급망)과 급여 등재 시 고가·PA 이슈의 결합 가능성이다</span>
                 </li></ul>
         </div>
+
         <article class="report-body text-gray-800">
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">공여자 ‘없음’ 문제를 세포로 푼다</h2>
-            <div class="mb-6">Dorocubicel은 동종 조혈모세포이식(allo-HSCT)에서 가장 현실적인 병목인 ‘적합한 공여세포 부재’를 적응증으로 정면 돌파한 제대혈 유래 CD34+ 세포치료제다. 성인 혈액암 환자에서 이식이 필요해도 공여자 매칭이 불가능하면 치료 경로가 사실상 막히는데, 이 약물은 그 공백을 ‘대체 가능한 세포원’으로 메우는 콘셉트다. 비확대(non-expanded) CD34+ 세포를 사용한다는 점에서, 제조공정·세포수·이식 성적(생착, 이식편대숙주병 등) 데이터가 허가의 핵심 판단축이 된다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">규제기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">승인일</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">승인 여부가 확인되지 않는다</td><td class="px-3 py-2 border-b border-gray-100">-</td><td class="px-3 py-2 border-b border-gray-100">입력 데이터 기준</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><a href="https://www.ema.europa.eu/en/medicines/human/EPAR/zemcelpro" target="_blank" class="text-indigo-600 hover:underline">EMA</a></td><td class="px-3 py-2 border-b border-gray-100">승인했다</td><td class="px-3 py-2 border-b border-gray-100">2025-08-25</td><td class="px-3 py-2 border-b border-gray-100">EMA PRIME, 조건부 승인</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">식약처(MFDS)</td><td class="px-3 py-2 border-b border-gray-100">승인 여부가 확인되지 않는다</td><td class="px-3 py-2 border-b border-gray-100">-</td><td class="px-3 py-2 border-b border-gray-100">제품명 미기재</td></tr> </table> 항암영역 경쟁약으로 입력된 <a href="polatuzumab_vedotin.html" class="text-indigo-600 hover:underline">Polatuzumab Vedotin</a>(ADC) 등은 ‘종양 치료’ 자체를 겨냥하는 약물인 반면, dorocubicel은 ‘이식을 가능하게 만드는 세포원’에 초점이 있어 경쟁축이 치료라인 경쟁보다 ‘이식 인프라·공급망·공여세포 접근성’으로 이동한다. 즉, 동일한 혈액암 환자군을 둘러싸더라도 표준항암요법의 대체제가 아니라 이식 단계의 병목 해소제로 포지셔닝된다. EMA가 2025-08-25에 조건부 승인을 완료했다는 사실은, 임상적 유효성뿐 아니라 공중보건적 필요(공여자 부재)를 근거로 한 접근성 가치가 규제 판단에 반영됐음을 의미한다.</div>
+            <!-- 글로벌 섹션: 팩트 테이블 + 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
+            
+            <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">날짜</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">미허가</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2025-08-25</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">MFDS(식약처)</td><td class="px-3 py-2 border-b border-gray-100">미허가</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table></div>
+            
+            <div class="mb-6">이 약물이 지금 중요한 이유는, 혈액암에서 '치료 성패'를 가르는 HSCT가 공여자 매칭 실패로 시작조차 못 하는 환자군을 정면으로 겨냥하기 때문이다. 특히 ema_status_text와 함께 PRIME·Conditional Approval·희귀의약품 트랙이 겹치면서, 임상적 미충족 수요가 규제 프레임을 통해 공식화된 케이스로 읽힌다. 기전은 전형적 항암제가 아니라, 제대혈 유래 동종 CD34+ 조혈모세포를 비확장 상태로 제공해 골수파괴적 전처치 후 조혈 재건(engraftment)을 돕는 '이식용 세포제'다. 적응증 문구가 명확히 시사하듯 핵심 타깃은 <strong>적절한 다른 공여자 세포가 없는 성인 혈액종양 환자</strong>로, 치료 효과의 본질은 종양 직접 살상보다 이식의 성립(이식 실패·감염·출혈 위험 감소)에 있다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong><a href="polatuzumab_vedotin.html" class="text-indigo-600 hover:underline">Polatuzumab Vedotin</a></strong>: 항체-약물 접합체(ADC)로 림프종 약물치료 경쟁축에 속하며, 이식 '세포 공급' 문제와는 가치제안이 다르다</li> <li><strong><a href="talquetamab.html" class="text-indigo-600 hover:underline">Talquetamab</a></strong>: 다발골수종 면역치료 축으로, 이식 전후 치료전략에 영향을 줄 수는 있어도 공여자 부재를 해결하진 못한다</li> <li><strong><a href="ivosidenib.html" class="text-indigo-600 hover:underline">Ivosidenib</a></strong>: 분자표적(AML 등)으로 환자 선별이 핵심인 반면, dorocubicel은 공여자/세포원 접근성이 핵심이다</li> </ul> 결국 dorocubicel의 글로벌 포지션은 항암 약효 경쟁이 아니라, 이식 적격 환자에서 '공급 제약'을 해소해 치료 경로 자체를 열어주는 데 있다. 이런 성격의 제품은 효과 지표가 생존지표뿐 아니라 생착 속도·이식 관련 합병증·입원일수로 설명될 때 설득력이 커지며, Conditional Approval 트랙과도 논리적으로 맞물린다.</div>
+
+            <!-- 타임라인 (팩트) -->
             
             <div class="my-10 p-6 bg-gray-50 rounded-xl">
                 <h4 class="meta-text text-sm font-semibold text-gray-500 mb-6">승인 타임라인</h4>
@@ -85,21 +97,34 @@
                     </div>
                 </div>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">허가도 급여도 ‘흰 칸’이다</h2>
-            <div class="mb-6">국내에서는 dorocubicel의 식약처(MFDS) 허가 여부가 확인되지 않고, 심평원(HIRA)에도 등재 정보가 not_found로 잡혀 ‘코드-약가-기준’ 3종 세트가 모두 비어 있다. 특히 세포치료제는 병원 내 이식 프로토콜과 공급/보관/해동 등 운영요건이 처방 가능성을 좌우해, 허가보다 ‘도입 주체(판매권자)와 센터 채택’이 먼저 움직이는 경우가 많다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">항목</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">국내 현황(입력 데이터)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">실무적 의미</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">식약처(MFDS) 허가</td><td class="px-3 py-2 border-b border-gray-100">승인 여부가 확인되지 않는다</td><td class="px-3 py-2 border-b border-gray-100">시판/사용 경로 자체가 불명확</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">심평원(HIRA) 급여</td><td class="px-3 py-2 border-b border-gray-100">not_found</td><td class="px-3 py-2 border-b border-gray-100">청구 불가(약가·기준 부재)</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><abbr title="임상연구정보서비스, Clinical Research Information Service">CRIS</abbr> 임상</td><td class="px-3 py-2 border-b border-gray-100">0건</td><td class="px-3 py-2 border-b border-gray-100">국내 근거 축적·센터 경험 축이 비어 있음</td></tr> </table> 타임라인은 context에 ‘글로벌 승인 후 182일 — 통상 허가 신청 준비 단계 (1~3년 소요)’로 제시돼 있다. 이 문구대로라면 지금은 국내 허가심사(본 심사)가 진행 중이라기보다, 자료 준비·국내 파트너십 구축 단계에 가까운 구간이다. 비교 대상으로 제시된 경쟁 항암제들(예: Polatuzumab Vedotin)은 국내 도입 상태가 expected/uncertain로 혼재해 있으나, dorocubicel은 ‘이식용 혈액제제/세포치료’ 카테고리 특성상 약제팀은 항암제 도입 로직이 아니라 이식센터 수요·공여자 매칭률·제대혈 뱅킹/공급 계약의 관점으로 접근해야 한다. 심사자 관점에서는 향후 등재가 추진될 경우, 대상 환자군이 “다른 적합 공여세포가 없는 경우”로 극도로 좁아 급여기준 설계가 정량 요건(공여자 탐색 실패 정의, 이식 적합성 기준) 중심으로 갈 가능성이 크다.</div>
+
+            <!-- 국내 섹션: 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
+            
+            <div class="my-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 meta-text">
+                <strong>경과:</strong> 글로벌 승인 후 183일 경과 — 글로벌 승인 후 183일 — 통상 허가 신청 준비 단계 (1~3년 소요)
+            </div>
+            
+            <div class="mb-6">현재 국내 상태는 mfds_status_text 및 심평원 not_found가 보여주듯, 실제 환자에게 연결되는 제도권 경로가 막혀 있는 '접근성 공백'으로 해석된다. d_day_text는 글로벌 승인 이후 아직 시간이 짧아 국내 허가가 본격 궤도에 올랐다고 단정하기보다, 판매권·공급망·임상/CMC 패키지 정비가 진행되는 구간에 가깝다는 신호다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>Polatuzumab Vedotin / <a href="zanidatamab-hrii.html" class="text-indigo-600 hover:underline">Zanidatamab-hrii</a></strong>: domestic_status가 expected로 분류돼, 국내 항암 신약 도입 경쟁이 지속되는 반면 dorocubicel은 약물치료가 아닌 이식 인프라형 제품이라 도입 장벽의 성격이 다르다</li> <li><strong><a href="zolbetuximab.html" class="text-indigo-600 hover:underline">Zolbetuximab</a> / Ivosidenib / Talquetamab</strong>: uncertain으로, 국내 진입 불확실성은 공통 과제지만 dorocubicel은 '제조·유통·병원 내 세포처리' 요건이 추가된다</li> </ul> 국내 도입의 병목은 허가 자체보다, 이식센터가 요구하는 체인오브커스터디/콜드체인/투여 타이밍을 표준화하고, 공여자 부재 환자 선별 기준을 임상현장에서 합의하는 데서 생길 가능성이 높다. 또한 혈액암 이식은 상급종합병원 중심으로 집중돼 있어, 도입이 시작되면 처방기관이 제한된 형태로 빠르게 '센터 간 격차'가 나타날 수 있다. RA/MA 관점에서는 GIFT 등 신속심사 프레임을 활용할 수 있는 논리(희귀·미충족 수요, 글로벌 승인 완료)를 조기에 구조화하는 작업이 실무적으로 중요해진다.</div>
+
+            <!-- 메드클레임: 비용표(팩트) + 인사이트 -->
             <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
                 <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
-                <div class="space-y-3 text-gray-800"><p>현 시점에서 심평원 등재 정보가 not_found이므로, 건강보험 청구는 전제 자체가 성립하지 않는다(약가·급여기준 미존재). 또한 식약처 허가 여부도 확인되지 않아, 통상 처방·원내 사용 경로를 기사 데이터만으로는 단정할 수 없다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">환자 부담 계산</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여(일반 급여)</td><td class="px-3 py-2 border-b border-gray-100">30%</td><td class="px-3 py-2 border-b border-gray-100">약가 정보가 없어 산출 불가</td><td class="px-3 py-2 border-b border-gray-100">외래 기준(도메인 규칙)</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여(암환자 산정특례)</td><td class="px-3 py-2 border-b border-gray-100">5%</td><td class="px-3 py-2 border-b border-gray-100">약가 정보가 없어 산출 불가</td><td class="px-3 py-2 border-b border-gray-100">입력값: 암환자 산정특례 5%</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">약가 정보가 없어 산출 불가</td><td class="px-3 py-2 border-b border-gray-100">실손보험 청구 가능성</td></tr> </table> 현장에서 가능한 ‘대안 경로’는 (1) 국내 허가 전후로 제약사 프로그램(EAP/NPP)이 열리는지 확인하거나, (2) 제도권 내 긴급도입 절차가 적용 가능한지 병원 규정과 함께 검토하는 방식이 현실적이다(단, 입력 데이터에 KODC/프로그램 존재 여부는 없음). 약제팀은 향후 등재 협상 국면에서 고가약제 사전심사(PA) 해당 여부를 ‘1회 투여 100만원 초과’ 기준으로 점검해야 하지만, 현재는 약가가 없어 PA 여부를 판단할 수 없다. 심사 담당자는 향후 기준 설정 시 ‘공여세포 부재’의 입증 서류(공여자 탐색 기록, 대체 공여원 부적합 사유)가 청구 적정성의 핵심 증빙이 될 수 있다는 점을 사전 체크리스트로 준비하는 것이 실무적으로 유리하다.</p></div>
+                
+                <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 (암환자 산정특례)</td><td class="px-3 py-2 border-b border-gray-100">5%</td><td class="px-3 py-2 border-b border-gray-100">등재 후 결정</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">전액 환자 부담</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">KODC 긴급도입</td><td class="px-3 py-2 border-b border-gray-100">전액</td><td class="px-3 py-2 border-b border-gray-100">개별 신청</td></tr> </table></div>
+                
+                <div class="space-y-3 text-gray-800"><p>현 시점에서는 copay_scenario_text가 명시하듯 '현재는 전액 비급여'라는 전제가 먼저다. 즉, 표준 청구로 급여 적용을 전제한 처방 설계가 아니라, 환자 접근 경로 자체를 별도로 설계해야 하는 단계다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>KODC 긴급도입</strong>: cost_scenario_table에 따라 개별 신청이며 전액 부담 구조를 전제로 환자·보호자 상담(총비용, 일정, 공급 리드타임)을 선제 준비</li> <li><strong>임상시험/프로그램 경로</strong>: cris에서 trial_count가 0이므로 국내 임상 참여 옵션이 즉시 보이지 않으며, EAP/Named Patient Program 등 비임상 경로 존재 여부를 별도 확인</li> <li><strong>실손보험</strong>: 비급여 100% 구조에서는 청구 가능성이 논의되지만, 세포치료제·해외도입 특성상 지급 제한 조건을 사전 확인해야 한다</li> </ul> 향후 급여가 열릴 경우에는 copay_scenario_text에 근거해 암환자 산정특례(5%) 적용 가능성이 있으므로, 약제팀은 '이식 적응증 코드-산정특례 등록-사전심사(PA) 가능성'을 한 묶음으로 프로토콜화하는 게 실무 부담을 줄인다. 심사자 관점에서는 약효 비교가 아니라 공여자 부재 요건 충족 여부와 이식 경로의 의학적 불가피성(대체 공여자 옵션 부재)을 판단 축으로 삼는 심사 프레임 정리가 필요하다.</p></div>
             </div>
         </article>
+
         <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
             <div class="mb-4">
                 <strong>데이터 출처:</strong> FDA Drug Approvals Database, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/zemcelpro" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
             </div>
             <div class="text-xs text-gray-400">
-                본 리포트는 RegScan AI가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
-                의사결정에 활용 시 원문 확인을 권장합니다.
-                마지막 업데이트: 2026-02-23
+                본 리포트는 RegScan AI V4가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
+                팩트(날짜·금액·상태)는 Python이 사전 계산하였으며, 인사이트(분석)는 LLM이 생성했습니다.
+                마지막 업데이트: 2026-02-24
             </div>
         </footer>
     </main>

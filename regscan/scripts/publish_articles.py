@@ -1419,22 +1419,46 @@ async def _run_render_only():
         source_data["analysis"] = {"hot_issue_reasons": hot_issue_reasons}
         source_data["therapeutic_areas"] = therapeutic_areas
 
-        report_data = {
-            "inn": inn,
-            "headline": data.get("headline", ""),
-            "subtitle": data.get("subtitle", ""),
-            "key_points": data.get("key_points", []),
-            "global_section": data.get("global_section", ""),
-            "domestic_section": data.get("domestic_section", ""),
-            "medclaim_section": data.get("medclaim_section", ""),
-            "source_data": source_data,
-        }
+        pipeline_version = data.get("_pipeline_version", "v3")
 
-        html_content = generate_article_html(
-            report_data, score=score,
-            source_urls=source_urls, nct_id=nct_id,
-            known_inns=known_inns,
-        )
+        if pipeline_version == "v4":
+            v4_facts = data.get("_v4_facts", {})
+            facts = {
+                "inn": inn,
+                "source_data": source_data,
+                "d_day_text": v4_facts.get("d_day_text", ""),
+                "approval_summary_table": v4_facts.get("approval_summary_table", ""),
+                "cost_scenario_table": v4_facts.get("cost_scenario_table", ""),
+            }
+            insights = {
+                "headline": data.get("headline", ""),
+                "subtitle": data.get("subtitle", ""),
+                "key_points": data.get("key_points", []),
+                "global_insight_text": data.get("global_section", ""),
+                "domestic_insight_text": data.get("domestic_section", ""),
+                "medclaim_action_text": data.get("medclaim_section", ""),
+            }
+            html_content = generate_article_html_v4(
+                facts, insights, score=score,
+                source_urls=source_urls, nct_id=nct_id,
+                known_inns=known_inns,
+            )
+        else:
+            report_data = {
+                "inn": inn,
+                "headline": data.get("headline", ""),
+                "subtitle": data.get("subtitle", ""),
+                "key_points": data.get("key_points", []),
+                "global_section": data.get("global_section", ""),
+                "domestic_section": data.get("domestic_section", ""),
+                "medclaim_section": data.get("medclaim_section", ""),
+                "source_data": source_data,
+            }
+            html_content = generate_article_html(
+                report_data, score=score,
+                source_urls=source_urls, nct_id=nct_id,
+                known_inns=known_inns,
+            )
         html_path = OUTPUT_DIR / f"{_safe_filename(inn)}.html"
         html_path.write_text(html_content, encoding="utf-8")
         rendered += 1
@@ -1633,6 +1657,12 @@ async def run_publish(
         _enriched["_therapeutic_areas"] = getattr(impact, 'therapeutic_areas', []) or []
         _enriched["_known_inns"] = _comp_inns
         _enriched["_pipeline_version"] = "v4" if use_v4 else "v3"
+        if use_v4:
+            _enriched["_v4_facts"] = {
+                "d_day_text": facts["d_day_text"],
+                "approval_summary_table": facts["approval_summary_table"],
+                "cost_scenario_table": facts["cost_scenario_table"],
+            }
         json_path.write_text(
             json.dumps(_enriched, ensure_ascii=False, indent=2, default=str),
             encoding="utf-8",

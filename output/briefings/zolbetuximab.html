@@ -13,6 +13,9 @@
         .meta-text { font-family: 'Inter', sans-serif; }
         .highlight-box { border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
         .timeline-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .fact-table { width: 100%; text-align: left; font-size: 0.875rem; margin: 1rem 0; border-collapse: collapse; }
+        .fact-table th { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600; background: #f9fafb; }
+        .fact-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
         abbr { text-decoration: none; border-bottom: 1px dashed #9ca3af; cursor: help; }
     </style>
 </head>
@@ -23,9 +26,9 @@
                 <div class="flex items-center space-x-3">
                     <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-indigo-600">MedClaim</a>
                     <span class="text-gray-300">|</span>
-                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑</span>
+                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑 V4</span>
                 </div>
-                <div class="meta-text text-sm text-gray-500">2026년 02월 23일</div>
+                <div class="meta-text text-sm text-gray-500">2026년 02월 24일</div>
             </div>
         </div>
     </header>
@@ -34,8 +37,8 @@
             <span class="px-3 py-1 bg-yellow-500 text-white text-xs font-semibold rounded">MEDIUM</span>
             
         </div>
-        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">CLDN18.2 표적 졸베툭시맙, 위암 1차 판 바꿨지만 국내는 ‘0’</h1>
-        <p class="text-xl text-gray-600 mb-8 leading-relaxed">FDA 2025-06-06·EMA 2024-09-19 승인…식약처 미확인·심평원 비급여</p>
+        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">CLDN18.2 표적 Zolbetuximab, 1차 위암 판 바꾼다</h1>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">글로벌 문턱은 넘었지만 국내 미허가·비급여로 접근성 공백</p>
         <div class="flex items-center space-x-4 mb-10 pb-10 border-b border-gray-200 meta-text">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -46,29 +49,38 @@
             <span class="text-gray-300">&middot;</span>
             <span class="text-sm text-gray-500">Hot Issue Score: 55</span>
         </div>
+
+        <!-- 핵심 요약 (인사이트) -->
         <div class="highlight-box p-6 rounded-r-lg mb-10">
             <h3 class="font-bold text-gray-900 mb-3 meta-text text-sm">핵심 요약</h3>
             <ul class="space-y-2 text-gray-800">
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>Zolbetuximab은 CLDN18.2(claudin 18.2)를 표적하는 단클론항체로, <abbr title="인간 표피성장인자 수용체 2, Human Epidermal Growth Factor Receptor 2">HER2</abbr> 음성·CLDN18.2 양성 진행성/전이성 위암·위식도접합부(GEJ) 선암의 1차에서 플루오로피리미딘+백금 기반 화학요법과 병용(Vyloy)하는 바이오마커 기반 치료제다.</span>
+                    <span>CLDN18.2 양성 <abbr title="인간 표피성장인자 수용체 2, Human Epidermal Growth Factor Receptor 2">HER2</abbr> 음성 진행성/전이성 위·GEJ 선암 1차에서 화학요법(불소피리미딘+백금)과 병용하는 단클론항체로, 종양 선택적 표적을 통해 표준요법의 한계를 정조준</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>EMA는 2024-09-19, FDA는 2025-06-06에 승인을 완료해(입력 데이터 기준) 위암 1차 치료에서 ‘표적+항암 병용’이라는 새 축을 공식화했다.</span>
+                    <span>글로벌 규제 성과는 fda_status_text·ema_status_text가 보여주듯 주요 시장에서 임상적 유효성과 바이오마커 기반 치료전략을 공식 인정받은 케이스</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>국내는 식약처(MFDS) 허가가 확인되지 않고, 심평원(HIRA) 급여 상태는 not_covered로 등재 약가·급여 기준이 없다(CRIS 국내 임상 0건).</span>
+                    <span>국내는 mfds_status_text와 같이 허가 공백이 지속되고, 심평원(HIRA)는 미등재(not_covered)로 실제 처방 경로가 사실상 막혀 있다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>글로벌 승인 후 522일 경과 시점이며, 입력된 타임라인 추정(통상 1~2년)을 적용하면 국내는 ‘허가 신청 진행 중일 가능성’ 구간에 해당한다. 다만 경쟁 후보(Polatuzumab vedotin, Zanidatamab-hrii 등)도 domestic_status가 expected 수준에 머물러, 항암 신약 전반의 국내 도입 속도·우선순위가 실제 접근성의 변수다.</span>
+                    <span>d_day_text 수준으로 글로벌 승인 후 시간이 경과한 만큼, 국내 도입의 관건은 판매권자/허가 전략과 급여에서의 바이오마커 검사-치료 연동(동반진단) 설계로 수렴된다</span>
                 </li></ul>
         </div>
+
         <article class="report-body text-gray-800">
+            <!-- 글로벌 섹션: 팩트 테이블 + 인사이트 -->
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
-            <div class="mb-6"><a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761365" target="_blank" class="text-indigo-600 hover:underline"><strong>Zolbetuximab</strong></a>은 위암 1차 치료에서 “HER2 음성”이라는 넓은 환자군 안에서도 CLDN18.2 양성이라는 바이오마커로 환자를 선별해 성적을 끌어올린 것이 핵심이다. 기전은 종양세포 표면 CLDN18.2에 결합하는 단클론항체로, 화학요법(CAPOX 등)과 병용해 종양 부담을 낮추는 전략에 맞춰 개발됐다. 임상 근거(NCT03653507)에서 CAPOX+졸베툭시맙은 <abbr title="무진행생존기간, Progression-Free Survival">PFS</abbr> 중앙값 8.21개월로 CAPOX+위약 6.80개월 대비 연장됐고(HR 0.689, p=0.0005), <abbr title="전체생존기간, Overall Survival">OS</abbr>도 14.32개월 vs 12.16개월로 개선됐다(HR 0.763, p=0.0047). <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">지표(NCT03653507)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">CAPOX+Zolbetuximab</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">CAPOX+Placebo</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">PFS 중앙값(개월)</td><td class="px-3 py-2 border-b border-gray-100">8.21</td><td class="px-3 py-2 border-b border-gray-100">6.80</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">PFS HR (95% CI)</td><td class="px-3 py-2 border-b border-gray-100">0.689 (0.552–0.860)</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">OS 중앙값(개월)</td><td class="px-3 py-2 border-b border-gray-100">14.32</td><td class="px-3 py-2 border-b border-gray-100">12.16</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">OS HR (95% CI)</td><td class="px-3 py-2 border-b border-gray-100">0.763 (0.622–0.936)</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table> 다만 QoL 하위지표(예: 신체기능 TTCD)는 HR 1.012(p=0.4654)로 뚜렷한 차이가 확인되지 않아, ‘생존지표 개선’과 ‘증상/기능 유지’는 별개의 과제로 남는다. 안전성에서는 구토가 중대한 이상사례 상위 항목으로 반복적으로 등장해(졸베툭시맙군에서도 보고), 병용 항암요법과 함께 항구토 전략이 치료 운영의 실무 포인트가 된다. 규제 측면에서 <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/vyloy" target="_blank" class="text-indigo-600 hover:underline">EMA</a>(2024-09-19)와 <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761365" target="_blank" class="text-indigo-600 hover:underline">FDA</a>(2025-06-06)가 연이어 승인을 완료하면서, CLDN18.2 표적 치료가 글로벌 표준 옵션으로 제도권에 진입했다.</div>
+            
+            <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">날짜</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2025-06-06</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2024-09-19</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">MFDS(식약처)</td><td class="px-3 py-2 border-b border-gray-100">미허가</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table></div>
+            
+            <div class="mb-6"><a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761365" target="_blank" class="text-indigo-600 hover:underline"><strong>Zolbetuximab</strong></a>은 위암 1차 치료에서 ‘HER2 음성’이라는 넓은 집단을 다시 CLDN18.2 양성으로 세분화해, 바이오마커 기반 표준치료를 하나 더 만든다는 점이 지금의 핵심 뉴스다. fda_status_text와 ema_status_text가 시사하듯, 위암 영역에서 표적항체가 1차 병용으로 자리 잡을 수 있음을 규제당국이 확인해 준 사례로 읽힌다. 기전적으로는 위점막 계열 종양에서 발현되는 <strong>Claudin 18.2</strong>를 표적해 항체 의존성 세포독성(ADCC) 등 면역매개 기전을 통해 종양 세포 사멸을 유도하는 접근이다. 임상 근거에서는 mFOLFOX6 병용에서 <abbr title="무진행생존기간, Progression-Free Survival">PFS</abbr>가 11.04개월 vs 8.94개월(HR 0.734)로 개선되고, <abbr title="전체생존기간, Overall Survival">OS</abbr>도 18.23개월 vs 15.57개월(HR 0.784)로 연장돼 ‘초치료에서 시간 이득’을 명확히 제시했다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>유효성 요지</strong>: PFS HR 0.734, OS HR 0.784로 질병 진행과 사망 위험을 동반 하향</li> <li><strong>안전성/운용 포인트</strong>: 중증 이상반응에서 구토·오심 시그널이 두드러져(serious events 상위), 병용 항암요법의 구역/구토 관리가 성패를 가를 가능성</li> <li><strong>치료전략 변화</strong>: ‘HER2 음성 1차’가 더 이상 단일 표준이 아니라, CLDN18.2 검사 기반으로 분기되는 구조로 재편</li> </ul> 경쟁 관점에서는 같은 oncology 버킷의 valid_competitors(<a href="polatuzumab_vedotin.html" class="text-indigo-600 hover:underline">Polatuzumab Vedotin</a>, <a href="zanidatamab-hrii.html" class="text-indigo-600 hover:underline"><a href="zanidatamab.html" class="text-indigo-600 hover:underline">Zanidatamab</a>-hrii</a>, <a href="ivosidenib.html" class="text-indigo-600 hover:underline">Ivosidenib</a>, <a href="talquetamab.html" class="text-indigo-600 hover:underline">Talquetamab</a>)와 직접 적응증이 겹친다고 단정하긴 어렵지만, 공통적으로 <strong>바이오마커·정밀의료 기반 고가 항암제의 도입 경쟁</strong>을 촉발한다는 점에서 병원 내 자원(검사, 주사실, 부작용 관리) 배분 이슈를 앞당긴다. 결국 Zolbetuximab의 글로벌 포지셔닝은 ‘치료제 자체’뿐 아니라 <strong>CLDN18.2 동반진단과 1차 병용 프로토콜의 표준화</strong>를 패키지로 얼마나 빨리 확산시키느냐에 달려 있다.</div>
+
+            <!-- 타임라인 (팩트) -->
             
             <div class="my-10 p-6 bg-gray-50 rounded-xl">
                 <h4 class="meta-text text-sm font-semibold text-gray-500 mb-6">승인 타임라인</h4>
@@ -92,21 +104,34 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 국내 섹션: 인사이트 -->
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
-            <div class="mb-6">국내에서는 졸베툭시맙의 식약처(MFDS) 허가 여부가 확인되지 않으며, 심평원(HIRA)에서도 not_covered로 급여 등재가 없다. 입력 데이터 기준 <abbr title="임상연구정보서비스, Clinical Research Information Service">CRIS</abbr> 등록 임상은 0건으로, 국내 데이터 축적을 통한 ‘동시개발’ 경로는 현재로선 비어 있다. 다만 context에 따르면 글로벌 승인 후 522일 경과한 시점으로, 통상 1~2년 내 허가 신청이 이뤄지는 패턴을 감안하면 ‘허가 신청 진행 중일 가능성’ 구간에 해당한다는 해석이 가능하다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">항목</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">국내 상태(입력 데이터)</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">식약처(MFDS)</td><td class="px-3 py-2 border-b border-gray-100">승인 여부 미확인(허가 정보 없음)</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">심평원(HIRA)</td><td class="px-3 py-2 border-b border-gray-100">not_covered(약가/기준 없음)</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">CRIS 국내 임상</td><td class="px-3 py-2 border-b border-gray-100">0건</td></tr> </table> 경쟁 지형을 보면 competitors에 포함된 Polatuzumab vedotin, <a href="zanidatamab-hrii.html" class="text-indigo-600 hover:underline">Zanidatamab-hrii</a> 역시 domestic_status가 expected로 표기돼 ‘해외 승인→국내 도입’의 병목이 특정 품목만의 문제가 아닐 가능성이 드러난다. 약제팀과 심사자는 이 약이 “바이오마커(클라우딘18.2) 기반 1차 치료”라는 점을 전제로, 도입 시점에 동반진단(검사 체계)과 처방 경로(병용 항암요법 프로토콜)가 동시에 갖춰져야 실제 처방이 가능하다는 점을 체크해야 한다. 급여가 없는 구간이 길어질수록 환자 접근은 ‘비급여/해외조달’로 쏠리고, 이는 병원 내 청구·원내위원회(약사위원회) 운영 부담으로 직결된다.</div>
+            
+            <div class="my-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 meta-text">
+                <strong>경과:</strong> 글로벌 승인 후 523일 경과 — 글로벌 승인 후 523일 — 허가 신청 진행 중일 가능성 (통상 1~2년)
+            </div>
+            
+            <div class="mb-6">현재 국내에서는 mfds_status_text인 만큼, ‘글로벌 표준이 된 1차 표적치료’가 임상 현장에 연결되지 않는 단절이 먼저 해석 포인트다. d_day_text는 글로벌 승인 이후 국내 허가 신청이 진행 중일 가능성이라는 맥락을 주지만, 국내 도입의 병목은 허가 자체보다도 <strong>CLDN18.2 검사 인프라와 급여 설계가 동시에 맞물려야 한다</strong>는 점에 있다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>규제/시장 상태</strong>: mfds_status_text로 인해 공식 유통·처방 경로가 제한되고, 심평원는 not_covered로 가격·기준이 비어 있는 상태</li> <li><strong>경쟁약(비교 범위 제한 준수)</strong>: valid_competitors에 포함된 Polatuzumab Vedotin·Zanidatamab-hrii 등도 국내 도입이 ‘expected/uncertain’로 표시돼, 고가 항암 신약군 전반의 도입 속도가 핵심 변수</li> <li><strong>현장 준비 과제</strong>: 위·GEJ 조직에서 CLDN18.2 판독의 표준화(컷오프, 검사실 간 재현성)와 처방 전 검사-결과-투약까지의 TAT 관리가 실질 장벽</li> </ul> 국내에서 이 약이 ‘새 약’으로 끝나지 않으려면, 1차 치료 라인에서의 사용이라는 특성상 <strong>초진-병리-항암 시작</strong>의 워크플로에 동반진단을 끼워 넣는 운영 설계가 선행돼야 한다. 약제팀 관점에선 도입 시점에 맞춰 항암 레짐셋 등록, 항구토제 프로토콜, 검사 결과 확인 절차를 패키지로 준비하는 기관이 초기 처방을 선점할 가능성이 높다.</div>
+
+            <!-- 메드클레임: 비용표(팩트) + 인사이트 -->
             <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
                 <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
-                <div class="space-y-3 text-gray-800"><p>현재 심평원 기준 not_covered이며, 식약처 허가가 확인되지 않아 통상적인 건강보험 청구 경로는 성립하지 않는다(약가·급여 기준 데이터 없음). 따라서 현 시점 실무는 ‘급여 30%’ 또는 ‘암환자 산정특례 5%’ 계산이 아니라, 허가·등재 이전 접근 경로를 어떻게 안내할지에 가깝다. 다만 향후 급여 등재가 이뤄질 경우 항암 적응증 특성상 입력된 산정특례(암환자 산정특례 5%)가 적용되는 구조가 기본 틀이 된다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">청구 가능 여부</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">환자 본인부담률</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">현재(식약처 허가 미확인 + 심평원(HIRA) not_covered)</td><td class="px-3 py-2 border-b border-gray-100">불가</td><td class="px-3 py-2 border-b border-gray-100">해당 없음</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 심평원 급여 등재(일반 급여)</td><td class="px-3 py-2 border-b border-gray-100">가능</td><td class="px-3 py-2 border-b border-gray-100">30%</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 심평원 급여 등재(암환자 산정특례)</td><td class="px-3 py-2 border-b border-gray-100">가능(등록 시)</td><td class="px-3 py-2 border-b border-gray-100">5%</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여 사용</td><td class="px-3 py-2 border-b border-gray-100">가능하더라도 100% 부담 구조</td><td class="px-3 py-2 border-b border-gray-100">100%</td></tr> </table> 허가 전 환자 접근을 현실적으로 논의하려면, 병원은 환자에게 선택지(임상시험 참여, 해외조달/긴급도입 여부 등)를 ‘비용 전액 부담 가능성’까지 포함해 명확히 고지해야 한다. 약제팀은 도입 준비 체크리스트를 ‘CLDN18.2 검사 운영(검체·판독·TAT) + CAPOX 등 병용 레짐 표준오더 + 항구토 프로토콜’로 묶어 사전 정비하는 것이, 허가·등재 후 초기 혼선을 줄이는 가장 실효적인 대응이다.</p></div>
+                
+                <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 (암환자 산정특례)</td><td class="px-3 py-2 border-b border-gray-100">5%</td><td class="px-3 py-2 border-b border-gray-100">등재 후 결정</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">전액 환자 부담</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">KODC 긴급도입</td><td class="px-3 py-2 border-b border-gray-100">전액</td><td class="px-3 py-2 border-b border-gray-100">개별 신청</td></tr> </table></div>
+                
+                <div class="space-y-3 text-gray-800"><p>현 시점에서는 copay_scenario_text 그대로, 국내 급여 청구는 불가하고 환자 부담은 ‘전액 비급여’로 정리된다. 다만 향후 급여 등재가 이뤄지면 암환자 산정특례(5%) 적용 가능성이 열려, 급여 전후의 환자 비용 체감 격차가 매우 커질 수 있다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>대안 경로 1: KODC 긴급도입</strong>: cost_scenario_table의 ‘KODC 긴급도입 — 전액’ 조건처럼 개별 신청 기반으로 환자 부담이 크다는 점을 사전 고지</li> <li><strong>대안 경로 2: 임상시험/프로그램</strong>: cris에 국내 등록 임상이 0건으로 제시돼 있어, 국내 임상 참여를 통한 접근성 기대는 현 시점에서 제한적</li> <li><strong>대안 경로 3: 실손보험</strong>: 비급여 구간에서는 실손 청구 가능성이 변수이나, 약값·투여 횟수·동반 검사 비용을 합산한 총비용 관점에서 환자 상담이 필요</li> </ul> 실무적으로는 ‘치료제’만이 아니라 <strong>CLDN18.2 검사 비용/청구 코드, 검사 결과 확인 절차, 병용요법(불소피리미딘+백금)과의 동시 청구 구조</strong>를 한 세트로 점검해야 삭감 리스크를 줄일 수 있다. 또한 중증 구토·오심 시그널을 고려해, 투여 초기 항구토/수액 프로토콜과 응급실 연계 기준을 레짐 수준에서 명확히 하는 것이 청구·안전 모두에 유리하다.</p></div>
             </div>
         </article>
+
         <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
             <div class="mb-4">
-                <strong>데이터 출처:</strong> <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761365" target="_blank" class="text-indigo-500 hover:underline">FDA Drug Approval</a>, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/vyloy" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, <a href="https://clinicaltrials.gov/study/NCT03653507" target="_blank" class="text-indigo-500 hover:underline">ClinicalTrials.gov (NCT03653507)</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
+                <strong>데이터 출처:</strong> <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761365" target="_blank" class="text-indigo-500 hover:underline">FDA Drug Approval</a>, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/vyloy" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, <a href="https://clinicaltrials.gov/study/NCT03504397" target="_blank" class="text-indigo-500 hover:underline">ClinicalTrials.gov (NCT03504397)</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
             </div>
             <div class="text-xs text-gray-400">
-                본 리포트는 RegScan AI가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
-                의사결정에 활용 시 원문 확인을 권장합니다.
-                마지막 업데이트: 2026-02-23
+                본 리포트는 RegScan AI V4가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
+                팩트(날짜·금액·상태)는 Python이 사전 계산하였으며, 인사이트(분석)는 LLM이 생성했습니다.
+                마지막 업데이트: 2026-02-24
             </div>
         </footer>
     </main>

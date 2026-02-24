@@ -13,6 +13,9 @@
         .meta-text { font-family: 'Inter', sans-serif; }
         .highlight-box { border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
         .timeline-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .fact-table { width: 100%; text-align: left; font-size: 0.875rem; margin: 1rem 0; border-collapse: collapse; }
+        .fact-table th { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600; background: #f9fafb; }
+        .fact-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
         abbr { text-decoration: none; border-bottom: 1px dashed #9ca3af; cursor: help; }
     </style>
 </head>
@@ -23,9 +26,9 @@
                 <div class="flex items-center space-x-3">
                     <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-indigo-600">MedClaim</a>
                     <span class="text-gray-300">|</span>
-                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑</span>
+                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑 V4</span>
                 </div>
-                <div class="meta-text text-sm text-gray-500">2026년 02월 23일</div>
+                <div class="meta-text text-sm text-gray-500">2026년 02월 24일</div>
             </div>
         </div>
     </header>
@@ -34,8 +37,8 @@
             <span class="px-3 py-1 bg-yellow-500 text-white text-xs font-semibold rounded">MEDIUM</span>
             
         </div>
-        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight"><abbr title="뒤센형 근디스트로피, Duchenne Muscular Dystrophy">DMD</abbr> 표준 스테로이드 재정의한 Vamorolone, FDA 승인…국내는 공백</h1>
-        <p class="text-xl text-gray-600 mb-8 leading-relaxed">글루코코르티코이드 계열 | 식약처(MFDS) 미확인·심평원 미등재로 급여 경로 부재</p>
+        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight"><abbr title="뒤센형 근디스트로피, Duchenne Muscular Dystrophy">DMD</abbr> 새 스테로이드 Vamorolone, 글로벌 승인 후 국내 공백</h1>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">근력 보존은 유지, 스테로이드 독성은 낮추는 설계가 핵심 포인트</p>
         <div class="flex items-center space-x-4 mb-10 pb-10 border-b border-gray-200 meta-text">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -46,29 +49,38 @@
             <span class="text-gray-300">&middot;</span>
             <span class="text-sm text-gray-500">Hot Issue Score: 45</span>
         </div>
+
+        <!-- 핵심 요약 (인사이트) -->
         <div class="highlight-box p-6 rounded-r-lg mb-10">
             <h3 class="font-bold text-gray-900 mb-3 meta-text text-sm">핵심 요약</h3>
             <ul class="space-y-2 text-gray-800">
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>Vamorolone(제품명 Agamree)은 듀센 근이영양증(DMD) 4세 이상 치료에 쓰이는 글루코코르티코이드 계열로, 기존 프레드니손/데플라자코트 기반 장기 스테로이드 치료의 효능-부작용 균형을 재설계하려는 포지션의 약물이다.</span>
+                    <span>DMD(4세 이상) 치료 적응증의 글루코코르티코이드 계열로, 기존 스테로이드의 효능 프레임을 유지하면서 부작용 부담을 줄이려는 ‘dissociative steroid’ 콘셉트의 약물</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>EMA는 2023-12-14 승인했고, FDA는 2024-06-05 승인을 완료했다(양대 규제기관이 반년 내 연속 승인).</span>
+                    <span>글로벌 규제 측면에서 fda_status_text 및 ema_status_text가 의미하듯, 주요 규제기관의 문턱을 넘으며 DMD 표준치료(스테로이드) 내 ‘대체/전환’ 옵션으로 포지셔닝이 가능해졌다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>국내에서는 식약처(MFDS) 허가 여부가 확인되지 않으며(브랜드명 공란), 심평원(HIRA) 급여 정보도 not_found로 약가·급여기준이 모두 부재다.</span>
+                    <span>국내는 mfds_status_text 상태이며 심평원(HIRA)도 ‘not_found’로 확인돼, 실제 처방 접근성은 제도적으로 막혀 있는 구간</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>글로벌 승인 후 802일 경과 시점에서 ‘허가 지연(국내 판매권자 확보 지연 가능성)’ 메모가 붙어 있어, 국내는 ‘허가 신청→심사→급여’ 트랙 자체가 아직 가동되지 않았을 가능성이 크다.</span>
+                    <span>d_day_text가 시사하듯 글로벌 승인 후 국내 진입 지연이 누적되는 국면으로, 판매권자 확보·허가 전략(GIFT 포함)과 급여 협상 설계가 도입 속도를 가를 변수</span>
                 </li></ul>
         </div>
+
         <article class="report-body text-gray-800">
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">장기 스테로이드의 딜레마를 겨냥</h2>
-            <div class="mb-6">DMD 치료에서 ‘걷는 기간을 늘리는 스테로이드’는 표준이지만, 체중 증가·골대사 이상·행동 변화 등 장기 독성이 늘 처방의 발목을 잡아왔다. <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=215239" target="_blank" class="text-indigo-600 hover:underline"><strong>Vamorolone</strong></a>은 글루코코르티코이드 계열로 이 지점을 정면으로 겨냥하며, DMD에서의 스테로이드 전략을 ‘효능만큼 독성도 관리하는’ 방향으로 끌어올린 것이 뉴스 가치다. 적응증은 Agamree로 명시된 대로 4세 이상 DMD 치료다. 임상 현장 기준 비교 축은 결국 기존 경구 스테로이드(프레드니손/프레드니솔론, 데플라자코트)이며, 새 약은 같은 ‘스테로이드 축’ 안에서 차별성을 증명해야 한다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">승인 상태(tense)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">승인일</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><a href="https://www.ema.europa.eu/en/medicines/human/EPAR/agamree" target="_blank" class="text-indigo-600 hover:underline">EMA</a></td><td class="px-3 py-2 border-b border-gray-100">승인 완료</td><td class="px-3 py-2 border-b border-gray-100">2023-12-14</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=215239" target="_blank" class="text-indigo-600 hover:underline">FDA</a></td><td class="px-3 py-2 border-b border-gray-100">승인 완료</td><td class="px-3 py-2 border-b border-gray-100">2024-06-05</td></tr> </table> EMA(2023-12-14)와 FDA(2024-06-05)가 모두 승인을 완료하면서, DMD에서 스테로이드 장기투여의 대안(또는 재구성)이라는 포지션이 글로벌 규제의 검증을 통과했다는 의미가 생겼다. 특히 두 기관 승인 간격이 짧아(‘FDA+EMA 근접 승인’) 상업화·가이드라인 반영이 빠르게 진행될 수 있는 조건을 갖췄다.</div>
+            <!-- 글로벌 섹션: 팩트 테이블 + 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
+            
+            <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">날짜</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2024-06-05</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2023-12-14</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">MFDS(식약처)</td><td class="px-3 py-2 border-b border-gray-100">미허가</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table></div>
+            
+            <div class="mb-6"><a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=215239" target="_blank" class="text-indigo-600 hover:underline"><strong>Vamorolone</strong></a>은 DMD에서 ‘효과가 있으나 독성이 큰’ 스테로이드 치료의 숙제를 정면으로 겨냥한 약물이다. fda_status_text와 ema_status_text가 보여주는 것처럼 글로벌 표준 규제 트랙에 올라섰다는 점이, 후속 국가 도입과 급여 논의의 출발점이 된다. 기전적으로는 글루코코르티코이드 수용체를 매개로 항염증·면역조절 효과를 유지하되, 전통적 스테로이드에서 문제가 되는 골대사·성장 억제 등 전신 부작용을 줄이려는 설계가 핵심이다. DMD 치료의 임상 현실에서 ‘장기 복용을 전제로 한 지속가능성’이 약물 가치의 상당 부분을 결정한다는 점에서, 단순 신약이 아니라 치료전략(전환/유지)의 문제로 읽힌다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong><a href="migalastat_hydrochloride.html" class="text-indigo-600 hover:underline">Migalastat Hydrochloride</a></strong>: 희귀질환 치료제로서 경구·장기복용 모델의 급여/접근성 설계를 참고할 만한 비교축</li> <li><strong><a href="elexacaftor__tezacaftor__and_ivacaftor.html" class="text-indigo-600 hover:underline">Elexacaftor, Tezacaftor, And Ivacaftor</a></strong>: 초고가 희귀질환 혁신약이 급여 문턱을 넘는 방식(임상가치-재정영향 균형)의 대표 사례</li> <li><strong><a href="pegunigalsidase_alfa.html" class="text-indigo-600 hover:underline">Pegunigalsidase Alfa</a> / <a href="velaglucerase_alfa.html" class="text-indigo-600 hover:underline">Velaglucerase Alfa</a></strong>: 효소대체요법(ERT) 계열의 ‘장기 투여·고비용’ 구조가 심사에서 어떻게 해석되는지 보여주는 레퍼런스</li> </ul> 즉, Vamorolone은 ‘스테로이드 대체’라는 임상 포지션을 갖지만, 시장 접근 전략은 다른 희귀질환 고가약과 동일하게 가치-재정 프레임으로 설득해야 한다는 점이 글로벌 단계에서 이미 드러난다.</div>
+
+            <!-- 타임라인 (팩트) -->
             
             <div class="my-10 p-6 bg-gray-50 rounded-xl">
                 <h4 class="meta-text text-sm font-semibold text-gray-500 mb-6">승인 타임라인</h4>
@@ -92,21 +104,34 @@
                     </div>
                 </div>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">802일 지났는데도 허가 ‘미확인’</h2>
-            <div class="mb-6">국내에서는 Vamorolone의 식약처(MFDS) 허가 여부가 확인되지 않고, 심평원(HIRA) 등재도 not_found로 ‘급여 논의의 출발점’이 되는 약가 자체가 없다. 입력된 타임라인 메모는 ‘글로벌 승인 후 802일 — 허가 지연(국내 판매권자 확보 지연 가능성)’으로, 통상 경로(FDA 승인→식약처 허가 1~3년)의 하한을 이미 지나고도 국내 트랙이 열리지 않았다는 신호다. <abbr title="임상연구정보서비스, Clinical Research Information Service">CRIS</abbr>(임상연구정보서비스) 등록 임상은 0건으로, 국내 임상을 기반으로 한 조기 도입 시나리오도 현재 데이터로는 뒷받침되지 않는다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>식약처: 승인 여부가 확인되지 않는다(브랜드명 공란)</li> <li>심평원(HIRA): not_found(약가/급여기준 없음)</li> <li>CRIS: 국내 임상 0건</li> </ul> 경쟁 구도 측면에서 입력된 competitors는 모두 ‘rare_disease’ 카테고리의 타 질환 약물들로, DMD 직접 경쟁약 비교라기보다 “희귀질환 약제 전반에서 국내 미도입/지연이 반복되는 패턴”을 상기시킨다. 약제팀/RA 관점에서는 결국 판매권자 확정→허가 신청 착수 여부가 1차 체크포인트이며, 그 전까지는 원내 도입(코드 생성, 처방세트 구성, 급여 기준 검토) 논의가 현실적으로 진행되기 어렵다.</div>
+
+            <!-- 국내 섹션: 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
+            
+            <div class="my-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 meta-text">
+                <strong>경과:</strong> 글로벌 승인 후 803일 경과 — 글로벌 승인 후 803일 — 허가 지연 (국내 판매권자 확보 지연 가능성)
+            </div>
+            
+            <div class="mb-6">국내에서는 mfds_status_text인 상태가 핵심 병목이며, d_day_text가 말하듯 글로벌 승인 이후 시간이 누적되면서 ‘도입 의지/판매권자’ 이슈가 먼저 의심되는 구간이다. 희귀의약품 지정이라는 배경이 있는 만큼, 허가 자체보다도 국내 파트너링과 서류 패키지의 준비도가 일정의 앞단을 좌우할 가능성이 크다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>도입 경로 관점</strong>: 글로벌 승인 약물인 만큼 GIFT 등 신속심사 트랙을 검토할 명분이 있으나, 실제 가속은 국내 개발·유통 주체가 확정돼야 현실화된다</li> <li><strong>급여 관점</strong>: 심평원 ‘not_found’는 가격·기준이 아직 논의 테이블에 없다는 의미로, 최초 등재 시 임상적 유용성(장기 안전성/성장·골 관련 지표)과 대체 가능성(기존 스테로이드 대비)을 명확히 구조화해야 한다</li> <li><strong>비교 환경(희귀질환 고가약 공통)</strong>: Migalastat Hydrochloride, Elexacaftor, Tezacaftor, And Ivacaftor 등과 마찬가지로 ‘환자 수는 적지만 1인당 비용이 큰’ 모델에서 예산영향 분석이 결정적이다</li> </ul> 병원 약제팀 관점에서는 ‘허가 공백’ 자체가 처방 불가를 의미하므로, 환자·의료진 문의가 발생할 때 대체치료(기존 스테로이드)와 접근 경로 안내를 표준화해 두는 것이 실무 부담을 줄인다.</div>
+
+            <!-- 메드클레임: 비용표(팩트) + 인사이트 -->
             <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
                 <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
-                <div class="space-y-3 text-gray-800"><p>현 시점에서는 심평원 청구 자체가 불가능한 상태다. 심평원가 not_found인 만큼 급여 상한금액과 급여기준이 없어, 건강보험 청구 시나리오는 성립하지 않는다. 다만 입력 데이터에 ‘희귀질환 산정특례 10%’가 명시돼 있어, 향후 희귀질환 산정특례 트랙에 올라탈 경우 본인부담 구조는 10%로 설계된다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">청구/처방 현실</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">현재(미허가·미등재)</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">심평원 등재 부재로 급여 청구 불가(처방 경로도 제한)</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 등재(희귀질환 산정특례)</td><td class="px-3 py-2 border-b border-gray-100">10%</td><td class="px-3 py-2 border-b border-gray-100">등재 후 산정특례 등록 시 적용</td></tr> </table> 대안 경로로는 ‘허가 전 접근’ 영역(예: 기관별 수입/공급 절차, 프로그램 여부 확인)이 거론될 수 있으나, 본 데이터에는 구체 제도·프로그램 정보가 없다. 실무적으로는 (1) 국내 판매권자 및 식약처 허가 신청 착수 여부 확인, (2) 등재가 시작되는 즉시 희귀질환 산정특례(10%) 적용 가능 질환/등록 요건을 원무·심사팀과 함께 사전 점검하는 것이 첫 액션이다.</p></div>
+                
+                <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 (희귀질환 산정특례)</td><td class="px-3 py-2 border-b border-gray-100">10%</td><td class="px-3 py-2 border-b border-gray-100">등재 후 결정</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">전액 환자 부담</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">KODC 긴급도입</td><td class="px-3 py-2 border-b border-gray-100">전액</td><td class="px-3 py-2 border-b border-gray-100">개별 신청</td></tr> </table></div>
+                
+                <div class="space-y-3 text-gray-800"><p>현 시점에서 copay_scenario_text가 명확히 말하듯, 국내에서는 전액 비급여 구간으로 해석되며 급여 청구를 전제로 한 처방 설계가 성립하기 어렵다. 따라서 실무는 ‘어떻게 합법적·제도적으로 약을 확보할 것인가’와 ‘향후 등재 시 어떤 기준으로 관리할 것인가’로 나뉜다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>KODC 긴급도입</strong>: cost_scenario_table에 제시된 대로 개별 신청 및 전액 부담 구조를 전제로 상담(서류·리드타임·공급 안정성 포함)</li> <li><strong>임상시험/프로그램</strong>: 팩트상 국내 임상 정보(cris)가 비어 있어, 현실적으로는 제약사 프로그램(Named Patient/EAP 등) 존재 여부를 별도 확인하는 작업이 우선</li> <li><strong>실손보험</strong>: 비급여·해외조달 형태일 수 있어, 환자에게 ‘가능성’이 아니라 제출서류/보장 제외 항목 중심으로 안내하는 것이 분쟁을 줄인다</li> </ul> 향후 등재 국면에서는 copay_scenario_text에 근거해 희귀질환 산정특례(10%) 적용 가능성이 논의될 수 있으므로, 약제팀/심사자는 ‘희귀질환 등록 요건’과 ‘대체약(기존 스테로이드) 대비 임상적 개선 지표’가 급여 기준의 문장으로 어떻게 번역될지에 초점을 맞춰 사전 자료를 축적해야 한다.</p></div>
             </div>
         </article>
+
         <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
             <div class="mb-4">
                 <strong>데이터 출처:</strong> <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=215239" target="_blank" class="text-indigo-500 hover:underline">FDA Drug Approval</a>, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/agamree" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
             </div>
             <div class="text-xs text-gray-400">
-                본 리포트는 RegScan AI가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
-                의사결정에 활용 시 원문 확인을 권장합니다.
-                마지막 업데이트: 2026-02-23
+                본 리포트는 RegScan AI V4가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
+                팩트(날짜·금액·상태)는 Python이 사전 계산하였으며, 인사이트(분석)는 LLM이 생성했습니다.
+                마지막 업데이트: 2026-02-24
             </div>
         </footer>
     </main>

@@ -13,6 +13,9 @@
         .meta-text { font-family: 'Inter', sans-serif; }
         .highlight-box { border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
         .timeline-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .fact-table { width: 100%; text-align: left; font-size: 0.875rem; margin: 1rem 0; border-collapse: collapse; }
+        .fact-table th { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600; background: #f9fafb; }
+        .fact-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
         abbr { text-decoration: none; border-bottom: 1px dashed #9ca3af; cursor: help; }
     </style>
 </head>
@@ -23,9 +26,9 @@
                 <div class="flex items-center space-x-3">
                     <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-indigo-600">MedClaim</a>
                     <span class="text-gray-300">|</span>
-                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑</span>
+                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑 V4</span>
                 </div>
-                <div class="meta-text text-sm text-gray-500">2026년 02월 23일</div>
+                <div class="meta-text text-sm text-gray-500">2026년 02월 24일</div>
             </div>
         </div>
     </header>
@@ -33,11 +36,10 @@
         <div class="flex items-center space-x-3 mb-6 meta-text">
             <span class="px-3 py-1 bg-yellow-500 text-white text-xs font-semibold rounded">MEDIUM</span>
             <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded">EMA PRIME</span>
-<span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded">희귀의약품</span>
 
         </div>
-        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">유전성 비만 MC4R 작용제 Setmelanotide, 국내는 ‘0’</h1>
-        <p class="text-xl text-gray-600 mb-8 leading-relaxed">EMA 승인·희귀의약품 축에도 식약처(MFDS)·심평원 데이터 부재</p>
+        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">유전성 비만 표적치료 Setmelanotide, 글로벌 표준화 vs 국내 공백</h1>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">MC4R 경로 복원 | 장기 미허가로 긴급도입·급여 설계가 관건</p>
         <div class="flex items-center space-x-4 mb-10 pb-10 border-b border-gray-200 meta-text">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -46,47 +48,91 @@
                 <span class="text-sm text-gray-600">RegScan AI 리포터</span>
             </div>
             <span class="text-gray-300">&middot;</span>
-            <span class="text-sm text-gray-500">Hot Issue Score: 40</span>
+            <span class="text-sm text-gray-500">Hot Issue Score: 50</span>
         </div>
+
+        <!-- 핵심 요약 (인사이트) -->
         <div class="highlight-box p-6 rounded-r-lg mb-10">
             <h3 class="font-bold text-gray-900 mb-3 meta-text text-sm">핵심 요약</h3>
             <ul class="space-y-2 text-gray-800">
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>Setmelanotide(IMCIVREE)는 MC4R(melanocortin-4 receptor) 경로를 활성화해 포만 신호를 복원하는 ‘유전성 비만’ 표적 치료제로, BBS·POMC/PCSK1 결핍·LEPR 결핍(2세 이상)에서 과식(hyperphagia) 조절과 체중 감소를 적응증으로 한다</span>
+                    <span>MC4R 경로를 활성화하는 멜라노코르틴-4 수용체(MC4R) 작용제로, 유전적으로 확진된 BBS·POMC/PCSK1 결핍·LEPR 결핍에서 ‘배고픔(과식)’ 자체를 조절하는 항비만 치료제</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>입력 데이터 기준 EMA는 승인(승인일자 미제공)했으나, FDA 승인 여부는 ‘확인되지 않는다’로 정리돼 글로벌 규제 포지션이 ‘유럽 중심’으로 기울어 있다</span>
+                    <span>글로벌 규제 수용성은 fda_status_text·ema_status_text가 보여주듯 확보됐고, 희귀의약품 및 PRIME 맥락에서 ‘표적 유전성 비만’의 치료 프레임을 고정시킨 점이 핵심</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>국내는 식약처(MFDS) 허가가 확인되지 않고(제품명 공란), 심평원(HIRA) 등재 정보도 not_found로 약가·급여기준이 전무하며, <abbr title="임상연구정보서비스, Clinical Research Information Service">CRIS</abbr> 국내 임상 등록도 0건이다</span>
+                    <span>국내는 mfds_status_text이며 심평원(HIRA)는 status가 not_found로 확인돼, 실무적으로는 허가·급여·상한금액이 모두 비어 있는 상태</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>희귀질환 산정특례(본인부담 10%) 라벨이 붙어 ‘급여 등재’가 성사될 경우 환자부담이 구조적으로 낮아질 여지는 있으나, 현 단계에서는 허가·등재의 출발점(신청/코드) 자체가 관측되지 않는다</span>
+                    <span>임상에서 1년 시점 ≥10% 체중감량 도달(핵심 코호트 45.5%)과 hunger score 개선을 근거로 ‘치료반응 기반 유지’ 모델이 유력하며, 국내 도입은 판매권자/시장성 판단이 병목이라는 d_day_text의 시사점이 크다</span>
                 </li></ul>
         </div>
+
         <article class="report-body text-gray-800">
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">‘다이어트약’이 아닌 유전자 치료 영역</h2>
-            <div class="mb-6">Setmelanotide는 일반 비만 치료제(GLP-1 계열)와 달리, 시상하부 MC4R 경로의 결함으로 발생하는 ‘유전성 비만’에서 과식과 체중 문제를 직접 겨냥하는 약물이다. 적응증은 유전자 확인(genetically confirmed)을 전제로 하며, BBS와 POMC(PCSK1 포함) 결핍, LEPR 결핍 환자(성인 및 2세 이상 소아)의 비만 치료 및 식욕 조절을 겨냥한다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">항목</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">내용</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">약물군</td><td class="px-3 py-2 border-b border-gray-100">Antiobesity preparations (식이제품 제외)</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">승인(승인일자: 입력 데이터 없음)</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">승인 여부가 확인되지 않는다(일자 없음)</td></tr> </table> 임상적으로는 52주 평가에서 BMI 개선 신호가 뚜렷했다. NCT04966741 결과에서 <strong>BMI Z-score 0.2 이상 감소 비율</strong>이 PPL 그룹 85.7%, BBS 그룹 80.0%였고, <strong>BMI 평균 변화율</strong>은 PPL -25.597%(SD 11.4911), BBS -9.719%(SD 8.8383)로 집단 간 효과 크기 차이도 확인된다. 경쟁 구도에서 ‘비만 치료’ 축의 대표 약물인 <a href="semaglutide.html" class="text-indigo-600 hover:underline">Semaglutide</a>가 체중감량 시장을 주도하지만, Setmelanotide는 “유전자 진단-표적 치료”로 시장 정의 자체가 다르다. 입력 데이터의 핫이슈 사유(EMA 승인, EMA PRIME, 희귀의약품)는 바로 이 ‘희귀·정밀의학’ 포지셔닝에서 나온다.</div>
+            <!-- 글로벌 섹션: 팩트 테이블 + 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
             
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">허가·급여 ‘흔적’이 아직 없다</h2>
-            <div class="mb-6">국내에서는 Setmelanotide의 식약처(MFDS) 허가가 확인되지 않으며, 시판 제품명도 입력돼 있지 않아 상업화 트랙이 포착되지 않는다. 심평원(HIRA)에서도 status가 not_found로, 등재 자체가 성립되지 않아 약가·급여기준을 논의할 실무 데이터가 없다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>식약처: 승인 여부 미확인(approved=false, 브랜드명 공란)</li> <li>심평원(HIRA): not_found(약가 null, 급여기준 공란)</li> <li>CRIS: 국내 임상 0건(병원 기반 도입 채널도 부재)</li> </ul> 경쟁 비교에서도 ‘국내 대체 옵션’이 선명하지 않다. 입력된 경쟁약 목록 중 Semaglutide(대사/비만 영역)는 국내에서 비만/당뇨 치료 맥락으로 이미 임상 사용 경험이 축적된 계열이지만, <strong>유전성 비만의 과식 조절을 적응증으로 한 국내 허가·급여 대체제</strong>를 이 데이터만으로는 확인할 수 없다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비교 축</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">Setmelanotide</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">Semaglutide</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">타깃 질환</td><td class="px-3 py-2 border-b border-gray-100">BBS·POMC/PCSK1·LEPR 결핍 비만</td><td class="px-3 py-2 border-b border-gray-100">일반 비만/당뇨 중심(계열)</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">국내 규제·급여(입력)</td><td class="px-3 py-2 border-b border-gray-100">식약처 미확인, 심평원 not_found</td><td class="px-3 py-2 border-b border-gray-100">경쟁약으로만 등재(국내 상태는 ‘uncertain’)</td></tr> </table> 결국 병원 약제팀 관점에서 지금 필요한 정보는 ‘허가 신청 주체(판매권자) 존재 여부’와 ‘유전자 진단-투약 연계 경로’인데, 입력 데이터에서는 둘 다 관측되지 않는다.</div>
+            <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">날짜</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2025-08-21</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2021-07-16</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">MFDS(식약처)</td><td class="px-3 py-2 border-b border-gray-100">미허가</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table></div>
+            
+            <div class="mb-6"><a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213793" target="_blank" class="text-indigo-600 hover:underline"><strong>Setmelanotide</strong></a>는 ‘일반 비만’이 아니라 유전 결함으로 MC4R 신호가 꺼진 환자에서 과식과 체중증가를 동시에 겨냥하는 표적치료라는 점 때문에 지금 중요하다. fda_status_text·ema_status_text처럼 주요 규제권역에서 임상적 유효성과 희귀질환 영역의 공중보건 가치를 인정받으면서, 유전성 비만을 “생활습관 문제”가 아닌 “치료 가능한 내분비-신경회로 질환”으로 재정의했다. 기전은 MC4R 작용을 통해 시상하부 식욕 조절 회로의 포만 신호를 복원하는 것으로, 적응증도 유전적으로 확진된 BBS 및 POMC/PCSK1·LEPR 결핍으로 한정돼 ‘정밀진단-정밀치료’ 구조가 전제된다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>임상(NCT03287960): 1년(Week 52) ≥10% 체중감량 도달 45.5%(p=0.0001), 평균 체중 변화 -12.34%, ‘Most hunger’ 점수 -42.7%로 체중과 식욕을 동시 개선</li> <li>안전성: 중대한 이상반응에 자살사고(suicidal ideation) 등이 보고돼, 소아·청소년 포함 환자군에서 정신건강 스크리닝과 추적이 처방 성공의 조건</li> </ul> 경쟁 구도에서 <a href="semaglutide.html" class="text-indigo-600 hover:underline">Semaglutide</a>가 대중적 비만 시장을 장악하더라도, Setmelanotide는 ‘유전 확진’이라는 진입장벽 덕분에 처방 대상이 겹치지 않는 분절 시장을 형성한다. 즉, 이 약의 가치는 체중감량 수치 경쟁이 아니라 “식욕 조절 실패의 원인이 유전자에 있을 때, 원인축을 직접 켠다”는 임상 의사결정의 명확성에 있다.</div>
+
+            <!-- 타임라인 (팩트) -->
+            
+            <div class="my-10 p-6 bg-gray-50 rounded-xl">
+                <h4 class="meta-text text-sm font-semibold text-gray-500 mb-6">승인 타임라인</h4>
+                <div class="relative">
+                    <div class="absolute left-2 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+                    <div class="relative flex items-center mb-6">
+                        <div class="timeline-dot bg-blue-500 z-10"></div>
+                        <div class="ml-6">
+                            <div class="meta-text text-xs text-blue-600 font-semibold">2025-08-21</div>
+                            <div class="font-medium"><a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213793" target="_blank" class="hover:underline">FDA 승인</a></div>
+                            <div class="text-sm text-gray-500">Approved</div>
+                        </div>
+                    </div>
+                    <div class="relative flex items-center mb-6">
+                        <div class="timeline-dot bg-yellow-500 z-10"></div>
+                        <div class="ml-6">
+                            <div class="meta-text text-xs text-yellow-600 font-semibold">2021-07-16</div>
+                            <div class="font-medium"><a href="https://www.ema.europa.eu/en/medicines/human/EPAR/imcivree" target="_blank" class="hover:underline">EMA 승인</a></div>
+                            <div class="text-sm text-gray-500">Authorised</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 국내 섹션: 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
+            
+            <div class="my-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 meta-text">
+                <strong>경과:</strong> 글로벌 승인 후 1684일 경과 — 글로벌 승인 후 1684일 경과 — 장기 미허가 (판매권자 부재 또는 시장성 판단 보류)
+            </div>
+            
+            <div class="mb-6">국내 관점에서 핵심은 d_day_text가 말하듯 글로벌 승인 후 상당 기간이 경과했는데도 mfds_status_text로 남아 있다는 ‘도입 주체 부재/시장성 보류’ 시그널이다. 이 적응증은 진단(유전자 검사) 인프라와 환자 발굴 체계가 함께 움직여야 시장이 열리기 때문에, 허가만으로 처방량이 자연 발생하기 어렵다는 점이 진입을 더디게 만든다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>국내 제도 지점: copay_scenario_text에 따라 등재 이후에는 희귀질환 산정특례(10%) 적용 가능성이 열려 있으나, 현재는 전액 비급여 프레임</li> <li>경쟁약(언급 범위 내): Semaglutide는 적응증/대상군이 달라 직접 대체재라기보다 예산·사회적 관심을 공유하는 비교축이고, <a href="metreleptin.html" class="text-indigo-600 hover:underline">Metreleptin</a>은 희귀 대사질환 영역에서 ‘희귀약 급여 설계’ 선례로 참고 가능한 포지션</li> </ul> 실무적으로는 ‘유전자 확진 → 치료 반응 평가(체중/식욕) → 유지 여부’의 경로가 급여 기준의 뼈대가 될 가능성이 크다. 따라서 국내 도입이 진행될 경우, 약제부서는 처방 적합성(유전자 결과)과 추적평가 지표를 EMR·진료과 합의로 미리 표준화하는 쪽이 급여 협상보다 먼저 준비돼야 한다.</div>
+
+            <!-- 메드클레임: 비용표(팩트) + 인사이트 -->
             <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
                 <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
-                <div class="space-y-3 text-gray-800"><p>현 시점에서 심평원 등재가 not_found이므로, 건강보험 청구(급여 청구) 실무로 바로 이어질 수 없다. 또한 식약처 허가가 확인되지 않아 원내 처방 프로세스 자체가 성립하기 어렵다(허가-등재 선행 필요). <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">청구/접근 현실</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 등재 + 희귀질환 산정특례</td><td class="px-3 py-2 border-b border-gray-100">10%</td><td class="px-3 py-2 border-b border-gray-100">입력 데이터상 산정특례 라벨 존재(‘희귀질환 산정특례’)이나, 약가/기준 미제공으로 금액 산정 불가</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">심평원 등재 정보 부재로 급여 청구 불가(비급여 비용은 입력 데이터에 없음)</td></tr> </table> 허가 전 단계에서 환자 접근은 통상 ‘긴급도입(개별 수입)’ 또는 ‘해외 치료 연계/임상 참여’ 같은 우회 경로로 논의되지만, CRIS 임상 0건이어서 국내 임상 참여 루트도 데이터로는 확인되지 않는다. 실무적으로는 (1) 유전자 확진(BBS, POMC/PCSK1, LEPR) 검사 체계 보유 여부, (2) 희귀질환 산정특례 적용을 위한 질환 등록 가능성, (3) 향후 등재 시 사전심사(PA) 가능성(고가약제 여부 판단에 필요한 ‘1회 투여비’ 데이터는 입력에 없음)을 분리해 체크리스트로 관리하는 편이 안전하다.</p></div>
+                
+                <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 (희귀질환 산정특례)</td><td class="px-3 py-2 border-b border-gray-100">10%</td><td class="px-3 py-2 border-b border-gray-100">등재 후 결정</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">전액 환자 부담</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">KODC 긴급도입</td><td class="px-3 py-2 border-b border-gray-100">전액</td><td class="px-3 py-2 border-b border-gray-100">개별 신청</td></tr> </table></div>
+                
+                <div class="space-y-3 text-gray-800"><p>현재는 copay_scenario_text 그대로, 급여 청구는 불가능하고 환자 비용은 전액 비급여로 귀결된다. 또한 mfds_status_text인 약물은 통상 원내 처방·조제가 제한되므로, 실제 접근은 제도적 예외 경로를 타는지 여부가 관건이다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>대안 경로: cost_scenario_table에 명시된 KODC 긴급도입은 ‘전액’ 부담 구조이므로, 병원은 환자·보호자에게 비용/기간/서류 요건을 사전에 안내할 템플릿이 필요</li> <li>대안 경로: 국내 임상(공식 등록/참여)은 현재 cris에서 trial_count 0으로 확인돼, 현실적으로는 긴급도입 또는 해외 조달 상담으로 수렴</li> <li>비용 대응: 실손보험은 상품별로 다르므로 ‘비급여-해외조달-희귀질환’ 조합에서 필요한 증빙(진단서, 유전자 결과, 의학적 소견서, 영수증)을 선제적으로 체크리스트화</li> </ul> 약제팀/심사자는 향후 등재 국면을 대비해 “희귀질환 산정특례(10%) 적용 가능”이라는 원칙을 넘어, 유전자 확진 요건과 52주 반응평가(체중·식욕) 지표를 급여 관리의 핵심 통제 변수로 설계하는 것이 청구 리스크를 줄이는 최단 경로다.</p></div>
             </div>
         </article>
+
         <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
             <div class="mb-4">
-                <strong>데이터 출처:</strong> FDA Drug Approvals Database, EMA Public Assessment Reports, <a href="https://clinicaltrials.gov/study/NCT04966741" target="_blank" class="text-indigo-500 hover:underline">ClinicalTrials.gov (NCT04966741)</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
+                <strong>데이터 출처:</strong> <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213793" target="_blank" class="text-indigo-500 hover:underline">FDA Drug Approval</a>, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/imcivree" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, <a href="https://clinicaltrials.gov/study/NCT03287960" target="_blank" class="text-indigo-500 hover:underline">ClinicalTrials.gov (NCT03287960)</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
             </div>
             <div class="text-xs text-gray-400">
-                본 리포트는 RegScan AI가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
-                의사결정에 활용 시 원문 확인을 권장합니다.
-                마지막 업데이트: 2026-02-23
+                본 리포트는 RegScan AI V4가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
+                팩트(날짜·금액·상태)는 Python이 사전 계산하였으며, 인사이트(분석)는 LLM이 생성했습니다.
+                마지막 업데이트: 2026-02-24
             </div>
         </footer>
     </main>

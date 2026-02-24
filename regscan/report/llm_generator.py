@@ -707,8 +707,6 @@ class LLMBriefingGenerator:
                 global_section=parsed.get("global_insight_text", ""),
                 domestic_section=parsed.get("domestic_insight_text", ""),
                 medclaim_section=parsed.get("medclaim_action_text", ""),
-                global_heading=parsed.get("global_heading", ""),
-                domestic_heading=parsed.get("domestic_heading", ""),
                 source_data=impact.to_dict(),
             )
         except Exception as e:

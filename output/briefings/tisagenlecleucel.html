@@ -13,6 +13,9 @@
         .meta-text { font-family: 'Inter', sans-serif; }
         .highlight-box { border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
         .timeline-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .fact-table { width: 100%; text-align: left; font-size: 0.875rem; margin: 1rem 0; border-collapse: collapse; }
+        .fact-table th { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600; background: #f9fafb; }
+        .fact-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
         abbr { text-decoration: none; border-bottom: 1px dashed #9ca3af; cursor: help; }
     </style>
 </head>
@@ -23,9 +26,9 @@
                 <div class="flex items-center space-x-3">
                     <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-indigo-600">MedClaim</a>
                     <span class="text-gray-300">|</span>
-                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑</span>
+                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑 V4</span>
                 </div>
-                <div class="meta-text text-sm text-gray-500">2026년 02월 23일</div>
+                <div class="meta-text text-sm text-gray-500">2026년 02월 24일</div>
             </div>
         </div>
     </header>
@@ -36,8 +39,8 @@
 <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded">희귀의약품</span>
 
         </div>
-        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight"><abbr title="키메라 항원 수용체 T세포, Chimeric Antigen Receptor T-cell">CAR-T</abbr> 티사젠렉류셀, EMA 승인 7년인데 국내 허가 공백</h1>
-        <p class="text-xl text-gray-600 mb-8 leading-relaxed">심평원(HIRA)는 급여 등재·상한가 3.6억원…‘허가-급여’ 비정상 구조</p>
+        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight"><abbr title="키메라 항원 수용체 T세포, Chimeric Antigen Receptor T-cell">CAR-T</abbr> 티사젠렉류셀, ‘급여-미허가’ 역설</h1>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">초고가 1회 치료제인데 국내 도입 경로가 불투명</p>
         <div class="flex items-center space-x-4 mb-10 pb-10 border-b border-gray-200 meta-text">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -48,29 +51,38 @@
             <span class="text-gray-300">&middot;</span>
             <span class="text-sm text-gray-500">Hot Issue Score: 50</span>
         </div>
+
+        <!-- 핵심 요약 (인사이트) -->
         <div class="highlight-box p-6 rounded-r-lg mb-10">
             <h3 class="font-bold text-gray-900 mb-3 meta-text text-sm">핵심 요약</h3>
             <ul class="space-y-2 text-gray-800">
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>CD19 표적 자가유래 CAR-T(기타 항종양제)로, 25세 이하 재발/불응 B-<abbr title="급성 림프구 백혈병, Acute Lymphoblastic Leukemia">ALL</abbr> 및 성인 재발/불응 <abbr title="미만성 거대 B세포 림프종, Diffuse Large B-Cell Lymphoma">DLBCL</abbr>·FL(2회 이상 전신치료 후) 치료에 쓰이는 맞춤형 세포치료제</span>
+                    <span>CD19 표적 자가 T세포 기반 CAR-T로, 소아·청년 B-<abbr title="급성 림프구 백혈병, Acute Lymphoblastic Leukemia">ALL</abbr> 및 성인 재발/불응 <abbr title="미만성 거대 B세포 림프종, Diffuse Large B-Cell Lymphoma">DLBCL</abbr>·FL(2차 이상)에서 ‘한 번의 제조-한 번의 주입’으로 깊은 반응을 노리는 세포치료제</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>EMA가 2018-08-23 승인 완료(D+2741일)했지만, FDA 승인 여부는 확인되지 않는다(입력 데이터 기준)</span>
+                    <span>글로벌 임상·허가 생태계에서는 EMA 경로가 먼저 확립됐고(팩트: ema_status_text), PRIME·희귀의약품 맥락에서 고위험 환자군 치료의 표준 옵션으로 자리잡았다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>국내에서는 식약처(MFDS) 허가 여부가 확인되지 않는데도, 심평원(HIRA) 급여 등재 상태이며 상한가 ₩360,039,359로 고가약제 구간(1회 100만원 초과)을 압도한다</span>
+                    <span>국내는 식약처(MFDS) 허가가 ‘미확인’인데 심평원(HIRA)는 ‘급여’로 잡혀 있는 구조(팩트: mfds_status_text, copay_scenario_text)여서, 실제 처방 가능성은 공급·제조·유통 체계와 제도적 해석에 강하게 좌우된다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>글로벌 승인 후 2741일이 지난 ‘장기 미허가’ 국면으로 분류되며(판매권자 부재/시장성 보류 가능성), 경쟁 후보(Polatuzumab Vedotin 등)도 국내 도입이 ‘expected/uncertain’로 정리돼 혈액암 고가 혁신약의 국내 접근 경로가 제도·공급 측면에서 꼬여 있다</span>
+                    <span>초고가·고난도 치료 특성상 센터 인증·중환자 대응 역량이 도입 속도를 좌우하며, 경쟁 구도는 Polatuzumab Vedotin 등 ‘예상’ 약물군의 국내 진입 여부에 따라 후기 혈액암 치료 알고리즘이 재편될 여지가 크다</span>
                 </li></ul>
         </div>
+
         <article class="report-body text-gray-800">
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">세포치료의 끝판왕, 데이터는 엇갈린다</h2>
-            <div class="mb-6">티사젠렉류셀(<a href="https://www.ema.europa.eu/en/medicines/human/EPAR/kymriah" target="_blank" class="text-indigo-600 hover:underline"><strong>Tisagenlecleucel</strong></a>, 키므리아)은 CD19를 표적하는 자가유래 CAR-T로, 기존 화학요법·항CD20 기반 면역화학요법에 실패한 B-ALL/DLBCL/FL 환자에서 ‘한 번의 제조-투여’로 깊은 반응을 노리는 치료 축을 만들었다. 혈액암 치료에서 경쟁 축은 항체약물접합체(ADC)·이중특이항체·CAR-T로 분화됐고, 키므리아는 그중 제조·투여 인프라까지 요구하는 가장 고난도 옵션이다. 다만 입력된 임상 결과(NCT03570892)에서는 BIRC 평가 EFS 중앙값이 표준치료와 동일 3.0개월, HR 1.07(95% CI 0.82–1.40), p=0.694로 ‘전략 비교’에서 우월성이 확인되지 않았다는 점이 급여·평가 논리에서 약점이 된다. 안전성은 CAR-T 고유의 독성 스펙트럼이 드러나며, 중대한 이상반응으로 사이토카인 방출 증후군(CRS) 사례가 보고됐다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">승인 상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">승인일</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><a href="https://www.ema.europa.eu/en/medicines/human/EPAR/kymriah" target="_blank" class="text-indigo-600 hover:underline">EMA</a></td><td class="px-3 py-2 border-b border-gray-100">승인 완료 (D+2741일)</td><td class="px-3 py-2 border-b border-gray-100">2018-08-23</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">승인 여부가 확인되지 않는다</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">식약처(MFDS)</td><td class="px-3 py-2 border-b border-gray-100">허가 여부가 확인되지 않는다</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table> 경쟁군으로는 DLBCL 영역에서 <a href="polatuzumab_vedotin.html" class="text-indigo-600 hover:underline">Polatuzumab Vedotin</a>(ADC) 같은 ‘오프더셸프(즉시 투여)’ 약물이 치료 라인에 따라 CAR-T와 대체·보완 관계를 만들며, 환자 상태·제조 대기·투여 가능 기관 여부가 실질적 분기점이 된다. EMA 승인 완료는 유럽에서 표준 옵션으로 제도권에 들어갔다는 뜻이지만, 이 약은 승인 자체보다 “공급·기관·비용”이 접근성을 결정하는 전형적인 세포치료제다.</div>
+            <!-- 글로벌 섹션: 팩트 테이블 + 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
+            
+            <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">날짜</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">미허가</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2018-08-23</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">MFDS(식약처)</td><td class="px-3 py-2 border-b border-gray-100">미허가</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table></div>
+            
+            <div class="mb-6">티사젠렉류셀은 ‘약을 맞는다’가 아니라 환자 T세포를 재프로그래밍해 종양을 추적하게 만드는 치료로, 재발/불응 혈액암에서 치료 목표를 단기 종양축소에서 장기 관해로 끌어올린 대표 사례다. 특히 CD19를 표적하는 CAR-T는 B세포 계열 종양의 공통 항원을 겨냥해, 여러 치료 라인에 실패한 환자에서 단회 투여로 깊은 반응을 기대하게 만든 점이 핵심 가치다. 다만 제조-운송-주입까지 이어지는 체인과 급성 독성 관리(사이토카인 방출 증후군, 중증 감염/호중구감소 등)가 치료 성패를 좌우해 ‘약효’만으로 경쟁이 끝나지 않는다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>임상 관점: 제시된 시험(NCT03570892)에서는 1차 지표 EFS가 표준치료 전략 대비 우위를 만들지 못해(p=0.694) ‘모든 상황에서 CAR-T가 더 낫다’는 단순 서사를 경계하게 한다</li> <li>안전성 관점: 중증 이상반응 축은 발열성 호중구감소·패혈증과 CAR-T 특이 독성(CRS)로, 센터의 초기 대응 프로토콜이 사실상 치료 품질을 결정한다</li> <li>경쟁 환경: valid_competitors 내 <a href="polatuzumab_vedotin.html" class="text-indigo-600 hover:underline">Polatuzumab Vedotin</a>·<a href="talquetamab.html" class="text-indigo-600 hover:underline">Talquetamab</a> 등은 기전이 달라 직접 대체재라기보다 ‘후기 치료 순서’와 ‘브릿지 요법’에서 충돌할 수 있는 옵션으로 해석된다</li> </ul> 결국 이 약의 글로벌 포지션은 ‘최후의 한 줄’이 아니라, 환자 선별(질병 속도·종양부하·공여세포 상태)과 치료 인프라(제조 슬롯·중환자 대응)를 동시에 갖춘 곳에서만 성과가 재현되는 고난도 표준치료로 요약된다.</div>
+
+            <!-- 타임라인 (팩트) -->
             
             <div class="my-10 p-6 bg-gray-50 rounded-xl">
                 <h4 class="meta-text text-sm font-semibold text-gray-500 mb-6">승인 타임라인</h4>
@@ -86,21 +98,34 @@
                     </div>
                 </div>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">급여는 있는데 허가는 안 보인다</h2>
-            <div class="mb-6">현재 입력 데이터상 국내에서는 식약처(MFDS) 허가가 확인되지 않지만, 심평원은 ‘급여’로 등재돼 있어 제도 흐름(허가→급여)과 어긋난 상태가 포착된다. 상한가가 ₩360,039,359로 단회 투여 기준 고가약제 사전심사(PA) 대상에 해당하며, 병원은 예산·성과기반 계약 여부·원내 세포치료 운영체계까지 포함한 ‘도입 가능성’ 검토가 선행돼야 한다. 타임라인도 글로벌 승인 후 2741일 경과로 장기 미진입 구간이며, 입력된 추정 문구는 판매권자 부재 또는 시장성 판단 보류 가능성을 직접 지목한다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>글로벌 승인 후 경과: 2741일(장기 미허가로 분류)</li> <li><abbr title="임상연구정보서비스, Clinical Research Information Service">CRIS</abbr> 국내 임상: 0건(입력 데이터 기준)</li> <li>경쟁 후보 국내 상태(입력 데이터): Polatuzumab Vedotin(expected), <a href="ivosidenib.html" class="text-indigo-600 hover:underline">Ivosidenib</a>(uncertain), <a href="talquetamab.html" class="text-indigo-600 hover:underline">Talquetamab</a>(uncertain)</li> </ul> 경쟁 약물군이 동시에 ‘expected/uncertain’으로 묶인다는 점은, 특정 품목 한 개의 문제가 아니라 혈액암 혁신 고가약 전반의 국내 도입 병목(판매권·공급망·센터 인증·재정영향 평가)이 같은 방향으로 작동하고 있음을 시사한다. 약제팀 관점에서는 ‘급여 등재’라는 문구만으로 실처방 가능성을 판단하기 어렵고, 실제 공급(제조 슬롯/해외 제조·운송), 지정 치료기관 요건, PA 운영 여부가 처방 가능성의 1차 필터가 된다.</div>
+
+            <!-- 국내 섹션: 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
+            
+            <div class="my-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 meta-text">
+                <strong>경과:</strong> 글로벌 승인 후 2742일 경과 — 글로벌 승인 후 2742일 경과 — 장기 미허가 (판매권자 부재 또는 시장성 판단 보류)
+            </div>
+            
+            <div class="mb-6">현재 국내에서는 ‘제도상 급여로 보이지만 허가·공급이 불명확한’ 신호가 동시에 존재해(팩트: mfds_status_text, copay_scenario_text), 현장에서는 실제 사용 가능성을 별도 확인해야 하는 약물로 분류하는 게 안전하다. d_day_text가 말하듯 글로벌 승인 경과가 길어, 단순히 심사 지연이라기보다 판매권자·제조/공급 체계·경제성 판단이 병목일 가능성이 더 설득력 있다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>Polatuzumab Vedotin: 국내 상태가 ‘expected’로 제시돼, 림프종 후기 라인에서 ‘세포치료 이전/이후’ 치료 시퀀스의 변수로 작동할 수 있다</li> <li><a href="zanidatamab-hrii.html" class="text-indigo-600 hover:underline">Zanidatamab-hrii</a>: ‘expected’이지만 표적/암종이 달라 CAR-T와는 자원 배분(고가약 재정) 측면에서 간접 경쟁이 될 가능성이 크다</li> <li><a href="ivosidenib.html" class="text-indigo-600 hover:underline">Ivosidenib</a>·Talquetamab·<a href="zolbetuximab.html" class="text-indigo-600 hover:underline">Zolbetuximab</a>: ‘uncertain’으로, 실제 국내 진입 시점과 급여 범위에 따라 고가 항암제 포트폴리오 내 우선순위 싸움이 발생할 수 있다</li> </ul> 국내 도입이 현실화되면 병원 간 격차(인증 센터 보유 여부, 중환자 대응, 세포처리 경험)가 곧 접근성 격차로 전환될 가능성이 높고, 약제팀은 ‘적응증’보다 ‘치료 인프라’를 기준으로 운영 전략을 짜야 한다.</div>
+
+            <!-- 메드클레임: 비용표(팩트) + 인사이트 -->
             <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
                 <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
-                <div class="space-y-3 text-gray-800"><p>입력 데이터에서 심평원 상태는 ‘reimbursed(급여)’로 제시돼 있어, 전제상 청구는 급여 트랙을 탄다. 동시에 1회 상한가가 ₩360,039,359로 고가약제(1회 100만원 초과) 사전심사(PA) 대상에 해당해, 병원은 투여 전 승인·서류·적응증 충족 증빙을 갖추지 않으면 청구 리스크가 급격히 커진다. 본인부담은 암환자 산정특례 5%가 적용되는 시나리오가 입력돼 있어, 환자 부담의 ‘자부담 절대액’ 자체가 여전히 크다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">환자 부담액(상한가 기준)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">일반 급여(외래 기준)</td><td class="px-3 py-2 border-b border-gray-100">30%</td><td class="px-3 py-2 border-b border-gray-100">₩108,011,808</td><td class="px-3 py-2 border-b border-gray-100">기준 충족+PA 전제</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">암환자 산정특례</td><td class="px-3 py-2 border-b border-gray-100">5%</td><td class="px-3 py-2 border-b border-gray-100">₩18,001,968</td><td class="px-3 py-2 border-b border-gray-100">산정특례 등록 전제</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">₩360,039,359</td><td class="px-3 py-2 border-b border-gray-100">실손 청구 가능성은 있으나 보장여부는 상품별</td></tr> </table> 현실적으로는 ‘급여 등재=즉시 처방’이 아니어서, 환자 접근 경로는 (1) PA 요건 충족 가능한 센터로 전원, (2) 해당 센터의 제조·투여 슬롯 확보, (3) 산정특례 등록 여부 확인의 순서로 좁혀진다. 약제팀/심사 담당자는 고시된 급여 기준(치료 라인, 재발·불응 정의, 연령, 전신치료 횟수 등)과 PA 제출 서류 체크리스트를 먼저 표준화해야 하며, 3.6억원 단가 특성상 ‘청구 불인정 1건’이 병원 재정에 미치는 영향이 다른 항암제와 비교 불가능한 수준이다.</p></div>
+                
+                <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">일반 급여</td><td class="px-3 py-2 border-b border-gray-100">30%</td><td class="px-3 py-2 border-b border-gray-100">₩108,011,808</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">암환자 산정특례</td><td class="px-3 py-2 border-b border-gray-100">5%</td><td class="px-3 py-2 border-b border-gray-100">₩18,001,968</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여(급여외 적응증)</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">₩360,039,359</td></tr> </table></div>
+                
+                <div class="space-y-3 text-gray-800"><p>청구 실무에서는 우선 이 약이 심평원 등재 약제로 제시돼 있고(팩트: copay_scenario_text), 산정특례가 명시돼 있어 암환자 등록 요건을 충족하는지부터 확인하는 흐름이 합리적이다. 다만 CAR-T는 약값만이 아니라 입원·중환자실·토실리주맙 등 동반치료 비용과 청구 항목이 함께 움직여, 단일 코드 청구로 끝나는 일반 항암제와 다르게 ‘에피소드(episode) 단위’로 점검해야 한다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>대안/우회 경로: 허가·공급이 불명확한 경우에는 치료기관의 임상시험 참여 가능성, 제조 슬롯이 확보된 상급기관 의뢰 프로토콜, 급여 외 적응증에 해당 시 실손보험 청구 가능성(개별 약관 기반)을 동시에 안내해야 한다</li> <li>서류 체크: 산정특례 적용을 전제로 진단명·치료 라인(2차 이상 등)·재발/불응 근거가 의무기록에 구조화돼 있어야 삭감 리스크를 줄인다</li> <li>PA 관점: 초고가 1회 치료 특성상 기관 내 사전심사 체크리스트(적응증 적합성, 제조/주입 일정, CRS 대응 자원)를 청구 전 단계에서 운영하는 게 효율적이다</li> </ul> 약제팀/심사자는 ‘약가’보다 ‘환자 선별-주입 일정-중증독성 대응’이 청구 적정성과 직결된다는 점을 전제로, 다학제 승인(혈액종양-중환자-약제-심사) 절차를 표준화하는 것이 실질적인 리스크 관리다.</p></div>
             </div>
         </article>
+
         <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
             <div class="mb-4">
                 <strong>데이터 출처:</strong> FDA Drug Approvals Database, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/kymriah" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, <a href="https://clinicaltrials.gov/study/NCT03570892" target="_blank" class="text-indigo-500 hover:underline">ClinicalTrials.gov (NCT03570892)</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
             </div>
             <div class="text-xs text-gray-400">
-                본 리포트는 RegScan AI가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
-                의사결정에 활용 시 원문 확인을 권장합니다.
-                마지막 업데이트: 2026-02-23
+                본 리포트는 RegScan AI V4가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
+                팩트(날짜·금액·상태)는 Python이 사전 계산하였으며, 인사이트(분석)는 LLM이 생성했습니다.
+                마지막 업데이트: 2026-02-24
             </div>
         </footer>
     </main>

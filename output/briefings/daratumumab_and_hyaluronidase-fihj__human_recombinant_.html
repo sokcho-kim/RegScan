@@ -13,6 +13,9 @@
         .meta-text { font-family: 'Inter', sans-serif; }
         .highlight-box { border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
         .timeline-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .fact-table { width: 100%; text-align: left; font-size: 0.875rem; margin: 1rem 0; border-collapse: collapse; }
+        .fact-table th { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600; background: #f9fafb; }
+        .fact-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
         abbr { text-decoration: none; border-bottom: 1px dashed #9ca3af; cursor: help; }
     </style>
 </head>
@@ -23,9 +26,9 @@
                 <div class="flex items-center space-x-3">
                     <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-indigo-600">MedClaim</a>
                     <span class="text-gray-300">|</span>
-                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑</span>
+                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑 V4</span>
                 </div>
-                <div class="meta-text text-sm text-gray-500">2026년 02월 23일</div>
+                <div class="meta-text text-sm text-gray-500">2026년 02월 24일</div>
             </div>
         </div>
     </header>
@@ -34,8 +37,8 @@
             <span class="px-3 py-1 bg-yellow-500 text-white text-xs font-semibold rounded">MEDIUM</span>
             
         </div>
-        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">피하 항CD38 다라투무맙, 美 승인했지만 국내 공백</h1>
-        <p class="text-xl text-gray-600 mb-8 leading-relaxed">다발골수종 1차 병용 적응증 | 글로벌 9년 경과에도 식약처·심평원 기록 없다</p>
+        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">피하 CD38 항체, 다발골수종 표준 바꿔도 국내는 공백</h1>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">DARZALEX SC 확산 속 '장기 미허가'…도입 병목은 판매·급여 설계</p>
         <div class="flex items-center space-x-4 mb-10 pb-10 border-b border-gray-200 meta-text">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -46,29 +49,38 @@
             <span class="text-gray-300">&middot;</span>
             <span class="text-sm text-gray-500">Hot Issue Score: 45</span>
         </div>
+
+        <!-- 핵심 요약 (인사이트) -->
         <div class="highlight-box p-6 rounded-r-lg mb-10">
             <h3 class="font-bold text-gray-900 mb-3 meta-text text-sm">핵심 요약</h3>
             <ul class="space-y-2 text-gray-800">
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>다라투무맙(anti-CD38) 항체에 히알루로니다제를 결합한 피하주사 제형으로, 다발골수종에서 종양세포 표면 CD38을 표적해 면역매개 세포사멸(ADCC/CDC)과 직접 세포사멸을 유도하는 계열 약물</span>
+                    <span>다발골수종에서 CD38을 표적하는 단일클론항체 치료제로, hyaluronidase 병용을 통해 피하(SC) 투여가 가능하도록 제형을 전환한 제품</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>EMA는 2016-05-20에 승인했고, FDA는 2026-02-12에 승인했다(입력 데이터 기준). EMA에서는 Accelerated Assessment가 이슈로 기록돼 심사 우선순위가 높았던 약물군으로 분류된다</span>
+                    <span>글로벌 규제기관에서 유효성·안전성의 기준선을 통과했다는 점이 핵심이며, 근거는 fda_status_text·ema_status_text에 정리된 승인 상태가 뒷받침한다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>국내는 식약처(MFDS) 허가가 확인되지 않으며, 심평원(HIRA) 등재·약가 정보도 not_found로 확인된다(가격/급여기준 공란). <abbr title="임상연구정보서비스, Clinical Research Information Service">CRIS</abbr> 국내 임상 등록은 0건</span>
+                    <span>국내는 mfds_status_text 기준으로 미허가이고 심평원(HIRA)는 not_found로 급여·가격 트랙이 열리지 않았으며, d_day_text가 시사하듯 '장기 미허가' 해석이 우세하다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>글로벌 승인 후 3,566일이 경과한 ‘장기 미허가’ 케이스로, 통상 패턴(1~3년 내 국내 허가)에서 벗어났다. oncology 경쟁군(Polatuzumab vedotin, Talquetamab 등)도 domestic_status가 expected/uncertain로 혼재해 국내 도입의 병목이 ‘판매권자·시장성 판단’에서 발생했을 가능성을 데이터가 시사한다</span>
+                    <span>국내 진입 시 성패는 (1) IV→SC 전환에 따른 병원 운영 효율의 실질적 가치 (2) 급여 기준에서 병용요법·치료라인을 어떻게 설정하느냐에 달리며, 경쟁약 대비 '항암 시장 내 예산 임팩트' 설명력이 관건이다</span>
                 </li></ul>
         </div>
+
         <article class="report-body text-gray-800">
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">피하제형이 바꾼 CD38 표준</h2>
-            <div class="mb-6"><a href="daratumumab.html" class="text-indigo-600 hover:underline">Daratumumab</a> and hyaluronidase-fihj는 ‘정맥주사(IV)로 오래 맞던’ 항CD38 치료를 피하(SC)로 전환해 투여 부담을 낮춘 제품이라는 점에서 병원 운영(주사실 체류시간)과 환자 경험을 동시에 건드린다. 기전은 기존 다라투무맙과 동일하게 CD38을 표적해 보체의존성 세포독성(CDC), 항체의존성 세포독성(ADCC) 등 면역학적 사멸을 유도하고, 병용요법에서 스테로이드·IMiD·프로테아좀억제제와 함께 1차 치료 축을 넓혀왔다. 입력된 적응증은 자가조혈모세포이식이 불가능한 성인 신규 진단 다발골수종에서 레날리도마이드+덱사메타손 또는 보르테조밉+멜팔란+프레드니손 병용이다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">승인일</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><a href="https://www.ema.europa.eu/en/medicines/human/EPAR/darzalex" target="_blank" class="text-indigo-600 hover:underline">EMA</a></td><td class="px-3 py-2 border-b border-gray-100">2016-05-20</td><td class="px-3 py-2 border-b border-gray-100">Accelerated Assessment 이슈 포함</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761145" target="_blank" class="text-indigo-600 hover:underline">FDA</a></td><td class="px-3 py-2 border-b border-gray-100">2026-02-12</td><td class="px-3 py-2 border-b border-gray-100">승인 완료</td></tr> </table> 같은 다발골수종 치료 축에서 경쟁 약물로는 BCMA 표적 계열(예: 이중특이항체/세포치료)이나 GPRC5D 표적 등이 떠오르지만, 이번 약물의 강점은 ‘초기·광범위 병용’에서의 자리와 피하 제형의 운영 효율이다. EMA가 먼저 승인한 뒤(2016) FDA가 2026-02-12에 승인했다는 입력 데이터는, 지역별 규제 전략과 적응증/제형 포트폴리오가 시간차를 두고 움직였음을 보여준다.</div>
+            <!-- 글로벌 섹션: 팩트 테이블 + 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
+            
+            <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">날짜</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2026-02-12</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2016-05-20</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">MFDS(식약처)</td><td class="px-3 py-2 border-b border-gray-100">미허가</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table></div>
+            
+            <div class="mb-6">이 약물의 뉴스 가치는 <strong>검증된 CD38 표적 치료를 피하 제형으로 재구성해 치료 운영(시간·인력·의료자원)의 게임을 바꾼다는 점</strong>이다. 팩트로는 ema_status_text와 fda_status_text가 보여주듯, 서로 다른 규제권역에서 임상적 유효성과 품질·제조 일관성에 대한 심사를 이미 통과했다. 다라투무맙은 골수종 세포 표면의 CD38에 결합해 보체의존세포독성(CDC), 항체의존세포독성(ADCC), 항체의존세포포식(ADCP) 및 직접 세포사멸 유도를 통해 종양 부담을 낮추는 계열의 핵심 약물이다. 여기에 hyaluronidase를 더한 피하 제형은 정맥주사 대비 투여 시간을 단축시키는 방향으로 설계돼, 고령 환자 비중이 큰 골수종 진료환경에서 '치료 접근성' 자체를 경쟁력으로 만든다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong><a href="polatuzumab_vedotin.html" class="text-indigo-600 hover:underline">Polatuzumab Vedotin</a></strong>: 림프종 영역 <abbr title="항체-약물 접합체, Antibody-Drug Conjugate">ADC</abbr>로 골수종과 직접 경쟁 축은 다르지만, 병원 내 항암제 예산·주사실 자원 배분 측면에서 간접 경쟁 요인이 된다</li> <li><strong><a href="talquetamab.html" class="text-indigo-600 hover:underline">Talquetamab</a></strong>: 골수종에서 새로운 표적(이중특이항체 계열)로 후속 치료 라인에서 존재감을 키울 수 있어, 다라투무맙의 포지션을 '초기 병용의 표준'으로 더 단단히 해야 한다</li> <li><strong><a href="ivosidenib.html" class="text-indigo-600 hover:underline">Ivosidenib</a> / <a href="zolbetuximab.html" class="text-indigo-600 hover:underline">Zolbetuximab</a> / <a href="zanidatamab-hrii.html" class="text-indigo-600 hover:underline"><a href="zanidatamab.html" class="text-indigo-600 hover:underline">Zanidatamab</a>-hrii</a></strong>: 적응증이 상이해 직접 대체재는 아니지만, 고가 항암 신약들의 동시 도입은 급여 협상에서 총 재정부담 논리를 강화시킨다</li> </ul> 결국 글로벌 시장에서의 승부처는 '약효'만이 아니라 <strong>SC 전환으로 확보되는 외래 회전율·투여실 병목 해소·환자 체류시간 감소</strong>를 얼마나 정량화해 설명하느냐에 있다. 특히 신규 진단 환자에서 표준 병용요법(레날리도마이드/덱사메타손 또는 보르테조밉 기반)으로 제시된 적응증은, 실제 임상에서 장기간 치료를 고려할 때 투여 편의성이 누적 가치로 작동한다.</div>
+
+            <!-- 타임라인 (팩트) -->
             
             <div class="my-10 p-6 bg-gray-50 rounded-xl">
                 <h4 class="meta-text text-sm font-semibold text-gray-500 mb-6">승인 타임라인</h4>
@@ -92,21 +104,34 @@
                     </div>
                 </div>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">9년 지나도 허가 기록이 없다</h2>
-            <div class="mb-6">국내에서는 식약처(MFDS) 허가가 승인되지 않았고(approved=false), 제품명(brand_name)도 공란으로 남아 있어 ‘국내 판매 단계 진입’ 자체가 확인되지 않는다. 심평원(HIRA) 역시 status가 not_found로, 급여 등재·약가·급여 기준이 모두 비어 있다. context에 따르면 글로벌 승인 후 3,566일 경과로 ‘장기 미허가(판매권자 부재 또는 시장성 판단 보류)’ 시나리오가 명시돼, 통상적인 FDA→식약처(MFDS)(1~3년), 식약처→심평원(HIRA)(6개월~2년) 흐름에 비춰 도입 지연이 구조화됐다고 해석된다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">구분</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">국내 상태(입력 데이터)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">실무 의미</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">식약처</td><td class="px-3 py-2 border-b border-gray-100">미허가(승인 여부 확인 불가 수준)</td><td class="px-3 py-2 border-b border-gray-100">원칙적으로 처방·공급 경로가 막힘</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">심평원</td><td class="px-3 py-2 border-b border-gray-100">not_found</td><td class="px-3 py-2 border-b border-gray-100">급여 청구/약가 협상 트랙 부재</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">CRIS</td><td class="px-3 py-2 border-b border-gray-100">0건</td><td class="px-3 py-2 border-b border-gray-100">국내 임상 기반의 허가 가속 신호 없음</td></tr> </table> 경쟁군으로 입력된 Polatuzumab vedotin, <a href="talquetamab.html" class="text-indigo-600 hover:underline">Talquetamab</a> 등도 domestic_status가 expected/uncertain로 정리돼 있어, 항암 혁신약 전반에서 ‘도입 속도’가 판매권·급여 전략에 의해 크게 좌우되는 국면이 이어지고 있다. 약제팀 관점에서는 동일 계열(항CD38) 치료가 국내에서 어떤 제형·급여 조건으로 정렬되는지가 관건인데, 본 데이터만으로는 그 정렬(허가 신청/급여협상 착수) 자체가 시작됐다는 신호를 확인할 수 없다.</div>
+
+            <!-- 국내 섹션: 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
+            
+            <div class="my-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 meta-text">
+                <strong>경과:</strong> 글로벌 승인 후 3567일 경과 — 글로벌 승인 후 3567일 경과 — 장기 미허가 (판매권자 부재 또는 시장성 판단 보류)
+            </div>
+            
+            <div class="mb-6">국내에서는 mfds_status_text처럼 허가 트랙이 열려 있지 않아, 임상 현장에서 '필요는 명확하지만 제도적 접근 경로가 막힌' 전형적 공백 상태다. d_day_text가 암시하듯 글로벌 승인 후 상당 기간이 지나도 미진입인 경우는 통상 판매권자·시장성 판단·도입 우선순위가 병목이었을 가능성을 우선 점검해야 한다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>국내 제도 포인트</strong>: 심평원 status가 not_found인 만큼, 현 단계에서는 급여 기준(치료라인, 병용요법, 반응 평가, 유지치료 범위) 자체가 존재하지 않는다</li> <li><strong>경쟁 환경(간접)</strong>: Polatuzumab Vedotin, Talquetamab 등 고가 항암 파이프라인이 동시에 논의되면 재정영향평가에서 보수적 기조가 강화될 수 있다</li> <li><strong>현장 수요</strong>: 골수종은 재발·불응을 반복하는 질환 특성상, '지속 치료'와 '치료 편의성'이 실제 의료자원 사용량을 좌우한다</li> </ul> 국내 도입 논리는 약효 우월성 경쟁보다 <strong>IV 대비 SC의 운영 효율을 근거로 한 가치 제시(주사실·간호 인력·환자 대기시간)</strong>가 더 설득력을 가질 가능성이 크다. 또 병원 약제팀 관점에서는, 동일 성분의 제형 전환이 가져올 처방 흐름 변화(외래 중심 전환, 투약실 슬롯 재배치)가 약제비만큼 중요해진다.</div>
+
+            <!-- 메드클레임: 비용표(팩트) + 인사이트 -->
             <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
                 <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
-                <div class="space-y-3 text-gray-800"><p>현 시점에서는 심평원 청구 자체가 성립하지 않는다. 심평원에 등재 정보가 not_found이고 식약처도 미허가로 기록돼 있어, 건강보험 급여(일반 30% 또는 산정특례) 시나리오는 ‘등재 이후’에만 계산 가능한 단계다. 다만 적응증이 oncology로 입력돼 있으며 copay_exemption이 ‘암환자 산정특례 5%’로 주어져, 향후 급여 등재가 이뤄질 경우 환자 본인부담 구조는 산정특례(등록 전제)로 설계될 가능성이 높다(단, 본 데이터에는 약가가 없어 금액 계산은 불가). <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">청구/부담 구조</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">데이터 기반 결론</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">현재(미허가·미등재)</td><td class="px-3 py-2 border-b border-gray-100">급여 청구 불가</td><td class="px-3 py-2 border-b border-gray-100">식약처 approved=false, 심평원 not_found</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 등재 시</td><td class="px-3 py-2 border-b border-gray-100">암환자 산정특례 5% 적용 가능</td><td class="px-3 py-2 border-b border-gray-100">copay_exemption=암환자 산정특례(0.05)</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여 사용</td><td class="px-3 py-2 border-b border-gray-100">100% 환자부담</td><td class="px-3 py-2 border-b border-gray-100">심평원 등재/약가 부재로 급여 경로 없음</td></tr> </table> 허가 전 접근은 통상적으로 긴급도입/환자별 공급, 또는 제약사 프로그램(EAP/NPP) 여부 확인이 핵심 경로가 되지만, 본 입력 데이터에는 해당 프로그램 정보가 없다. 보험심사·약제팀 실무에서는 ‘동일 적응증의 국내 허가 약물로 치료경로를 유지하면서’, 식약처 허가 신청 및 심평원 등재 착수 신호(판매권자 확보, 품목허가 신청 공지, 급여평가 신청)를 확인하는 체크리스트를 우선 구축하는 것이 현실적인 대응이다.</p></div>
+                
+                <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 (암환자 산정특례)</td><td class="px-3 py-2 border-b border-gray-100">5%</td><td class="px-3 py-2 border-b border-gray-100">등재 후 결정</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">전액 환자 부담</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">KODC 긴급도입</td><td class="px-3 py-2 border-b border-gray-100">전액</td><td class="px-3 py-2 border-b border-gray-100">개별 신청</td></tr> </table></div>
+                
+                <div class="space-y-3 text-gray-800"><p>현 시점에서는 copay_scenario_text가 말하듯 <strong>현재는 전액 비급여</strong>이며, 급여 청구를 전제로 한 심사·삭감 관리 체계를 만들기 어렵다. 다만 향후 급여 등재가 이뤄지면 copay_scenario_text 범위 내에서 <strong>암환자 산정특례(5%) 적용 가능</strong>성이 열리므로, 도입 초기에는 산정특례 등록·적응증 부합성 확인이 실무의 핵심 변수가 된다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>환자 접근 경로</strong>: KODC 긴급도입은 cost_scenario_table에 기재된 것처럼 개별 신청이며 전액 부담 구조를 전제로 상담해야 한다</li> <li><strong>대안 경로</strong>: 국내 임상(연구자 주도 포함) 참여 기회가 있다면 환자 비용을 낮출 수 있으나, 본 팩트 데이터의 cris는 trial_count 0으로 확인된다</li> <li><strong>실손보험 커뮤니케이션</strong>: 비급여인 동안에는 환자 측에서 실손 청구 가능성을 문의할 수 있어, 병원은 비급여 고지·사전 상담 문구를 표준화할 필요가 있다</li> </ul> 약제팀/심사자 관점에서는, 등재 이후를 대비해 <strong>병용요법 구성(레날리도마이드/덱사메타손 또는 보르테조밉 기반)과 치료라인 정의</strong>가 급여 기준의 핵심 쟁점이 될 수 있음을 사전에 시뮬레이션해 두는 것이 효율적이다. 동시에 SC 제형 특성상 조제·투여 프로세스(교육, 관찰시간, 이상반응 대응) 표준 운영지침을 먼저 마련해 두면, 등재 즉시 현장 혼선을 줄일 수 있다.</p></div>
             </div>
         </article>
+
         <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
             <div class="mb-4">
                 <strong>데이터 출처:</strong> <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761145" target="_blank" class="text-indigo-500 hover:underline">FDA Drug Approval</a>, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/darzalex" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
             </div>
             <div class="text-xs text-gray-400">
-                본 리포트는 RegScan AI가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
-                의사결정에 활용 시 원문 확인을 권장합니다.
-                마지막 업데이트: 2026-02-23
+                본 리포트는 RegScan AI V4가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
+                팩트(날짜·금액·상태)는 Python이 사전 계산하였으며, 인사이트(분석)는 LLM이 생성했습니다.
+                마지막 업데이트: 2026-02-24
             </div>
         </footer>
     </main>

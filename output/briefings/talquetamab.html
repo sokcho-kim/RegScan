@@ -13,6 +13,9 @@
         .meta-text { font-family: 'Inter', sans-serif; }
         .highlight-box { border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
         .timeline-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .fact-table { width: 100%; text-align: left; font-size: 0.875rem; margin: 1rem 0; border-collapse: collapse; }
+        .fact-table th { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600; background: #f9fafb; }
+        .fact-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
         abbr { text-decoration: none; border-bottom: 1px dashed #9ca3af; cursor: help; }
     </style>
 </head>
@@ -23,9 +26,9 @@
                 <div class="flex items-center space-x-3">
                     <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-indigo-600">MedClaim</a>
                     <span class="text-gray-300">|</span>
-                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑</span>
+                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑 V4</span>
                 </div>
-                <div class="meta-text text-sm text-gray-500">2026년 02월 23일</div>
+                <div class="meta-text text-sm text-gray-500">2026년 02월 24일</div>
             </div>
         </div>
     </header>
@@ -35,8 +38,8 @@
             <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded">EMA PRIME</span>
 
         </div>
-        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">GPRC5D×CD3 이중항체 Talquetamab, RRMM 4차 이후 판 흔든다</h1>
-        <p class="text-xl text-gray-600 mb-8 leading-relaxed">EMA는 문을 열었지만 국내는 미허가·비급여…도입의 첫 단추는 판매권자</p>
+        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">GPRC5D 이중특이항체 Talquetamab, RRMM 후기 치료 새 축</h1>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">글로벌 문턱은 넘었지만 국내는 미허가·비급여 공백</p>
         <div class="flex items-center space-x-4 mb-10 pb-10 border-b border-gray-200 meta-text">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -47,29 +50,38 @@
             <span class="text-gray-300">&middot;</span>
             <span class="text-sm text-gray-500">Hot Issue Score: 55</span>
         </div>
+
+        <!-- 핵심 요약 (인사이트) -->
         <div class="highlight-box p-6 rounded-r-lg mb-10">
             <h3 class="font-bold text-gray-900 mb-3 meta-text text-sm">핵심 요약</h3>
             <ul class="space-y-2 text-gray-800">
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>Talquetamab(Talvey)는 GPRC5D와 CD3를 동시에 겨냥하는 T세포 유도 이중특이항체로, IMiD·프로테아좀 억제제·항CD38 항체를 포함해 최소 3차 이상 치료 후 진행한 재발·불응성 다발골수종(RRMM) 성인 환자 단독요법 적응증을 가진 항암제</span>
+                    <span>GPRC5D×CD3 이중특이항체로 T세포를 골수종 세포에 유도해 살상하는 면역항암제이며, 3차 이상 치료 후 재발·불응성 다발골수종(RRMM) 단독요법 적응증을 가진다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>EMA는 승인(허가) 상태로 확인되며, PRIME 및 조건부 허가(Conditional Approval) 트랙이 이 약물의 ‘혁신·미충족 수요’ 포지션을 규정한다(단, 입력 데이터에 승인일은 제공되지 않음)</span>
+                    <span>글로벌 규제 성과는 fda_status_text 및 ema_status_text가 보여주듯 ‘후기 RRMM’에서 기전 기반 혁신성을 공식적으로 인정받은 사례로 해석된다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>국내에서는 식약처(MFDS) 허가가 확인되지 않고, 심평원(HIRA)도 비급여(not_covered)로 등재돼 약가·급여기준 정보가 부재하다</span>
+                    <span>국내는 mfds_status_text 상태이며 심평원(HIRA)도 not_covered로 정리돼 있어, 실제 환자 접근은 제도 밖(비급여) 경로에 사실상 묶여 있다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span><abbr title="임상연구정보서비스, Clinical Research Information Service">CRIS</abbr> 국내 임상 등록 0건으로 ‘국내 근거 축적→허가 신청’ 경로가 보이지 않으며, 경쟁 약물(입력 목록)도 국내 도입 상태가 대부분 expected/uncertain로 표시돼 도입 지연 시 후기 라인 치료 공백이 구조화될 가능성이 크다</span>
+                    <span>d_day_text의 ‘허가 지연’ 신호를 감안하면, 국내 도입은 임상·공급·판매권자 정렬이 먼저이며, 허가 이후에도 급여는 ‘후기 라인·고가 면역치료제’ 특성상 엄격한 기준 설계가 관건이다</span>
                 </li></ul>
         </div>
+
         <article class="report-body text-gray-800">
+            <!-- 글로벌 섹션: 팩트 테이블 + 인사이트 -->
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
-            <div class="mb-6">다발골수종 4차 이후에서는 <abbr title="키메라 항원 수용체 T세포, Chimeric Antigen Receptor T-cell">CAR-T</abbr>, 이중특이항체, 항체약물접합체(ADC)가 ‘남은 환자군’을 놓고 경쟁하는 국면이다. <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761342" target="_blank" class="text-indigo-600 hover:underline"><strong>Talquetamab</strong></a>은 BCMA가 아닌 <strong>GPRC5D</strong>를 표적해, 기존 BCMA 표적 치료(BCMA CAR-T·BCMA 이중항체) 이후에도 선택지를 남기는 전략적 카드로 평가된다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>기전</strong>: GPRC5D(골수종 세포 표면 항원)×CD3(T세포) 결합 → T세포를 종양에 재유도해 세포독성 활성화</li> <li><strong>적응증(입력 데이터)</strong>: 성인 RRMM, 이전 치료 ≥3종(IMiD·PI·항CD38 포함) 및 최종 치료 중 진행, 단독요법</li> </ul> <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">승인 여부(입력)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">승인일(입력)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고(입력)</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761342" target="_blank" class="text-indigo-600 hover:underline">FDA</a></td><td class="px-3 py-2 border-b border-gray-100">승인 여부가 확인되지 않는다</td><td class="px-3 py-2 border-b border-gray-100">-</td><td class="px-3 py-2 border-b border-gray-100">fda.approved=false(승인 데이터 부재)</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><a href="https://www.ema.europa.eu/en/medicines/human/EPAR/talvey" target="_blank" class="text-indigo-600 hover:underline">EMA</a></td><td class="px-3 py-2 border-b border-gray-100">승인(허가) 상태</td><td class="px-3 py-2 border-b border-gray-100">제공되지 않음</td><td class="px-3 py-2 border-b border-gray-100">PRIME, Conditional Approval, 희귀의약품</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">식약처(MFDS)</td><td class="px-3 py-2 border-b border-gray-100">승인 여부가 확인되지 않는다</td><td class="px-3 py-2 border-b border-gray-100">-</td><td class="px-3 py-2 border-b border-gray-100">mfds.approved=false</td></tr> </table> 치료 패러다임 관점에서 Talquetamab의 경쟁 축은 ‘같은 후기 라인에서 빠르게 확장 중인 T세포 유도 플랫폼(이중항체·CAR-T)’이며, 표적을 BCMA에서 GPRC5D로 바꿨다는 점이 차별점이다. 입력 데이터 기준 EMA가 PRIME·조건부 허가 트랙을 적용한 만큼, 유럽에서는 ‘근거 축적을 전제로 한 조기 접근’에 무게가 실린 약물로 읽힌다.</div>
+            
+            <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">날짜</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2025-10-02</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2023-08-21</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">MFDS(식약처)</td><td class="px-3 py-2 border-b border-gray-100">미허가</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table></div>
+            
+            <div class="mb-6"><a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761342" target="_blank" class="text-indigo-600 hover:underline"><strong>Talquetamab</strong></a>은 ‘후기 RRMM에서 더 이상 미루기 어려운 면역치료 옵션’을 한 축 더 늘렸다는 점에서 지금 의미가 크다. fda_status_text와 ema_status_text가 가리키는 것처럼, 양대 규제권에서 이미 임상적 유효성과 안전성의 최소 요건을 통과한 플랫폼으로 분류된다. Talquetamab은 GPRC5D를 표적하는 T-cell engager(이중특이항체)로, BCMA가 아닌 표적을 통해 면역치료의 ‘표적 다변화’를 구현한다. 적응증 문구가 명확히 전제하듯(3차 이상·IMiD/PI/anti-CD38 노출 후 진행), 치료 선택지가 급격히 줄어드는 구간을 직접 겨냥한다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>Talquetamab</strong>: GPRC5D×CD3 이중특이항체로 ‘비-BCMA’ 축을 제공해 후속 치료 시퀀싱에 여지를 만든다</li> <li><strong><a href="polatuzumab_vedotin.html" class="text-indigo-600 hover:underline">Polatuzumab Vedotin</a> / <a href="zanidatamab-hrii.html" class="text-indigo-600 hover:underline"><a href="zanidatamab.html" class="text-indigo-600 hover:underline">Zanidatamab</a>-hrii</a> / <a href="zolbetuximab.html" class="text-indigo-600 hover:underline">Zolbetuximab</a> / <a href="ivosidenib.html" class="text-indigo-600 hover:underline">Ivosidenib</a></strong>: 모두 oncology 영역이지만 질환·표적이 달라, Talquetamab의 직접 대체재라기보다 ‘국내 허가·급여 자원 경쟁’ 측면에서 비교 대상으로 작동한다</li> </ul> 포지셔닝의 핵심은 “후기 라인에서의 즉시 사용성”과 “비-BCMA 표적”의 결합이다. 다만 이중특이항체 특성상 CRS·감염·면역저하 관리, 단계적 용량증량(step-up) 같은 투여 운영 역량이 치료 성과를 좌우해, 실제 확산 속도는 센터의 경험 축적에 의해 결정될 가능성이 크다.</div>
+
+            <!-- 타임라인 (팩트) -->
             
             <div class="my-10 p-6 bg-gray-50 rounded-xl">
                 <h4 class="meta-text text-sm font-semibold text-gray-500 mb-6">승인 타임라인</h4>
@@ -93,21 +105,34 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 국내 섹션: 인사이트 -->
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
-            <div class="mb-6">국내에서는 Talquetamab의 식약처 허가가 확인되지 않고, 심평원 급여 상태도 <strong>비급여(not_covered)</strong>로 고정돼 있다. 더 큰 문제는 CRIS에 국내 임상이 0건이라, 학회·상급종합병원 중심의 ‘국내 사용 경험 축적’ 루트가 현재 데이터상 확인되지 않는다는 점이다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">항목</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">Talquetamab(입력)</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">식약처 허가</td><td class="px-3 py-2 border-b border-gray-100">미확인(mfds.approved=false)</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">심평원 급여</td><td class="px-3 py-2 border-b border-gray-100">비급여(not_covered)</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">약가</td><td class="px-3 py-2 border-b border-gray-100">제공되지 않음</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">CRIS 국내 임상</td><td class="px-3 py-2 border-b border-gray-100">0건</td></tr> </table> 경쟁 구도도 국내에서는 ‘함께 늦는’ 양상이다. 입력된 경쟁약 리스트에서 <a href="polatuzumab_vedotin.html" class="text-indigo-600 hover:underline">Polatuzumab Vedotin</a>, <a href="zanidatamab-hrii.html" class="text-indigo-600 hover:underline"><a href="zanidatamab.html" class="text-indigo-600 hover:underline">Zanidatamab</a>-hrii</a>는 domestic_status가 expected로 표시됐지만, Talquetamab을 포함해 <a href="zolbetuximab.html" class="text-indigo-600 hover:underline">Zolbetuximab</a>·<a href="ivosidenib.html" class="text-indigo-600 hover:underline">Ivosidenib</a>는 uncertain로 묶여 있어, 특정 계열만 빨리 들어오는 그림이 아니라 ‘도입 지연이 누적’되는 리스크가 드러난다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>Polatuzumab vedotin: expected</li> <li>Zanidatamab-hrii: expected</li> <li>Zolbetuximab / Ivosidenib / Talquetamab: uncertain</li> </ul> 타임라인 측면에서 context.days_since_global_approval 및 mfds_timeline_estimate가 모두 null이라, ‘승인 후 몇 일 경과’ 기반의 정량 예측은 불가능하다. 약제팀·RA 관점에서는 결국 <strong>국내 판매권자 확보 및 허가 신청 착수 여부</strong>가 첫 번째 체크포인트가 된다(데이터상 국내 개발·임상 신호가 없기 때문).</div>
+            
+            <div class="my-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 meta-text">
+                <strong>경과:</strong> 글로벌 승인 후 918일 경과 — 글로벌 승인 후 918일 — 허가 지연 (국내 판매권자 확보 지연 가능성)
+            </div>
+            
+            <div class="mb-6">현재 국내에서는 mfds_status_text 상태여서, 글로벌 혁신 약물이 임상 현장에 ‘제도적으로는 부재’한 공백이 이어진다. context의 d_day_text가 말하듯 글로벌 승인 이후 상당 기간이 경과했는데도 미진입인 패턴은, 통상 임상·공급·판매권자(상업화) 판단이 엇갈릴 때 나타난다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>Talquetamab</strong>: domestic_status가 uncertain이며 ‘허가 지연’ 신호가 있는 만큼, 도입의 1차 병목은 허가 신청/심사 트랙 확보다</li> <li><strong>Polatuzumab Vedotin / Zanidatamab-hrii</strong>: domestic_status가 expected로 표시돼 있어, 국내에서는 ‘도입이 빠른 고가 항암제’가 먼저 포트폴리오를 선점할 수 있다</li> <li><strong>Zolbetuximab / Ivosidenib</strong>: uncertain로 분류돼, 동시다발적 미진입은 항암 희귀·표적치료의 상업화 우선순위 이슈를 시사한다</li> </ul> 실무적으로는 ‘후기 RRMM’ 환자군에서 해외 표준과 국내 가용 치료 간의 격차가 커질수록, 상급종합병원 중심으로 긴급도입·환자별 접근 요청이 늘어나는 구조다. 희귀의약품 이유가 부여된 만큼(korea_relevance_reasons), 허가 전략이 잡히면 신속심사 활용 가능성이 논의될 여지는 있으나, 그 자체가 자동 진입을 보장하진 않는다.</div>
+
+            <!-- 메드클레임: 비용표(팩트) + 인사이트 -->
             <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
                 <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
-                <div class="space-y-3 text-gray-800"><p>현재 심평원 상태가 비급여(not_covered)이고 약가 정보가 없어, 국내 요양급여 청구 자체를 설계할 단계가 아니다. 다만 항암제이며 copay_exemption이 ‘암환자 산정특례 5%’로 주어져 있어, <strong>향후 급여 등재가 이뤄질 경우</strong> 환자 본인부담 구조는 산정특례 프레임으로 들어간다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">환자 부담액 산정</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 일반 급여</td><td class="px-3 py-2 border-b border-gray-100">30%</td><td class="px-3 py-2 border-b border-gray-100">약가 정보가 없어 계산 불가</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 암환자 산정특례</td><td class="px-3 py-2 border-b border-gray-100">5%</td><td class="px-3 py-2 border-b border-gray-100">약가 정보가 없어 계산 불가</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">현 시점(비급여)</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">약가 정보가 없어 계산 불가</td></tr> </table> 현실적으로 병원 현장에서 가능한 액션은 ‘급여 청구 최적화’가 아니라 ‘환자 접근 경로 안내’다. 비급여 상태에서는 실손보험 청구 가능성이 존재하더라도(도메인 지식), 약가·투여 스케줄·처방 가능성(허가 여부)에 따라 실무가 갈리므로 약제팀은 <strong>(1) 식약처 허가 진행 여부, (2) 제약사 환자지원/공급 프로그램 유무, (3) 국내 도입 시 고가약제(PA) 가능성(1회 100만원 초과 여부는 약가 확인 필요)</strong>를 체크리스트로 먼저 구축해야 한다.</p></div>
+                
+                <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 (암환자 산정특례)</td><td class="px-3 py-2 border-b border-gray-100">5%</td><td class="px-3 py-2 border-b border-gray-100">등재 후 결정</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">전액 환자 부담</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">KODC 긴급도입</td><td class="px-3 py-2 border-b border-gray-100">전액</td><td class="px-3 py-2 border-b border-gray-100">개별 신청</td></tr> </table></div>
+                
+                <div class="space-y-3 text-gray-800"><p>copay_scenario_text가 정리하듯, 현 시점에서는 전액 비급여 구간으로 건강보험 청구를 전제로 한 처방·조제가 성립하기 어렵다. 따라서 병원은 ‘환자 접근 경로’를 제도 내 청구가 아니라 예외적 도입/지원 경로 중심으로 안내해야 한다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>KODC 긴급도입</strong>: cost_scenario_table에 명시된 대로 개별 신청 트랙이며 전액 부담 구조를 전제로 상담해야 한다</li> <li><strong>임상시험 참여</strong>: 국내 공개 과제가 없다고 정리돼(cris), 당장은 현실적 옵션이 제한적일 수 있어 해외/다기관 확장 여부를 별도 확인하는 접근이 필요하다</li> <li><strong>제약사 지원 프로그램(NPP/EAP)</strong>: 병원 약제팀이 프로그램 개설 여부·공급 조건을 확인하면 환자별 ‘시간-비용’ 변수를 줄일 수 있다</li> </ul> 향후 급여 등재가 이뤄질 경우에는 copay_scenario_text 범위 내에서 암환자 산정특례(5%) 적용 가능성이 열리지만, 등재 초기엔 치료라인·전처치·반응평가·투여기관 요건이 촘촘하게 설계될 공산이 크다. 약제팀과 심사부서는 이중특이항체 운영(전처치, step-up, 이상반응 대응) 표준 프로토콜과 비용 발생 지점(입원/관찰/응급대응)을 함께 정리해 ‘임상 운영 가능성’ 자체를 급여 논의의 근거로 제시할 준비가 필요하다.</p></div>
             </div>
         </article>
+
         <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
             <div class="mb-4">
                 <strong>데이터 출처:</strong> <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761342" target="_blank" class="text-indigo-500 hover:underline">FDA Drug Approval</a>, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/talvey" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
             </div>
             <div class="text-xs text-gray-400">
-                본 리포트는 RegScan AI가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
-                의사결정에 활용 시 원문 확인을 권장합니다.
-                마지막 업데이트: 2026-02-23
+                본 리포트는 RegScan AI V4가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
+                팩트(날짜·금액·상태)는 Python이 사전 계산하였으며, 인사이트(분석)는 LLM이 생성했습니다.
+                마지막 업데이트: 2026-02-24
             </div>
         </footer>
     </main>

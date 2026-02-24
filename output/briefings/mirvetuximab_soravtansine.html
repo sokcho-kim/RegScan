@@ -13,6 +13,9 @@
         .meta-text { font-family: 'Inter', sans-serif; }
         .highlight-box { border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
         .timeline-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .fact-table { width: 100%; text-align: left; font-size: 0.875rem; margin: 1rem 0; border-collapse: collapse; }
+        .fact-table th { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600; background: #f9fafb; }
+        .fact-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
         abbr { text-decoration: none; border-bottom: 1px dashed #9ca3af; cursor: help; }
     </style>
 </head>
@@ -23,9 +26,9 @@
                 <div class="flex items-center space-x-3">
                     <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-indigo-600">MedClaim</a>
                     <span class="text-gray-300">|</span>
-                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑</span>
+                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑 V4</span>
                 </div>
-                <div class="meta-text text-sm text-gray-500">2026년 02월 23일</div>
+                <div class="meta-text text-sm text-gray-500">2026년 02월 24일</div>
             </div>
         </div>
     </header>
@@ -34,8 +37,8 @@
             <span class="px-3 py-1 bg-yellow-500 text-white text-xs font-semibold rounded">MEDIUM</span>
             
         </div>
-        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">FRα 표적 <abbr title="항체-약물 접합체, Antibody-Drug Conjugate">ADC</abbr> 엘라히어, 난치성 난소암에 ‘표적치료’ 진입</h1>
-        <p class="text-xl text-gray-600 mb-8 leading-relaxed">FDA(2025)·EMA(2024) 승인에도 국내는 허가·급여 모두 공백</p>
+        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">FRα 표적 <abbr title="항체-약물 접합체, Antibody-Drug Conjugate">ADC</abbr> Elahere, 난치성 난소암 공략 본격화</h1>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">글로벌 문턱은 넘었지만 국내는 미허가—바이오마커 기반 진입이 관건</p>
         <div class="flex items-center space-x-4 mb-10 pb-10 border-b border-gray-200 meta-text">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -46,29 +49,38 @@
             <span class="text-gray-300">&middot;</span>
             <span class="text-sm text-gray-500">Hot Issue Score: 55</span>
         </div>
+
+        <!-- 핵심 요약 (인사이트) -->
         <div class="highlight-box p-6 rounded-r-lg mb-10">
             <h3 class="font-bold text-gray-900 mb-3 meta-text text-sm">핵심 요약</h3>
             <ul class="space-y-2 text-gray-800">
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>Mirvetuximab soravtansine(Elahere)은 FRα(엽산수용체-알파) 양성·백금저항성 고등급 장액성 난소암/난관암/원발 복막암에서 항체-약물 접합체(ADC)로 종양세포에 선택적으로 세포독성 payload를 전달하는 항암제</span>
+                    <span>Folate receptor-alpha(FRα) 양성, 백금저항성 고등급 장액성 난소·난관·복막암에서 1~3차 치료 후 단독요법으로 쓰이는 항체-약물접합체(ADC) 계열 항암제</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>EMA가 2024-11-14 승인을 완료했고, FDA도 2025-07-14 승인을 완료하며(양대 기관 승인) FRα 발현을 치료선택의 ‘분자 기준’으로 끌어올렸다</span>
+                    <span>fda_status_text와 ema_status_text가 보여주듯 양대 규제기관에서 효능·안전성의 최소 기준을 충족해 글로벌 상용화 단계로 진입</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>국내는 식약처(MFDS) 허가 여부가 확인되지 않고, 심평원(HIRA) 급여·약가 정보도 ‘not_found’로 확인돼 공식 등재 경로가 열려 있지 않다(국내 임상 <abbr title="임상연구정보서비스, Clinical Research Information Service">CRIS</abbr> 등록 0건)</span>
+                    <span>mfds_status_text 기준 국내는 아직 처방 기반(허가·급여·약가)이 형성되지 않았고, d_day_text처럼 글로벌 승인 이후 경과 기간을 감안하면 도입 속도가 실무 이슈로 부상</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>글로벌 승인 후 466일 경과 시점이며, 입력된 추정치(통상 1~2년)대로라면 지금은 국내 허가 신청 진행 중일 ‘가능성’이 있는 구간이지만, 실제 병원 도입은 식약처(MFDS) 허가→심평원(HIRA) 등재(통상 6개월~2년)까지 추가 시간이 필요하다</span>
+                    <span>같은 항암 포트폴리오 경쟁이 예상되는 Polatuzumab Vedotin·Zanidatamab-hrii 등도 국내 진입이 ‘expected’로 묶여 있어, 선허가·선급여를 누가 먼저 가져가느냐가 초기 시장을 좌우</span>
                 </li></ul>
         </div>
+
         <article class="report-body text-gray-800">
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">백금저항성 난소암, FRα가 ‘표적’이 됐다</h2>
-            <div class="mb-6">미르베투시맙 소라브탄신은 백금저항성 고등급 장액성 난소암에서 ‘FRα 양성’이라는 바이오마커로 환자를 선별해 쓰는 ADC라는 점에서, 항암 치료를 조직학 중심에서 분자표적 기반으로 한 단계 더 밀어붙인 약이다. 적응증은 FRα 양성·백금저항성 난소암/난관암/원발 복막암 성인 환자 중 1~3차 전신치료 후 단독요법이다. ADC 특성상 항체가 표적(FRα)에 결합해 종양세포로 internalization된 뒤 세포독성 payload가 작동하는 구조로, ‘표적 결합+세포독성 전달’을 묶어 효율을 노린다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">근거(시험/지표)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">결과(미르베투시맙 소라브탄신)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">NCT04296890 <abbr title="객관적 반응률, Objective Response Rate">ORR</abbr></td><td class="px-3 py-2 border-b border-gray-100">32.4%</td><td class="px-3 py-2 border-b border-gray-100">RECIST v1.1, 최대 약 15개월</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">DOR(중앙값)</td><td class="px-3 py-2 border-b border-gray-100">6.93개월</td><td class="px-3 py-2 border-b border-gray-100"></td></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><abbr title="무진행생존기간, Progression-Free Survival">PFS</abbr>(중앙값)</td><td class="px-3 py-2 border-b border-gray-100">4.27개월</td><td class="px-3 py-2 border-b border-gray-100"></td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">중대한 이상반응</td><td class="px-3 py-2 border-b border-gray-100">36/106명</td><td class="px-3 py-2 border-b border-gray-100">비중대 102/106명</td></tr> </table> 경쟁 구도에서 핵심 비교축은 ‘후기라인 표준’인 화학요법(예: weekly paclitaxel, pegylated liposomal doxorubicin, topotecan 등) 대비 바이오마커 기반 표적 접근의 효율성이다. 입력 데이터 기준으로는 경쟁 후보로 <a href="polatuzumab_vedotin.html" class="text-indigo-600 hover:underline">Polatuzumab Vedotin</a>, <a href="zanidatamab-hrii.html" class="text-indigo-600 hover:underline"><a href="zanidatamab.html" class="text-indigo-600 hover:underline">Zanidatamab</a>-hrii</a> 등이 언급되지만(모두 종양 영역), 본 약의 실제 임상 포지션은 난소암의 백금저항성·FRα 양성 세부군에 고정돼 있어 “같은 ADC라도 암종이 다르면 급여·도입 논리가 달라진다”는 점이 포인트다. <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/elahere" target="_blank" class="text-indigo-600 hover:underline">EMA</a>는 2024-11-14, <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761310" target="_blank" class="text-indigo-600 hover:underline">FDA</a>는 2025-07-14에 승인을 완료해 규제 신뢰도 측면의 2중 레퍼런스를 확보했다.</div>
+            <!-- 글로벌 섹션: 팩트 테이블 + 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
+            
+            <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">날짜</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2025-07-14</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2024-11-14</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">MFDS(식약처)</td><td class="px-3 py-2 border-b border-gray-100">미허가</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table></div>
+            
+            <div class="mb-6">Mirvetuximab soravtansine(Elahere)가 지금 중요한 이유는, 난소암의 ‘백금저항성’ 구간에서 바이오마커(FRα)로 환자를 선별해 표적치료의 승부를 보려는 ADC 전략이 본격적으로 임상·규제에서 검증된 사례이기 때문이다. fda_status_text·ema_status_text가 의미하는 바는, 단순 신약이 아니라 <strong>바이오마커 기반 처방 체계</strong>까지 포함한 치료 패러다임으로 인정받았다는 점이다. 작용기전은 FRα에 결합하는 항체에 세포독성 페이로드를 붙여 종양세포 내로 전달하는 ADC로, 기존 화학요법의 비선택적 독성을 ‘표적 전달’로 재구성한다. 적응증도 FRα 양성·백금저항성 고등급 장액성 난소/난관/복막암에서 1~3차 치료 후로 명확히 규정돼, 실제 현장에서는 <strong>FRα 검사 접근성</strong>이 처방량을 좌우한다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>임상 근거(제공 데이터 기준): 전체군 <abbr title="무진행생존기간, Progression-Free Survival">PFS</abbr>는 IC 화학요법과 큰 차이가 없었고(중앙값 4.14 vs 4.44개월), <strong>FRα 고발현군</strong>에서 PFS가 개선(4.76 vs 3.25개월)되며 ‘선별 치료’의 타당성이 강화됐다.</li> <li>반응률(ORR)은 22%로 IC 화학요법(12%) 대비 우위였고, 증상(QoL) 지표에서 개선을 보인 점은 백금저항성 구간에서 임상적 설득력을 보탠다.</li> <li>안전성은 serious AE가 적지 않게 보고돼(제공 표본 기준), 실제 처방에서는 이상반응 관리 역량이 약제 선택의 숨은 장벽이 될 수 있다.</li> </ul> valid_competitors 범위에서 보면 <a href="polatuzumab_vedotin.html" class="text-indigo-600 hover:underline">Polatuzumab Vedotin</a>·<a href="zanidatamab-hrii.html" class="text-indigo-600 hover:underline"><a href="zanidatamab.html" class="text-indigo-600 hover:underline">Zanidatamab</a>-hrii</a>·<a href="zolbetuximab.html" class="text-indigo-600 hover:underline">Zolbetuximab</a>·<a href="ivosidenib.html" class="text-indigo-600 hover:underline">Ivosidenib</a>·<a href="talquetamab.html" class="text-indigo-600 hover:underline">Talquetamab</a>과 직접 적응증이 겹친다고 단정하긴 어렵지만, 공통적으로 ‘고가·표적·바이오마커/세부 환자군’ 축에서 <strong>급여·접근성 경쟁</strong>을 벌이게 된다. 결국 Elahere의 글로벌 포지셔닝은 “백금저항성 난소암에서 FRα라는 문턱을 세우고 그 안에서 성과를 극대화하는 약”으로 요약된다.</div>
+
+            <!-- 타임라인 (팩트) -->
             
             <div class="my-10 p-6 bg-gray-50 rounded-xl">
                 <h4 class="meta-text text-sm font-semibold text-gray-500 mb-6">승인 타임라인</h4>
@@ -92,21 +104,34 @@
                     </div>
                 </div>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">승인은 끝났는데, 국내는 ‘코드’가 없다</h2>
-            <div class="mb-6">국내에서는 미르베투시맙 소라브탄신의 식약처(MFDS) 허가가 ‘승인 여부가 확인되지 않는다’는 상태이며, 심평원(HIRA)에서도 급여 상태가 not_found로 확인돼 약가·급여 기준이 아직 잡히지 않았다. 즉, 현재 시점에서 병원 약제팀이 다룰 수 있는 것은 ‘급여 등재된 처방 경로’가 아니라, 도입 준비(위원회 검토·재원 추계·대체요법 정리) 수준이다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">구분</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">데이터 근거</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">식약처</td><td class="px-3 py-2 border-b border-gray-100">승인 여부가 확인되지 않는다</td><td class="px-3 py-2 border-b border-gray-100">mfds.approved=false, date=null</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">심평원</td><td class="px-3 py-2 border-b border-gray-100">not_found(급여/약가 미확인)</td><td class="px-3 py-2 border-b border-gray-100">hira.status=not_found</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">CRIS</td><td class="px-3 py-2 border-b border-gray-100">국내 임상 0건</td><td class="px-3 py-2 border-b border-gray-100">cris.trial_count=0</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">글로벌 승인 후 경과</td><td class="px-3 py-2 border-b border-gray-100">466일</td><td class="px-3 py-2 border-b border-gray-100">context.days_since_global_approval</td></tr> </table> 입력된 타임라인 해석은 “글로벌 승인 후 466일 — 허가 신청 진행 중일 가능성(통상 1~2년)”으로, 지금은 국내 허가 서류 제출이 이뤄졌거나 준비 중일 때 나타나는 전형적 구간이다. 다만 CRIS 임상이 0건인 점은 ‘국내 개발-임상 기반의 자연스런 확산’보다는, 해외 데이터 기반으로 허가를 가져오는 수입·라이선스 모델 가능성을 시사한다(판매권자/자료 제출 여부가 병목이 될 수 있음). 경쟁 후보(입력된 competitors)도 국내 상태가 expected/uncertain로 제시돼 있어, 항암 고가 생물학제제/ADC 계열의 국내 도입이 개별 회사의 전략과 급여 가능성 판단에 크게 좌우되는 환경이 이어진다. 심사·약제 실무에서는 FRα 검사 인프라(검체, 판독, 양성 기준)와 ‘1~3차 치료 후’ 라인 정의가 향후 급여 기준의 핵심 문구가 될 가능성이 높아, 해당 항목을 사전 정리해 두는 것이 유리하다.</div>
+
+            <!-- 국내 섹션: 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
+            
+            <div class="my-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 meta-text">
+                <strong>경과:</strong> 글로벌 승인 후 467일 경과 — 글로벌 승인 후 467일 — 허가 신청 진행 중일 가능성 (통상 1~2년)
+            </div>
+            
+            <div class="mb-6">현재 국내에서는 mfds_status_text처럼 제도권 진입이 완료되지 않아, ‘필요 환자군은 존재하지만 처방 경로가 막힌’ 형태의 공백이 핵심이다. d_day_text가 시사하듯 글로벌 승인 후 상당 기간이 경과한 만큼, 국내 도입은 <strong>판매권자 전략(허가 신청 의지)과 동반진단/검사 인프라</strong>가 병목이 될 가능성이 크다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>국내 경쟁 구도(팩트 범위): Polatuzumab Vedotin·Zanidatamab-hrii는 domestic_status가 ‘expected’로, 고가 표적항암제 군에서 동시다발적 도입 경쟁이 형성될 여지가 있다.</li> <li>Zolbetuximab·Ivosidenib·Talquetamab은 ‘uncertain’로 묶여 있어, 기업별 우선순위에 따라 국내 포트폴리오 공백이 길어질 수 있다.</li> <li>Elahere는 희귀의약품 맥락(analysis의 korea_relevance_reasons)과 맞물려, 허가가 가시화될 경우 신속심사·등재 전략이 함께 설계될 가능성이 있다.</li> </ul> 병원 관점에서는 FRα 검사 루틴화와 치료 라인 정의가 선행되지 않으면, 허가 이후에도 실제 사용은 제한될 수 있다. 반대로 검사-선별-투약 프로토콜을 미리 갖춘 기관은 초기 처방 경험을 빠르게 축적해 지역 내 레퍼런스를 선점할 여지가 있다.</div>
+
+            <!-- 메드클레임: 비용표(팩트) + 인사이트 -->
             <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
                 <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
-                <div class="space-y-3 text-gray-800"><p>현재 심평원(HIRA)에 급여·약가가 확인되지 않아, 건강보험 청구를 전제로 한 처방 설계가 성립하기 어렵다(급여 코드·상한가·급여기준 부재). 다만 치료영역이 항암(oncology)이며 입력 데이터에 산정특례가 명시돼 있어, 향후 급여 등재가 성사될 경우 환자 본인부담 구조는 암환자 산정특례(5%) 적용이 기본 프레임이 된다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">청구/처방 현실</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">심평원 급여 등재 전(현 시점)</td><td class="px-3 py-2 border-b border-gray-100">해당 없음(급여 기준 부재)</td><td class="px-3 py-2 border-b border-gray-100">급여 청구 불가(등재 정보 not_found)</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 심평원 급여 등재 + 암환자 산정특례</td><td class="px-3 py-2 border-b border-gray-100">5%</td><td class="px-3 py-2 border-b border-gray-100">급여 기준(FRα 양성, 백금저항성, 치료 라인 1~3차 등) 충족 시 적용</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">급여 외 사용(비급여)</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">병원 내 프로토콜·원내위원회 및 환자 부담 이슈가 핵심</td></tr> </table> 허가·급여 공백 구간에서 현실적인 대안 경로는 ① 허가 전이라면 법적 틀 내 도입 절차(국내 제도에 따른 도입/공급 경로) 확인, ② 가능하다면 해외 임상 근거 기반의 임상시험 참여(다만 CRIS 0건이라 국내 개설은 확인되지 않음), ③ 환자 측에서는 비급여 시 실손보험 청구 가능성 상담(약관별 상이) 정도로 정리된다. 약제팀/심사자는 향후 등재 시 ‘FRα 검사 비용 및 급여 여부’, ‘치료 라인(1~3차) 판정 문서’, ‘백금저항성 정의’가 삭감 리스크를 좌우하므로, 처방 전 필수 증빙 목록을 미리 템플릿화해 두는 것이 실무 효율을 만든다.</p></div>
+                
+                <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 (암환자 산정특례)</td><td class="px-3 py-2 border-b border-gray-100">5%</td><td class="px-3 py-2 border-b border-gray-100">등재 후 결정</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">전액 환자 부담</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">KODC 긴급도입</td><td class="px-3 py-2 border-b border-gray-100">전액</td><td class="px-3 py-2 border-b border-gray-100">개별 신청</td></tr> </table></div>
+                
+                <div class="space-y-3 text-gray-800"><p>현 시점에서는 copay_scenario_text대로 <strong>급여 청구 전제가 성립하지 않으며 전액 비급여</strong>라는 점이 실무의 출발점이다. 따라서 약제팀과 심사부서는 ‘어떤 경로로 약을 확보하고, 어떤 서류로 환자 부담을 설명할지’를 케이스별로 표준화해야 한다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>KODC 긴급도입: cost_scenario_table에 명시된 것처럼 개별 신청이 필요하고 전액 부담 구조이므로, 적응증·대체치료 실패 근거·투약 계획서 준비가 관건이다.</li> <li>임상시험 참여: 현재 제공된 국내 임상(cris trial_count=0) 기반으로는 즉시 연결이 어렵기 때문에, 다기관 글로벌 임상 오픈 여부를 별도 루트로 확인하는 접근이 현실적이다.</li> <li>실손보험: 비급여 상황에서 환자 문의가 집중될 수 있어, 약제비·투약 주기·부대비용(검사 포함)을 항목별로 분리 안내하는 것이 분쟁을 줄인다.</li> </ul> 향후 급여 등재가 성립하면 copay_scenario_text에 따라 <strong>암환자 산정특례(5%) 적용 가능</strong>하므로, 그 시점에는 FRα 양성 판정 기준과 치료 라인(1~3차 이후) 충족 여부가 청구 적정성의 핵심 체크포인트가 된다. 약제팀은 지금부터 FRα 검사 코드·검체 흐름·결과 리포트 형식을 점검해 ‘허가 후 즉시 처방 가능한 준비 상태’를 만드는 것이 비용·환자 대기시간을 동시에 줄이는 실무 해법이다.</p></div>
             </div>
         </article>
+
         <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
             <div class="mb-4">
-                <strong>데이터 출처:</strong> <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761310" target="_blank" class="text-indigo-500 hover:underline">FDA Drug Approval</a>, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/elahere" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, <a href="https://clinicaltrials.gov/study/NCT04296890" target="_blank" class="text-indigo-500 hover:underline">ClinicalTrials.gov (NCT04296890)</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
+                <strong>데이터 출처:</strong> <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761310" target="_blank" class="text-indigo-500 hover:underline">FDA Drug Approval</a>, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/elahere" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, <a href="https://clinicaltrials.gov/study/NCT02631876" target="_blank" class="text-indigo-500 hover:underline">ClinicalTrials.gov (NCT02631876)</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
             </div>
             <div class="text-xs text-gray-400">
-                본 리포트는 RegScan AI가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
-                의사결정에 활용 시 원문 확인을 권장합니다.
-                마지막 업데이트: 2026-02-23
+                본 리포트는 RegScan AI V4가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
+                팩트(날짜·금액·상태)는 Python이 사전 계산하였으며, 인사이트(분석)는 LLM이 생성했습니다.
+                마지막 업데이트: 2026-02-24
             </div>
         </footer>
     </main>

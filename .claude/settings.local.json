@@ -133,7 +133,23 @@
       "Bash(git -C C:JiminRegScan status -u)",
       "WebFetch(domain:maily.so)",
       "Bash(PYTHONIOENCODING=utf-8 python:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "WebFetch(domain:www.nejm.org)",
+      "WebFetch(domain:www.drugs.com)",
+      "WebFetch(domain:namu.wiki)",
+      "WebFetch(domain:journals.lww.com)",
+      "WebFetch(domain:www.ovid.com)",
+      "WebFetch(domain:pubmed.ncbi.nlm.nih.gov)",
+      "WebFetch(domain:www.health.kr)",
+      "WebFetch(domain:www.thelancet.com)",
+      "WebFetch(domain:www.endocrinologyadvisor.com)",
+      "WebFetch(domain:classic.clinicaltrials.gov)",
+      "WebFetch(domain:www.sciencedirect.com)",
+      "WebFetch(domain:genentech-clinicaltrials.com)",
+      "WebFetch(domain:www.biospace.com)",
+      "WebFetch(domain:www.contemporarypediatrics.com)",
+      "WebFetch(domain:www.pharmacytimes.com)",
+      "Bash(python3:*)"
     ]
   }
 }

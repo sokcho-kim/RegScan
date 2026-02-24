@@ -13,6 +13,9 @@
         .meta-text { font-family: 'Inter', sans-serif; }
         .highlight-box { border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
         .timeline-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .fact-table { width: 100%; text-align: left; font-size: 0.875rem; margin: 1rem 0; border-collapse: collapse; }
+        .fact-table th { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600; background: #f9fafb; }
+        .fact-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
         abbr { text-decoration: none; border-bottom: 1px dashed #9ca3af; cursor: help; }
     </style>
 </head>
@@ -23,9 +26,9 @@
                 <div class="flex items-center space-x-3">
                     <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-indigo-600">MedClaim</a>
                     <span class="text-gray-300">|</span>
-                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑</span>
+                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑 V4</span>
                 </div>
-                <div class="meta-text text-sm text-gray-500">2026년 02월 23일</div>
+                <div class="meta-text text-sm text-gray-500">2026년 02월 24일</div>
             </div>
         </div>
     </header>
@@ -35,8 +38,8 @@
             <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded">EMA PRIME</span>
 
         </div>
-        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight"><abbr title="폐동맥 고혈압, Pulmonary Arterial Hypertension">PAH</abbr> 병용 판 바꾼 Sotatercept, FDA·EMA 승인 후 국내 공백</h1>
-        <p class="text-xl text-gray-600 mb-8 leading-relaxed">TGF-β 경로 조절로 ‘혈관 리모델링’ 겨냥…트레프로스티닐 계열과 기전 분화</p>
+        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight"><abbr title="폐동맥 고혈압, Pulmonary Arterial Hypertension">PAH</abbr> 판 바꾸는 Sotatercept, 국내는 공백</h1>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">Winrevair 병용 적응증 글로벌 확립 vs 식약처(MFDS)·급여 미진입</p>
         <div class="flex items-center space-x-4 mb-10 pb-10 border-b border-gray-200 meta-text">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -47,29 +50,38 @@
             <span class="text-gray-300">&middot;</span>
             <span class="text-sm text-gray-500">Hot Issue Score: 50</span>
         </div>
+
+        <!-- 핵심 요약 (인사이트) -->
         <div class="highlight-box p-6 rounded-r-lg mb-10">
             <h3 class="font-bold text-gray-900 mb-3 meta-text text-sm">핵심 요약</h3>
             <ul class="space-y-2 text-gray-800">
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>Sotatercept-csrk(Winrevair)은 TGF-β 슈퍼패밀리(activin/BMP) 신호를 조절해 폐혈관 리모델링을 되돌리는 방향의 생물학적 제제로, WHO FC II–III 성인 폐동맥고혈압(PAH)에서 기존 PAH 치료와 병용해 운동능력 개선을 목표로 한다</span>
+                    <span>폐동맥고혈압(PAH) 성인 WHO FC II–III에서 기존 PAH 치료와 병용해 운동능력을 개선하는 치료제로, 혈관 재형성 신호축을 겨냥하는 질병조절형 접근이 핵심</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>EMA는 2024-08-22 승인, FDA는 2025-12-08 승인을 완료해(입력 데이터 기준) 글로벌 양대 규제기관에서 허가를 확보했다</span>
+                    <span>글로벌 규제기관에서 임상적 유효성과 혁신성을 확인받아(예: fda_status_text, ema_status_text), PAH 치료가 ‘혈관확장 중심’에서 ‘리모델링 교정’으로 확장되는 계기를 만들었다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>국내는 식약처(MFDS) 허가 여부가 확인되지 않으며, 심평원(HIRA) 급여 등재 정보도 ‘not_found’로 약가·급여기준이 모두 공백이다</span>
+                    <span>국내는 mfds_status_text이며 심평원(HIRA)도 등재 근거가 확인되지 않는 상태로, d_day_text가 시사하듯 글로벌 표준과 국내 접근성 간 격차가 커졌다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>글로벌 승인 후 550일 경과 구간으로 ‘통상 1~2년’ 패턴에 비춰 허가 신청 단계일 가능성이 데이터에 제시돼 있으며, 경쟁 축인 Treprostinil(프로스타사이클린 계열) 대비 ‘질환 수정’ 기전이 급여평가에서 임상적 가치의 핵심 쟁점이 된다</span>
+                    <span>국내 도입이 본격화되면 기존 프로스타사이클린 계열(예: Treprostinil)과의 병용 최적화·라인업 재편이 관건이며, 희귀질환 약가-급여 협상 구조가 진입 속도를 좌우할 가능성이 크다</span>
                 </li></ul>
         </div>
+
         <article class="report-body text-gray-800">
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">혈관확장제 다음은 리모델링</h2>
-            <div class="mb-6">PAH 치료가 ‘증상 완화용 혈관확장’ 중심에서 ‘폐혈관 리모델링 표적’으로 확장되면서 <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761363" target="_blank" class="text-indigo-600 hover:underline"><strong><a href="sotatercept.html" class="text-indigo-600 hover:underline">Sotatercept</a>-csrk</strong></a>가 약제·심사 실무의 새 변수로 들어왔다. Winrevair는 다른 PAH 치료들과 병용해 WHO 기능분류(FC) II–III 성인 PAH에서 운동능력 개선을 적응증으로 내세운다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>기전 포인트</strong>: TGF-β 슈퍼패밀리 신호축(activin/BMP 균형)을 조절하는 생물학적 제제로, 기존 ERA/PDE5i/프로스타사이클린 계열처럼 ‘즉각적 혈관확장’에만 머무르지 않고 혈관벽 구조 변화(리모델링)를 겨냥한다.</li> </ul> <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">승인일</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><a href="https://www.ema.europa.eu/en/medicines/human/EPAR/winrevair" target="_blank" class="text-indigo-600 hover:underline">EMA</a></td><td class="px-3 py-2 border-b border-gray-100">승인 완료</td><td class="px-3 py-2 border-b border-gray-100">2024-08-22</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761363" target="_blank" class="text-indigo-600 hover:underline">FDA</a></td><td class="px-3 py-2 border-b border-gray-100">승인 완료</td><td class="px-3 py-2 border-b border-gray-100">2025-12-08</td></tr> </table> 경쟁 구도에서 가장 실무적으로 부딪히는 축은 프로스타사이클린 경로 약물(예: <a href="treprostinil.html" class="text-indigo-600 hover:underline">Treprostinil</a>)처럼 기존에 병용의 ‘층’을 쌓아온 약물군과의 조합·순서다. 즉, Sotatercept는 같은 PAH 시장에 있으면서도 ‘기전이 겹치지 않는 병용 확장’이 가능한 카드라는 점에서, 급여권에 들어오면 처방 알고리즘 자체가 재정의될 여지가 크다. EMA가 2024-08-22, FDA가 2025-12-08 승인을 완료했다는 점은(입력 데이터) 최소한 유효성·안전성 판단의 규제 리스크가 주요 시장에서 한 차례 정리됐다는 의미다.</div>
+            <!-- 글로벌 섹션: 팩트 테이블 + 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
+            
+            <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">날짜</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2025-12-08</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2024-08-22</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">MFDS(식약처)</td><td class="px-3 py-2 border-b border-gray-100">미허가</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table></div>
+            
+            <div class="mb-6"><a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761363" target="_blank" class="text-indigo-600 hover:underline"><strong><a href="sotatercept.html" class="text-indigo-600 hover:underline">Sotatercept</a>-csrk</strong></a>(Winrevair)는 PAH에서 ‘증상 완화’ 중심이던 약물군에 질병 기전을 건드리는 축을 더해 치료 지형을 바꾸고 있다. 특히 fda_status_text 및 ema_status_text가 의미하는 것은, 단일 지역 성공이 아니라 글로벌 표준치료 조합 안에 편입될 수준의 근거가 확보됐다는 점이다. 적응증은 fact의 indication처럼 성인 WHO FC II–III에서 기존 PAH 치료와 병용해 운동능력 개선을 목표로 한다. 기전적으로는 TGF-β 슈퍼패밀리(BMP/activin) 신호 불균형과 연관된 혈관 리모델링을 조절하는 ‘리간드 트랩’ 개념으로, PDE5 억제제·ERA·프로스타사이클린처럼 혈관확장에 치우친 축과 성격이 다르다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>Sotatercept</strong>: 혈관 재형성 신호축을 조절하는 병용 기반의 질병조절형 포지션</li> <li><strong><a href="treprostinil.html" class="text-indigo-600 hover:underline">Treprostinil</a></strong>: 프로스타사이클린 계열로 증상/혈역학 개선에 강점, 복약·투여 부담이 치료 지속성 변수</li> <li><strong><a href="mexiletine_hydrochloride.html" class="text-indigo-600 hover:underline">Mexiletine Hydrochloride</a> / <a href="epinephrine.html" class="text-indigo-600 hover:underline">Epinephrine</a> / <a href="ibuprofen.html" class="text-indigo-600 hover:underline">Ibuprofen</a></strong>: PAH 표준치료 축과는 거리가 있어 직접 대체보다는 동반질환·대증요법 영역에 머문다</li> </ul> 결국 Sotatercept의 가치는 ‘추가적인 혈관확장제’가 아니라, 병용 조합에서 리모델링 축을 보완해 기능상태(FC)와 운동능력의 갭을 줄이는 데 있다. 경쟁의 초점은 단일 약 간 우열이라기보다, 어떤 환자군에서 기존 3제(ERA+PDE5i+프로스타사이클린) 대비 임상적·경제적 증분이 가장 큰지로 이동할 가능성이 크다.</div>
+
+            <!-- 타임라인 (팩트) -->
             
             <div class="my-10 p-6 bg-gray-50 rounded-xl">
                 <h4 class="meta-text text-sm font-semibold text-gray-500 mb-6">승인 타임라인</h4>
@@ -93,21 +105,34 @@
                     </div>
                 </div>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">허가도 급여도 ‘미확인’</h2>
-            <div class="mb-6">국내에서는 Winrevair(Sotatercept-csrk)의 식약처 허가가 확인되지 않고, 심평원 급여 등재도 조회되지 않아 ‘도입 이전 단계’로 해석되는 공백이 가장 큰 이슈다. 특히 <abbr title="임상연구정보서비스, Clinical Research Information Service">CRIS</abbr> 국내 임상 등록이 0건으로 제시돼 있어, 국내 개발·확증 트랙이 아니라 글로벌 자료 기반 도입(판매권자·허가전략)에 의존하는 구조다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">구분</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">현재 상태(입력 데이터)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">실무 의미</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">식약처(MFDS)</td><td class="px-3 py-2 border-b border-gray-100">승인 여부 미확인</td><td class="px-3 py-2 border-b border-gray-100">처방·공급 경로가 제도권에 없음</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">심평원(HIRA)</td><td class="px-3 py-2 border-b border-gray-100">not_found</td><td class="px-3 py-2 border-b border-gray-100">약가/급여기준 부재로 청구 불가</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">CRIS</td><td class="px-3 py-2 border-b border-gray-100">0건</td><td class="px-3 py-2 border-b border-gray-100">국내 임상 기반 조기 진입 근거 부족</td></tr> </table> 타임라인은 ‘글로벌 승인 후 550일’로 제시되며, 입력 데이터의 추정 문구가 “허가 신청 진행 중일 가능성(통상 1~2년)”이다. 즉, 지금은 국내 RA 관점에서 <strong>자료 제출 여부와 판매권자 확정</strong>이 가장 큰 병목이 된다. 경쟁약 측면에서 competitors에 포함된 Treprostinil은 같은 심혈관 영역(cardiovascular)에서 점수를 부여받았지만 국내 상태도 ‘uncertain’로 제시돼, PAH 약제군 전반의 국내 데이터가 이 입력셋에서는 빈약하다. 약제팀/심사자는 Sotatercept가 희귀의약품(입력 데이터 사유) 프레임으로 들어올 때 <strong>신속심사 트랙(GIFT 등) 적용 여부와 급여평가 시 비교대상(기존 PAH 병용요법)</strong> 설정이 실제 등재 속도를 좌우한다는 점을 전제로 준비해야 한다.</div>
+
+            <!-- 국내 섹션: 인사이트 -->
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
+            
+            <div class="my-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 meta-text">
+                <strong>경과:</strong> 글로벌 승인 후 551일 경과 — 글로벌 승인 후 551일 — 허가 신청 진행 중일 가능성 (통상 1~2년)
+            </div>
+            
+            <div class="mb-6">국내에서는 mfds_status_text인 상태라, 이미 글로벌에서 치료 조합의 한 축으로 자리잡는 동안 환자 접근성은 사실상 ‘공백’으로 남아 있다. d_day_text가 말해주듯 글로벌 승인 이후 상당 기간이 경과한 만큼, 국내 허가 신청이 진행 중이더라도 병원 현장에서는 ‘언제 처방 가능한가’가 아니라 ‘처방 가능한 경로가 있는가’가 먼저 문제다. 희귀의약품 지정 이력은 국내에서도 우선심사·시장진입 논리의 토대가 될 수 있지만, 실제 진입은 판매권자 전략과 약가-급여 패키지 설계에 좌우된다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>Sotatercept</strong>: 국내 도입은 미확인(국내_status가 uncertain)으로, 허가·급여의 동시 설계가 필요</li> <li><strong>Treprostinil</strong>: 국내 현황이 uncertain로 제시돼 비교가 제한적이나, 도입돼 있더라도 투여경로·순응도 이슈가 남아 병용 전략이 중요</li> <li><strong>Ibuprofen</strong>: approved_deleted로, PAH 축과 무관하게 ‘시장에 남는 약’과 ‘사라지는 약’의 제도적 변수를 상기시킨다</li> </ul> 국내 약제위원회/심사부서는 PAH 환자군이 작고 중증도가 높은 만큼, 초기에는 상급종합병원 중심의 처방 통제(센터화)와 사전심사형 관리가 결합될 가능성을 염두에 둬야 한다. 또한 병용 적응증 특성상, 기존 약제와의 급여 기준 정합성(동시투여 인정 범위)이 등재 성패를 가르는 포인트가 된다.</div>
+
+            <!-- 메드클레임: 비용표(팩트) + 인사이트 -->
             <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
                 <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
-                <div class="space-y-3 text-gray-800"><p>현 시점에서 심평원 등재가 ‘not_found’이므로, 건강보험 청구(급여·약가 산정 포함)는 출발선에 서지 못한 상태다. 또한 식약처 허가가 확인되지 않아, 통상적인 원내 도입(구매-처방-청구) 루틴으로는 접근 자체가 제한된다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">환자 부담(입력 데이터로 계산 가능 범위)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 등재 + 희귀질환 산정특례</td><td class="px-3 py-2 border-b border-gray-100">10%</td><td class="px-3 py-2 border-b border-gray-100">약가 미제시로 금액 산출 불가</td><td class="px-3 py-2 border-b border-gray-100">희귀질환 산정특례(10%)는 입력 데이터에 명시</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여(등재 전)</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">약가 미제시로 금액 산출 불가</td><td class="px-3 py-2 border-b border-gray-100">실손 청구 가능성은 있으나 약관별 상이</td></tr> </table> 등재 전 대안 경로는 제도적으로는 긴급도입(기관별 절차) 또는 해외 치료 연계가 거론되지만, 본 입력 데이터에는 KODC/EAP/Named Patient Program 정보가 없어 임의로 단정할 수 없다. 약제팀 실무에서는 ‘희귀질환 산정특례 10%’가 적용될 수 있는 구조(중증·희귀 등록 전제)를 염두에 두되, 실제 청구 설계는 <strong>식약처 허가 확인 → 심평원 등재(약가/기준) 생성</strong> 이후에만 가능하다는 점이 핵심 제약이다. 심사 담당자는 향후 등재 국면에서 비교대조군을 ‘기존 병용요법(예: Treprostinil 포함 프로스타사이클린 경로 약물)’로 놓고 임상적 개선(운동능력)과 투약·관리 부담을 어떤 지표로 평가할지 사전 정리하는 것이 가장 실질적인 준비 항목이다.</p></div>
+                
+                <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 (희귀질환 산정특례)</td><td class="px-3 py-2 border-b border-gray-100">10%</td><td class="px-3 py-2 border-b border-gray-100">등재 후 결정</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">전액 환자 부담</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">KODC 긴급도입</td><td class="px-3 py-2 border-b border-gray-100">전액</td><td class="px-3 py-2 border-b border-gray-100">개별 신청</td></tr> </table></div>
+                
+                <div class="space-y-3 text-gray-800"><p>현 시점에서는 copay_scenario_text대로 급여 등재 전 단계여서 환자 부담은 ‘전액’ 구도로 해석하는 것이 안전하다. 처방 가능성 자체가 허가·도입 경로에 의해 제한될 수 있으므로, 병원은 청구 실무보다 ‘환자 안내’와 ‘대체 치료 조합 최적화’가 우선 과제가 된다. 향후 등재가 이뤄질 경우에는 copay_scenario_text에 명시된 희귀질환 산정특례(10%) 프레임이 적용 가능한 구조이므로, 진단코딩·등록요건 충족이 실제 환자 부담을 좌우한다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>KODC 긴급도입: cost_scenario_table처럼 개별 신청이며 전액 부담 구조를 전제로 환자 동의·서류 흐름을 표준화</li> <li>임상시험/프로그램: fact의 cris가 0건이므로 현 시점 ‘국내 임상 참여’ 경로는 제한적으로 보되, 해외/다기관 프로그램 유무를 별도 확인</li> <li>실손보험: 비급여(전액) 구간에서 청구 가능성이 거론될 수 있으나, 약제·적응증·증빙요건을 사전 점검해야 분쟁을 줄인다</li> </ul> 약제팀장은 도입 초기 예상 수요(FC II–III, 병용 대상)와 병용 약제군(ERA/PDE5i/프로스타사이클린)의 재원 영향 분석을 동시에 준비해야 하며, 심사자는 ‘병용 인정 기준’과 ‘센터 처방 요건’이 과잉/과소 사용을 가르는 관리장치가 될 수 있음을 염두에 두는 것이 실무적으로 중요하다.</p></div>
             </div>
         </article>
+
         <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
             <div class="mb-4">
                 <strong>데이터 출처:</strong> <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761363" target="_blank" class="text-indigo-500 hover:underline">FDA Drug Approval</a>, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/winrevair" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
             </div>
             <div class="text-xs text-gray-400">
-                본 리포트는 RegScan AI가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
-                의사결정에 활용 시 원문 확인을 권장합니다.
-                마지막 업데이트: 2026-02-23
+                본 리포트는 RegScan AI V4가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
+                팩트(날짜·금액·상태)는 Python이 사전 계산하였으며, 인사이트(분석)는 LLM이 생성했습니다.
+                마지막 업데이트: 2026-02-24
             </div>
         </footer>
     </main>
