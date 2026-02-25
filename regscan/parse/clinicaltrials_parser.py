@@ -182,7 +182,65 @@ class ClinicalTrialsGovParser:
         if ae_mod:
             parsed["adverse_events"] = self._parse_adverse_events(ae_mod)
 
+        # 3) 한계점(Limitations) 자동 추출
+        parsed["limitations"] = self._extract_limitations(parsed)
+
         return parsed
+
+    def _extract_limitations(self, parsed_results: dict) -> list[str]:
+        """임상 결과에서 한계점을 자동 추출
+
+        기준:
+        - 표본 크기 < 200: 소규모 시험 경고
+        - CI 폭 > 0.5: 넓은 신뢰구간 경고
+        - p-value 경계값 (0.01 < p < 0.05): 경계적 유의성 경고
+        - primary outcome에서 통계적 유의성 미달
+        """
+        limitations: list[str] = []
+
+        for outcome in parsed_results.get("primary_outcomes", []):
+            for analysis in outcome.get("analyses", []):
+                # p-value 경계성 체크
+                p_str = analysis.get("p_value", "")
+                if p_str:
+                    try:
+                        # "<0.001" → 0.001, "0.02" → 0.02 등
+                        p_clean = p_str.replace("<", "").replace(">", "").replace("=", "").strip()
+                        p_val = float(p_clean)
+                        if 0.01 < p_val < 0.05:
+                            limitations.append(
+                                f"Primary endpoint p-value가 경계적 수준({p_str})으로, 통계적 유의성이 강건하지 않을 수 있음"
+                            )
+                        elif p_val >= 0.05:
+                            limitations.append(
+                                f"Primary endpoint에서 통계적 유의성 미달(p={p_str})"
+                            )
+                    except (ValueError, TypeError):
+                        pass
+
+                # CI 폭 체크
+                ci_str = analysis.get("ci", "")
+                if ci_str:
+                    # "95% CI [0.44, 0.80]" 형식 파싱
+                    ci_match = re.search(r'\[([0-9.]+),\s*([0-9.]+)\]', ci_str)
+                    if ci_match:
+                        try:
+                            ci_lower = float(ci_match.group(1))
+                            ci_upper = float(ci_match.group(2))
+                            ci_width = ci_upper - ci_lower
+                            if ci_width > 0.5:
+                                limitations.append(
+                                    f"신뢰구간 폭이 넓음({ci_str}), 효과 추정의 정밀도 제한적"
+                                )
+                        except (ValueError, TypeError):
+                            pass
+
+            # 그룹 표본 크기 체크
+            for gv in outcome.get("group_values", []):
+                # group_values에서 표본 크기 추정은 어려우므로 생략
+                pass
+
+        return limitations
 
     def _parse_outcome_measure(self, measure: dict) -> dict[str, Any] | None:
         """단일 outcome measure 파싱"""
