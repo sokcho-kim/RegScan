@@ -197,25 +197,28 @@ class LLMBriefingGenerator:
 
     @staticmethod
     def _estimate_mfds_timeline(impact: DomesticImpact) -> str | None:
-        """글로벌 승인 경과일 기반 MFDS 허가 타임라인 예측"""
+        """글로벌 승인 경과일 기반 MFDS 허가 타임라인 — 순수 사실만 제공, 해석은 LLM에 위임"""
         if impact.mfds_approved:
             return "already_approved"
         days = impact.days_since_global_approval
         if days is None:
             return None
-        if impact.has_active_trial or len(impact.cris_trials) > 0:
-            if days < 365:
-                return "1~2년 내 허가 가능 (국내 임상 진행 중, 글로벌 승인 1년 미만)"
-            else:
-                return f"허가 임박 가능 (글로벌 승인 후 {days}일 경과, 국내 임상 진행 중)"
+        years = days / 365.25
+        period = f"{int(years)}년 {int((years % 1) * 12)}개월" if years >= 1 else f"{days}일"
+
+        has_trial = impact.has_active_trial or len(impact.cris_trials) > 0
+        trial_tag = ", 국내 임상 진행 중" if has_trial else ""
+
         if days < 365:
-            return f"글로벌 승인 후 {days}일 — 통상 허가 신청 준비 단계 (1~3년 소요)"
+            grade = "초기"
         elif days < 730:
-            return f"글로벌 승인 후 {days}일 — 허가 신청 진행 중일 가능성 (통상 1~2년)"
+            grade = "통상 범위"
         elif days < 1095:
-            return f"글로벌 승인 후 {days}일 — 허가 지연 (국내 판매권자 확보 지연 가능성)"
+            grade = "지연"
         else:
-            return f"글로벌 승인 후 {days}일 경과 — 장기 미허가 (판매권자 부재 또는 시장성 판단 보류)"
+            grade = "장기 미허가"
+
+        return f"글로벌 승인 후 {period} 경과 ({days}일, {grade}{trial_tag})"
 
     @staticmethod
     def _build_approval_timeline(impact: DomesticImpact) -> list[dict]:
@@ -409,15 +412,15 @@ class LLMBriefingGenerator:
         return f"승인 완료 ({date_str}{suffix})"
 
     def _compute_d_day_text(self, impact: DomesticImpact) -> str:
-        """글로벌 승인 경과일 + 해석 텍스트"""
+        """글로벌 승인 경과일 — 순수 사실(경과일 + 기간 등급)만 제공"""
         days = impact.days_since_global_approval
         if days is None:
             return "글로벌 승인 정보 없음"
         estimate = self._estimate_mfds_timeline(impact)
-        if estimate and estimate != "already_approved":
-            return f"글로벌 승인 후 {days}일 경과 — {estimate}"
         if estimate == "already_approved":
             return f"글로벌 승인 후 {days}일 경과 (국내 허가 완료)"
+        if estimate:
+            return estimate  # 이미 "글로벌 승인 후 N년 M개월 경과 (Xdays, 등급)" 형식
         return f"글로벌 승인 후 {days}일 경과"
 
     def _compute_copay_scenario_text(self, impact: DomesticImpact) -> str:
@@ -503,8 +506,65 @@ class LLMBriefingGenerator:
         header = "| 시나리오 | 본인부담률 | 비고 |\n|---|---|---|"
         return header + "\n" + "\n".join(rows)
 
+    def _compute_price_spectrum(self, impact: DomesticImpact) -> dict | None:
+        """HIRA class_no 기반 가격 스펙트럼 조회.
+
+        급여약: ingredient_code → class_no → 스펙트럼 + drug_position
+        미급여약: therapeutic_areas → class_no fallback → 스펙트럼만
+        """
+        try:
+            from regscan.report.price_stats import (
+                get_class_no_for_ingredient,
+                get_class_no_for_therapeutic_area,
+                get_price_spectrum,
+                compute_drug_position,
+            )
+        except ImportError:
+            return None
+
+        class_no = None
+        segment = "original"
+
+        # 1) 급여약: ingredient_code → class_no
+        if impact.hira_code:
+            class_no = get_class_no_for_ingredient(impact.hira_code)
+
+        # 2) 미급여약 fallback: therapeutic_areas → class_no
+        if not class_no and impact.therapeutic_areas:
+            for ta in impact.therapeutic_areas:
+                class_no = get_class_no_for_therapeutic_area(ta)
+                if class_no:
+                    break
+
+        if not class_no:
+            return None
+
+        spectrum = get_price_spectrum(class_no, segment)
+        if not spectrum:
+            return None
+
+        result = {
+            "class_no": spectrum["class_no"],
+            "class_name": spectrum["class_name"],
+            "segment": segment,
+            "count": spectrum["count"],
+            "p50_median": f"{spectrum['p50_median']:,.0f}원",
+            "p75": f"{spectrum['p75']:,.0f}원",
+            "p90": f"{spectrum['p90']:,.0f}원",
+            "max_price": f"{spectrum['max_price']:,.0f}원",
+        }
+
+        # 급여약이면 위치도 계산
+        if impact.hira_price and impact.hira_price > 0:
+            pos = compute_drug_position(impact.hira_price, class_no, segment)
+            if pos:
+                result["drug_position"] = pos
+                result["drug_price"] = f"{impact.hira_price:,.0f}원"
+
+        return result
+
     def _compute_valid_competitors(self, impact: DomesticImpact) -> list[dict]:
-        """경쟁약 목록을 간결한 형태로 변환"""
+        """경쟁약 목록을 간결한 형태로 변환 (적응증 200자 + mechanism_class)"""
         raw = getattr(impact, '_competitors', []) or []
         result = []
         for comp in raw[:5]:
@@ -513,9 +573,28 @@ class LLMBriefingGenerator:
             if ds:
                 entry["domestic_status"] = ds
             if comp.get("indication"):
-                entry["reason"] = comp["indication"][:100]
+                entry["indication"] = comp["indication"][:200]
+            if comp.get("mechanism_class"):
+                entry["mechanism_class"] = comp["mechanism_class"]
             result.append(entry)
         return result
+
+    @staticmethod
+    def _build_moa_hint(impact: DomesticImpact) -> str:
+        """pharmacotherapeutic_group + indication_text → moa_hint 구성"""
+        parts = []
+        ptg = getattr(impact, '_pharmacotherapeutic_group', '') or ''
+        ind = getattr(impact, '_indication_text', '') or ''
+        if ptg:
+            parts.append(ptg)
+        if ind:
+            parts.append(ind[:300])
+        return ' / '.join(parts) if parts else ''
+
+    @staticmethod
+    def _build_limitations(impact: DomesticImpact) -> str:
+        """임상 결과에서 자동 추출된 한계점 텍스트"""
+        return getattr(impact, '_limitations_text', '') or ''
 
     def _prepare_drug_data_v4(self, impact: DomesticImpact) -> str:
         """V4 FactComputer: 기존 데이터 + 사전 계산 팩트 필드"""
@@ -537,6 +616,21 @@ class LLMBriefingGenerator:
         data["valid_competitors"] = self._compute_valid_competitors(impact)
         data["approval_summary_table"] = self._compute_approval_summary_table(impact)
         data["cost_scenario_table"] = self._compute_cost_scenario_table(impact)
+
+        # MOA 힌트: 약리학적 분류 + 적응증 텍스트 결합
+        moa_hint = self._build_moa_hint(impact)
+        if moa_hint:
+            data["moa_hint"] = moa_hint
+
+        # 한계점: 임상 결과 기반 자동 추출
+        limitations = self._build_limitations(impact)
+        if limitations:
+            data["limitations"] = limitations
+
+        # 가격 스펙트럼: HIRA class_no 기반 백분위 통계
+        price_spectrum = self._compute_price_spectrum(impact)
+        if price_spectrum:
+            data["price_spectrum"] = price_spectrum
 
         return json.dumps(data, ensure_ascii=False, indent=2)
 

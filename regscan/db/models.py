@@ -1,4 +1,4 @@
-"""DB 모델 — 12개 정규화 테이블 + FeedCardDB(레거시)
+"""DB 모델 — 정규화 테이블 + FeedCardDB(레거시)
 
 테이블 구조:
   drugs              — 약물 마스터 (INN 기준 1행)
@@ -16,6 +16,14 @@
   expert_opinions    — Health.kr 전문가 리뷰
   ai_insights        — AI 3단 파이프라인 추론·검증 결과
   articles           — AI 기사 (GPT-5.2 Writer)
+
+  # v3 신규 테이블
+  stream_snapshots   — 스트림 실행 스냅샷
+  drug_competitors   — 경쟁약물 매핑
+  pdufa_dates        — PDUFA 일정
+  clinical_trials_gov — ClinicalTrials.gov Phase 3
+  stream_briefings   — 스트림별 브리핑
+  hira_price_stats   — HIRA 가격 스펙트럼 (사전 계산)
 """
 
 from datetime import datetime
@@ -580,3 +588,32 @@ class StreamBriefingDB(Base):
     __table_args__ = (
         Index("idx_briefing_stream_type", "stream_name", "briefing_type"),
     )
+
+
+# ──────────────────────────────────────────────
+# v3-6. hira_price_stats — HIRA 가격 스펙트럼 (사전 계산)
+# ──────────────────────────────────────────────
+
+class HiraPriceStatsDB(Base):
+    """HIRA 가격 스펙트럼 사전 계산 통계
+
+    HIRA 원본 JSON(~30,000건 급여)에서 class_no × segment별
+    백분위 가격 통계를 사전 계산하여 저장.
+    HIRA 파일 갱신 시 SHA-256 해시 비교 후 전체 재구축.
+    """
+
+    __tablename__ = "hira_price_stats"
+
+    class_no = Column(String(10), primary_key=True)
+    segment = Column(String(10), primary_key=True)  # 'original' | 'generic'
+    class_name = Column(String(100), nullable=False)
+    count = Column(Integer, nullable=False)
+    min_price = Column(Float, nullable=False)
+    p25 = Column(Float, nullable=False)
+    p50_median = Column(Float, nullable=False)
+    p75 = Column(Float, nullable=False)
+    p90 = Column(Float, nullable=False)
+    max_price = Column(Float, nullable=False)
+    source_file = Column(String(200), nullable=False)
+    source_hash = Column(String(64), nullable=False)
+    computed_at = Column(DateTime, nullable=False, default=datetime.utcnow)

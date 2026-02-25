@@ -1135,7 +1135,12 @@ async def _fetch_ema_indication_index() -> dict[str, dict]:
 
 
 async def _fetch_ctgov_results_batch(inns: list[str]) -> dict:
-    """CT.gov에서 약물 INN 목록의 임상 결과를 배치 조회
+    """CT.gov에서 약물 INN 목록의 임상 결과를 배치 조회 (단계적 확장)
+
+    단계적 조회 전략:
+    1) Phase 3 + 결과 있음 (page_size=5)
+    2) Phase 3 + 결과 없음 (enrolled > 0인 주요 시험)
+    3) Phase 2 + 결과 있음 (Phase 3가 없는 약물용)
 
     Returns:
         {normalized_inn: {"clinical_results": {...}, "nct_id": "..."}}
@@ -1153,9 +1158,66 @@ async def _fetch_ctgov_results_batch(inns: list[str]) -> dict:
             norm = matcher.normalize(inn)
             if norm in cache:
                 continue
+
+            found = False
+
+            # Stage 1: Phase 3 + 결과 있음 (가장 신뢰도 높은 데이터)
             try:
                 studies = await client.search_by_intervention(
-                    inn, phase="PHASE3", has_results=True, page_size=3,
+                    inn, phase="PHASE3", has_results=True, page_size=5,
+                )
+                for s in studies:
+                    parsed = parser.parse_study(s)
+                    cr = parsed.get("clinical_results")
+                    if cr and cr.get("primary_outcomes"):
+                        cache[norm] = {
+                            "clinical_results": cr,
+                            "nct_id": parsed["nct_id"],
+                        }
+                        found = True
+                        break
+            except Exception as e:
+                logger.debug("CT.gov Stage 1 실패 (%s): %s", inn, e)
+
+            if found:
+                continue
+
+            # Stage 2: Phase 3 + 결과 없음 (대형 시험 메타데이터라도 확보)
+            try:
+                studies = await client.search_by_intervention(
+                    inn, phase="PHASE3", has_results=False, page_size=5,
+                )
+                for s in studies:
+                    parsed = parser.parse_study(s)
+                    # 결과가 없어도 enrollment + conditions 정보 활용
+                    if parsed.get("enrollment", 0) >= 50:
+                        cache[norm] = {
+                            "clinical_results": {
+                                "primary_outcomes": [],
+                                "secondary_outcomes": [],
+                                "adverse_events": None,
+                                "trial_metadata": {
+                                    "nct_id": parsed["nct_id"],
+                                    "title": parsed.get("title", ""),
+                                    "enrollment": parsed.get("enrollment", 0),
+                                    "status": parsed.get("status", ""),
+                                    "conditions": parsed.get("conditions", []),
+                                },
+                            },
+                            "nct_id": parsed["nct_id"],
+                        }
+                        found = True
+                        break
+            except Exception as e:
+                logger.debug("CT.gov Stage 2 실패 (%s): %s", inn, e)
+
+            if found:
+                continue
+
+            # Stage 3: Phase 2 + 결과 있음 (Phase 3가 없는 초기 약물용)
+            try:
+                studies = await client.search_by_intervention(
+                    inn, phase="PHASE2", has_results=True, page_size=5,
                 )
                 for s in studies:
                     parsed = parser.parse_study(s)
@@ -1167,7 +1229,7 @@ async def _fetch_ctgov_results_batch(inns: list[str]) -> dict:
                         }
                         break
             except Exception as e:
-                logger.debug("CT.gov 조회 실패 (%s): %s", inn, e)
+                logger.debug("CT.gov Stage 3 실패 (%s): %s", inn, e)
 
     logger.info("CT.gov 임상 결과 조회: %d/%d건 확보", len(cache), len(inns))
     return cache
@@ -1320,16 +1382,45 @@ async def load_drugs_from_db(
                 impact.clinical_results = ctgov_results_cache[norm_inn]["clinical_results"]
                 impact.clinical_results_nct_id = ctgov_results_cache[norm_inn]["nct_id"]
 
+            # ── 4.6) 한계점(Limitations) 자동 추출 → LLM에 전달 ──
+            _limitations_parts: list[str] = []
+            if impact.clinical_results:
+                cr = impact.clinical_results
+                auto_lims = cr.get("limitations", [])
+                if auto_lims:
+                    _limitations_parts.extend(auto_lims)
+            if _limitations_parts:
+                impact._limitations_text = " ".join(_limitations_parts)
+
             # ── 5) 경쟁약 주입 ──
             # EMA therapeutic_area가 있으면 이를 우선 사용 (더 구체적)
             # 없으면 DB therapeutic_areas 사용
             competitors = []
             seen = {drug.inn}
 
-            # 5-a) EMA therapeutic_area 기반 (같은 EMA 분류 약물)
+            # 5-a) EMA therapeutic_area 기반 (같은 EMA 분류 + 적응증 키워드 오버랩)
             if ema_ta:
+                # 대상 약물의 적응증 키워드 집합 (소문자, 3자 이상 단어)
+                _target_ind_words = set()
+                if ema_indication:
+                    _target_ind_words = {
+                        w.lower() for w in re.split(r'[\s,;/()]+', ema_indication)
+                        if len(w) >= 3 and w.isalpha()
+                    }
+
                 for other_inn, other_info in ema_index.items():
                     if other_info.get("therapeutic_area", "") == ema_ta:
+                        # 적응증 키워드 오버랩 필터: 최소 2단어 공통
+                        comp_indication = other_info.get("indication", "")
+                        if _target_ind_words and comp_indication:
+                            comp_words = {
+                                w.lower() for w in re.split(r'[\s,;/()]+', comp_indication)
+                                if len(w) >= 3 and w.isalpha()
+                            }
+                            overlap = _target_ind_words & comp_words
+                            if len(overlap) < 2:
+                                continue
+
                         # DB에서 해당 약물 score 조회
                         for area_list in area_index.values():
                             for comp in area_list:
@@ -1337,9 +1428,12 @@ async def load_drugs_from_db(
                                     if comp["inn"] not in seen:
                                         seen.add(comp["inn"])
                                         comp_with_indication = dict(comp)
-                                        comp_indication = other_info.get("indication", "")
                                         if comp_indication:
-                                            comp_with_indication["indication"] = comp_indication[:150]
+                                            comp_with_indication["indication"] = comp_indication[:200]
+                                        # mechanism_class 추가 (pharmacotherapeutic_group 기반)
+                                        comp_ptg = other_info.get("pharmacotherapeutic_group", "")
+                                        if comp_ptg:
+                                            comp_with_indication["mechanism_class"] = comp_ptg
                                         competitors.append(comp_with_indication)
 
             # 5-b) DB therapeutic_area 폴백 (primary area 기반)
@@ -1357,7 +1451,18 @@ async def load_drugs_from_db(
                     if comp_primary != target_primary:
                         continue
                     seen.add(comp["inn"])
-                    competitors.append(comp)
+                    # EMA 인덱스에서 추가 맥락 보강
+                    comp_enriched = dict(comp)
+                    comp_norm = matcher.normalize(comp["inn"])
+                    comp_ema = ema_index.get(comp_norm, {})
+                    if not comp_ema and '-' in comp_norm:
+                        comp_ema = ema_index.get(comp_norm.rsplit('-', 1)[0], {})
+                    if comp_ema:
+                        if comp_ema.get("indication") and "indication" not in comp_enriched:
+                            comp_enriched["indication"] = comp_ema["indication"][:200]
+                        if comp_ema.get("pharmacotherapeutic_group"):
+                            comp_enriched["mechanism_class"] = comp_ema["pharmacotherapeutic_group"]
+                    competitors.append(comp_enriched)
 
             # score 내림차순 정렬 후 상위 5개, INN Title Case 정규화
             competitors.sort(key=lambda x: x["score"], reverse=True)
@@ -1501,6 +1606,15 @@ async def run_publish(
     pipeline_ver = "V4 (팩트/인사이트 분리)" if use_v4 else "V3"
     logger.info("=== 기사 발행 시작 [%s] ===", pipeline_ver)
     logger.info("  대상: score >= %d, 최대 %d건", min_score, top_n)
+
+    # ── HIRA 가격 스펙트럼 사전 구축 (변경 시에만 재계산) ──
+    try:
+        from regscan.report.price_stats import check_and_rebuild_if_needed
+        rebuilt = check_and_rebuild_if_needed()
+        if rebuilt:
+            logger.info("  HIRA 가격 스펙트럼 재구축 완료")
+    except Exception as e:
+        logger.warning("  HIRA 가격 스펙트럼 구축 실패 (무시): %s", e)
 
     # CT.gov 임상 결과 사전 조회 (기사 품질 향상)
     logger.info("  CT.gov 임상 결과 사전 조회...")
@@ -1728,6 +1842,15 @@ async def run_publish(
     logger.info("  HTML 기사: %s/*.html (%d건)", OUTPUT_DIR, len(articles_meta))
     logger.info("  인덱스: %s", index_path)
     logger.info("  핫이슈: %s", hot_path)
+
+    # ── 자동 스냅샷 (결과 + 프롬프트 보관) ──
+    try:
+        from regscan.scripts.snapshot_articles import take_auto_snapshot
+        ver_label = "v4" if use_v4 else "v3"
+        snap_dest = take_auto_snapshot(pipeline_version=ver_label)
+        logger.info("  스냅샷: %s", snap_dest.name)
+    except Exception as e:
+        logger.warning("  자동 스냅샷 실패 (무시): %s", e)
 
     print(f"\n{'='*60}")
     print(f"  RegScan 기사 발행 완료")
