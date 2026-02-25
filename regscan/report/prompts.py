@@ -604,8 +604,8 @@ BRIEFING_REPORT_PROMPT_V4 = """아래 약물의 **사전 계산된 팩트 데이
 
 ## ★ 가격 스펙트럼 해석 규칙 ★
 - price_spectrum이 제공된 경우, domestic_insight_text 또는 medclaim_action_text에서 반드시 1회 이상 인용하라.
-- 미급여 약물: "동일 계열({class_name}) 급여 {segment} {count}종 기준, 상한가 중앙값 {p50_median}, 상위 10%는 {p90} 이상"
-- 급여 약물: "이 약물의 상한가({drug_price})는 {class_name} {segment} {count}종 중 {drug_position} 수준"
+- 미급여 약물: "동일 계열({{class_name}}) 급여 {{segment}} {{count}}종 기준, 상한가 중앙값 {{p50_median}}, 상위 10%는 {{p90}} 이상"
+- 급여 약물: "이 약물의 상한가({{drug_price}})는 {{class_name}} {{segment}} {{count}}종 중 {{drug_position}} 수준"
 - 단순 평균은 인용하지 마라. 반드시 중앙값(p50_median)과 p90을 사용하라.
 - max_price 값이 p50_median의 100배 이상이면 "CAR-T 등 초고가 치료제 포함" 맥락을 추가하라.
 - price_spectrum이 없으면 가격 비교를 추정하거나 날조하지 마라.

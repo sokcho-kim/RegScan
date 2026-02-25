@@ -1,0 +1,187 @@
+[
+  {
+    "inn": "POLATUZUMAB VEDOTIN",
+    "score": 60,
+    "headline": "2232일째 미허가: CD79b ADC 폴라투주맙",
+    "key_points": [
+      "CD79b 표적 ADC로 B세포에 결합→세포 내 유입→MMAE 방출→미세소관 기능 저해→세포사멸을 유도하며, DLBCL에서 pola+BR(재발/불응) 및 pola+R-CHP(1차) 병용 적응증을 가진 항악성종양제",
+      "EMA가 2020-01-16 승인한 뒤 2232일이 지났고, FDA도 2023-04-19에 승인해 글로벌 규제 문턱은 이미 넘어섰다",
+      "국내는 식약처 미허가 상태이며 HIRA도 비급여(미등재)로, 현 시점에서는 제도권 처방·급여 경로가 닫혀 있다",
+      "임상에서 OS HR 0.60(95% CI 0.43–0.83, p=0.0017)·PFS HR 0.37(95% CI 0.27–0.51, p<0.0001)을 제시한 만큼, 국내 도입의 관건은 허가 착수와 이후 급여 등재 시 임상적 가치(생존·반응) 기반의 기준 설계로 수렴한다"
+    ],
+    "status_label": "expected",
+    "source_data": {
+      "inn": "POLATUZUMAB VEDOTIN",
+      "domestic_status": "expected",
+      "fda_approved": true,
+      "fda_date": "2023-04-19",
+      "ema_approved": true,
+      "ema_date": "2020-01-16",
+      "mfds_approved": false,
+      "mfds_date": null,
+      "mfds_brand_name": "",
+      "hira_status": "not_covered",
+      "hira_code": "691801BIJ",
+      "hira_criteria": "",
+      "hira_price": null,
+      "cris_trial_count": 0,
+      "has_active_trial": false,
+      "global_score": 60,
+      "korea_relevance_score": 10,
+      "quadrant": "watch",
+      "summary": "글로벌: FDA+EMA | MFDS: 미허가 | HIRA: 비급여",
+      "analysis_notes": [
+        "글로벌 승인 후 6년 경과, 국내 미허가"
+      ]
+    },
+    "html_file": "polatuzumab_vedotin.html"
+  },
+  {
+    "inn": "ZANIDATAMAB-HRII",
+    "score": 60,
+    "headline": "FDA 승인 462일째, HER2 BTC 이중항체는 국내 미허가",
+    "key_points": [
+      "HER2-positive(IHC3+) 담도암(BTC) 2차 이상에서 쓰는 항암 단클론항체로, HER2 표적 결합을 통해 종양 성장 신호를 차단하는 바이오마커 기반 치료 전략",
+      "FDA가 2024-11-20 승인했고 EMA도 2025-06-27 승인(Conditional Approval)까지 마친 뒤, 글로벌 승인 후 462일이 경과해 유럽·미국 표준권에서는 이미 ‘사용 가능한 옵션’으로 자리잡았다",
+      "국내는 아직 허가 문턱을 넘지 못해 처방 자체가 불가하며, HIRA 등재 정보도 확인되지 않는다—환자 입장에서는 전액 비급여 구간에 놓인다",
+      "희귀의약품 지정 이력은 접근성 개선의 제도적 근거가 될 수 있으나, 실제 전환점은 MFDS 허가와 급여 등재(산정특례 5% 적용 가능)로 이어지는 속도에 달려 있다"
+    ],
+    "status_label": "expected",
+    "source_data": {
+      "inn": "ZANIDATAMAB-HRII",
+      "domestic_status": "expected",
+      "fda_approved": true,
+      "fda_date": "2024-11-20",
+      "ema_approved": true,
+      "ema_date": "2025-06-27",
+      "mfds_approved": false,
+      "mfds_date": null,
+      "mfds_brand_name": "",
+      "hira_status": "not_found",
+      "hira_code": "",
+      "hira_criteria": "",
+      "hira_price": null,
+      "cris_trial_count": 0,
+      "has_active_trial": false,
+      "global_score": 60,
+      "korea_relevance_score": 10,
+      "quadrant": "watch",
+      "summary": "글로벌: FDA+EMA | MFDS: 미허가",
+      "analysis_notes": [
+        "글로벌 승인 후 1년 경과, 국내 미허가"
+      ]
+    },
+    "html_file": "zanidatamab-hrii.html"
+  },
+  {
+    "inn": "ZOLBETUXIMAB",
+    "score": 55,
+    "headline": "524일째, CLDN18.2 표적 위암 1차 치료제 국내 미진입",
+    "key_points": [
+      "Zolbetuximab는 CLDN18.2 양성·HER2 음성 진행성/전이성 위암·위식도접합부 선암 1차에서 화학요법(플루오로피리미딘+백금)과 병용하는 표적 단클론항체 계열 항암제",
+      "EMA는 2024-09-19, FDA는 2025-06-06에 승인 결정을 내리며 글로벌 1차 치료 근거가 제도권에 편입됐다",
+      "국내는 MFDS 미허가로 처방이 불가하고, HIRA도 미등재(현재 전액 비급여 구간) 상태다",
+      "임상적으로는 HR과 p-value가 뒷받침된 생존 이득이 ‘바이오마커( CLDN18.2) 기반 1차 표준’ 신호를 만들었고, 국내에서는 허가 이후 급여 등재 시 암환자 산정특례(5%) 적용이 핵심 변수가 된다"
+    ],
+    "status_label": "expected",
+    "source_data": {
+      "inn": "ZOLBETUXIMAB",
+      "domestic_status": "uncertain",
+      "fda_approved": true,
+      "fda_date": "2025-06-06",
+      "ema_approved": true,
+      "ema_date": "2024-09-19",
+      "mfds_approved": false,
+      "mfds_date": null,
+      "mfds_brand_name": "",
+      "hira_status": "not_covered",
+      "hira_code": "738001BIJ",
+      "hira_criteria": "",
+      "hira_price": null,
+      "cris_trial_count": 0,
+      "has_active_trial": false,
+      "global_score": 55,
+      "korea_relevance_score": 10,
+      "quadrant": "normal",
+      "summary": "글로벌: FDA+EMA | MFDS: 미허가 | HIRA: 비급여",
+      "analysis_notes": [
+        "글로벌 승인 후 1년 경과, 국내 미허가"
+      ]
+    },
+    "html_file": "zolbetuximab.html"
+  },
+  {
+    "inn": "IVOSIDENIB",
+    "score": 55,
+    "headline": "1,028일째 공백: IDH1 표적 ivosidenib",
+    "key_points": [
+      "IDH1 R132 변이 효소를 억제하는 표적항암제로, 표준 유도요법이 어려운 신규 AML에서는 azacitidine 병용, 담관암에서는 2차 이후 단독요법으로 쓰인다",
+      "EMA가 2023-05-04, FDA가 2023-10-24 승인을 완료하며 IDH1 변이 기반 정밀치료의 규제 근거가 양대 축에서 확립됐다",
+      "국내는 아직 허가 문턱을 넘지 못해 처방 자체가 불가하고, HIRA도 미등재로 현재 접근은 전액 환자부담 경로에만 걸려 있다",
+      "글로벌 승인 후 2년 9개월(1,028일)이 흐른 만큼, 국내 도입의 관건은 변이 검사-처방-급여로 이어지는 ‘동반진단 기반 진입 전략’의 구체화와 실제 진료 수요를 증명하는 데이터 축적이다"
+    ],
+    "status_label": "expected",
+    "source_data": {
+      "inn": "IVOSIDENIB",
+      "domestic_status": "uncertain",
+      "fda_approved": true,
+      "fda_date": "2023-10-24",
+      "ema_approved": true,
+      "ema_date": "2023-05-04",
+      "mfds_approved": false,
+      "mfds_date": null,
+      "mfds_brand_name": "",
+      "hira_status": "not_covered",
+      "hira_code": "734201ATB",
+      "hira_criteria": "",
+      "hira_price": null,
+      "cris_trial_count": 0,
+      "has_active_trial": false,
+      "global_score": 55,
+      "korea_relevance_score": 10,
+      "quadrant": "normal",
+      "summary": "글로벌: FDA+EMA | MFDS: 미허가 | HIRA: 비급여",
+      "analysis_notes": [
+        "글로벌 승인 후 2년 경과, 국내 미허가"
+      ]
+    },
+    "html_file": "ivosidenib.html"
+  },
+  {
+    "inn": "TALQUETAMAB",
+    "score": 55,
+    "headline": "919일 경과, GPRC5D 표적 Talquetamab의 국내 공백",
+    "key_points": [
+      "재발·불응성 다발골수종(≥3차 치료 후)에서 단독요법으로 쓰이는 항암제로, **GPRC5D를 표적하는 T세포 유도 면역치료(이중특이 항체 계열)**로 분류된다",
+      "EMA가 2023-08-21 승인(Conditional Approval)한 뒤 919일이 지났고, FDA도 2025-10-02 승인 완료로 글로벌 규제기관의 유효성·안전성 판단을 이미 통과했다",
+      "국내는 MFDS 미허가로 처방이 불가능하며, HIRA도 미등재 상태라 급여·약가 기준이 비어 있다(환자 비용은 현재 전액 비급여 구간)",
+      "국내 도입은 '허가→급여'의 2단계를 새로 밟아야 하며, 급여 등재 시에는 암환자 산정특례 5% 적용 가능성이 열리지만(팩트 기준), 실제 접근성은 긴급도입·프로그램 운영 여부에 좌우된다"
+    ],
+    "status_label": "expected",
+    "source_data": {
+      "inn": "TALQUETAMAB",
+      "domestic_status": "uncertain",
+      "fda_approved": true,
+      "fda_date": "2025-10-02",
+      "ema_approved": true,
+      "ema_date": "2023-08-21",
+      "mfds_approved": false,
+      "mfds_date": null,
+      "mfds_brand_name": "",
+      "hira_status": "not_covered",
+      "hira_code": "735601BIJ",
+      "hira_criteria": "",
+      "hira_price": null,
+      "cris_trial_count": 0,
+      "has_active_trial": false,
+      "global_score": 55,
+      "korea_relevance_score": 10,
+      "quadrant": "normal",
+      "summary": "글로벌: FDA+EMA | MFDS: 미허가 | HIRA: 비급여",
+      "analysis_notes": [
+        "글로벌 승인 후 2년 경과, 국내 미허가"
+      ]
+    },
+    "html_file": "talquetamab.html"
+  }
+]
