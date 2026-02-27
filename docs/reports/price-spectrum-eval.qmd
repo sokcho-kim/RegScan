@@ -1,0 +1,163 @@
+---
+title: "가격 스펙트럼 반영 기사 품질 검증"
+subtitle: "HIRA class_no 기반 백분위 통계 도입 전후 비교 + GPT-4.1 vs Gemini 3.1 Pro"
+date: 2026-02-26
+format:
+  html:
+    toc: true
+    code-fold: true
+    theme: cosmo
+---
+
+## 1. 배경
+
+RegScan V4에 **가격 스펙트럼** 기능이 추가되었다 (commit `40a736f`).
+HIRA `class_no` 기반으로 동일 계열 약물의 상한가 분포(백분위)를 계산하여,
+기사 생성 시 중앙값(p50), 상위 10%(p90) 등을 인용하도록 프롬프트가 업데이트되었다.
+
+**비교 대상 3건**: ZANIDATAMAB-HRII, IVOSIDENIB, ZOLBETUXIMAB
+
+| 스냅샷 | 설명 |
+|--------|------|
+| `snapshots/2026-02-25_v4` | 가격 스펙트럼 미반영 (pre) |
+| `output/briefings/` (main) | 가격 스펙트럼 반영 (post) |
+
+## 2. 스냅샷 비교: Pre vs Post 품질 메트릭
+
+```{python}
+#| label: load-snapshot-results
+import json
+from pathlib import Path
+import pandas as pd
+
+EVAL_PATH = Path(r"C:\Jimin\Test-Harness\evals\regscan\outputs\snapshot_compare.json")
+
+if EVAL_PATH.exists():
+    with open(EVAL_PATH) as f:
+        data = json.load(f)
+
+    rows = []
+    for result in data.get("results", []):
+        provider = result.get("provider", {}).get("label", "unknown")
+        desc = result.get("test", {}).get("description", "")
+        score = result.get("score", 0)
+
+        # 컴포넌트별 결과 추출
+        components = {}
+        for gr in result.get("gradingResult", {}).get("componentResults", []):
+            # reason에서 메트릭 이름 추출 (첫 단어)
+            reason = gr.get("reason", "")
+            metric = reason.split(" ")[0]
+            components[metric] = gr.get("score", 0)
+
+        rows.append({
+            "provider": provider,
+            "drug": desc,
+            "overall_score": round(score, 3),
+            **{k: round(v, 2) for k, v in components.items()},
+        })
+
+    df = pd.DataFrame(rows)
+    df
+else:
+    print("⚠ snapshot_compare.json not found. Run eval first:")
+    print("  cd C:/Jimin/Test-Harness/evals/regscan")
+    print("  npx promptfoo eval -c promptfooconfig.snapshot.yaml --no-cache")
+```
+
+### 2.1 가격 스펙트럼 참조 메트릭 비교
+
+```{python}
+#| label: spectrum-metric-compare
+if EVAL_PATH.exists():
+    spectrum_col = [c for c in df.columns if "price-spectrum" in c.lower()]
+    if spectrum_col:
+        pivot = df.pivot_table(
+            index="drug",
+            columns="provider",
+            values=spectrum_col[0],
+            aggfunc="first"
+        )
+        pivot
+    else:
+        print("price-spectrum-ref 메트릭이 결과에 포함되지 않았습니다.")
+```
+
+## 3. 모델 비교: GPT-4.1 vs Gemini 3.1 Pro
+
+```{python}
+#| label: load-model-results
+MODEL_EVAL_PATH = Path(r"C:\Jimin\Test-Harness\evals\regscan\outputs\eval_latest.json")
+
+if MODEL_EVAL_PATH.exists():
+    with open(MODEL_EVAL_PATH) as f:
+        model_data = json.load(f)
+
+    model_rows = []
+    for result in model_data.get("results", []):
+        provider = result.get("provider", {}).get("label", result.get("provider", {}).get("id", "unknown"))
+        desc = result.get("test", {}).get("description", "")
+        score = result.get("score", 0)
+        token_usage = result.get("response", {}).get("tokenUsage", {})
+
+        model_rows.append({
+            "provider": provider,
+            "drug": desc,
+            "overall_score": round(score, 3),
+            "tokens_total": token_usage.get("total", 0),
+        })
+
+    model_df = pd.DataFrame(model_rows)
+
+    # 모델별 평균 요약
+    summary = model_df.groupby("provider").agg(
+        avg_score=("overall_score", "mean"),
+        avg_tokens=("tokens_total", "mean"),
+        n_tests=("drug", "count"),
+    ).round(3)
+    summary
+else:
+    print("⚠ eval_latest.json not found. Run eval first:")
+    print("  cd C:/Jimin/Test-Harness/evals/regscan")
+    print("  npx promptfoo eval --filter-first-n 3 --no-cache")
+```
+
+### 3.1 약물별 점수 비교
+
+```{python}
+#| label: model-score-chart
+#| fig-cap: "GPT-4.1 vs Gemini 3.1 Pro — 약물별 품질 점수"
+if MODEL_EVAL_PATH.exists() and len(model_df["provider"].unique()) > 1:
+    import matplotlib.pyplot as plt
+    import matplotlib
+
+    matplotlib.rcParams["font.family"] = "Malgun Gothic"
+    matplotlib.rcParams["axes.unicode_minus"] = False
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+    pivot_scores = model_df.pivot_table(
+        index="drug", columns="provider", values="overall_score"
+    )
+    pivot_scores.plot(kind="barh", ax=ax)
+    ax.set_xlabel("Quality Score (0-1)")
+    ax.set_title("모델별 기사 품질 점수")
+    ax.legend(title="Model")
+    plt.tight_layout()
+    plt.show()
+else:
+    print("단일 모델만 있거나 결과가 없습니다. 모델 비교 eval을 먼저 실행하세요.")
+```
+
+## 4. 결론 및 다음 단계
+
+### 주요 발견
+
+1. **가격 스펙트럼 반영 효과**: post 버전에서 `price-spectrum-ref` 메트릭이 개선되어,
+   domestic/medclaim 섹션에 중앙값·p90 등 구체적 가격 정보가 인용됨
+2. **모델 비교**: GPT-4.1 vs Gemini 3.1 Pro 결과는 위 테이블 참조
+
+### 다음 단계
+
+- [ ] 가격 스펙트럼이 없는 약물(비급여/미등재)의 fallback 문구 품질 확인
+- [ ] Gemini 결과가 양호할 경우 비용 최적화 검토
+- [ ] 프롬프트 v4.1 반복 개선 (MOA 연쇄 성공률 개선)
