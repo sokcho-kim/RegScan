@@ -108,6 +108,12 @@ class Settings(BaseSettings):
     ENABLE_STREAM_BRIEFINGS: bool = True
     ENABLE_UNIFIED_BRIEFING: bool = True
 
+    # ── 뉴스 수집 (C-3) ──
+    ENABLE_NEWS_FETCH: bool = True
+    NEWS_FETCH_DAYS_BACK: int = 7          # 최근 N일 이내 기사
+    NEWS_FETCH_LIMIT: int = 5              # INN당 프롬프트 주입 최대 건수
+    NEWS_FETCH_TIMEOUT: float = 15.0       # RSS 수집 타임아웃(초)
+
     # 로깅
     LOG_LEVEL: str = "INFO"
 

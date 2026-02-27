@@ -596,6 +596,35 @@ class LLMBriefingGenerator:
         """임상 결과에서 자동 추출된 한계점 텍스트"""
         return getattr(impact, '_limitations_text', '') or ''
 
+    @staticmethod
+    def _get_recent_news(impact: DomesticImpact) -> list[dict]:
+        """_news_cache에서 해당 INN의 매칭 뉴스를 추출 (최대 NEWS_FETCH_LIMIT건)"""
+        from regscan.config import settings as _s
+
+        cache = getattr(impact, '_news_cache', None)
+        if not cache:
+            return []
+
+        from regscan.map.matcher import IngredientMatcher
+        matcher = IngredientMatcher()
+        norm = matcher.normalize(impact.inn)
+
+        articles = cache.get(norm, [])
+        limit = _s.NEWS_FETCH_LIMIT
+        result = []
+        for art in articles[:limit]:
+            entry = {
+                "title": art.title,
+                "source": art.source,
+                "url": art.url,
+            }
+            if art.published:
+                entry["date"] = art.published.strftime("%Y-%m-%d")
+            if art.summary:
+                entry["summary"] = art.summary[:200]
+            result.append(entry)
+        return result
+
     def _prepare_drug_data_v4(self, impact: DomesticImpact) -> str:
         """V4 FactComputer: 기존 데이터 + 사전 계산 팩트 필드"""
         # 기존 V3 데이터를 기반으로 구축
@@ -631,6 +660,11 @@ class LLMBriefingGenerator:
         price_spectrum = self._compute_price_spectrum(impact)
         if price_spectrum:
             data["price_spectrum"] = price_spectrum
+
+        # 최근 뉴스: _news_cache에서 INN 매칭된 기사 주입
+        recent_news = self._get_recent_news(impact)
+        if recent_news:
+            data["recent_news"] = recent_news
 
         return json.dumps(data, ensure_ascii=False, indent=2)
 

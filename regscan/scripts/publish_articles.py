@@ -1616,6 +1616,23 @@ async def run_publish(
     except Exception as e:
         logger.warning("  HIRA 가격 스펙트럼 구축 실패 (무시): %s", e)
 
+    # ── 뉴스 수집 (1회, INN→기사 인덱스 구축) ──
+    news_cache: dict = {}
+    if settings.ENABLE_NEWS_FETCH:
+        try:
+            from regscan.news.fetcher import fetch_news
+            from regscan.news.matcher import match_news_to_inns
+            news_articles = await fetch_news(
+                days_back=settings.NEWS_FETCH_DAYS_BACK,
+            )
+            if news_articles:
+                news_cache = match_news_to_inns(news_articles)
+                logger.info("  뉴스 캐시: %d INN, %d건",
+                           len(news_cache),
+                           sum(len(v) for v in news_cache.values()))
+        except Exception as e:
+            logger.warning("  뉴스 수집 실패 (무시): %s", e)
+
     # CT.gov 임상 결과 사전 조회 (기사 품질 향상)
     logger.info("  CT.gov 임상 결과 사전 조회...")
     from regscan.db.database import init_db, get_async_session
@@ -1644,6 +1661,12 @@ async def run_publish(
         return
 
     logger.info("  DB 로드: %d건", len(impacts))
+
+    # ── 뉴스 캐시 주입 ──
+    if news_cache:
+        for imp in impacts:
+            imp._news_cache = news_cache
+
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     generator = LLMBriefingGenerator(provider="openai", model="gpt-5.2")
