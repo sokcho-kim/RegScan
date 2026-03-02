@@ -1,3 +1,6 @@
+# macOS resource forks (exFAT 드라이브)
+._*
+
 # Python
 __pycache__/
 *.py[cod]
