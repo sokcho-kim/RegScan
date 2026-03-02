@@ -440,6 +440,7 @@ class TherapeuticAreaStream(BaseStream):
         """EMA에서만 수집된 약물을 FDA generic_name/substance_name으로 교차검색
 
         pharm_class_epc 검색에서 누락된 약물(CAR-T, 이중특이항체 등)을 보강.
+        USAN 접미사(-hrii, -piiq 등)를 제거한 변형으로도 검색.
 
         Args:
             drugs_by_inn: 정규화된 INN → drug dict
@@ -447,8 +448,10 @@ class TherapeuticAreaStream(BaseStream):
         Returns:
             FDA 교차참조로 보강된 약물 수
         """
+        import re
         import asyncio as _aio
         from regscan.ingest.fda import FDAClient
+        from regscan.parse.fda_parser import FDADrugParser
 
         # EMA 있고 FDA 없는 약물 필터
         targets = [
@@ -458,6 +461,7 @@ class TherapeuticAreaStream(BaseStream):
         if not targets:
             return 0
 
+        fda_parser = FDADrugParser()
         count = 0
         async with FDAClient() as client:
             for norm, drug in targets:
@@ -471,6 +475,15 @@ class TherapeuticAreaStream(BaseStream):
                     search_names = [p.strip() for p in inn.split(";") if p.strip()]
                 elif " / " in inn:
                     search_names = [p.strip() for p in inn.split(" / ") if p.strip()]
+
+                # USAN 접미사 제거 변형 추가 (-hrii, -piiq, -bysp 등)
+                expanded: list[str] = []
+                for name in search_names:
+                    expanded.append(name)
+                    stripped = re.sub(r"-[a-z]{3,5}$", "", name, flags=re.IGNORECASE)
+                    if stripped != name:
+                        expanded.append(stripped)
+                search_names = expanded
 
                 fda_result = None
                 for search_name in search_names:
@@ -506,20 +519,17 @@ class TherapeuticAreaStream(BaseStream):
                     brand_names = openfda.get("brand_name", [])
                     submissions = fda_result.get("submissions", [])
 
-                    # 최신 승인 submission 찾기
-                    submission_status_date = ""
-                    for sub in submissions:
-                        if sub.get("submission_status") == "AP":
-                            sub_date = sub.get("submission_status_date", "")
-                            if sub_date > submission_status_date:
-                                submission_status_date = sub_date
+                    # FDADrugParser 재사용으로 ORIG+AP 우선순위 일관성 확보
+                    sub_info = fda_parser._extract_latest_submission(submissions)
+                    submission_status_date = sub_info.get("submission_status_date", "")
+                    submission_status = sub_info.get("submission_status", "")
 
                     drug["fda_data"] = {
                         "generic_name": generic_names[0] if generic_names else inn,
                         "brand_name": brand_names[0] if brand_names else "",
                         "application_number": fda_result.get("application_number", ""),
                         "submission_status_date": submission_status_date,
-                        "submission_status": "AP" if submission_status_date else "",
+                        "submission_status": submission_status,
                         "submissions": submissions,
                         "pharm_class_epc": openfda.get("pharm_class_epc", []),
                         "raw": fda_result,

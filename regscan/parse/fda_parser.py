@@ -1,7 +1,10 @@
 """FDA 응답 파서"""
 
-from datetime import datetime
+import logging
+from datetime import date, datetime
 from typing import Any, Optional
+
+logger = logging.getLogger(__name__)
 
 
 class FDADrugParser:
@@ -97,6 +100,30 @@ class FDADrugParser:
 
         return (brand_name, generic_name, dosage_form)
 
+    @staticmethod
+    def _validate_date(date_str: str) -> bool:
+        """submission_status_date 유효성 검증.
+
+        Returns:
+            True if valid, False if invalid (future, before 1985, unparseable)
+        """
+        if not date_str:
+            return False
+        try:
+            dt = datetime.strptime(date_str, "%Y%m%d").date()
+        except ValueError:
+            logger.warning("FDA 날짜 파싱 불가: '%s'", date_str)
+            return False
+
+        if dt > date.today():
+            logger.warning("FDA 미래 날짜 스킵: %s", date_str)
+            return False
+        if dt.year < 1985:
+            logger.warning("FDA 1985년 이전 날짜 스킵: %s", date_str)
+            return False
+
+        return True
+
     def _extract_latest_submission(
         self, submissions: list[dict]
     ) -> dict[str, Any]:
@@ -104,15 +131,21 @@ class FDADrugParser:
         최초 승인(ORIG+AP) 우선으로 submission 추출.
 
         우선순위:
-          1) ORIG + AP (최초 승인) — 날짜 내림차순
-          2) 아무 AP (sNDA 승인 등) — 날짜 내림차순
+          1) ORIG + AP (최초 승인) — 유효 날짜, 날짜 내림차순
+          2) 아무 AP (sNDA 승인 등) — 유효 날짜, 날짜 내림차순
           3) 가장 최근 submission (fallback)
         """
         if not submissions:
             return {}
 
+        # 유효 날짜를 가진 submission만 필터
+        valid_subs = [
+            s for s in submissions
+            if self._validate_date(s.get("submission_status_date", ""))
+        ]
+
         by_date_desc = sorted(
-            submissions,
+            valid_subs if valid_subs else submissions,
             key=lambda x: x.get("submission_status_date", ""),
             reverse=True,
         )

@@ -691,6 +691,40 @@ def _select_best(candidates: list[dict], agency: str = "fda") -> dict:
     return candidates_sorted[0]
 
 
+def _select_best_mfds(candidates: list[dict]) -> dict:
+    """같은 INN의 여러 MFDS 제품 중 best 선택.
+
+    기준 (우선순위):
+      1. 유효 제품 우선 (cancel_name 없는 것)
+      2. 단독 성분 우선 (ingredients가 1개)
+      3. 가장 이른 허가일
+    """
+    if not candidates:
+        return {}
+    if len(candidates) == 1:
+        return candidates[0]
+
+    def _sort_key(item: dict):
+        # 유효 제품 우선 (cancel_name 없는 것 = 0)
+        cancel_name = item.get("cancel_name", "") or ""
+        cancel_rank = 0 if not cancel_name else 1
+
+        # 단독 성분 우선
+        ingredients = item.get("ingredients", [])
+        n_ingredients = len(ingredients) if ingredients else 1
+
+        # 가장 이른 허가일
+        permit_date = item.get("permit_date")
+        if isinstance(permit_date, (date, datetime)):
+            date_str = permit_date.isoformat()
+        else:
+            date_str = item.get("permit_date_str", "") or "99999999"
+
+        return (cancel_rank, n_ingredients, date_str)
+
+    return sorted(candidates, key=_sort_key)[0]
+
+
 def merge_by_inn(
     fda_list: list[dict],
     ema_list: list[dict],
@@ -788,7 +822,7 @@ def merge_global_status(
             ema_by_inn_all.setdefault(normalized, []).append(ema_data)
     ema_by_inn = {k: _select_best(v, "ema") for k, v in ema_by_inn_all.items()}
 
-    mfds_by_inn: dict[str, dict] = {}
+    mfds_by_inn_all: dict[str, list[dict]] = {}
     for mfds_data in mfds_list:
         # MFDS는 main_ingredient 또는 ingredients 사용
         inn = mfds_data.get("main_ingredient", "")
@@ -797,9 +831,8 @@ def merge_global_status(
             inn = ingredients[0] if ingredients else ""
         if inn:
             normalized = matcher.normalize(inn)
-            # MFDS는 같은 성분에 여러 제품이 있을 수 있으므로 첫 번째만 저장
-            if normalized not in mfds_by_inn:
-                mfds_by_inn[normalized] = mfds_data
+            mfds_by_inn_all.setdefault(normalized, []).append(mfds_data)
+    mfds_by_inn = {k: _select_best_mfds(v) for k, v in mfds_by_inn_all.items()}
 
     # 모든 INN 수집
     all_inns = set(fda_by_inn.keys()) | set(ema_by_inn.keys()) | set(mfds_by_inn.keys())
@@ -833,8 +866,8 @@ def enrich_with_mfds(
     matcher = IngredientMatcher()
     builder = GlobalStatusBuilder()
 
-    # MFDS 인덱싱
-    mfds_by_inn: dict[str, dict] = {}
+    # MFDS 인덱싱 (list 수집 → best 선택)
+    mfds_by_inn_all: dict[str, list[dict]] = {}
     for mfds_data in mfds_list:
         inn = mfds_data.get("main_ingredient", "")
         if not inn:
@@ -842,8 +875,8 @@ def enrich_with_mfds(
             inn = ingredients[0] if ingredients else ""
         if inn:
             normalized = matcher.normalize(inn)
-            if normalized not in mfds_by_inn:
-                mfds_by_inn[normalized] = mfds_data
+            mfds_by_inn_all.setdefault(normalized, []).append(mfds_data)
+    mfds_by_inn = {k: _select_best_mfds(v) for k, v in mfds_by_inn_all.items()}
 
     # 기존 상태에 MFDS 추가
     for status in global_statuses:

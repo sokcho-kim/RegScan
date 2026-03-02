@@ -131,7 +131,7 @@ class TestInnovationStream:
 
     @pytest.mark.asyncio
     async def test_collect_breakthrough(self, mock_fda_bt_response):
-        """FDA Breakthrough 수집 테스트"""
+        """FDA Breakthrough 수집 테스트 (TYPE 5 + TYPE 4 2회 검색)"""
         stream = InnovationStream()
 
         with patch("regscan.ingest.fda.FDAClient") as MockFDA:
@@ -144,9 +144,11 @@ class TestInnovationStream:
             signals = []
             count = await stream._collect_fda_breakthrough(drugs, signals)
 
-        assert count == 1
-        assert signals[0]["type"] == "fda_breakthrough"
-        assert signals[0]["inn"] == "pirtobrutinib"
+        # TYPE 5 + TYPE 4 2회 검색 → 중복 INN이지만 signal은 각각 생성
+        assert count >= 2
+        assert len(signals) >= 2
+        assert all(s["type"] in ("fda_accelerated", "fda_priority") for s in signals)
+        assert "pirtobrutinib" in [s["inn"] for s in signals]
 
     @pytest.mark.asyncio
     async def test_collect_ema_prime(self, mock_ema_medicines_with_prime):

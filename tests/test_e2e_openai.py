@@ -26,9 +26,16 @@ logger = logging.getLogger(__name__)
 # ── 조건부 스킵 ──
 # .env 파일의 키도 인식하도록 settings에서 확인
 HAS_OPENAI_KEY = bool(os.environ.get("OPENAI_API_KEY") or settings.OPENAI_API_KEY)
-skip_no_key = pytest.mark.skipif(not HAS_OPENAI_KEY, reason="OPENAI_API_KEY not set")
+try:
+    import openai  # noqa: F401
+    HAS_OPENAI_PKG = True
+except ImportError:
+    HAS_OPENAI_PKG = False
 
-pytestmark = [pytest.mark.e2e, skip_no_key]
+skip_no_key = pytest.mark.skipif(not HAS_OPENAI_KEY, reason="OPENAI_API_KEY not set")
+skip_no_pkg = pytest.mark.skipif(not HAS_OPENAI_PKG, reason="openai package not installed")
+
+pytestmark = [pytest.mark.e2e, skip_no_key, skip_no_pkg]
 
 
 # ── Test 1: ReasoningEngine 단독 ──

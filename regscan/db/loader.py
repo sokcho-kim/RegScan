@@ -264,7 +264,8 @@ class DBLoader:
         self, session: AsyncSession, impact: DomesticImpact
     ) -> DrugDB:
         """drugs 테이블 upsert. INN 이 unique key."""
-        stmt = select(DrugDB).where(DrugDB.inn == impact.inn)
+        normalized_inn = impact.inn.lower().strip()
+        stmt = select(DrugDB).where(DrugDB.inn == normalized_inn)
         result = await session.execute(stmt)
         drug: Optional[DrugDB] = result.scalar_one_or_none()
 
@@ -288,7 +289,7 @@ class DBLoader:
             drug.updated_at = datetime.utcnow()
         else:
             drug = DrugDB(
-                inn=impact.inn,
+                inn=normalized_inn,
                 global_score=impact.global_score,
                 korea_relevance_score=impact.korea_relevance_score,
                 hot_issue_level=level,
@@ -424,7 +425,8 @@ class DBLoader:
 
         없으면 최소 레코드를 생성하고 id 를 반환합니다.
         """
-        stmt = select(DrugDB.id).where(DrugDB.inn == inn)
+        normalized_inn = inn.lower().strip()
+        stmt = select(DrugDB.id).where(DrugDB.inn == normalized_inn)
         result = await session.execute(stmt)
         row = result.scalar_one_or_none()
 
@@ -432,7 +434,7 @@ class DBLoader:
             return row
 
         # 아직 drugs 에 없으면 최소 레코드 생성
-        drug = DrugDB(inn=inn, hot_issue_level="LOW")
+        drug = DrugDB(inn=normalized_inn, hot_issue_level="LOW")
         session.add(drug)
         await session.flush()
         return drug.id
@@ -452,7 +454,8 @@ class DBLoader:
         Returns:
             (DrugDB, is_changed) — 변경 여부
         """
-        stmt = select(DrugDB).where(DrugDB.inn == impact.inn)
+        normalized_inn = impact.inn.lower().strip()
+        stmt = select(DrugDB).where(DrugDB.inn == normalized_inn)
         result = await session.execute(stmt)
         drug: Optional[DrugDB] = result.scalar_one_or_none()
 
@@ -516,7 +519,7 @@ class DBLoader:
         else:
             # 새 약물 → new_drug
             drug = DrugDB(
-                inn=impact.inn,
+                inn=normalized_inn,
                 global_score=impact.global_score,
                 korea_relevance_score=impact.korea_relevance_score,
                 hot_issue_level=level,
@@ -632,3 +635,42 @@ class DBLoader:
             pipeline_run_id=pipeline_run_id,
         )
         session.add(log)
+
+    async def normalize_existing_inns(self) -> int:
+        """기존 DB의 INN을 lower().strip() 정규화.
+
+        중복 레코드(같은 INN의 대소문자 변형)가 있으면
+        가장 오래된 레코드를 유지하고 나머지를 삭제합니다.
+
+        Returns:
+            정규화된 레코드 수
+        """
+        from sqlalchemy import func
+
+        count = 0
+        async with self._session_factory() as session:
+            async with session.begin():
+                stmt = select(DrugDB).order_by(DrugDB.id)
+                result = await session.execute(stmt)
+                all_drugs = list(result.scalars().all())
+
+                seen: dict[str, DrugDB] = {}
+                for drug in all_drugs:
+                    normalized = drug.inn.lower().strip()
+                    if normalized in seen:
+                        # 중복 → 나중에 생성된 것 삭제
+                        logger.info(
+                            "INN 중복 제거: '%s' (id=%d) → 유지: '%s' (id=%d)",
+                            drug.inn, drug.id,
+                            seen[normalized].inn, seen[normalized].id,
+                        )
+                        await session.delete(drug)
+                        count += 1
+                    else:
+                        if drug.inn != normalized:
+                            drug.inn = normalized
+                            count += 1
+                        seen[normalized] = drug
+
+        logger.info("INN 정규화 완료: %d건 처리", count)
+        return count
