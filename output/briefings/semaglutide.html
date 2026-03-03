@@ -13,6 +13,9 @@
         .meta-text { font-family: 'Inter', sans-serif; }
         .highlight-box { border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
         .timeline-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .fact-table { width: 100%; text-align: left; font-size: 0.875rem; margin: 1rem 0; border-collapse: collapse; }
+        .fact-table th { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600; background: #f9fafb; }
+        .fact-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
         abbr { text-decoration: none; border-bottom: 1px dashed #9ca3af; cursor: help; }
     </style>
 </head>
@@ -23,19 +26,19 @@
                 <div class="flex items-center space-x-3">
                     <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-indigo-600">MedClaim</a>
                     <span class="text-gray-300">|</span>
-                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑</span>
+                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑 V4</span>
                 </div>
-                <div class="meta-text text-sm text-gray-500">2026년 02월 24일</div>
+                <div class="meta-text text-sm text-gray-500">2026년 03월 03일</div>
             </div>
         </div>
     </header>
     <main class="max-w-4xl mx-auto px-6 py-10">
         <div class="flex items-center space-x-3 mb-6 meta-text">
-            <span class="px-3 py-1 bg-yellow-500 text-white text-xs font-semibold rounded">MEDIUM</span>
+            <span class="px-3 py-1 bg-gray-400 text-white text-xs font-semibold rounded">LOW</span>
             
         </div>
-        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">세마글루타이드 비만치료, 승인 빠른데 국내는 ‘급여-허가’ 역전</h1>
-        <p class="text-xl text-gray-600 mb-8 leading-relaxed">GLP-1 작용제 체중관리 적응증 | 식약처 미확인인데 심평원 급여가 먼저 잡혔다</p>
+        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">1517일째, 비만 치료 세마글루타이드의 국내 허가 공백</h1>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">GLP-1 기반 체중감량 근거 확립 vs 식약처(MFDS) 미허가·급여 해석 혼선</p>
         <div class="flex items-center space-x-4 mb-10 pb-10 border-b border-gray-200 meta-text">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -44,69 +47,83 @@
                 <span class="text-sm text-gray-600">RegScan AI 리포터</span>
             </div>
             <span class="text-gray-300">&middot;</span>
-            <span class="text-sm text-gray-500">Hot Issue Score: 40</span>
+            <span class="text-sm text-gray-500">Hot Issue Score: 20</span>
         </div>
+
+        <!-- 핵심 요약 (인사이트) -->
         <div class="highlight-box p-6 rounded-r-lg mb-10">
             <h3 class="font-bold text-gray-900 mb-3 meta-text text-sm">핵심 요약</h3>
             <ul class="space-y-2 text-gray-800">
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>GLP-1 수용체 작용제로 식욕·위배출을 조절해 체중감량과 유지에 쓰이며, 성인 비만(BMI≥30) 또는 동반질환 있는 과체중(BMI≥27)에서 식이·운동 병행요법으로 허가되는 계열(항비만제)</span>
+                    <span>GLP-1 수용체 작용제로 식욕·위배출·인슐린 분비를 조절해 체중감량을 유도하는 항비만 약물로, 식이·운동요법 보조요법으로 성인 비만/과체중(동반질환 포함)에 사용</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>FDA는 2025-10-14 승인했고 EMA도 2025-11-24 승인했다(두 기관 승인 간격이 짧아 글로벌 표준화가 빠르게 진행된 케이스)</span>
+                    <span>EMA가 2022-01-06 승인한 뒤 1517일이 경과했고, 미국에서도 허가가 완료된 상태로 글로벌 규제기관의 효능·안전성 판단은 이미 내려졌다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>국내는 식약처(MFDS) 허가 여부가 확인되지 않지만, 심평원(HIRA) 급여 등재 상태로 약가 73,528원이 입력돼 ‘허가-급여’ 통상 순서와 맞지 않는 데이터 구조가 관측된다</span>
+                    <span>국내는 식약처 미허가로 ‘동일 INN의 어떤 제형/적응증이 급여로 관리되는지’와 ‘비만 적응증 접근성’이 분리돼 해석될 여지가 크다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>글로벌 승인 후 132일 경과로 입력된 ‘통상 허가 신청 준비 단계(1~3년)’ 구간에 해당하며, 경쟁군으로 제시된 Setmelanotide·Metreleptin 등도 국내 상태가 불확실로 묶여 있어 국내 시장은 ‘도입 주체/허가 트랙’이 실질 변수가 된다</span>
+                    <span>유사 대사질환/비만 영역 경쟁약(세트멜라노타이드 등)과는 적응증 스펙트럼이 달라 직접 대체는 제한적이며, 국내 도입은 허가-급여-공급의 순차 과제가 핵심 변수가 된다</span>
                 </li></ul>
         </div>
+
         <article class="report-body text-gray-800">
+            <!-- 글로벌 섹션: 팩트 테이블 + 인사이트 -->
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
-            <div class="mb-6">세마글루타이드(<a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209637" target="_blank" class="text-indigo-600 hover:underline"><strong>Semaglutide</strong></a>)는 GLP-1 수용체를 활성화해 포만감을 높이고 섭취를 줄이는 기전으로, 비만을 ‘생활요법 보조’가 아니라 약물치료 대상으로 끌어올린 축에 속한다. 입력된 적응증도 성인에서 BMI≥30 또는 동반질환을 가진 BMI≥27의 체중관리(감량 및 유지)로, 전형적인 비만 치료 라벨이다. 이번 데이터의 핵심은 <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209637" target="_blank" class="text-indigo-600 hover:underline">FDA</a>(2025-10-14)와 <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/kyinsu" target="_blank" class="text-indigo-600 hover:underline">EMA</a>(2025-11-24)가 짧은 간격으로 승인해, 동일 계열 약물의 글로벌 채택 속도를 다시 끌어올렸다는 점이다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">일자</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">승인 완료 (D+132일)</td><td class="px-3 py-2 border-b border-gray-100">2025-10-14</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">승인 완료 (D+91일)</td><td class="px-3 py-2 border-b border-gray-100">2025-11-24</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">식약처(MFDS)</td><td class="px-3 py-2 border-b border-gray-100">승인 여부가 확인되지 않는다</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table> 임상 데이터로는(입력 제공 시험: NCT02692716) 심혈관 사건(MACE) 복합지표에서 oral Semaglutide가 위약 대비 HR 0.79(95% CI 0.57–1.11)로 제시돼, ‘위험 감소 신호’는 있으나 신뢰구간이 1을 포함해 해석이 단선적이지 않다. 반면 개별 구성요소 중 심혈관 사망은 HR 0.49(95% CI 0.27–0.92)로 분리 신호가 있어, 급여·심사에서는 “체중감량” 외에 동반질환(심혈관질환, 당대사 이상) 환자군에서의 가치 주장에 근거로 동원되기 쉽다. 같은 대사질환 영역 경쟁약으로는 <a href="setmelanotide.html" class="text-indigo-600 hover:underline">Setmelanotide</a>(멜라노코르틴 경로)처럼 표적이 다른 희귀 비만 치료제가 존재하지만, 세마글루타이드는 대중적 비만/과체중 풀을 겨냥하는 점에서 시장 성격이 다르다.</div>
+            
+            <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">날짜</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2022-01-06</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">MFDS(식약처)</td><td class="px-3 py-2 border-b border-gray-100">미허가</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table></div>
+            
+            <div class="mb-6">1517일. <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/wegovy" target="_blank" class="text-indigo-600 hover:underline">EMA가</a> 체중관리 적응증의 세마글루타이드를 승인한 뒤 경과한 시간은 ‘비만 치료를 약물로 다룬다’는 임상 실무가 이미 제도권에 들어왔음을 보여준다. 이 약의 뉴스 가치는 체중감량을 ‘생활요법 실패 후의 보조’가 아니라, 동반질환 위험을 함께 낮추는 치료 축으로 끌어올렸다는 데 있다. 작용기전은 비교적 명확하다: 세마글루타이드→<strong>GLP-1 수용체</strong> 결합→시상하부 포만 신호 강화·위배출 지연→에너지 섭취 감소로 체중감량. 쉽게 말해 “먹고 싶은 신호를 줄이고, 배가 차는 신호를 늘리는” 방향으로 생리학을 재설정한다. NCT04998136에서 44주 체중 변화는 세마글루타이드 -16.4% vs 위약 -2.6%였고, 치료차는 -12.99%(95% CI [-15.28, -10.70], p<0.0001)로 일관되게 유의했다. ‘5% 이상 감량’ 달성의 OR이 88.87로 제시된 점은, 임상적으로 의미 있는 감량 문턱을 넘는 환자 비율이 크게 이동했음을 시사한다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong><a href="setmelanotide.html" class="text-indigo-600 hover:underline">Setmelanotide</a></strong>: 유전적 비만(BBS, POMC 결손 등) 기반의 ‘희귀·원인 규명형’ 포지션</li> <li><strong><a href="alogliptin.html" class="text-indigo-600 hover:underline">Alogliptin</a></strong>: 제2형 당뇨 혈당조절(DPP-4 억제) 중심으로 체중감량 약물과 임상 목표가 다름</li> <li><strong><a href="teplizumab.html" class="text-indigo-600 hover:underline">Teplizumab</a></strong>: 1형 당뇨 진행 지연(면역조절)로 비만 치료 축과 직접 경쟁 관계는 제한적</li> </ul> 결국 세마글루타이드는 “대상 환자 풀” 자체가 큰 생활습관성 비만/과체중군을 겨냥한다는 점에서, 동일 ‘metabolic’ 범주의 다른 약들과도 시장·재정 영향 경로가 다르다. 다만 5% 감량 OR의 95% CI가 [21.96, 359.61]로 넓고, 또 다른 분석에서도 CI가 [38.41, 1672.57]로 크게 벌어져 효과 크기 추정의 정밀도에는 제한이 남는다.</div>
+
+            <!-- 타임라인 (팩트) -->
             
             <div class="my-10 p-6 bg-gray-50 rounded-xl">
                 <h4 class="meta-text text-sm font-semibold text-gray-500 mb-6">승인 타임라인</h4>
                 <div class="relative">
                     <div class="absolute left-2 top-0 bottom-0 w-0.5 bg-gray-300"></div>
                     <div class="relative flex items-center mb-6">
-                        <div class="timeline-dot bg-blue-500 z-10"></div>
-                        <div class="ml-6">
-                            <div class="meta-text text-xs text-blue-600 font-semibold">2025-10-14</div>
-                            <div class="font-medium"><a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209637" target="_blank" class="hover:underline">FDA 승인</a></div>
-                            <div class="text-sm text-gray-500">Approved</div>
-                        </div>
-                    </div>
-                    <div class="relative flex items-center mb-6">
                         <div class="timeline-dot bg-yellow-500 z-10"></div>
                         <div class="ml-6">
-                            <div class="meta-text text-xs text-yellow-600 font-semibold">2025-11-24</div>
-                            <div class="font-medium"><a href="https://www.ema.europa.eu/en/medicines/human/EPAR/kyinsu" target="_blank" class="hover:underline">EMA 승인</a></div>
+                            <div class="meta-text text-xs text-yellow-600 font-semibold">2022-01-06</div>
+                            <div class="font-medium"><a href="https://www.ema.europa.eu/en/medicines/human/EPAR/wegovy" target="_blank" class="hover:underline">EMA 승인</a></div>
                             <div class="text-sm text-gray-500">Authorised</div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- 국내 섹션: 인사이트 -->
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
-            <div class="mb-6">국내에서는 식약처(MFDS) 허가가 ‘승인 여부가 확인되지 않는다’로 잡혀 있어, 규제상 처방 가능한 상용 제품(제품명 포함) 관점에서는 공백이 남아 있다. 그런데 심평원(HIRA)에는 ‘급여’로 등재돼 있고 약가가 73,528원으로 입력돼, 통상적인 ‘식약처 허가 → 심평원 급여’ 흐름과 충돌한다는 점이 가장 큰 실무 리스크다(전산상 코드가 있더라도 실제 처방·청구가 성립하는지 별도 확인 필요). <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>타임라인 입력: 글로벌 승인 후 132일 경과</li> <li>식약처 도입 가늠치(입력): “글로벌 승인 후 132일 — 통상 허가 신청 준비 단계 (1~3년 소요)”</li> </ul> 경쟁 구도 데이터상 국내 상태는 대부분 ‘uncertain’으로 묶여 있다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비교 약물(입력 경쟁군)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">치료영역</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">국내 상태(입력)</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">Setmelanotide</td><td class="px-3 py-2 border-b border-gray-100">metabolic</td><td class="px-3 py-2 border-b border-gray-100">uncertain</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><a href="metreleptin.html" class="text-indigo-600 hover:underline">Metreleptin</a></td><td class="px-3 py-2 border-b border-gray-100">metabolic</td><td class="px-3 py-2 border-b border-gray-100">uncertain</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100"><a href="parathyroid_hormone.html" class="text-indigo-600 hover:underline">Parathyroid Hormone</a></td><td class="px-3 py-2 border-b border-gray-100">metabolic</td><td class="px-3 py-2 border-b border-gray-100">uncertain</td></tr> </table> 약제팀 관점에서는 ① 식약처 허가 제품코드/품목기준, ② 심평원 급여 고시의 약제 기준(성분-함량-제형 매칭), ③ 동일 성분의 당뇨 적응증 제형과 비만 적응증 제형 간 청구 충돌 가능성을 분리 점검해야 한다. 특히 ‘급여’라고만 기재된 criteria는 적응증 제한·BMI 기준·동반질환 요건 같은 실제 급여기준의 핵심을 담지 못하므로, 고시 원문 확인 없이는 처방 프로토콜을 만들기 어렵다.</div>
+            
+            <div class="my-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 meta-text">
+                <strong>경과:</strong> 글로벌 승인 후 4년 1개월 경과 (1517일, 장기 미허가)
+            </div>
+            
+            <div class="mb-6">국내에서는 식약처 미허가로 인해 ‘비만 적응증의 제도권 처방’이 성립하지 않는 상태인데, 동시에 심평원(HIRA)에 ‘급여(상한가 ₩139,703)’로 잡혀 있어 현장에서는 품목/적응증 단위의 해석 혼선이 발생하기 쉬운 구조다. 즉, 같은 성분명이라도 어떤 제품·적응증을 전제로 급여가 책정돼 있는지와 별개로, 비만 치료로서의 접근성은 허가 여부가 선행 조건이다. 또 하나의 신호는 시간이다. 글로벌 승인 후 4년 1개월이 지난 ‘장기 미허가’ 구간은, 단순한 도입 지연을 넘어 국내 임상·공급·급여 설계가 한 번도 패키지로 굴러가지 않았을 가능성을 높인다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>Setmelanotide(국내 expected)</strong>: 희귀 유전비만 중심이라, 세마글루타이드가 겨냥하는 다수 비만 환자군을 흡수하기는 어렵다</li> <li><strong>Teplizumab(uncertain)</strong>: 당뇨 ‘예방/지연’ 축으로 재정영향 평가 프레임이 다르다</li> <li><strong>Alogliptin(uncertain)</strong>: 기존 당뇨 급여 틀(혈당 지표 중심)과 연결되며, 체중감량 성과를 급여 근거로 삼기 어렵다</li> </ul> 국내 시사점은 ‘비만=미용’ 프레임을 벗어나, BMI 기준과 동반질환(고혈압·이상지질혈증·수면무호흡·심혈관질환 등)을 급여 기준 언어로 어떻게 번역할지가 관건이라는 점이다. 약제팀·심사부서는 성분 기반 데이터만 보고 접근하기보다, 실제 처방 가능성은 식약처 허가와 적응증 라벨에 의해 결정된다는 점을 분리해 관리할 필요가 있다.</div>
+
+            <!-- 메드클레임: 비용표(팩트) + 인사이트 -->
             <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
                 <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
-                <div class="space-y-3 text-gray-800"><p>현 데이터만 놓고 보면 심평원 등재는 ‘급여’이지만, 식약처 허가가 미확인이어서 실제 청구는 ‘코드 존재=청구 가능’으로 단정할 수 없다. 그럼에도 약가(73,528원)가 제시돼 있어, 급여 청구가 열리는 순간 환자 본인부담은 일반 급여 30% 프레임으로 계산된다(산정특례는 copay_exemption이 null이므로 포함하지 않는다). <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">환자부담(약가 73,528원 기준)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">일반 급여</td><td class="px-3 py-2 border-b border-gray-100">30%</td><td class="px-3 py-2 border-b border-gray-100">22,058원</td><td class="px-3 py-2 border-b border-gray-100">외래 기준, 급여기준 충족 필요</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">73,528원</td><td class="px-3 py-2 border-b border-gray-100">전액 환자부담</td></tr> </table> 비급여 또는 처방 불가(허가 공백) 상황에서는 병원 실무가 ‘대체 처방’으로 이동한다. 같은 대사질환 영역에서 기전이 다른 Setmelanotide·Metreleptin이 경쟁군으로 제시돼 있으나 국내 상태가 불확실로 입력돼 있어, 현실적 대안은 동일 계열 내 다른 허가·급여 품목(해당 병원 채택 목록 기준)로 좁혀질 가능성이 크다. 심사·청구 담당자는 급여가 열릴 때 가장 먼저 문제 되는 항목이 ‘BMI/동반질환 요건’과 ‘적응증(비만 vs 당뇨)별 코드 분리’이므로, 처방 전 EMR에 적응증·BMI·동반질환 증빙 입력을 강제하는 템플릿을 우선 설계하는 편이 삭감 비용을 줄인다.</p></div>
+                
+                <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">일반 급여</td><td class="px-3 py-2 border-b border-gray-100">30%</td><td class="px-3 py-2 border-b border-gray-100">₩41,911</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여(급여외 적응증)</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">₩139,703</td></tr> </table></div>
+                
+                <div class="space-y-3 text-gray-800"><p>현재 상태에서 핵심은 단순하다: 식약처 미허가이므로 국내에서 해당 적응증으로 처방·청구 프로세스를 정상적으로 열 수 없다. 그럼에도 심평원에 ‘급여’와 상한가(₩139,703), 일반 급여 기준 본인부담 약 ₩41,911(30%)이 제시돼 있어, 원내에서는 ‘어떤 제품/적응증이 이 급여코드에 연결되는지’부터 선확인이 필요하다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>원내 약제팀 체크리스트: 동일 성분의 <strong>제품명/제형/적응증</strong>이 급여 코드와 1:1로 매칭되는지, 비만 적응증이 포함되는지 문서로 재확인</li> <li>급여외 적응증으로 분기될 경우: 동일 상한가를 전제로 해도 환자 부담이 <strong>전액(₩139,703, 100%)</strong>으로 바뀌는 구조임을 사전 고지</li> <li>처방 연계 부서 정렬: 내분비·가정의학·비만클리닉이 사용하는 체중지표(BMI, 동반질환)가 청구 서류 언어로 변환 가능한지 점검</li> </ul> 실무적으로는 ‘가격’보다 ‘적응증-급여 매칭’이 먼저다. 비만 환자에서의 사용을 검토하는 기관이라면, 현재는 내부 프로토콜을 “허가 후 즉시 적용 가능한 대상군 정의” 수준으로 준비해 두고, 급여 적용 범위가 확정되는 순간 처방 폭증에 따른 재고·교육·상담 흐름을 동시에 열 수 있게 설계하는 편이 비용·민원 리스크를 줄인다.</p></div>
             </div>
         </article>
+
         <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
             <div class="mb-4">
-                <strong>데이터 출처:</strong> <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209637" target="_blank" class="text-indigo-500 hover:underline">FDA Drug Approval</a>, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/kyinsu" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, <a href="https://clinicaltrials.gov/study/NCT02692716" target="_blank" class="text-indigo-500 hover:underline">ClinicalTrials.gov (NCT02692716)</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
+                <strong>데이터 출처:</strong> <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209637" target="_blank" class="text-indigo-500 hover:underline">FDA Drug Approval</a>, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/wegovy" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, <a href="https://clinicaltrials.gov/study/NCT04998136" target="_blank" class="text-indigo-500 hover:underline">ClinicalTrials.gov (NCT04998136)</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
             </div>
             <div class="text-xs text-gray-400">
-                본 리포트는 RegScan AI가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
-                의사결정에 활용 시 원문 확인을 권장합니다.
-                마지막 업데이트: 2026-02-24
+                본 리포트는 RegScan AI V4가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
+                팩트(날짜·금액·상태)는 Python이 사전 계산하였으며, 인사이트(분석)는 LLM이 생성했습니다.
+                마지막 업데이트: 2026-03-03
             </div>
         </footer>
     </main>

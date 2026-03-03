@@ -13,6 +13,9 @@
         .meta-text { font-family: 'Inter', sans-serif; }
         .highlight-box { border-left: 4px solid #dc2626; background: linear-gradient(90deg, #fef2f2 0%, #ffffff 100%); }
         .timeline-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .fact-table { width: 100%; text-align: left; font-size: 0.875rem; margin: 1rem 0; border-collapse: collapse; }
+        .fact-table th { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600; background: #f9fafb; }
+        .fact-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f3f4f6; }
         abbr { text-decoration: none; border-bottom: 1px dashed #9ca3af; cursor: help; }
     </style>
 </head>
@@ -23,20 +26,19 @@
                 <div class="flex items-center space-x-3">
                     <a href="index.html" class="text-xl font-bold text-gray-900 hover:text-indigo-600">MedClaim</a>
                     <span class="text-gray-300">|</span>
-                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑</span>
+                    <span class="text-sm text-gray-500 meta-text">RegScan 브리핑 V4</span>
                 </div>
-                <div class="meta-text text-sm text-gray-500">2026년 02월 24일</div>
+                <div class="meta-text text-sm text-gray-500">2026년 03월 03일</div>
             </div>
         </div>
     </header>
     <main class="max-w-4xl mx-auto px-6 py-10">
         <div class="flex items-center space-x-3 mb-6 meta-text">
-            <span class="px-3 py-1 bg-yellow-500 text-white text-xs font-semibold rounded">MEDIUM</span>
-            <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded">희귀의약품</span>
-
+            <span class="px-3 py-1 bg-orange-500 text-white text-xs font-semibold rounded">HIGH</span>
+            
         </div>
-        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight"><abbr title="인간 표피성장인자 수용체 2, Human Epidermal Growth Factor Receptor 2">HER2</abbr> 이중결합 항체 Zanidatamab, HER2+ 담도암 2차 겨냥</h1>
-        <p class="text-xl text-gray-600 mb-8 leading-relaxed">EMA 조건부 허가 ‘확인’됐지만, 국내 허가·급여는 근거 데이터가 비어 있다</p>
+        <h1 class="report-title text-4xl text-gray-900 mb-4 leading-tight">468일째, Zanidatamab의 <abbr title="인간 표피성장인자 수용체 2, Human Epidermal Growth Factor Receptor 2">HER2</abbr> BTC는 국내 미허가</h1>
+        <p class="text-xl text-gray-600 mb-8 leading-relaxed">FDA·EMA 승인 완료에도 처방 공백…희귀·바이오마커 항암의 급여 설계가 관건</p>
         <div class="flex items-center space-x-4 mb-10 pb-10 border-b border-gray-200 meta-text">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -45,47 +47,91 @@
                 <span class="text-sm text-gray-600">RegScan AI 리포터</span>
             </div>
             <span class="text-gray-300">&middot;</span>
-            <span class="text-sm text-gray-500">Hot Issue Score: 40</span>
+            <span class="text-sm text-gray-500">Hot Issue Score: 60</span>
         </div>
+
+        <!-- 핵심 요약 (인사이트) -->
         <div class="highlight-box p-6 rounded-r-lg mb-10">
             <h3 class="font-bold text-gray-900 mb-3 meta-text text-sm">핵심 요약</h3>
             <ul class="space-y-2 text-gray-800">
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>Zanidatamab는 HER2에 이중으로 결합하는(biparatopic) 항-HER2 단일클론항체로, HER2 양성(IHC 3+) 절제불가/전이성 담도암(BTC)에서 1차 이상 전신치료 후 단독요법 적응증을 겨냥한다(항암제 계열).</span>
+                    <span>HER2 양성(IHC 3+) 담도암에서 사용되는 항암 단일클론항체로, HER2에 이중 결합해 신호전달을 억제하고 면역매개 세포사멸을 유도하는 바이오마커 기반 치료 전략</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>EMA는 승인=true로 입력돼 있으나 승인일(date)이 null이며, 승인 타임라인에서도 EMA ‘승인 여부가 확인되지 않는다(tense=unknown)’로 표기돼 날짜·시점 근거를 확정할 수 없다. 다만 분석 필드에 ‘EMA Conditional Approval’이 포함돼 유럽에서는 조건부 허가 트랙을 탄 약물로 해석된다(날짜는 미기재).</span>
+                    <span>FDA가 2024-11-20, EMA가 2025-06-27 승인 결정을 내리며 글로벌 규제기관의 효익-위험 판단을 통과했다(EMA는 조건부 승인 맥락)</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>식약처(MFDS) 허가=false, 제품명 공란이며 심평원(HIRA) 등재는 not_found로 약가·급여기준이 확인되지 않는다. <abbr title="임상연구정보서비스, Clinical Research Information Service">CRIS</abbr> 국내 임상도 0건으로, 국내 도입을 뒷받침할 ‘국내 개발/브리징’ 신호가 데이터상 보이지 않는다.</span>
+                    <span>국내는 식약처(MFDS) 미허가로 처방이 불가능하고, 심평원(HIRA) 등재·약가·급여기준도 확인되지 않아 현재 접근 경로는 제도권 급여가 아닌 예외적 도입에 한정된다</span>
                 </li>
                 <li class="flex items-start">
                     <span class="text-red-500 mr-2">&#x25B8;</span>
-                    <span>경쟁지형은 데이터상 oncology 약물들이 혼재돼 있으나(Polatuzumab vedotin 등), 적응증(담도암·HER2+) 관점에서 Zanidatamab의 실질 경쟁은 기존 담도암 표준 화학요법 및 HER2 표적요법과의 ‘바이오마커 기반 선별’ 프레임이 핵심이다. 국내에서는 허가→급여까지 통상 6개월~2년의 급여 프로세스를 감안해도, 현재는 ‘신청·심사 착수’ 자체를 확인할 데이터가 부족하다.</span>
+                    <span>희귀의약품 축에 놓인 담도암 표적치료는 허가 이후에도 바이오마커 검사-환자선별-급여기준이 한 세트로 설계돼야 해, 허가와 급여의 '동시 진입' 전략이 성패를 가른다</span>
                 </li></ul>
         </div>
+
         <article class="report-body text-gray-800">
+            <!-- 글로벌 섹션: 팩트 테이블 + 인사이트 -->
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">글로벌 승인 현황</h2>
-            <div class="mb-6">HER2 양성 담도암은 환자 수가 많지 않지만, 바이오마커가 맞으면 치료 반응이 크게 갈리는 영역이라 약제 도입의 파급력이 크다. Zanidatamab는 HER2의 서로 다른 부위에 이중으로 결합해 수용체 신호 억제와 면역매개 항종양 작용을 동시에 노리는 항-HER2 항체로 설계됐다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>적응증(입력 데이터): 성인 HER2 양성(IHC3+) 절제불가 국소진행/전이성 담도암(BTC), 최소 1차 전신치료 후 단독요법</li> <li>약물군: Antineoplastic agents(항암제)</li> </ul> <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">승인 여부(입력)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">승인일(입력)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">타임라인 문구(tense=unknown)</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">false</td><td class="px-3 py-2 border-b border-gray-100">null</td><td class="px-3 py-2 border-b border-gray-100">승인 여부가 확인되지 않는다</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">true</td><td class="px-3 py-2 border-b border-gray-100">null</td><td class="px-3 py-2 border-b border-gray-100">승인 여부가 확인되지 않는다</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">식약처(MFDS)</td><td class="px-3 py-2 border-b border-gray-100">false</td><td class="px-3 py-2 border-b border-gray-100">null</td><td class="px-3 py-2 border-b border-gray-100">승인 여부가 확인되지 않는다</td></tr> </table> 담도암 2차 이후 치료는 전통적으로 세포독성 화학요법 중심으로 운용돼 왔고, 최근에는 FGFR2/IDH1 등 표적이 있는 환자군에서 분자표적제가 치료 알고리즘을 재편했다. 그 연장선에서 Zanidatamab는 ‘HER2(IHC3+)’라는 명확한 선별 기준을 전면에 두고 들어온다는 점이 차별점이다. 입력 데이터의 분석 항목에 ‘EMA Conditional Approval’이 명시돼, 유럽에서는 조건부 허가 형태로 임상적 유효성의 추가 확증(후속 데이터 제출)을 전제로 접근성을 먼저 열어준 케이스로 읽힌다(구체 승인일은 미제공).</div>
             
+            <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">기관</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">날짜</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">FDA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2024-11-20</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">EMA</td><td class="px-3 py-2 border-b border-gray-100">승인</td><td class="px-3 py-2 border-b border-gray-100">2025-06-27</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">MFDS(식약처)</td><td class="px-3 py-2 border-b border-gray-100">미허가</td><td class="px-3 py-2 border-b border-gray-100">-</td></tr> </table></div>
+            
+            <div class="mb-6">468일. <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761416" target="_blank" class="text-indigo-600 hover:underline">FDA가</a> <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761416" target="_blank" class="text-indigo-600 hover:underline"><strong>Zanidatamab</strong></a>을 승인한 뒤 글로벌 도입 시계가 움직였지만, 국내는 아직 처방 가능한 제도적 좌표가 없다. 2024-11-20 FDA 승인과 2025-06-27 <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/ziihera" target="_blank" class="text-indigo-600 hover:underline">EMA 승인</a>(조건부 승인)은, 담도암처럼 치료 옵션이 제한된 영역에서 HER2 양성 환자군의 ‘바이오마커 기반 2차 치료’가 규제기관 판단을 받았다는 의미가 크다. 기전은 ‘Zanidatamab→HER2의 두 에피토프에 동시 결합→HER2 신호전달 차단 및 수용체 클러스터링/내재화 촉진→ADCC 등 면역효과 강화’의 연쇄로 설명된다. 쉽게 말해, HER2를 표적해 암세포 성장 신호를 꺼뜨리는 동시에 면역계가 암세포를 더 잘 인지하도록 돕는 방식이다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong><a href="entrectinib.html" class="text-indigo-600 hover:underline">Entrectinib</a></strong>: <abbr title="신경영양성 티로신 수용체 키나제, Neurotrophic Tyrosine Receptor Kinase">NTRK</abbr> 융합을 표적하는 범종양 정밀의학 옵션으로, ‘희귀 바이오마커-고가 치료’ 급여 설계의 선례를 제공한다는 점에서 참고 축</li> <li><strong><a href="zolbetuximab.html" class="text-indigo-600 hover:underline">Zolbetuximab</a></strong>: 위암 1차(화학요법 병용) 포지션으로, ‘바이오마커(Claudin 18.2) 기반 + 병용요법’의 급여기준 복잡성이 유사한 비교점</li> <li><strong><a href="mosunetuzumab.html" class="text-indigo-600 hover:underline">Mosunetuzumab</a> / Polatuzumab vedotin / <a href="talquetamab.html" class="text-indigo-600 hover:underline">Talquetamab</a></strong>: 혈액암 영역이지만, 조건부 승인·고가항암의 국내 등재 과정에서 ‘임상근거의 성숙도’가 협상력으로 직결된다는 점을 보여준다</li> </ul> 결국 Zanidatamab의 글로벌 의미는 ‘HER2 양성 담도암’이라는 좁은 표적집단에서 승인 근거를 확보했다는 데 있고, 국내에서는 이 좁은 집단을 정확히 선별할 검사·병리·투여 인프라가 상업화의 전제조건이 된다. 다만 제공된 임상 정보는 NCT 번호 수준으로 제한적이어서, 반응률·지속기간·안전성 프로파일의 정량 비교를 기사 수준에서 단정하기는 어렵다는 한계가 있다.</div>
+
+            <!-- 타임라인 (팩트) -->
+            
+            <div class="my-10 p-6 bg-gray-50 rounded-xl">
+                <h4 class="meta-text text-sm font-semibold text-gray-500 mb-6">승인 타임라인</h4>
+                <div class="relative">
+                    <div class="absolute left-2 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+                    <div class="relative flex items-center mb-6">
+                        <div class="timeline-dot bg-blue-500 z-10"></div>
+                        <div class="ml-6">
+                            <div class="meta-text text-xs text-blue-600 font-semibold">2024-11-20</div>
+                            <div class="font-medium"><a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761416" target="_blank" class="hover:underline">FDA 승인</a></div>
+                            <div class="text-sm text-gray-500">Approved</div>
+                        </div>
+                    </div>
+                    <div class="relative flex items-center mb-6">
+                        <div class="timeline-dot bg-yellow-500 z-10"></div>
+                        <div class="ml-6">
+                            <div class="meta-text text-xs text-yellow-600 font-semibold">2025-06-27</div>
+                            <div class="font-medium"><a href="https://www.ema.europa.eu/en/medicines/human/EPAR/ziihera" target="_blank" class="hover:underline">EMA 승인</a></div>
+                            <div class="text-sm text-gray-500">Authorised</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 국내 섹션: 인사이트 -->
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">국내 도입 전망</h2>
-            <div class="mb-6">국내에서는 Zanidatamab의 식약처 허가가 확인되지 않고(approved=false), 심평원 급여 등재도 not_found로 잡혀 있어 제도권 처방 경로가 열려 있지 않다. 더 중요한 신호는 CRIS 국내 임상 0건으로, 국내 환자 접근을 뒷받침할 임상 기반이 데이터상 전무하다는 점이다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">항목</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">현재 상태(입력 데이터)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">실무적 의미</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">식약처</td><td class="px-3 py-2 border-b border-gray-100">미허가(brand_name 공란)</td><td class="px-3 py-2 border-b border-gray-100">원칙적으로 국내 처방/유통 불가</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">심평원(HIRA)</td><td class="px-3 py-2 border-b border-gray-100">not_found(약가 null)</td><td class="px-3 py-2 border-b border-gray-100">급여 청구·상한가 기반 원가 산정 불가</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">CRIS</td><td class="px-3 py-2 border-b border-gray-100">0건</td><td class="px-3 py-2 border-b border-gray-100">국내 임상 참여를 통한 접근 경로도 확인 어려움</td></tr> </table> 경쟁약 데이터에는 <a href="polatuzumab_vedotin.html" class="text-indigo-600 hover:underline">Polatuzumab Vedotin</a>, <a href="zolbetuximab.html" class="text-indigo-600 hover:underline">Zolbetuximab</a>, <a href="ivosidenib.html" class="text-indigo-600 hover:underline">Ivosidenib</a>, <a href="talquetamab.html" class="text-indigo-600 hover:underline">Talquetamab</a> 등이 포함돼 있으나(모두 oncology), 담도암 HER2+라는 좁은 세그먼트에서 직접 대체 경쟁으로 보기에는 결이 다르다. 오히려 국내 약제팀 관점에서는 ‘담도암에서 바이오마커 기반 급여 기준이 어떻게 설계될지’가 핵심이며, HER2 검사(IHC3+)를 급여 기준의 출발점으로 삼을 가능성이 높다. 다만 context.mfds_timeline_estimate가 null이고 days_since_global_approval도 null이라, “글로벌 승인 후 몇 일 경과”를 근거로 한 허가 신청 시점 추정은 불가능하다.</div>
+            
+            <div class="my-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 meta-text">
+                <strong>경과:</strong> 글로벌 승인 후 1년 3개월 경과 (468일, 통상 범위)
+            </div>
+            
+            <div class="mb-6">국내에서는 식약처 미허가 상태라 Zanidatamab은 ‘좋은 데이터가 있어도 처방할 수 없는’ 단계에 머물러 있다. 글로벌 승인 후 1년 3개월(468일)이 경과한 시점은 통상 범위로 분류되지만, 담도암처럼 환자 수가 제한된 적응증은 허가 진입과 동시에 급여 설계까지 맞물리지 않으면 실제 사용량이 형성되기 어렵다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li>접근성의 병목은 ‘허가’뿐 아니라 <strong>HER2 IHC 3+ 선별을 위한 검사 표준화·청구 체계</strong>로 이동한다(선별이 흔들리면 급여기준도 흔들린다)</li> <li>심평원에서 약가·등재 정보가 확인되지 않는 만큼, 초기에는 제도권 급여가 아니라 예외적 도입 경로에 의존할 수밖에 없다</li> <li>비교 축으로는 <strong>Entrectinib</strong>처럼 ‘희귀 바이오마커 기반’ 약제가 국내에서 어떤 방식으로 급여기준을 구성했는지가 실무적 참고가 된다</li> </ul> 또 하나의 현실 변수는 비용 구조다. 사전 계산된 시나리오가 말하듯, 향후 등재가 되면 암환자 산정특례 5%가 적용될 수 있지만, 지금은 전액 비급여 구간이다. 약제팀·심사부서는 허가 이후 곧바로 “검사-투여-급여”를 한 묶음으로 제시할 준비가 되어 있는지 여부가, 실제 도입 속도를 좌우할 포인트가 된다.</div>
+
+            <!-- 메드클레임: 비용표(팩트) + 인사이트 -->
             <div class="my-10 p-6 bg-indigo-50 rounded-xl border border-indigo-100">
                 <h4 class="meta-text text-sm font-semibold text-indigo-600 mb-3">메드클레임 시사점</h4>
-                <div class="space-y-3 text-gray-800"><p>현재 상태(심평원 not_found)에서는 건강보험 청구 경로가 성립하지 않는다. 즉, 병원 약제팀이 ‘급여 코드/약가’를 전제로 한 구매·청구 프로세스를 설계할 수 없고, 심사자 역시 급여 기준 적용 자체가 불가능하다. <table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">급여 상태</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률(규칙 적용)</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">환자 부담 해석</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 등재(적응증 내)</td><td class="px-3 py-2 border-b border-gray-100">급여</td><td class="px-3 py-2 border-b border-gray-100">30%</td><td class="px-3 py-2 border-b border-gray-100">외래 기준 일반 급여 적용</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 등재 + 암환자 산정특례</td><td class="px-3 py-2 border-b border-gray-100">급여</td><td class="px-3 py-2 border-b border-gray-100">5%</td><td class="px-3 py-2 border-b border-gray-100">암환자 산정특례(입력: 0.05) 등록 시 경감</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">현재(미등재/미허가 상태)</td><td class="px-3 py-2 border-b border-gray-100">비급여 성립 전 단계</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">급여 청구 불가(사실상 제도권 처방 경로 부재)</td></tr> </table> 비급여 ‘처방’ 논의 이전에, 국내에서는 허가가 선행돼야 하고 그 다음에 급여 등재(약가 협상→건정심 의결)가 따라온다. 실무적으로는 ① 병리과/진단검사과의 HER2 IHC 판독 체계(IHC3+ 선별) ② 향후 급여 기준이 치료 라인(‘최소 1차 치료 후’)을 어떻게 문구화하는지 ③ 고가약제(PA) 여부는 ‘1회 투여 100만원 초과’ 가격 정보가 없으므로 현재 판단 불가, 이 3가지를 약제팀·심사파트 체크리스트로 선제 준비하는 게 현실적이다.</p></div>
+                
+                <div class="my-4"><table class="w-full text-sm my-4 border-collapse"> <tr><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">시나리오</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">본인부담률</th><th class="text-left px-3 py-2 border-b border-gray-200 font-semibold bg-gray-50">비고</th></tr> <tr><td class="px-3 py-2 border-b border-gray-100">향후 급여 (암환자 산정특례)</td><td class="px-3 py-2 border-b border-gray-100">5%</td><td class="px-3 py-2 border-b border-gray-100">등재 후 결정</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">비급여</td><td class="px-3 py-2 border-b border-gray-100">100%</td><td class="px-3 py-2 border-b border-gray-100">전액 환자 부담</td></tr> <tr><td class="px-3 py-2 border-b border-gray-100">KODC 긴급도입</td><td class="px-3 py-2 border-b border-gray-100">전액</td><td class="px-3 py-2 border-b border-gray-100">개별 신청</td></tr> </table></div>
+                
+                <div class="space-y-3 text-gray-800"><p>현재 국내 미허가로 의료기관에서 정규 처방은 불가능하다. 따라서 실무는 ‘허가 전 접근 경로’와 ‘허가 직후 급여 설계 준비’로 나뉜다. <ul class="list-disc list-inside space-y-1 my-4 text-gray-700"> <li><strong>KODC 긴급도입</strong>: 희귀의약품 지정 전제 하에 검토 가능하며, 비용은 전액 환자 부담(개별 신청)이라는 점을 사전에 고지해야 한다</li> <li><strong>제약사 EAP/Named Patient Program</strong>: 프로그램 유무와 대상 환자 조건(치료 라인, HER2 IHC 기준 등)을 확인해, 임상의가 환자에게 설명 가능한 형태로 정리한다</li> </ul> <abbr title="임상연구정보서비스, Clinical Research Information Service">CRIS</abbr>에 등록된 국내 임상시험 정보가 없는 만큼, ‘임상 참여’는 현재 단계에서 현실적 경로로 제시하기 어렵다. 약제팀은 내부적으로 HER2 IHC 3+ 판정 프로세스(병리 판독, 재검 기준, 외부 의뢰 동선)와 투여·이상반응 대응 체계를 미리 점검해, 허가가 확인되는 즉시 원내 도입 논의를 시작할 수 있게 준비하는 것이 안전하다. 또한 향후 급여 논의가 개시되면 산정특례 5% 적용 가능성이 언급되는 만큼, 심사부서는 담도암 적응증에서의 ‘바이오마커-치료 라인’ 급여기준 문구가 어떻게 설계돼야 삭감 리스크를 줄이는지 선제적으로 템플릿을 마련할 필요가 있다.</p></div>
             </div>
         </article>
+
         <footer class="mt-16 pt-8 border-t border-gray-200 meta-text text-sm text-gray-500">
             <div class="mb-4">
-                <strong>데이터 출처:</strong> FDA Drug Approvals Database, EMA Public Assessment Reports, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
+                <strong>데이터 출처:</strong> <a href="https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=761416" target="_blank" class="text-indigo-500 hover:underline">FDA Drug Approval</a>, <a href="https://www.ema.europa.eu/en/medicines/human/EPAR/ziihera" target="_blank" class="text-indigo-500 hover:underline">EMA Assessment Report</a>, <a href="https://clinicaltrials.gov/study/NCT04164199" target="_blank" class="text-indigo-500 hover:underline">ClinicalTrials.gov (NCT04164199)</a>, 식약처(MFDS) 의약품통합정보시스템, 심평원(HIRA) 건강보험심사평가원
             </div>
             <div class="text-xs text-gray-400">
-                본 리포트는 RegScan AI가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
-                의사결정에 활용 시 원문 확인을 권장합니다.
-                마지막 업데이트: 2026-02-24
+                본 리포트는 RegScan AI V4가 공개 데이터를 기반으로 자동 생성한 브리핑 자료입니다.
+                팩트(날짜·금액·상태)는 Python이 사전 계산하였으며, 인사이트(분석)는 LLM이 생성했습니다.
+                마지막 업데이트: 2026-03-03
             </div>
         </footer>
     </main>

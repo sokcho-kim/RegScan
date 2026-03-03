@@ -20,14 +20,101 @@ from .timeline import DrugTimeline, TimelineBuilder, FDAInfo, MFDSInfo, HIRAInfo
 class IngredientMatcher:
     """성분명 정규화 및 매칭"""
 
-    # 제거할 접미사 패턴
-    SUFFIX_PATTERNS = [
-        r"\s*(mesylate|mesilate|maleate|hydrochloride|hcl|sulfate|sodium|potassium)\s*",
-        r"\s*(micronized|anhydrous|hydrate|dihydrate)\s*",
-        r"\s*\(.*\)\s*",  # 괄호 내용
-        r"\s*,.*$",  # 콤마 이후
-        r"-[a-z]{3,5}$",  # USAN 접미사 (-hrii, -piiq, -bcmm 등)
-    ]
+    # ── 포괄적 염/에스테르/물리형태 사전 (FDA/USP 기준, 90+ entries) ──
+    SALT_FORMS: frozenset[str] = frozenset({
+        # --- Inorganic acid salts ---
+        "hydrochloride", "dihydrochloride", "trihydrochloride",
+        "hydrobromide", "hydroiodide",
+        "sulfate", "hemisulfate", "bisulfate",
+        "phosphate",
+        "nitrate",
+        # --- Organic acid salts ---
+        "acetate", "diacetate", "triacetate", "subacetate",
+        "benzoate",
+        "citrate",
+        "fumarate", "hemifumarate",
+        "gluconate",
+        "glucuronate",
+        "glutamate",
+        "glycinate", "glycolate",
+        "hippurate",
+        "isobutyrate",
+        "lactate",
+        "lactobionate",
+        "malate",
+        "maleate",
+        "mandelate",
+        "mucate",
+        "oleate",
+        "orotate",
+        "oxalate", "hemioxalate",
+        "pamoate", "embonate",
+        "phthalate",
+        "propionate",
+        "salicylate", "subsalicylate",
+        "stearate",
+        "succinate", "hemisuccinate",
+        "tannate",
+        "tartrate", "bitartrate", "hemitartrate",
+        "valerate", "isovalerate",
+        "xinafoate",
+        "gentisate",
+        "aspartate",
+        "butyrate",
+        "carbonate", "bicarbonate",
+        "decanoate",
+        "enanthate", "heptanoate",
+        "hexanoate", "caproate",
+        "laurate",
+        "palmitate",
+        "undecylenate",
+        # --- Sulfonate salts ---
+        "mesylate", "mesilate", "methanesulfonate",
+        "besylate", "besilate", "benzenesulfonate",
+        "tosylate", "tosilate", "toluenesulfonate",
+        "esylate", "esilate", "ethanesulfonate",
+        "edisylate", "ethanedisulfonate",
+        "isethionate",
+        "napsylate", "napadisylate",
+        "camsylate", "camphorsulfonate",
+        "triflutate",
+        # --- Base (cation) salts ---
+        "sodium", "disodium", "trisodium",
+        "potassium", "dipotassium",
+        "calcium",
+        "magnesium",
+        "zinc",
+        "aluminum", "aluminium",
+        "lithium",
+        "ammonium",
+        "tromethamine", "trometamol",
+        "meglumine", "dimeglumine",
+        "lysine", "dilysine",
+        "arginine",
+        "diethanolamine",
+        "ethanolamine", "olamine",
+        "choline",
+        "piperazine",
+        "benzathine",
+        "procaine",
+        "erbumine",
+        # --- Hydration states ---
+        "hydrate", "monohydrate", "dihydrate", "trihydrate",
+        "hemihydrate", "sesquihydrate", "pentahydrate",
+        "anhydrous",
+        # --- Other physical forms ---
+        "micronized",
+        # --- Abbreviations ---
+        "hcl", "hbr",
+    })
+
+    # 염/에스테르 매칭 정규식 (문자열 끝, longest-match-first)
+    _salt_re = re.compile(
+        r"\s+(?:" + "|".join(
+            re.escape(s) for s in sorted(SALT_FORMS, key=len, reverse=True)
+        ) + r")\s*$",
+        re.IGNORECASE,
+    )
 
     # 알려진 유의어 (brand → INN 매핑 포함)
     SYNONYMS = {
@@ -73,29 +160,56 @@ class IngredientMatcher:
     }
 
     def normalize(self, name: str) -> str:
-        """
-        성분명 정규화
+        """성분명 정규화
+
+        처리 순서:
+          1) 소문자 변환
+          2) 입체이성질체 접두사 제거: (S)-, (R)-, (RS)-, (+)-, (-)- 등
+          3) 공백 뒤 bare 접두사 제거: " s-malate" → " malate"
+          4) 괄호 내용 제거
+          5) 콤마 이후 제거
+          6) 염/에스테르/물리형태 제거 (끝에서부터, 최대 3회 반복)
+          7) FDA 바이오의약품 4자리 식별 접미사 제거 (정확히 4자)
+          8) 잔여 하이픈·공백 정리
 
         Args:
             name: 원본 성분명
 
         Returns:
-            정규화된 성분명 (소문자, 접미사 제거)
+            정규화된 Core INN (소문자)
         """
         if not name:
             return ""
 
-        # 소문자 변환
-        normalized = name.lower().strip()
+        n = name.lower().strip()
 
-        # 접미사 제거
-        for pattern in self.SUFFIX_PATTERNS:
-            normalized = re.sub(pattern, "", normalized, flags=re.IGNORECASE)
+        # 1) 괄호 입체이성질체: (s)-, (r)-, (rs)-, (+)-, (-)-
+        n = re.sub(r"\([srdl+\-]{1,2}\)-?\s*", "", n)
 
-        # 공백 정리
-        normalized = re.sub(r"\s+", " ", normalized).strip()
+        # 2) 공백 뒤 bare 입체이성질체: " s-malate" → " malate"
+        n = re.sub(r"(?<=\s)[srdl]{1,2}-(?=[a-z])", "", n)
 
-        return normalized
+        # 3) 괄호 내용 제거
+        n = re.sub(r"\s*\(.*?\)\s*", " ", n)
+
+        # 4) 콤마 이후 제거
+        n = re.sub(r"\s*,.*$", "", n)
+
+        # 5) 염/에스테르/물리형태 (끝에서부터 반복 제거)
+        for _ in range(3):
+            m = self._salt_re.search(n)
+            if not m:
+                break
+            n = n[:m.start()]
+
+        # 6) FDA 바이오의약품 4자리 식별 접미사 (정확히 4자)
+        n = re.sub(r"-[a-z]{4}$", "", n)
+
+        # 7) 잔여 하이픈·공백 정리
+        n = n.rstrip(" -")
+        n = re.sub(r"\s+", " ", n).strip()
+
+        return n
 
     def find_canonical(self, name: str) -> str:
         """

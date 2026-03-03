@@ -58,6 +58,16 @@ class DBLoader:
     외부에서 세션 관리가 필요하지 않습니다.
     """
 
+    _inn_normalizer = None
+
+    @classmethod
+    def _normalize_inn(cls, inn: str) -> str:
+        """IngredientMatcher.normalize() 위임 — 염/에스테르·FDA 접미사 통합 정규화."""
+        if cls._inn_normalizer is None:
+            from regscan.map.matcher import IngredientMatcher
+            cls._inn_normalizer = IngredientMatcher()
+        return cls._inn_normalizer.normalize(inn)
+
     def __init__(self) -> None:
         self._session_factory = get_async_session()
 
@@ -264,7 +274,7 @@ class DBLoader:
         self, session: AsyncSession, impact: DomesticImpact
     ) -> DrugDB:
         """drugs 테이블 upsert. INN 이 unique key."""
-        normalized_inn = impact.inn.lower().strip()
+        normalized_inn = self._normalize_inn(impact.inn)
         stmt = select(DrugDB).where(DrugDB.inn == normalized_inn)
         result = await session.execute(stmt)
         drug: Optional[DrugDB] = result.scalar_one_or_none()
@@ -425,7 +435,7 @@ class DBLoader:
 
         없으면 최소 레코드를 생성하고 id 를 반환합니다.
         """
-        normalized_inn = inn.lower().strip()
+        normalized_inn = self._normalize_inn(inn)
         stmt = select(DrugDB.id).where(DrugDB.inn == normalized_inn)
         result = await session.execute(stmt)
         row = result.scalar_one_or_none()
@@ -454,7 +464,7 @@ class DBLoader:
         Returns:
             (DrugDB, is_changed) — 변경 여부
         """
-        normalized_inn = impact.inn.lower().strip()
+        normalized_inn = self._normalize_inn(impact.inn)
         stmt = select(DrugDB).where(DrugDB.inn == normalized_inn)
         result = await session.execute(stmt)
         drug: Optional[DrugDB] = result.scalar_one_or_none()
@@ -637,9 +647,9 @@ class DBLoader:
         session.add(log)
 
     async def normalize_existing_inns(self) -> int:
-        """기존 DB의 INN을 lower().strip() 정규화.
+        """기존 DB의 INN을 IngredientMatcher.normalize() 기준으로 정규화.
 
-        중복 레코드(같은 INN의 대소문자 변형)가 있으면
+        중복 레코드(같은 INN의 대소문자/염/접미사 변형)가 있으면
         가장 오래된 레코드를 유지하고 나머지를 삭제합니다.
 
         Returns:
@@ -656,7 +666,7 @@ class DBLoader:
 
                 seen: dict[str, DrugDB] = {}
                 for drug in all_drugs:
-                    normalized = drug.inn.lower().strip()
+                    normalized = self._normalize_inn(drug.inn)
                     if normalized in seen:
                         # 중복 → 나중에 생성된 것 삭제
                         logger.info(

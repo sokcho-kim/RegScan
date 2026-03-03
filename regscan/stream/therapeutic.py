@@ -476,11 +476,11 @@ class TherapeuticAreaStream(BaseStream):
                 elif " / " in inn:
                     search_names = [p.strip() for p in inn.split(" / ") if p.strip()]
 
-                # USAN 접미사 제거 변형 추가 (-hrii, -piiq, -bysp 등)
+                # FDA 바이오의약품 4자리 식별 접미사 제거 변형 추가
                 expanded: list[str] = []
                 for name in search_names:
                     expanded.append(name)
-                    stripped = re.sub(r"-[a-z]{3,5}$", "", name, flags=re.IGNORECASE)
+                    stripped = re.sub(r"-[a-z]{4}$", "", name, flags=re.IGNORECASE)
                     if stripped != name:
                         expanded.append(stripped)
                 search_names = expanded
