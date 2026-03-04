@@ -319,7 +319,9 @@ class TherapeuticAreaStream(BaseStream):
     async def _search_fda_pharm_class(self, area: AreaConfig) -> list[dict]:
         """FDA pharm_class_epc로 약물 검색"""
         from regscan.ingest.fda import FDAClient
+        from regscan.parse.fda_parser import FDADrugParser
 
+        fda_parser = FDADrugParser()
         all_drugs: list[dict] = []
         seen_inns: set[str] = set()
 
@@ -346,6 +348,10 @@ class TherapeuticAreaStream(BaseStream):
                         atc = openfda.get("pharm_class_epc", [])
                         brand_names = openfda.get("brand_name", [])
 
+                        # FDADrugParser로 ORIG+AP 우선순위 submission 추출
+                        submissions = r.get("submissions", [])
+                        sub_info = fda_parser._extract_latest_submission(submissions)
+
                         all_drugs.append({
                             "inn": inn,
                             "atc_code": "",
@@ -354,7 +360,12 @@ class TherapeuticAreaStream(BaseStream):
                                 "brand_name": brand_names[0] if brand_names else "",
                                 "pharm_class_epc": atc,
                                 "application_number": r.get("application_number", ""),
-                                "submissions": r.get("submissions", []),
+                                "submission_status_date": sub_info.get("submission_status_date", ""),
+                                "submission_status": sub_info.get("submission_status", ""),
+                                "submission_type": sub_info.get("submission_type", ""),
+                                "submission_class_code": sub_info.get("submission_class_code", ""),
+                                "submission_class_code_description": sub_info.get("submission_class_code_description", ""),
+                                "submissions": submissions,
                                 "raw": r,
                             },
                         })

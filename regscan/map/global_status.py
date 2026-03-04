@@ -434,6 +434,25 @@ class GlobalStatusBuilder:
         # 날짜 파싱
         approval_date = None
         date_str = data.get("submission_status_date", "")
+
+        # Fallback: submission_status_date 누락 시 submissions raw에서 추출
+        if not date_str:
+            submissions = (
+                data.get("submissions")
+                or data.get("raw", {}).get("submissions", [])
+            )
+            if submissions:
+                from regscan.parse.fda_parser import FDADrugParser
+                sub_info = FDADrugParser._extract_latest_submission(
+                    FDADrugParser(), submissions,
+                )
+                date_str = sub_info.get("submission_status_date", "")
+                # fallback에서 추출한 submission 메타도 반영
+                if not data.get("submission_status"):
+                    data["submission_status"] = sub_info.get("submission_status", "")
+                if not data.get("submission_class_code"):
+                    data["submission_class_code"] = sub_info.get("submission_class_code", "")
+
         if date_str:
             try:
                 approval_date = datetime.strptime(date_str, "%Y%m%d").date()
