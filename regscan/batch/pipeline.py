@@ -491,9 +491,11 @@ async def run_pipeline(days_back: int = 7, force: bool = False) -> dict:
                 await loader.save_snapshot(source, scan_date_obj, count, gcs_path)
 
         # Step 4.5: v2 신규 소스 수집
-        v2_data = {"asti": [], "healthkr": [], "biorxiv": []}
+        v2_data = {"asti": [], "healthkr": [], "biorxiv": [], "khidi": [], "kdca": []}
         any_v2_enabled = (
-            settings.ENABLE_ASTI or settings.ENABLE_HEALTHKR or settings.ENABLE_BIORXIV
+            settings.ENABLE_ASTI or settings.ENABLE_HEALTHKR
+            or settings.ENABLE_BIORXIV or settings.ENABLE_KHIDI
+            or settings.ENABLE_KDCA
         )
         if any_v2_enabled:
             logger.info("[4.5/9] v2 신규 소스 수집...")
@@ -517,6 +519,30 @@ async def run_pipeline(days_back: int = 7, force: bool = False) -> dict:
                 except Exception as e:
                     logger.warning("  bioRxiv 수집 실패: %s", e)
                     v2_counts["biorxiv"] = f"error: {e}"
+
+            if settings.ENABLE_KHIDI:
+                try:
+                    from regscan.ingest.khidi import KHIDIBriefIngestor
+
+                    async with KHIDIBriefIngestor(days_back=days_back) as ingestor:
+                        v2_data["khidi"] = await ingestor.fetch()
+                    v2_counts["khidi"] = len(v2_data["khidi"])
+                    logger.info("  KHIDI: %d건", v2_counts["khidi"])
+                except Exception as e:
+                    logger.warning("  KHIDI 수집 실패: %s", e)
+                    v2_counts["khidi"] = f"error: {e}"
+
+            if settings.ENABLE_KDCA:
+                try:
+                    from regscan.ingest.kdca import KDCAIngestor
+
+                    async with KDCAIngestor(days_back=days_back) as ingestor:
+                        v2_data["kdca"] = await ingestor.fetch()
+                    v2_counts["kdca"] = len(v2_data["kdca"])
+                    logger.info("  KDCA: %d건", v2_counts["kdca"])
+                except Exception as e:
+                    logger.warning("  KDCA 수집 실패: %s", e)
+                    v2_counts["kdca"] = f"error: {e}"
 
             result["steps"]["v2_ingest"] = v2_counts
         else:

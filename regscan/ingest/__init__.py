@@ -37,6 +37,8 @@ from .cris import (
 from .asti import ASTIClient, ASTIIngestor
 from .healthkr import HealthKRClient, HealthKRIngestor
 from .biorxiv import BioRxivClient, BioRxivIngestor
+from .khidi import KHIDIIngestor, KHIDIBriefIngestor, KHIDIReportIngestor
+from .kdca import KDCAIngestor
 
 __all__ = [
     "BaseIngestor",
@@ -77,4 +79,10 @@ __all__ = [
     # v2: bioRxiv
     "BioRxivClient",
     "BioRxivIngestor",
+    # KHIDI
+    "KHIDIIngestor",
+    "KHIDIBriefIngestor",
+    "KHIDIReportIngestor",
+    # KDCA
+    "KDCAIngestor",
 ]

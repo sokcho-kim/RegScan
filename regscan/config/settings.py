@@ -84,6 +84,8 @@ class Settings(BaseSettings):
     ENABLE_ASTI: bool = False
     ENABLE_HEALTHKR: bool = False
     ENABLE_BIORXIV: bool = True
+    ENABLE_KHIDI: bool = True
+    ENABLE_KDCA: bool = True
 
     # 기사 발행 기준
     MIN_SCORE_FOR_DB: int = 10            # DB 적재 최소 점수 (MFDS-only OTC 제외)
