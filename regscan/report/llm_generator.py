@@ -842,29 +842,8 @@ class LLMBriefingGenerator:
             return self._generate_fallback(impact)
 
     async def generate(self, impact: DomesticImpact) -> BriefingReport:
-        """브리핑 리포트 생성"""
-        drug_data = self._prepare_drug_data(impact)
-        prompt = BRIEFING_REPORT_PROMPT.format(drug_data=drug_data)
-
-        try:
-            response_text = await self._call_llm(prompt)
-            parsed = self._parse_json_response(response_text)
-
-            return BriefingReport(
-                inn=self._to_display_case(impact.inn),
-                headline=parsed.get("headline", f"{self._to_display_case(impact.inn)} 규제 동향"),
-                subtitle=parsed.get("subtitle", ""),
-                key_points=parsed.get("key_points", []),
-                global_section=parsed.get("global_section", ""),
-                domestic_section=parsed.get("domestic_section", ""),
-                medclaim_section=parsed.get("medclaim_section", ""),
-                global_heading=parsed.get("global_heading", ""),
-                domestic_heading=parsed.get("domestic_heading", ""),
-                source_data=impact.to_dict(),
-            )
-        except Exception as e:
-            logger.error(f"LLM 리포트 생성 실패: {e}")
-            return self._generate_fallback(impact)
+        """브리핑 리포트 생성 — V4.1 (팩트/인사이트 분리 + Executive Tone)"""
+        return await self.generate_v4(impact)
 
     async def generate_quick_summary(self, impact: DomesticImpact) -> str:
         """간단 요약 생성"""

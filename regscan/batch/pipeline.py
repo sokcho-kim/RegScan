@@ -562,6 +562,37 @@ async def run_pipeline(days_back: int = 7, force: bool = False) -> dict:
             "mode": "force" if force else "event_trigger",
         }
 
+        # Step 4.7: KHIDI/KDCA → NewsArticle 변환 (브리핑 recent_news 주입용)
+        # article_texts: [(NewsArticle, lowercased_text)] — 사전 처리로 루프 내 중복 연산 방지
+        public_article_texts: list[tuple] = []
+        _public_items = v2_data.get("khidi", []) + v2_data.get("kdca", [])
+        if _public_items:
+            try:
+                from regscan.news.fetcher import NewsArticle
+                from datetime import datetime as _dt
+
+                for item in _public_items:
+                    pub_date = None
+                    if item.get("date"):
+                        try:
+                            pub_date = _dt.strptime(item["date"][:10], "%Y-%m-%d")
+                        except (ValueError, TypeError):
+                            pass
+                    summary = (item.get("content", "") or "")[:200]
+                    art = NewsArticle(
+                        title=item.get("title", ""),
+                        url=item.get("url", ""),
+                        source=item.get("source", item.get("source_type", "공공 보도자료")),
+                        published=pub_date,
+                        summary=summary,
+                    )
+                    # 사전 lowercase — drug별 매칭 시 반복 연산 방지
+                    lowered = f"{art.title} {art.summary}".lower()
+                    public_article_texts.append((art, lowered))
+                logger.info("  공공 보도자료 %d건 → NewsArticle 변환 완료", len(public_article_texts))
+            except Exception as e:
+                logger.warning("  공공 보도자료 변환 실패: %s", e)
+
         # Step 5: LLM 브리핑 생성
         logger.info("[5/9] 핫이슈 LLM 브리핑 생성...")
         try:
@@ -570,6 +601,13 @@ async def run_pipeline(days_back: int = 7, force: bool = False) -> dict:
             generator = get_llm_generator()
             hot_issues = store.get_hot_issues(min_score=settings.MIN_SCORE_FOR_BRIEFING)
             generated, failed, skipped_unchanged = 0, 0, 0
+            news_injected_total = 0
+
+            # IngredientMatcher 1회 생성 (루프 내 재생성 방지)
+            _normalizer = None
+            if public_article_texts:
+                from regscan.map.matcher import IngredientMatcher
+                _normalizer = IngredientMatcher().normalize
 
             for drug in hot_issues:
                 if target_filter is not None:
@@ -578,21 +616,31 @@ async def run_pipeline(days_back: int = 7, force: bool = False) -> dict:
                         skipped_unchanged += 1
                         continue
 
+                # 공공 보도자료 → drug._news_cache 주입
+                if public_article_texts and _normalizer:
+                    matched = _match_public_news(drug, public_article_texts)
+                    news_injected_total += _inject_public_news(
+                        drug, matched, _normalizer,
+                    )
+
                 try:
                     report = await generator.generate(drug)
                     await loader.save_briefing(report)
                     report.save()
                     generated += 1
                 except Exception as e:
-                    logger.warning(f"  브리핑 실패 ({drug.inn}): {e}")
+                    logger.warning("  브리핑 실패 (%s): %s", drug.inn, e)
                     failed += 1
 
+            if news_injected_total:
+                logger.info("  공공 보도자료 %d건 브리핑에 주입됨", news_injected_total)
             result["steps"]["briefings"] = {
                 "generated": generated, "failed": failed,
                 "skipped_unchanged": skipped_unchanged,
+                "public_news_injected": news_injected_total,
             }
         except Exception as e:
-            logger.warning(f"  브리핑 배치 실패: {e}")
+            logger.warning("  브리핑 배치 실패: %s", e)
             result["steps"]["briefings"] = f"error: {e}"
 
         # Step 6: 스캔 결과 JSON 저장
@@ -624,6 +672,66 @@ async def run_pipeline(days_back: int = 7, force: bool = False) -> dict:
         logger.error(f"=== 레거시 파이프라인 실패: {e} ({duration:.1f}초) ===", exc_info=True)
 
     return result
+
+
+# 치료영역 → 한글 키워드 매핑 (공공 보도자료 매칭용)
+_AREA_KR_KEYWORDS: dict[str, list[str]] = {
+    "oncology": ["항암", "암", "종양"],
+    "rare_disease": ["희귀", "난치"],
+    "immunology": ["면역", "자가면역"],
+    "cardiovascular": ["심혈관", "심장"],
+    "metabolic": ["대사", "당뇨", "비만"],
+    "infectious": ["감염", "백신", "바이러스"],
+}
+
+_MAX_PUBLIC_NEWS_PER_DRUG = 3
+
+
+def _match_public_news(drug, article_texts: list[tuple]) -> list:
+    """공공 보도자료 중 drug과 관련된 기사를 키워드 매칭으로 선별.
+
+    Args:
+        drug: DomesticImpact (inn, therapeutic_areas 속성 필요)
+        article_texts: [(NewsArticle, lowercased_text), ...] 사전 처리된 리스트
+
+    Returns:
+        매칭된 NewsArticle 리스트 (최대 _MAX_PUBLIC_NEWS_PER_DRUG건)
+    """
+    if not article_texts:
+        return []
+
+    inn_lower = (drug.inn or "").lower()
+    keywords = [inn_lower] if inn_lower else []
+    for area in getattr(drug, 'therapeutic_areas', []) or []:
+        keywords.extend(_AREA_KR_KEYWORDS.get(area, []))
+
+    if not keywords:
+        return []
+
+    return [
+        art for art, text in article_texts
+        if any(kw in text for kw in keywords)
+    ][:_MAX_PUBLIC_NEWS_PER_DRUG]
+
+
+def _inject_public_news(drug, matched: list, normalizer) -> int:
+    """매칭된 공공 보도자료를 drug._news_cache에 주입.
+
+    Args:
+        drug: DomesticImpact
+        matched: _match_public_news()가 반환한 기사 리스트
+        normalizer: IngredientMatcher.normalize 호출 가능 객체
+
+    Returns:
+        주입된 기사 수
+    """
+    if not matched:
+        return 0
+    norm = normalizer(drug.inn)
+    existing = getattr(drug, '_news_cache', None) or {}
+    existing[norm] = existing.get(norm, []) + matched
+    drug._news_cache = existing
+    return len(matched)
 
 
 async def _get_drug_id_by_inn(loader, inn: str) -> int | None:
