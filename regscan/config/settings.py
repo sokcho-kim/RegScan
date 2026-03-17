@@ -65,7 +65,7 @@ class Settings(BaseSettings):
     # ── v2: AI 엔진 ──
     GEMINI_API_KEY: Optional[str] = None
     ENABLE_GEMINI_PARSING: bool = False
-    GEMINI_MODEL: str = "gemini-2.0-flash"
+    GEMINI_MODEL: str = "gemini-2.5-flash"
 
     ENABLE_AI_REASONING: bool = False
     REASONING_MODEL: str = "o4-mini"

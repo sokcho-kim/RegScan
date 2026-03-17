@@ -189,6 +189,87 @@ async def run_stream_pipeline(
             logger.warning("  스트림 스냅샷 저장 실패: %s", e)
             result["steps"]["stream_snapshots"] = f"error: {e}"
 
+        # Step 4.7: KHIDI/KDCA 공공 보도자료 수집 + 뉴스 주입
+        if settings.ENABLE_KHIDI or settings.ENABLE_KDCA:
+            logger.info("[4.7/6] KHIDI/KDCA 공공 보도자료 수집...")
+            _public_items: list = []
+            v2_counts: dict = {}
+
+            if settings.ENABLE_KHIDI:
+                try:
+                    from regscan.ingest.khidi import KHIDIBriefIngestor
+                    async with KHIDIBriefIngestor(days_back=7) as ingestor:
+                        khidi_data = await ingestor.fetch()
+                    _public_items.extend(khidi_data)
+                    v2_counts["khidi"] = len(khidi_data)
+                    logger.info("  KHIDI: %d건", len(khidi_data))
+                except Exception as e:
+                    logger.warning("  KHIDI 수집 실패: %s", e)
+                    v2_counts["khidi"] = f"error: {e}"
+
+            if settings.ENABLE_KDCA:
+                try:
+                    from regscan.ingest.kdca import KDCAIngestor
+                    async with KDCAIngestor(days_back=7) as ingestor:
+                        kdca_data = await ingestor.fetch()
+                    _public_items.extend(kdca_data)
+                    v2_counts["kdca"] = len(kdca_data)
+                    logger.info("  KDCA: %d건", len(kdca_data))
+                except Exception as e:
+                    logger.warning("  KDCA 수집 실패: %s", e)
+                    v2_counts["kdca"] = f"error: {e}"
+
+            # NewsArticle 변환 + impacts에 주입
+            public_article_texts: list[tuple] = []
+            if _public_items:
+                try:
+                    from regscan.news.fetcher import NewsArticle
+                    from datetime import datetime as _dt
+                    def _get(item, key, default=""):
+                        """dict와 object 모두 지원하는 getter"""
+                        if isinstance(item, dict):
+                            return item.get(key, default) or default
+                        return getattr(item, key, default) or default
+
+                    for item in _public_items:
+                        title = _get(item, "title", "")
+                        body = _get(item, "body", "") or _get(item, "summary", "")
+                        art = NewsArticle(
+                            title=title,
+                            summary=body[:300] if body else title[:300],
+                            url=_get(item, "url", ""),
+                            source=_get(item, "source", "공공보도자료"),
+                            published=_get(item, "published", None) or _get(item, "date", None) or _dt.now(),
+                        )
+                        combined = f"{title} {body}".lower()
+                        public_article_texts.append((art, combined))
+                except Exception as e:
+                    logger.warning("  공공 보도자료 변환 실패: %s", e)
+
+            # qualified impacts에 뉴스 주입
+            news_injected_total = 0
+            if public_article_texts and qualified:
+                _normalizer = None
+                try:
+                    from regscan.map.matcher import IngredientMatcher
+                    _normalizer = IngredientMatcher().normalize
+                except Exception:
+                    pass
+
+                if _normalizer:
+                    for drug in qualified:
+                        matched = _match_public_news(drug, public_article_texts)
+                        news_injected_total += _inject_public_news(
+                            drug, matched, _normalizer
+                        )
+
+            result["steps"]["public_news"] = {
+                **v2_counts,
+                "articles_converted": len(public_article_texts),
+                "news_injected": news_injected_total,
+            }
+            logger.info("  공공 보도자료: %d건 변환, %d건 주입", len(public_article_texts), news_injected_total)
+
         # Step 5: 스트림별 브리핑 생성
         if settings.ENABLE_STREAM_BRIEFINGS:
             logger.info("[5/6] 스트림 브리핑 생성...")
