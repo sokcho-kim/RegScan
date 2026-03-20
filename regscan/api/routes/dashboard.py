@@ -1,10 +1,12 @@
 """대시보드 HTML 라우트"""
 
+import json
 import logging
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
@@ -107,5 +109,81 @@ async def drug_briefing(
             "today": _today_str(),
             "drug": drug,
             "briefing": briefing,
+        },
+    )
+
+
+@router.get("/dashboard/briefing", response_class=HTMLResponse)
+async def stream_briefing_page(
+    request: Request,
+    run_id: Optional[str] = Query(None),
+):
+    """V2 Executive Briefing 페이지"""
+    import sqlite3
+
+    raw_url = settings.DATABASE_URL
+    for prefix in ("sqlite+aiosqlite:///", "sqlite:///"):
+        raw_url = raw_url.replace(prefix, "")
+    db_path = Path(raw_url)
+    if not db_path.exists():
+        raise HTTPException(status_code=404, detail="SQLite DB not found")
+
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
+
+    # 파이프라인 실행 목록
+    run_rows = conn.execute(
+        """SELECT pipeline_run_id, MIN(generated_at) as first_at, COUNT(*) as cnt
+           FROM stream_briefings
+           GROUP BY pipeline_run_id
+           ORDER BY MIN(generated_at) DESC"""
+    ).fetchall()
+
+    runs = []
+    for r in run_rows:
+        dt = r["first_at"][:16].replace("T", " ")
+        runs.append({"id": r["pipeline_run_id"], "date": dt, "count": r["cnt"]})
+
+    if not runs:
+        conn.close()
+        raise HTTPException(status_code=404, detail="No briefings found")
+
+    current_run = run_id or runs[0]["id"]
+
+    # 해당 run의 브리핑 조회
+    rows = conn.execute(
+        """SELECT stream_name, sub_category, briefing_type, headline, content_json
+           FROM stream_briefings
+           WHERE pipeline_run_id = ?
+           ORDER BY id""",
+        (current_run,),
+    ).fetchall()
+    conn.close()
+
+    unified = None
+    streams = []
+    for row in rows:
+        content = json.loads(row["content_json"]) if row["content_json"] else {}
+        entry = {
+            "stream_name": row["stream_name"],
+            "sub_category": row["sub_category"] or "",
+            "briefing_type": row["briefing_type"],
+            "headline": row["headline"],
+            "content": content,
+        }
+        if row["briefing_type"] == "unified":
+            unified = content
+        else:
+            streams.append(entry)
+
+    return templates.TemplateResponse(
+        "stream_briefing.html",
+        {
+            "request": request,
+            "today": _today_str(),
+            "runs": runs,
+            "current_run": current_run,
+            "unified": unified,
+            "streams": streams,
         },
     )

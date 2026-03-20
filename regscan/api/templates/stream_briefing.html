@@ -1,0 +1,566 @@
+{% extends "base.html" %}
+
+{% block title %}RegScan - Executive Briefing{% endblock %}
+
+{% block extra_css %}
+.briefing-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #888;
+    text-decoration: none;
+}
+.back-link:hover { color: #1a1a1a; }
+
+/* ── Run selector ── */
+.run-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+}
+
+.run-selector select {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    background: #fff;
+}
+
+/* ── Unified card ── */
+.unified-card {
+    background: #fff;
+    border: 2px solid #1a1a1a;
+    border-radius: 8px;
+    padding: 32px;
+    margin-bottom: 36px;
+}
+
+.unified-card .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #c00;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+}
+
+.unified-card h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 16px;
+}
+
+.unified-summary {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #333;
+    white-space: pre-line;
+    margin-bottom: 24px;
+}
+
+/* ── Cross analysis ── */
+.cross-box {
+    background: #fafafa;
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+}
+
+.cross-box h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.cross-box p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #444;
+    white-space: pre-line;
+}
+
+/* ── Top 5 drugs ── */
+.top5-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.top5-item {
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.top5-item .rank {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #c00;
+    margin-bottom: 4px;
+}
+
+.top5-item .drug-name {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.top5-item .drug-reason {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 6px;
+}
+
+.top5-item .drug-action {
+    font-size: 12px;
+    color: #0066cc;
+    font-family: 'Inter', sans-serif;
+}
+
+/* ── Alerts ── */
+.alert-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.alert-box {
+    border-radius: 6px;
+    padding: 20px;
+}
+
+.alert-box.risk {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
+.alert-box.opportunity {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+}
+
+.alert-box h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.alert-box.risk h4 { color: #991b1b; }
+.alert-box.opportunity h4 { color: #166534; }
+
+.alert-box ul {
+    list-style: none;
+    padding: 0;
+}
+
+.alert-box li {
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 4px 0;
+    color: #333;
+}
+
+.alert-box.risk li::before { content: "\26A0\FE0F "; }
+.alert-box.opportunity li::before { content: "\2714\FE0F "; }
+
+/* ── Stream cards ── */
+.stream-section {
+    margin-bottom: 32px;
+}
+
+.stream-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 20px;
+}
+
+.stream-card .stream-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    padding: 3px 10px;
+    display: inline-block;
+    border-radius: 2px;
+}
+
+.stream-label.therapeutic { background: #dbeafe; color: #1e40af; }
+.stream-label.innovation { background: #fce7f3; color: #9d174d; }
+.stream-label.external { background: #fef3c7; color: #92400e; }
+
+.stream-card h2 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.stream-takeaway {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background: #fafafa;
+    border-left: 3px solid #ddd;
+    border-radius: 0 4px 4px 0;
+}
+
+/* ── Drug table ── */
+.drug-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.drug-table th {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 2px solid #1a1a1a;
+}
+
+.drug-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+    line-height: 1.5;
+}
+
+.drug-table tr:hover { background: #fafafa; }
+
+/* ── Trend / Action ── */
+.trend-box {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #333;
+}
+
+.trend-box h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.action-list {
+    list-style: none;
+    padding: 0;
+}
+
+.action-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.action-list li::before {
+    content: "\25B8";
+    color: #0066cc;
+    margin-right: 8px;
+    font-weight: 700;
+}
+
+/* ── Source footer ── */
+.briefing-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+}
+
+/* ── Tomorrow watch ── */
+.tomorrow-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 6px;
+    padding: 16px 20px;
+    font-size: 15px;
+    color: #92400e;
+    line-height: 1.6;
+}
+
+.tomorrow-box strong {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 6px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="briefing-page">
+    <a href="/dashboard" class="back-link">&larr; Dashboard</a>
+
+    <!-- Run selector -->
+    {% if runs|length > 1 %}
+    <div class="run-selector">
+        <span style="color:#888;">브리핑 일자:</span>
+        <form method="get" action="/dashboard/briefing">
+            <select name="run_id" onchange="this.form.submit()">
+                {% for run in runs %}
+                <option value="{{ run.id }}" {% if run.id == current_run %}selected{% endif %}>
+                    {{ run.date }} ({{ run.count }}건)
+                </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if unified %}
+    <!-- ══ Unified Executive Briefing ══ -->
+    <div class="unified-card">
+        <div class="label">Executive Daily Briefing</div>
+        <h1>{{ unified.headline }}</h1>
+
+        {% if unified.executive_summary %}
+        <div class="unified-summary">{{ unified.executive_summary }}</div>
+        {% endif %}
+
+        {% if unified.key_takeaway %}
+        <div class="stream-takeaway">{{ unified.key_takeaway }}</div>
+        {% endif %}
+
+        <!-- Cross-stream analysis -->
+        {% if unified.cross_analysis %}
+        <div class="cross-box">
+            <h4>Cross-Stream Analysis</h4>
+            <p>{{ unified.cross_analysis }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Top 5 Drugs -->
+        {% if unified.top_5_drugs %}
+        <div class="top5-grid">
+            {% for drug in unified.top_5_drugs %}
+            <div class="top5-item">
+                <div class="rank">#{{ drug.rank or loop.index }}</div>
+                <div class="drug-name">{{ drug.inn }}</div>
+                <div class="drug-reason">{{ drug.reason }}</div>
+                <div class="drug-action">{{ drug.action }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Risk / Opportunity -->
+        {% if unified.risk_alerts or unified.opportunities %}
+        <div class="alert-row">
+            {% if unified.risk_alerts %}
+            <div class="alert-box risk">
+                <h4>Risk Alerts</h4>
+                <ul>
+                    {% for alert in unified.risk_alerts %}
+                    <li>{{ alert }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% if unified.opportunities %}
+            <div class="alert-box opportunity">
+                <h4>Opportunities</h4>
+                <ul>
+                    {% for opp in unified.opportunities %}
+                    <li>{{ opp }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Tomorrow Watch -->
+        {% if unified.tomorrow_watch %}
+        <div class="tomorrow-box">
+            <strong>Tomorrow Watch</strong>
+            {{ unified.tomorrow_watch }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- ══ Stream Briefings ══ -->
+    <div class="stream-section">
+        {% for b in streams %}
+        <div class="stream-card">
+            {% if b.stream_name == 'therapeutic_area' %}
+            <span class="stream-label therapeutic">Therapeutic Area{% if b.sub_category %} &middot; {{ b.sub_category }}{% endif %}</span>
+            {% elif b.stream_name == 'innovation' %}
+            <span class="stream-label innovation">Innovation Signal</span>
+            {% elif b.stream_name == 'external' %}
+            <span class="stream-label external">External Signal</span>
+            {% else %}
+            <span class="stream-label" style="background:#eee;color:#555;">{{ b.stream_name }}</span>
+            {% endif %}
+
+            <h2>{{ b.content.headline or '(No headline)' }}</h2>
+
+            {% if b.content.key_takeaway %}
+            <div class="stream-takeaway">{{ b.content.key_takeaway }}</div>
+            {% endif %}
+
+            <!-- Top drugs table -->
+            {% if b.content.top_drugs %}
+            <table class="drug-table">
+                <thead>
+                    <tr>
+                        <th>INN</th>
+                        <th>Status</th>
+                        <th>Why it matters</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in b.content.top_drugs[:5] %}
+                    <tr>
+                        <td><strong>{{ d.inn }}</strong></td>
+                        <td>{{ d.status or '' }}</td>
+                        <td>{{ d.why_it_matters or '' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+            <!-- NME spotlight (innovation) -->
+            {% if b.content.nme_spotlight %}
+            <table class="drug-table">
+                <thead>
+                    <tr>
+                        <th>INN</th>
+                        <th>Designation</th>
+                        <th>Implication</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in b.content.nme_spotlight %}
+                    <tr>
+                        <td><strong>{{ d.inn }}</strong></td>
+                        <td>{{ d.designation or '' }}</td>
+                        <td>{{ d.implication or '' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+            <!-- Trial failures (external) -->
+            {% if b.content.trial_failures %}
+            <table class="drug-table">
+                <thead>
+                    <tr>
+                        <th>INN</th>
+                        <th>Verdict</th>
+                        <th>Hospital Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in b.content.trial_failures %}
+                    <tr>
+                        <td><strong>{{ d.inn }}</strong></td>
+                        <td>{{ d.verdict or '' }}</td>
+                        <td>{{ d.hospital_impact or '' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+            <!-- Trend analysis -->
+            {% if b.content.trend_analysis %}
+            <div class="trend-box">
+                <h4>Trend Analysis</h4>
+                {{ b.content.trend_analysis }}
+            </div>
+            {% endif %}
+
+            <!-- Strategic implications (innovation) -->
+            {% if b.content.strategic_implications %}
+            <div class="trend-box">
+                <h4>Strategic Implications</h4>
+                {{ b.content.strategic_implications }}
+            </div>
+            {% endif %}
+
+            <!-- medRxiv insights -->
+            {% if b.content.medrxiv_insights %}
+            <div class="trend-box">
+                <h4>medRxiv Insights</h4>
+                {% for m in b.content.medrxiv_insights %}
+                <p><strong>{{ m.topic }}:</strong> {{ m.finding }}
+                {% if m.timeline %}<br><span style="font-size:13px;color:#888;">{{ m.timeline }}</span>{% endif %}
+                </p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Action items -->
+            {% if b.content.action_items %}
+            <ul class="action-list">
+                {% for a in b.content.action_items %}
+                <li>{{ a }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="briefing-footer">
+        <p>RegScan Executive Briefing &middot; Generated by V2 Stream Pipeline</p>
+        <p style="margin-top:4px;">본 브리핑은 공개 데이터 기반 AI 분석 결과입니다. 의사결정 시 원문 확인을 권장합니다.</p>
+    </div>
+</div>
+{% endblock %}
