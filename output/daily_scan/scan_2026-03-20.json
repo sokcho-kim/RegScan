@@ -1,0 +1,627 @@
+{
+  "scan_date": "2026-03-20",
+  "scan_time": "2026-03-20T08:00:01.408174",
+  "summary": {
+    "fda_new": 5,
+    "ema_new": 16,
+    "mfds_new": 0,
+    "total_new": 21,
+    "hot_issues": 6
+  },
+  "fda_new": [
+    {
+      "source": "fda",
+      "drug_name": "BUPROPION HYDROCHLORIDE XL",
+      "generic_name": "BUPROPION HYDROCHLORIDE",
+      "approval_date": "2018-06-14",
+      "application_number": "ANDA210015",
+      "indication": "",
+      "sponsor": "YICHANG HUMANWELL",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPTOMYCIN",
+      "generic_name": "DAPTOMYCIN",
+      "approval_date": "2021-06-29",
+      "application_number": "ANDA213623",
+      "indication": "Lipopeptide Antibacterial [EPC]",
+      "sponsor": "MEITHEAL",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "GEMCITABINE",
+      "generic_name": "GEMCITABINE",
+      "approval_date": "2018-07-20",
+      "application_number": "ANDA209077",
+      "indication": "",
+      "sponsor": "SAGENT PHARMS INC",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "MEFENAMIC ACID",
+      "generic_name": "MEFENAMIC ACID",
+      "approval_date": "2010-11-19",
+      "application_number": "ANDA090562",
+      "indication": "Nonsteroidal Anti-inflammatory Drug [EPC]",
+      "sponsor": "MICRO LABS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ALLOPURINOL SODIUM",
+      "generic_name": "ALLOPURINOL SODIUM",
+      "approval_date": "2004-08-26",
+      "application_number": "ANDA076870",
+      "indication": "",
+      "sponsor": "HIKMA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": false,
+      "existing_approvals": []
+    }
+  ],
+  "ema_new": [
+    {
+      "source": "ema",
+      "drug_name": "Libmyris",
+      "generic_name": "adalimumab",
+      "approval_date": "2021-11-12",
+      "application_number": "",
+      "indication": "Arthritis, Rheumatoid;Arthritis, Juvenile Rheumatoid;Spondylitis, Ankylosing;Arthritis, Psoriatic;Psoriasis;Hidradenitis Suppurativa;Crohn Disease;Colitis, Ulcerative;Uveitis",
+      "sponsor": "Stada Arzneimittel AG",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Kaftrio",
+      "generic_name": "ivacaftor;tezacaftor;elexacaftor",
+      "approval_date": "2020-08-21",
+      "application_number": "",
+      "indication": "Cystic Fibrosis",
+      "sponsor": "Vertex Pharmaceuticals (Ireland) Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "orphan",
+      "hot_issue_score": 15,
+      "hot_issue_reasons": [
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Hympavzi",
+      "generic_name": "marstacimab",
+      "approval_date": "2024-11-18",
+      "application_number": "",
+      "indication": "Hemophilia A;Hemophilia B",
+      "sponsor": "Pfizer Europe MA EEIG",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Keytruda",
+      "generic_name": "pembrolizumab",
+      "approval_date": "2015-07-17",
+      "application_number": "",
+      "indication": "Melanoma;Hodgkin Disease;Carcinoma, Renal Cell;Carcinoma, Non-Small-Cell Lung;Carcinoma, Transitional Cell;Squamous Cell Carcinoma of Head and Neck;Urologic Neoplasms;Endometrial Neoplasms",
+      "sponsor": "Merck Sharp & Dohme B.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "고관심 적응증 (carcinoma)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Cegfila (previously Pegfilgrastim Mundipharma)",
+      "generic_name": "pegfilgrastim",
+      "approval_date": "2019-12-19",
+      "application_number": "",
+      "indication": "",
+      "sponsor": "Mundipharma Corporation (Ireland) Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Pelmeg",
+      "generic_name": "pegfilgrastim",
+      "approval_date": "2018-11-20",
+      "application_number": "",
+      "indication": "",
+      "sponsor": "Mundipharma Corporation (Ireland) Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Gohibic",
+      "generic_name": "vilobelimab",
+      "approval_date": "2025-01-13",
+      "application_number": "",
+      "indication": "Respiratory Distress Syndrome, Adult;COVID-19 virus infection",
+      "sponsor": "InflaRx GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "high_interest",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "고관심 적응증 (covid)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Daybu",
+      "generic_name": "trofinetide",
+      "approval_date": "2026-03-17",
+      "application_number": "",
+      "indication": "Rett Syndrome",
+      "sponsor": "Acadia Pharmaceuticals B.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "orphan",
+      "hot_issue_score": 15,
+      "hot_issue_reasons": [
+        "희귀의약품"
+      ],
+      "matched_existing": false,
+      "existing_approvals": []
+    },
+    {
+      "source": "ema",
+      "drug_name": "Trydonis",
+      "generic_name": "beclometasone;formoterol;glycopyrronium bromide",
+      "approval_date": "2018-04-26",
+      "application_number": "",
+      "indication": "Pulmonary Disease, Chronic Obstructive",
+      "sponsor": "Chiesi Farmaceutici S.p.A.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Trimbow",
+      "generic_name": "beclometasone;formoterol;glycopyrronium bromide",
+      "approval_date": "2017-07-17",
+      "application_number": "",
+      "indication": "Pulmonary Disease, Chronic Obstructive",
+      "sponsor": "Chiesi Farmaceutici S.p.A.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Ozempic",
+      "generic_name": "semaglutide",
+      "approval_date": "2018-02-08",
+      "application_number": "",
+      "indication": "Diabetes Mellitus",
+      "sponsor": "Novo Nordisk A/S",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "고관심 적응증 (diabetes)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Orphacol",
+      "generic_name": "cholic acid",
+      "approval_date": "2013-09-12",
+      "application_number": "",
+      "indication": "Digestive System Diseases;Metabolism, Inborn Errors",
+      "sponsor": "Theravia",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Arsenic trioxide Accord",
+      "generic_name": "arsenic trioxide",
+      "approval_date": "2019-11-14",
+      "application_number": "",
+      "indication": "Leukemia, Promyelocytic, Acute",
+      "sponsor": "Accord Healthcare S.L.U.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "high_interest",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "고관심 적응증 (leukemia)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Skyclarys",
+      "generic_name": "omaveloxolone",
+      "approval_date": "2024-02-09",
+      "application_number": "",
+      "indication": "Friedreich Ataxia",
+      "sponsor": "Biogen Netherlands B.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "orphan",
+      "hot_issue_score": 15,
+      "hot_issue_reasons": [
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Vizamyl",
+      "generic_name": "flutemetamol (18F)",
+      "approval_date": "2014-08-22",
+      "application_number": "",
+      "indication": "Radionuclide Imaging;Alzheimer Disease",
+      "sponsor": "GE Healthcare AS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "high_interest",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "고관심 적응증 (alzheimer)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Anktiva",
+      "generic_name": "nogapendekin alfa inbakicept",
+      "approval_date": "2026-02-16",
+      "application_number": "",
+      "indication": "",
+      "sponsor": "Immunitybio Ireland Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "EMA Conditional Approval"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    }
+  ],
+  "mfds_new": [],
+  "hot_issues": [
+    {
+      "source": "ema",
+      "drug_name": "Keytruda",
+      "generic_name": "pembrolizumab",
+      "approval_date": "2015-07-17",
+      "application_number": "",
+      "indication": "Melanoma;Hodgkin Disease;Carcinoma, Renal Cell;Carcinoma, Non-Small-Cell Lung;Carcinoma, Transitional Cell;Squamous Cell Carcinoma of Head and Neck;Urologic Neoplasms;Endometrial Neoplasms",
+      "sponsor": "Merck Sharp & Dohme B.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "고관심 적응증 (carcinoma)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Ozempic",
+      "generic_name": "semaglutide",
+      "approval_date": "2018-02-08",
+      "application_number": "",
+      "indication": "Diabetes Mellitus",
+      "sponsor": "Novo Nordisk A/S",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "고관심 적응증 (diabetes)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPTOMYCIN",
+      "generic_name": "DAPTOMYCIN",
+      "approval_date": "2021-06-29",
+      "application_number": "ANDA213623",
+      "indication": "Lipopeptide Antibacterial [EPC]",
+      "sponsor": "MEITHEAL",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Libmyris",
+      "generic_name": "adalimumab",
+      "approval_date": "2021-11-12",
+      "application_number": "",
+      "indication": "Arthritis, Rheumatoid;Arthritis, Juvenile Rheumatoid;Spondylitis, Ankylosing;Arthritis, Psoriatic;Psoriasis;Hidradenitis Suppurativa;Crohn Disease;Colitis, Ulcerative;Uveitis",
+      "sponsor": "Stada Arzneimittel AG",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Cegfila (previously Pegfilgrastim Mundipharma)",
+      "generic_name": "pegfilgrastim",
+      "approval_date": "2019-12-19",
+      "application_number": "",
+      "indication": "",
+      "sponsor": "Mundipharma Corporation (Ireland) Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Pelmeg",
+      "generic_name": "pegfilgrastim",
+      "approval_date": "2018-11-20",
+      "application_number": "",
+      "indication": "",
+      "sponsor": "Mundipharma Corporation (Ireland) Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    }
+  ],
+  "errors": []
+}
