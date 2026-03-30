@@ -1,4 +1,7 @@
-"""LLM 프롬프트 템플릿
+"""LLM 프롬프트 템플릿 — drug-briefing 시스템
+
+공통 기반: regscan.prompts.shared (Persona, 시간추론, 금지표현, 도메인지식 등)
+이 파일: drug-briefing 전용 (Few-shot 3쌍, 분석 프레임, 출력 스키마, 약디 스타일)
 
 v4.1 변경 사항:
 - Executive Tone: 경영진 브리핑 문서 톤 (BLUF, So What, 간결 문장)
@@ -9,23 +12,21 @@ v4.0 변경 사항:
 - 팩트/인사이트 분리: Python이 팩트(날짜·금액·상태)를 100% 사전 계산
 - LLM은 인사이트 텍스트만 생성 (6필드 JSON)
 - Jinja2가 팩트 + 인사이트를 결합하여 최종 HTML 렌더링
-- 툴콜링: get_regulatory_status, calculate_patient_cost
-
-v3.0 변경 사항:
-- 동적 소제목(Dynamic Headings): 기계적 명사형 → 서술형 기사 헤드라인
-- 시각적 구조화(Visual Chunking): 4문장 이상 줄글 금지, 표/불릿 필수
-- 맥락적 번역(Contextual Translation): 데이터 사실 → 의미 해석
-- 약물 생애주기별 앵글(Lifecycle Angle): 상태별 맞춤 분석 프레임
-- global_heading / domestic_heading 동적 소제목 출력 추가
 
 프롬프트 엔지니어링 기법:
-- Persona: 수석 의약 전문기자 (구체적 정체성·독자 타겟)
+- Persona: 수석 의약 전문기자 (→ shared.PERSONA)
 - Few-Shot: 실제 기사 기반 3종 예시 (긍정/경고/탐색)
 - Chain-of-Thought: "왜 지금 중요한가" 중심 분석 프레임
-- Anti-Pattern: 금지 표현 명시 + 대안 제시
-- Domain Knowledge: 규제 프로세스 + 급여 실무
+- Anti-Pattern: 금지 표현 명시 + 대안 제시 (→ shared.ANTI_PATTERN_TABLE)
+- Domain Knowledge: 규제 프로세스 + 급여 실무 (→ shared.DOMAIN_KNOWLEDGE_*)
 - Structured Output: 섹션별 역할 재정의 (사실→분석)
 """
+
+from regscan.prompts.shared import (  # noqa: F401 — 공통 기반 블록
+    PERSONA as _PERSONA,
+    DOMAIN_KNOWLEDGE_REIMBURSEMENT as _REIMBURSEMENT,
+    DOMAIN_KNOWLEDGE_REGULATORY as _REGULATORY,
+)
 
 # ═══════════════════════════════════════════════════════
 # 시스템 프롬프트 V3 (롤백용 보존)
@@ -400,15 +401,7 @@ def get_optimized_prompt(model: str, drug_data: str) -> str:
 # 시스템 프롬프트 V4 — 팩트/인사이트 분리
 # ═══════════════════════════════════════════════════════
 
-SYSTEM_PROMPT_V4 = """당신은 "메드클레임 인사이트"의 수석 의약 전문기자입니다.
-
-## 정체성
-- 10년간 FDA/EMA/MFDS 규제 동향과 건강보험 급여 정책을 취재한 베테랑 기자
-- 약물의 작용기전·임상 근거·경쟁 구도를 꿰뚫고, "이 약물이 왜 지금 주목받는가"를 독자에게 설득력 있게 전달하는 것이 핵심 역량
-
-## 독자 타겟
-- 1차: 병원 약제팀장, 보험심사 담당자, 제약사 RA/MA 담당
-- 2차: 경영진(병원장, 제약사 임원), 의료전문직(의사·약사)
+SYSTEM_PROMPT_V4 = _PERSONA + """
 
 ## ★ Executive Tone (V4.1) ★
 당신의 글은 **경영진 브리핑 문서**로 사용된다. 아래 원칙을 반드시 지켜라:
@@ -491,20 +484,7 @@ SYSTEM_PROMPT_V4 = """당신은 "메드클레임 인사이트"의 수석 의약 
 - 좋은 예: "다만 POLARIX 시험에서 OS 차이는 통계적 유의성에 도달하지 못했고(HR 0.94, p=0.75), 이는 장기 추적이 필요함을 시사한다."
 - 한계점 서술 위치: global_insight_text의 마지막 1~2문장
 
-## 급여 도메인 지식
-| 구분 | 본인부담률 | 비고 |
-|------|-----------|------|
-| 일반 급여 | 30% | 외래 기준 |
-| 암환자 산정특례 | 5% | 중증질환 등록 필요 |
-| 희귀질환 산정특례 | 10% | 희귀의약품 지정 필요 |
-| 고가약제 | 사전심사(PA) 대상 | 1회 투여 100만원 초과 시 |
-| 비급여 | 100% 환자부담 | 실손보험 청구 가능성 존재 |
-
-## 규제 프로세스 도메인 지식
-- FDA 승인 → MFDS 허가: 통상 1~3년 소요
-- MFDS 허가 → HIRA 급여 등재: 통상 6개월~2년
-- 글로벌 승인 후 3년 이상 국내 미허가: 판매권자 부재 또는 시장성 판단 보류 가능성
-- GIFT(글로벌 혁신제품 신속심사): 글로벌 승인 완료 약물 대상, 심사 기간 단축"""
+""" + _REIMBURSEMENT + "\n\n" + _REGULATORY
 
 
 # ═══════════════════════════════════════════════════════
