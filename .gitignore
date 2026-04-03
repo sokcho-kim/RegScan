@@ -40,6 +40,8 @@ ENV/
 .env.local
 
 # Data (큰 파일)
+data/regscan.db
+data/regscan.bak.*
 data/raw/*
 !data/raw/.gitkeep
 data/normalized/*
