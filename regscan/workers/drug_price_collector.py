@@ -303,6 +303,13 @@ NUMERIC_COLUMNS = ("price_ceiling", "가산금")
 # 코드형 컬럼 (int/str 혼재 위험 → 문자열 강제 + 소수점/0 패딩 제거)
 CODE_COLUMNS = ("제품코드", "ingredient_code", "class_no", "대응코드", "변경이전약품코드", "변경이후약품코드")
 
+# 제품명 류 컬럼 (숫자+단위 사이 공백 제거 대상)
+# 조사 결과: unit 컬럼은 upper()만으로 162→140 흡수 충분, 제품명만 내부 공백 변형 존재
+NAME_COLUMNS = ("제품명",)
+
+# 제품명 내 '숫자 + 공백 + 단위' 패턴 매칭용 (mg/ml/g/mcg/l/iu/kg 등)
+_UNIT_PATTERN = re.compile(r"(\d+(?:\.\d+)?)\s+(mg|ml|mcg|iu|kg|g|l)\b", re.IGNORECASE)
+
 
 def _normalize_code(val: Any) -> str:
     """코드 컬럼 정규화: int 12345 / float 12345.0 / str '12345 ' → '12345'."""
@@ -318,7 +325,11 @@ def _normalize_code(val: Any) -> str:
 
 
 def _normalize_numeric(val: Any) -> str:
-    """수치 컬럼 정규화: 반올림 후 정수면 int, 아니면 소수 2자리 고정."""
+    """수치 컬럼 정규화: 반올림 후 정수면 int, 아니면 소수 4자리 고정.
+
+    4자리 확장 이유: 고가 항암제 1mg당 단가 계산 시 2자리는 손실 발생.
+    59,004건 조사 결과 현재는 모두 정수지만 미래 대비 여유.
+    """
     if val is None:
         return ""
     try:
@@ -326,12 +337,26 @@ def _normalize_numeric(val: Any) -> str:
         f = float(val)
         if math.isnan(f):
             return ""
-        rounded = round(f, 2)
+        rounded = round(f, 4)
         if rounded == int(rounded):
             return str(int(rounded))
-        return f"{rounded:.2f}"
+        return f"{rounded:.4f}"
     except (ValueError, TypeError):
         return str(val).strip()
+
+
+def _normalize_name(val: Any) -> str:
+    """제품명 정규화: 숫자+단위 사이 공백 제거.
+
+    '80 mg' → '80mg', '500 MG' → '500MG' (upper는 이후 단계에서 적용).
+    조사 결과 HIRA 제품명에 mg/ml/g 앞뒤 공백 변형 실존.
+    """
+    if val is None:
+        return ""
+    s = str(val).strip()
+    if not s:
+        return ""
+    return _UNIT_PATTERN.sub(r"\1\2", s)
 
 
 def compute_dataframe_hash(path: Path | str) -> str:
@@ -384,10 +409,16 @@ def compute_dataframe_hash(path: Path | str) -> str:
         if col in df.columns:
             df[col] = df[col].apply(_normalize_code)
 
-    # ─── #3 Float Precision: 수치형 컬럼 반올림 정수화 ───
+    # ─── #3 Float Precision: 수치형 컬럼 반올림 정수화 (4자리) ───
     for col in NUMERIC_COLUMNS:
         if col in df.columns:
             df[col] = df[col].apply(_normalize_numeric)
+
+    # ─── #2-α Name Unit Normalization: 제품명 내 '숫자 단위' → '숫자단위' ───
+    # (조사 결과: HIRA 제품명에 '80 mg' vs '80mg' 변형 실존, unit 컬럼은 불필요)
+    for col in NAME_COLUMNS:
+        if col in df.columns:
+            df[col] = df[col].apply(_normalize_name)
 
     # 정렬 키 결정: ingredient_code > 제품코드 (정규화 이후 수행)
     sort_key = "ingredient_code" if "ingredient_code" in df.columns else "제품코드"
