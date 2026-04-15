@@ -1,14 +1,19 @@
 version: "3.9"
 
+# ═══════════════════════════════════════
+# DEV: docker-compose up
+# PROD: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+# ═══════════════════════════════════════
+
 services:
   db:
     image: postgres:14
     environment:
       POSTGRES_DB: regscan
       POSTGRES_USER: regscan
-      POSTGRES_PASSWORD: dev_password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password}
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -22,14 +27,14 @@ services:
       context: .
       dockerfile: Dockerfile.web
     ports:
-      - "8001:8080"
+      - "${WEB_PORT:-8001}:8080"
     env_file:
       - .env
     environment:
-      DATABASE_URL: "postgresql+asyncpg://regscan:dev_password@db/regscan"
-      DATABASE_URL_SYNC: "postgresql+psycopg2://regscan:dev_password@db/regscan"
+      DATABASE_URL: "postgresql+asyncpg://regscan:${POSTGRES_PASSWORD:-dev_password}@db/regscan"
+      DATABASE_URL_SYNC: "postgresql+psycopg2://regscan:${POSTGRES_PASSWORD:-dev_password}@db/regscan"
       SCHEDULER_ENABLED: "false"
-      LOG_LEVEL: "INFO"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
     depends_on:
       db:
         condition: service_healthy
@@ -41,15 +46,15 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: "postgresql+asyncpg://regscan:dev_password@db/regscan"
-      DATABASE_URL_SYNC: "postgresql+psycopg2://regscan:dev_password@db/regscan"
+      DATABASE_URL: "postgresql+asyncpg://regscan:${POSTGRES_PASSWORD:-dev_password}@db/regscan"
+      DATABASE_URL_SYNC: "postgresql+psycopg2://regscan:${POSTGRES_PASSWORD:-dev_password}@db/regscan"
       SCHEDULER_ENABLED: "false"
-      LOG_LEVEL: "INFO"
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
     depends_on:
       db:
         condition: service_healthy
     profiles:
-      - batch  # docker-compose --profile batch run batch
+      - batch
 
 volumes:
   pgdata:

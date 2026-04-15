@@ -1,0 +1,24 @@
+version: "3.9"
+
+# PROD 오버라이드
+# 사용: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  db:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # 반드시 .env에 설정
+    ports: []  # 외부 노출 안 함
+    restart: always
+
+  web:
+    ports:
+      - "8080:8080"
+    environment:
+      LOG_LEVEL: "WARNING"
+      SCHEDULER_ENABLED: "true"
+    restart: always
+
+  batch:
+    environment:
+      LOG_LEVEL: "INFO"
+    restart: "no"
