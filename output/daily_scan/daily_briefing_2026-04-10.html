@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegScan Daily - 2026-04-10</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .wrapper {
+            max-width: 720px;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 100vh;
+        }
+
+        /* 헤더 */
+        header {
+            padding: 24px 32px;
+            border-bottom: 3px solid #1a1a1a;
+        }
+
+        .masthead {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+
+        .logo {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .date-area {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .tagline {
+            font-size: 12px;
+            color: #888;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* 요약 바 */
+        .summary-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 32px;
+            background: #fafafa;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .summary-item .num {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .summary-item.hot .num {
+            color: #c00;
+        }
+
+        /* 메인 콘텐츠 */
+        main {
+            padding: 32px;
+        }
+
+        /* 기사 스타일 */
+        .article {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .article:last-child {
+            border-bottom: none;
+        }
+
+        .article.main {
+            margin-bottom: 40px;
+            padding-bottom: 40px;
+        }
+
+        .article-meta {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 3px 8px;
+            background: #1a1a1a;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .tag.hot {
+            background: #c00;
+        }
+
+        .tag.orphan {
+            background: #5a4fcf;
+        }
+
+        .tag.fda {
+            background: #0066cc;
+        }
+
+        .tag.ema {
+            background: #cc6600;
+        }
+
+        .tag.mfds {
+            background: #008844;
+        }
+
+        .article-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .article.main .article-title {
+            font-size: 32px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .article-body p {
+            margin-bottom: 12px;
+        }
+
+        .key-points {
+            margin: 20px 0;
+            padding: 16px 20px;
+            background: #f9f9f9;
+            border-left: 3px solid #1a1a1a;
+        }
+
+        .key-points li {
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .medclaim-box {
+            margin: 20px 0;
+            padding: 16px 20px;
+            background: #fff8f0;
+            border: 1px solid #f0e0d0;
+        }
+
+        .medclaim-box .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #996633;
+            margin-bottom: 8px;
+        }
+
+        .medclaim-box .content {
+            font-size: 14px;
+            color: #664422;
+        }
+
+        .price-info {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 4px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .price-info .price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #006644;
+        }
+
+        /* 기타 승인 목록 */
+        .other-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 2px solid #1a1a1a;
+        }
+
+        .section-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .other-table {
+            width: 100%;
+            font-size: 13px;
+            border-collapse: collapse;
+        }
+
+        .other-table th {
+            text-align: left;
+            padding: 8px 0;
+            border-bottom: 1px solid #1a1a1a;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+        }
+
+        .other-table td {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .other-table .name {
+            font-weight: 500;
+        }
+
+        .other-table .brand {
+            color: #666;
+        }
+
+        .other-table .source {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .other-table .date {
+            color: #888;
+            text-align: right;
+        }
+
+        /* 푸터 */
+        footer {
+            padding: 24px 32px;
+            border-top: 1px solid #eee;
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+        }
+
+        footer a {
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <div class="masthead">
+                <div class="logo">RegScan</div>
+                <div class="date-area">2026년 04월 10일 (금)</div>
+            </div>
+            <div class="tagline">Global Regulatory Intelligence</div>
+        </header>
+
+        <div class="summary-bar">
+            <div class="summary-item">
+                <span>FDA</span>
+                <span class="num">10</span>
+            </div>
+            <div class="summary-item">
+                <span>EMA</span>
+                <span class="num">19</span>
+            </div>
+            <div class="summary-item">
+                <span>MFDS</span>
+                <span class="num">0</span>
+            </div>
+            <div class="summary-item hot">
+                <span>HOT</span>
+                <span class="num">18</span>
+            </div>
+        </div>
+
+        <main>
+            
+        <article class="article main">
+            <div class="article-meta"><span class="tag hot">HOT</span><span class="tag ema">EMA</span><span class="tag orphan">희귀의약품</span></div>
+            <h2 class="article-title">belumosudil, EMA 승인</h2>
+            <p class="article-subtitle">Rezurock · 2026-03-24</p>
+            <div class="article-body"></div>
+        </article>
+    
+        <article class="article ">
+            <div class="article-meta"><span class="tag hot">HOT</span><span class="tag ema">EMA</span><span class="tag orphan">희귀의약품</span></div>
+            <h2 class="article-title">caplacizumab, EMA 승인</h2>
+            <p class="article-subtitle">Cablivi · 2018-08-30</p>
+            <div class="article-body"></div>
+        </article>
+    
+        <article class="article ">
+            <div class="article-meta"><span class="tag hot">HOT</span><span class="tag ema">EMA</span><span class="tag orphan">희귀의약품</span></div>
+            <h2 class="article-title">897일째 미허가, DMD 스테로이드 대안 공백</h2>
+            <p class="article-subtitle">vamorolone은 성장·대사 부작용을 줄인 스테로이드로 설계</p>
+            <div class="article-body"><ul class="key-points"><li>Duchenne 근이영양증(DMD)에서 항염·면역조절을 노리는 ‘해리형 스테로이드’ 계열로, 글루코코르티코이드 수용체 조절을 통해 효능은 유지하고 일부 부작용 신호는 줄이도록 설계된 약물</li><li>FDA가 2023-10-26, EMA가 2023-12-14 승인으로 글로벌 표준 진입을 확정했다. 그래서 병원은 ‘스테로이드 치료의 대체 옵션’ 흐름을 전제로 진료 프로토콜을 점검해야 한다.</li><li>국내는 아직 허가 문턱을 넘지 못해 처방이 불가하다. 급여도 확인되지 않아 제도권 접근 경로가 사실상 닫혀 있다.</li><li>글로벌 승인 후 2년 5개월(897일) 지연이 누적됐다. 그래서 국내 도입은 ‘허가 신청 착수’ 자체가 핵심 변곡점이 된다.</li></ul><p>897일. FDA 승인 이후 국내 환자가 이 약에 접근하지 못한 기간이다. Vamorolone은 DMD에서 장기 스테로이드 치료가 불가피한 현실을 겨냥해, 효능은 유지하면서 성장지연·골대사·대사 이상 같은 부담을 줄이도록 설계된 ‘스테로이드 대안’으로 포지셔닝된다. 작용기전은 ‘vamorolone→글루코코르티코이드 수용체 결합→염증 관련 유전자 발현 조절→근손상 진행 속도 완화’의 흐름이다. 기존 프레드니손/데플라자코트가 강한 전사 활성까지 동반하는 반면, 이 약은 전사 억제 중심의 조절을 목표로 한다는 점이 차별점이다.
+- **치료 맥락**: DMD는 장기 스테로이드가 기능 유지의 축이다.
+- **미충족 수요**: 효능-부작용의 균형이 치료 지속성을 좌우한다.
+- **약물 포지션**: ‘대체’가 아니라 ‘장기 유지’ 적합성을 겨냥한다.
+임상적으로는 ‘스테로이드를 끊게 만드는 부작용’을 줄이는지가 채택의 핵심 지표가 된다. 다만 팩트 데이터에 임상 수치와 추적기간이 제시되지 않아, 글로벌 승인만으로 국내 급여 가치평가 논리를 단정할 수는 없다.</p><p>국내에서는 MFDS 미허가로 처방이 불가능하며, 급여 적용도 성립하지 않는다. 글로벌에서 FDA(2023-10-26)·EMA(2023-12-14) 승인 후 2년 5개월이 지났다는 점은, 국내 도입 논의가 ‘임상 우수성’보다 ‘접근 경로’에서 막혀 있음을 의미한다.
+- **규제 해석**: 승인 약물의 국내 미허가 기간이 897일로 누적됐다.
+- **급여 해석**: 등재 정보가 없어 병원 내 예산 편성 근거가 없다.
+- **임상 인프라**: 국내 등록 임상이 0건이라 연구경로 접근도 없다.
+병원 관점에서는 DMD 장기 관리에서 ‘스테로이드 부작용 관리’가 계속 비용을 만든다. 그래서 약제팀은 해외 승인 정보가 진료현장에 미치는 상담 수요를 먼저 대비해야 한다.</p>
+                <div class="medclaim-box">
+                    <div class="label">메드클레임 시사점</div>
+                    <div class="content">현재 국내 미허가로 병원 처방은 불가하다. 따라서 환자 접근은 ‘허가 전 예외 경로’로만 논의해야 한다.
+- **KODC 긴급도입**: 개별 신청이며 전액 환자 부담 구조다.
+- **제약사 EAP/NPP**: 운영 여부를 확인해 안내문을 표준화한다.
+- **국내 임상 참여**: 등록 임상이 없어 당장 선택지로 보기 어렵다.
+약제팀은 DMD 진료과와 함께 ‘해외 승인 약물 문의’ 대응 스크립트를 즉시 마련해야 한다. 동시에 긴급도입 신청 시 필요한 의학적 소견서·대체치료 사용 이력 항목을 체크리스트로 고정해야 한다. 마지막으로 허가 신청 동향이 포착되는 즉시, 희귀질환 약제의 평가자료(비교치료, 부작용 관리 비용) 템플릿을 선제 준비해야 한다.</div>
+                    
+                </div>
+            </div>
+        </article>
+    
+        <article class="article ">
+            <div class="article-meta"><span class="tag hot">HOT</span><span class="tag ema">EMA</span><span class="tag orphan">희귀의약품</span></div>
+            <h2 class="article-title">burosumab, EMA 승인</h2>
+            <p class="article-subtitle">Crysvita · 2018-02-19</p>
+            <div class="article-body"></div>
+        </article>
+    
+
+            
+            <div class="other-section">
+                <h3 class="section-title">Other Approvals</h3>
+                <table class="other-table">
+                    <thead>
+                        <tr>
+                            <th>성분명</th>
+                            <th>제품명</th>
+                            <th>출처</th>
+                            <th style="text-align:right">승인일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr>
+                    <td class="name">DAPAGLIFLOZIN</td>
+                    <td class="brand">DAPAGLIFLOZIN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">04/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">DAPAGLIFLOZIN</td>
+                    <td class="brand">DAPAGLIFLOZIN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">04/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">PEMBROLIZUMAB</td>
+                    <td class="brand">KEYTRUDA</td>
+                    <td class="source">FDA</td>
+                    <td class="date">09/04</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">DAPAGLIFLOZIN</td>
+                    <td class="brand">DAPAGLIFLOZIN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">04/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">DAPAGLIFLOZIN</td>
+                    <td class="brand">DAPAGLIFLOZIN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">04/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">DAPAGLIFLOZIN</td>
+                    <td class="brand">DAPAGLIFLOZIN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">04/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">DAPAGLIFLOZIN</td>
+                    <td class="brand">DAPAGLIFLOZIN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">04/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">TREPROSTINIL</td>
+                    <td class="brand">TYVASO</td>
+                    <td class="source">FDA</td>
+                    <td class="date">07/30</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">DAPAGLIFLOZIN</td>
+                    <td class="brand">DAPAGLIFLOZIN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">04/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">DAPAGLIFLOZIN</td>
+                    <td class="brand">DAPAGLIFLOZIN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">04/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">dupilumab</td>
+                    <td class="brand">Dupixent</td>
+                    <td class="source">EMA</td>
+                    <td class="date">09/26</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">sorafenib</td>
+                    <td class="brand">Sorafenib Accord</td>
+                    <td class="source">EMA</td>
+                    <td class="date">11/09</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">semaglutide</td>
+                    <td class="brand">Kayshild</td>
+                    <td class="source">EMA</td>
+                    <td class="date">03/26</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">estetrol</td>
+                    <td class="brand">Fylrevy</td>
+                    <td class="source">EMA</td>
+                    <td class="date">03/26</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">insulin glargine</td>
+                    <td class="brand">Ondibta</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/09</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">potassium citrate;potassium hydrogen carbonate</td>
+                    <td class="brand">Sibnayal</td>
+                    <td class="source">EMA</td>
+                    <td class="date">04/30</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">trivalent influenza vaccine (recombinant, prepared in cell culture)</td>
+                    <td class="brand">Supemtek</td>
+                    <td class="source">EMA</td>
+                    <td class="date">03/30</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">COVID-19 mRNA vaccine</td>
+                    <td class="brand">Comirnaty</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/21</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">aripiprazole</td>
+                    <td class="brand">Aripiprazole Zentiva</td>
+                    <td class="source">EMA</td>
+                    <td class="date">06/25</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">mogamulizumab</td>
+                    <td class="brand">Poteligeo</td>
+                    <td class="source">EMA</td>
+                    <td class="date">11/22</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">rezafungin</td>
+                    <td class="brand">Rezzayo</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/22</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">nevirapine</td>
+                    <td class="brand">Viramune</td>
+                    <td class="source">EMA</td>
+                    <td class="date">02/04</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">rotigotine</td>
+                    <td class="brand">Neupro</td>
+                    <td class="source">EMA</td>
+                    <td class="date">02/15</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">sipavibart</td>
+                    <td class="brand">Kavigale</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/20</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">desloratadine;pseudoephedrine</td>
+                    <td class="brand">Aerinaze</td>
+                    <td class="source">EMA</td>
+                    <td class="date">07/30</td>
+                </tr>
+            
+                    </tbody>
+                </table>
+            </div>
+            
+        </main>
+
+        <footer>
+            <p>RegScan AI · Scanning Global Regulation into Local Impact</p>
+            <p>Generated 2026-04-10 08:00</p>
+        </footer>
+    </div>
+</body>
+</html>

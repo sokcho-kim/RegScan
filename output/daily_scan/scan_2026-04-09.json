@@ -1,0 +1,526 @@
+{
+  "scan_date": "2026-04-09",
+  "scan_time": "2026-04-09T08:00:00.931134",
+  "summary": {
+    "fda_new": 3,
+    "ema_new": 12,
+    "mfds_new": 0,
+    "total_new": 15,
+    "hot_issues": 7
+  },
+  "fda_new": [
+    {
+      "source": "fda",
+      "drug_name": "EYLEA HD",
+      "generic_name": "AFLIBERCEPT",
+      "approval_date": "2023-08-18",
+      "application_number": "BLA761355",
+      "indication": "Vascular Endothelial Growth Factor Inhibitor [EPC]",
+      "sponsor": "REGENERON PHARMACEUTICALS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "NINTEDANIB",
+      "generic_name": "NINTEDANIB",
+      "approval_date": "2026-04-02",
+      "application_number": "ANDA219819",
+      "indication": "",
+      "sponsor": "DEXCEL",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "NINTEDANIB",
+      "generic_name": "NINTEDANIB",
+      "approval_date": "2026-04-02",
+      "application_number": "ANDA219227",
+      "indication": "",
+      "sponsor": "APOTEX",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    }
+  ],
+  "ema_new": [
+    {
+      "source": "ema",
+      "drug_name": "Supemtek",
+      "generic_name": "trivalent influenza vaccine (recombinant, prepared in cell culture)",
+      "approval_date": "2026-03-30",
+      "application_number": "",
+      "indication": "Influenza, Human",
+      "sponsor": "Sanofi Winthrop Industrie",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Comirnaty",
+      "generic_name": "COVID-19 mRNA vaccine",
+      "approval_date": "2020-12-21",
+      "application_number": "",
+      "indication": "COVID-19 virus infection",
+      "sponsor": "BioNTech Manufacturing GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "high_interest",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "고관심 적응증 (covid)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Agamree",
+      "generic_name": "vamorolone",
+      "approval_date": "2023-12-14",
+      "application_number": "",
+      "indication": "Muscular Dystrophy, Duchenne",
+      "sponsor": "Santhera Pharmaceuticals (Deutschland) GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Aripiprazole Zentiva",
+      "generic_name": "aripiprazole",
+      "approval_date": "2015-06-25",
+      "application_number": "",
+      "indication": "Schizophrenia;Bipolar Disorder",
+      "sponsor": "Zentiva, k.s.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Poteligeo",
+      "generic_name": "mogamulizumab",
+      "approval_date": "2018-11-22",
+      "application_number": "",
+      "indication": "Sezary Syndrome;Mycosis Fungoides",
+      "sponsor": "Kyowa Kirin Holdings B.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "orphan",
+      "hot_issue_score": 15,
+      "hot_issue_reasons": [
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Crysvita",
+      "generic_name": "burosumab",
+      "approval_date": "2018-02-19",
+      "application_number": "",
+      "indication": "Hypophosphatemia, Familial;Hypophosphatemic Rickets, X-Linked Dominant;Osteomalacia",
+      "sponsor": "Kyowa Kirin Holdings B.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Rezzayo",
+      "generic_name": "rezafungin",
+      "approval_date": "2023-12-22",
+      "application_number": "",
+      "indication": "Candidiasis;Candidiasis, Invasive",
+      "sponsor": "Mundipharma GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Viramune",
+      "generic_name": "nevirapine",
+      "approval_date": "1998-02-04",
+      "application_number": "",
+      "indication": "HIV Infections",
+      "sponsor": "Boehringer Ingelheim International GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Neupro",
+      "generic_name": "rotigotine",
+      "approval_date": "2006-02-15",
+      "application_number": "",
+      "indication": "Restless Legs Syndrome;Parkinson Disease",
+      "sponsor": "UCB Pharma S.A.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "high_interest",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "고관심 적응증 (parkinson)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Kavigale",
+      "generic_name": "sipavibart",
+      "approval_date": "2025-01-20",
+      "application_number": "",
+      "indication": "COVID-19 virus infection",
+      "sponsor": "AstraZeneca AB",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "high_interest",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "고관심 적응증 (covid)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Aerinaze",
+      "generic_name": "desloratadine;pseudoephedrine",
+      "approval_date": "2007-07-30",
+      "application_number": "",
+      "indication": "Rhinitis, Allergic, Seasonal",
+      "sponsor": "Organon N.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Rezurock",
+      "generic_name": "belumosudil",
+      "approval_date": "2026-03-24",
+      "application_number": "",
+      "indication": "Graft vs Host Disease",
+      "sponsor": "Sanofi Winthrop Industrie",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 50,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품",
+        "EMA Conditional Approval"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    }
+  ],
+  "mfds_new": [],
+  "hot_issues": [
+    {
+      "source": "ema",
+      "drug_name": "Rezurock",
+      "generic_name": "belumosudil",
+      "approval_date": "2026-03-24",
+      "application_number": "",
+      "indication": "Graft vs Host Disease",
+      "sponsor": "Sanofi Winthrop Industrie",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 50,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품",
+        "EMA Conditional Approval"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Agamree",
+      "generic_name": "vamorolone",
+      "approval_date": "2023-12-14",
+      "application_number": "",
+      "indication": "Muscular Dystrophy, Duchenne",
+      "sponsor": "Santhera Pharmaceuticals (Deutschland) GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Crysvita",
+      "generic_name": "burosumab",
+      "approval_date": "2018-02-19",
+      "application_number": "",
+      "indication": "Hypophosphatemia, Familial;Hypophosphatemic Rickets, X-Linked Dominant;Osteomalacia",
+      "sponsor": "Kyowa Kirin Holdings B.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Rezzayo",
+      "generic_name": "rezafungin",
+      "approval_date": "2023-12-22",
+      "application_number": "",
+      "indication": "Candidiasis;Candidiasis, Invasive",
+      "sponsor": "Mundipharma GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "EYLEA HD",
+      "generic_name": "AFLIBERCEPT",
+      "approval_date": "2023-08-18",
+      "application_number": "BLA761355",
+      "indication": "Vascular Endothelial Growth Factor Inhibitor [EPC]",
+      "sponsor": "REGENERON PHARMACEUTICALS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "NINTEDANIB",
+      "generic_name": "NINTEDANIB",
+      "approval_date": "2026-04-02",
+      "application_number": "ANDA219819",
+      "indication": "",
+      "sponsor": "DEXCEL",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "NINTEDANIB",
+      "generic_name": "NINTEDANIB",
+      "approval_date": "2026-04-02",
+      "application_number": "ANDA219227",
+      "indication": "",
+      "sponsor": "APOTEX",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    }
+  ],
+  "errors": []
+}

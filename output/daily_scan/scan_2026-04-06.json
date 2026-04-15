@@ -1,0 +1,793 @@
+{
+  "scan_date": "2026-04-06",
+  "scan_time": "2026-04-06T08:00:00.747055",
+  "summary": {
+    "fda_new": 16,
+    "ema_new": 13,
+    "mfds_new": 0,
+    "total_new": 29,
+    "hot_issues": 7
+  },
+  "fda_new": [
+    {
+      "source": "fda",
+      "drug_name": "MESALAMINE",
+      "generic_name": "MESALAMINE",
+      "approval_date": "2026-03-31",
+      "application_number": "ANDA220016",
+      "indication": "Aminosalicylate [EPC]",
+      "sponsor": "KLM LABS PVT",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": false,
+      "existing_approvals": []
+    },
+    {
+      "source": "fda",
+      "drug_name": "VALPROATE SODIUM",
+      "generic_name": "VALPROATE SODIUM",
+      "approval_date": "2010-02-17",
+      "application_number": "ANDA078523",
+      "indication": "",
+      "sponsor": "HIKMA FARMACEUTICA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": false,
+      "existing_approvals": []
+    },
+    {
+      "source": "fda",
+      "drug_name": "LAMOTRIGINE",
+      "generic_name": "LAMOTRIGINE",
+      "approval_date": "2009-01-27",
+      "application_number": "ANDA078525",
+      "indication": "Anti-epileptic Agent [EPC], Mood Stabilizer [EPC]",
+      "sponsor": "TARO PHARM INDS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "VAFSEO",
+      "generic_name": "VADADUSTAT",
+      "approval_date": "2024-03-27",
+      "application_number": "NDA215192",
+      "indication": "Hypoxia-inducible Factor Prolyl Hydroxylase Inhibitor [EPC]",
+      "sponsor": "AKEBIA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "ZYNYZ",
+      "generic_name": "RETIFANLIMAB-DLWR",
+      "approval_date": "2023-03-22",
+      "application_number": "BLA761334",
+      "indication": "Programmed Death Receptor-1 Blocking Antibody [EPC]",
+      "sponsor": "INCYTE CORP",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "METHYLENE BLUE",
+      "generic_name": "METHYLENE BLUE",
+      "approval_date": "2023-12-05",
+      "application_number": "ANDA215636",
+      "indication": "",
+      "sponsor": "ZYDUS LIFESCIENCES",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DEPAKOTE ER",
+      "generic_name": "DIVALPROEX SODIUM",
+      "approval_date": "2000-08-04",
+      "application_number": "NDA021168",
+      "indication": "",
+      "sponsor": "ABBVIE",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "KESIMPTA",
+      "generic_name": "OFATUMUMAB",
+      "approval_date": "2009-10-26",
+      "application_number": "BLA125326",
+      "indication": "CD20-directed Cytolytic Antibody [EPC]",
+      "sponsor": "NOVARTIS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DEPAKOTE SPRINKLES",
+      "generic_name": "DIVALPROEX SODIUM",
+      "approval_date": "1989-09-12",
+      "application_number": "NDA019680",
+      "indication": "",
+      "sponsor": "ABBVIE",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "FOUNDAYO",
+      "generic_name": "ORFORGLIPRON",
+      "approval_date": "2026-04-01",
+      "application_number": "NDA220934",
+      "indication": "",
+      "sponsor": "ELI LILLY AND CO",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": false,
+      "existing_approvals": []
+    },
+    {
+      "source": "fda",
+      "drug_name": "DEPAKOTE",
+      "generic_name": "DIVALPROEX SODIUM",
+      "approval_date": "1983-03-10",
+      "application_number": "NDA018723",
+      "indication": "",
+      "sponsor": "ABBVIE",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "BUPROPION HYDROCHLORIDE SR",
+      "generic_name": "BUPROPION HYDROCHLORIDE",
+      "approval_date": "2018-10-16",
+      "application_number": "ANDA211347",
+      "indication": "",
+      "sponsor": "YICHANG HUMANWELL",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "FOCINVEZ",
+      "generic_name": "FOSAPREPITANT DIMEGLUMINE",
+      "approval_date": "2023-08-22",
+      "application_number": "NDA216686",
+      "indication": "",
+      "sponsor": "STERISCIENCE",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "INBRIJA",
+      "generic_name": "LEVODOPA",
+      "approval_date": "2018-12-21",
+      "application_number": "NDA209184",
+      "indication": "Aromatic Amino Acid [EPC]",
+      "sponsor": "MERZ",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "GLIPIZIDE",
+      "generic_name": "GLIPIZIDE",
+      "approval_date": "1995-02-27",
+      "application_number": "ANDA074223",
+      "indication": "Sulfonylurea [EPC]",
+      "sponsor": "WATSON LABS TEVA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "BYOOVIZ",
+      "generic_name": "RANIBIZUMAB-NUNA",
+      "approval_date": "2021-09-17",
+      "application_number": "BLA761202",
+      "indication": "Vascular Endothelial Growth Factor Inhibitor [EPC]",
+      "sponsor": "SAMSUNG BIOEPIS CO LTD",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda"
+      ]
+    }
+  ],
+  "ema_new": [
+    {
+      "source": "ema",
+      "drug_name": "Keppra",
+      "generic_name": "levetiracetam",
+      "approval_date": "2000-09-29",
+      "application_number": "",
+      "indication": "Epilepsy",
+      "sponsor": "UCB Pharma SA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Ryzneuta",
+      "generic_name": "efbemalenograstim alfa",
+      "approval_date": "2024-03-21",
+      "application_number": "",
+      "indication": "",
+      "sponsor": "Evive Biotechnology Ireland Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Ilumira",
+      "generic_name": "lutetium (177Lu) chloride",
+      "approval_date": "2026-03-26",
+      "application_number": "",
+      "indication": "Radionuclide Imaging",
+      "sponsor": "Shine Europe B.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Firazyr",
+      "generic_name": "icatibant",
+      "approval_date": "2008-07-11",
+      "application_number": "",
+      "indication": "Angioedemas, Hereditary",
+      "sponsor": "Takeda Pharmaceuticals International AG",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Eliquis",
+      "generic_name": "apixaban",
+      "approval_date": "2011-05-18",
+      "application_number": "",
+      "indication": "Arthroplasty;Venous Thromboembolism",
+      "sponsor": "Bristol-Myers Squibb / Pfizer EEIG",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "LysaKare",
+      "generic_name": "arginine;lysine",
+      "approval_date": "2019-07-25",
+      "application_number": "",
+      "indication": "Radiation Injuries",
+      "sponsor": "Advanced Accelerator Applications",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Topotecan Hospira",
+      "generic_name": "topotecan",
+      "approval_date": "2010-06-09",
+      "application_number": "",
+      "indication": "Uterine Cervical Neoplasms;Small Cell Lung Carcinoma",
+      "sponsor": "Pfizer Europe MA EEIG",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "high_interest",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "고관심 적응증 (carcinoma)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Zoledronic acid Mylan",
+      "generic_name": "zoledronic acid",
+      "approval_date": "2012-08-23",
+      "application_number": "",
+      "indication": "Fractures, Bone",
+      "sponsor": "Mylan Pharmaceuticals Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Cinacalcet Accordpharma",
+      "generic_name": "cinacalcet",
+      "approval_date": "2020-04-03",
+      "application_number": "",
+      "indication": "Hyperparathyroidism",
+      "sponsor": "Accord Healthcare S.L.U.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Jemperli",
+      "generic_name": "dostarlimab",
+      "approval_date": "2021-04-21",
+      "application_number": "",
+      "indication": "Endometrial Neoplasms",
+      "sponsor": "GlaxoSmithKline Trading Services Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Alyftrek",
+      "generic_name": "deutivacaftor / tezacaftor / vanzacaftor",
+      "approval_date": "2025-06-30",
+      "application_number": "",
+      "indication": "Cystic Fibrosis",
+      "sponsor": "Vertex Pharmaceuticals (Ireland) Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "orphan",
+      "hot_issue_score": 15,
+      "hot_issue_reasons": [
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Increlex",
+      "generic_name": "mecasermin",
+      "approval_date": "2007-08-02",
+      "application_number": "",
+      "indication": "Laron Syndrome",
+      "sponsor": "Esteve Pharmaceuticals, S.A.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Wegovy",
+      "generic_name": "semaglutide",
+      "approval_date": "2022-01-06",
+      "application_number": "",
+      "indication": "Obesity;Overweight",
+      "sponsor": "Novo Nordisk A/S",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "고관심 적응증 (obesity)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    }
+  ],
+  "mfds_new": [],
+  "hot_issues": [
+    {
+      "source": "ema",
+      "drug_name": "Wegovy",
+      "generic_name": "semaglutide",
+      "approval_date": "2022-01-06",
+      "application_number": "",
+      "indication": "Obesity;Overweight",
+      "sponsor": "Novo Nordisk A/S",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "고관심 적응증 (obesity)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "VAFSEO",
+      "generic_name": "VADADUSTAT",
+      "approval_date": "2024-03-27",
+      "application_number": "NDA215192",
+      "indication": "Hypoxia-inducible Factor Prolyl Hydroxylase Inhibitor [EPC]",
+      "sponsor": "AKEBIA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "KESIMPTA",
+      "generic_name": "OFATUMUMAB",
+      "approval_date": "2009-10-26",
+      "application_number": "BLA125326",
+      "indication": "CD20-directed Cytolytic Antibody [EPC]",
+      "sponsor": "NOVARTIS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "INBRIJA",
+      "generic_name": "LEVODOPA",
+      "approval_date": "2018-12-21",
+      "application_number": "NDA209184",
+      "indication": "Aromatic Amino Acid [EPC]",
+      "sponsor": "MERZ",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Keppra",
+      "generic_name": "levetiracetam",
+      "approval_date": "2000-09-29",
+      "application_number": "",
+      "indication": "Epilepsy",
+      "sponsor": "UCB Pharma SA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Jemperli",
+      "generic_name": "dostarlimab",
+      "approval_date": "2021-04-21",
+      "application_number": "",
+      "indication": "Endometrial Neoplasms",
+      "sponsor": "GlaxoSmithKline Trading Services Limited",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Increlex",
+      "generic_name": "mecasermin",
+      "approval_date": "2007-08-02",
+      "application_number": "",
+      "indication": "Laron Syndrome",
+      "sponsor": "Esteve Pharmaceuticals, S.A.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    }
+  ],
+  "errors": []
+}

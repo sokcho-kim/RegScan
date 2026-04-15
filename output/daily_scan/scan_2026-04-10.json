@@ -1,0 +1,1112 @@
+{
+  "scan_date": "2026-04-10",
+  "scan_time": "2026-04-10T08:00:00.903566",
+  "summary": {
+    "fda_new": 10,
+    "ema_new": 19,
+    "mfds_new": 0,
+    "total_new": 29,
+    "hot_issues": 18
+  },
+  "fda_new": [
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211560",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "ALEMBIC",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211582",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "ZYDUS PHARMS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "KEYTRUDA",
+      "generic_name": "PEMBROLIZUMAB",
+      "approval_date": "2014-09-04",
+      "application_number": "BLA125514",
+      "indication": "Programmed Death Receptor-1 Blocking Antibody [EPC]",
+      "sponsor": "MERCK SHARP DOHME",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211468",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "AUROBINDO PHARMA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211482",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "AJANTA PHARMA LTD",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211156",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "INVENTIA HLTHCARE",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211506",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "MACLEODS PHARMS LTD",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "TYVASO",
+      "generic_name": "TREPROSTINIL",
+      "approval_date": "2009-07-30",
+      "application_number": "NDA022387",
+      "indication": "Prostacycline Vasodilator [EPC]",
+      "sponsor": "UNITED THERAP",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211531",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "LUPIN LTD",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211535",
+      "indication": "",
+      "sponsor": "CIPLA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    }
+  ],
+  "ema_new": [
+    {
+      "source": "ema",
+      "drug_name": "Cablivi",
+      "generic_name": "caplacizumab",
+      "approval_date": "2018-08-30",
+      "application_number": "",
+      "indication": "Purpura, Thrombotic Thrombocytopenic",
+      "sponsor": "Ablynx NV",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Dupixent",
+      "generic_name": "dupilumab",
+      "approval_date": "2017-09-26",
+      "application_number": "",
+      "indication": "Dermatitis, Atopic;Prurigo;Esophageal Diseases;Asthma;Sinusitis",
+      "sponsor": "Sanofi Winthrop Industrie",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Sorafenib Accord",
+      "generic_name": "sorafenib",
+      "approval_date": "2022-11-09",
+      "application_number": "",
+      "indication": "Carcinoma, Hepatocellular;Carcinoma, Renal Cell",
+      "sponsor": "Accord Healthcare S.L.U.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "high_interest",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "고관심 적응증 (carcinoma)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Kayshild",
+      "generic_name": "semaglutide",
+      "approval_date": "2026-03-26",
+      "application_number": "",
+      "indication": "Non-alcoholic Fatty Liver Disease;Liver Cirrhosis",
+      "sponsor": "Novo Nordisk A/S",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "EMA Conditional Approval"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Fylrevy",
+      "generic_name": "estetrol",
+      "approval_date": "2026-03-26",
+      "application_number": "",
+      "indication": "Menopause",
+      "sponsor": "Gedeon Richter Plc.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Ondibta",
+      "generic_name": "insulin glargine",
+      "approval_date": "2026-01-09",
+      "application_number": "",
+      "indication": "Diabetes Mellitus",
+      "sponsor": "Gan & Lee Pharmaceuticals Europe GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "고관심 적응증 (diabetes)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Sibnayal",
+      "generic_name": "potassium citrate;potassium hydrogen carbonate",
+      "approval_date": "2021-04-30",
+      "application_number": "",
+      "indication": "Acidosis, Renal Tubular",
+      "sponsor": "Advicenne S.A.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Supemtek",
+      "generic_name": "trivalent influenza vaccine (recombinant, prepared in cell culture)",
+      "approval_date": "2026-03-30",
+      "application_number": "",
+      "indication": "Influenza, Human",
+      "sponsor": "Sanofi Winthrop Industrie",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Comirnaty",
+      "generic_name": "COVID-19 mRNA vaccine",
+      "approval_date": "2020-12-21",
+      "application_number": "",
+      "indication": "COVID-19 virus infection",
+      "sponsor": "BioNTech Manufacturing GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "high_interest",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "고관심 적응증 (covid)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Agamree",
+      "generic_name": "vamorolone",
+      "approval_date": "2023-12-14",
+      "application_number": "",
+      "indication": "Muscular Dystrophy, Duchenne",
+      "sponsor": "Santhera Pharmaceuticals (Deutschland) GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Aripiprazole Zentiva",
+      "generic_name": "aripiprazole",
+      "approval_date": "2015-06-25",
+      "application_number": "",
+      "indication": "Schizophrenia;Bipolar Disorder",
+      "sponsor": "Zentiva, k.s.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Poteligeo",
+      "generic_name": "mogamulizumab",
+      "approval_date": "2018-11-22",
+      "application_number": "",
+      "indication": "Sezary Syndrome;Mycosis Fungoides",
+      "sponsor": "Kyowa Kirin Holdings B.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "orphan",
+      "hot_issue_score": 15,
+      "hot_issue_reasons": [
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Crysvita",
+      "generic_name": "burosumab",
+      "approval_date": "2018-02-19",
+      "application_number": "",
+      "indication": "Hypophosphatemia, Familial;Hypophosphatemic Rickets, X-Linked Dominant;Osteomalacia",
+      "sponsor": "Kyowa Kirin Holdings B.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Rezzayo",
+      "generic_name": "rezafungin",
+      "approval_date": "2023-12-22",
+      "application_number": "",
+      "indication": "Candidiasis;Candidiasis, Invasive",
+      "sponsor": "Mundipharma GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Viramune",
+      "generic_name": "nevirapine",
+      "approval_date": "1998-02-04",
+      "application_number": "",
+      "indication": "HIV Infections",
+      "sponsor": "Boehringer Ingelheim International GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Neupro",
+      "generic_name": "rotigotine",
+      "approval_date": "2006-02-15",
+      "application_number": "",
+      "indication": "Restless Legs Syndrome;Parkinson Disease",
+      "sponsor": "UCB Pharma S.A.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "high_interest",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "고관심 적응증 (parkinson)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Kavigale",
+      "generic_name": "sipavibart",
+      "approval_date": "2025-01-20",
+      "application_number": "",
+      "indication": "COVID-19 virus infection",
+      "sponsor": "AstraZeneca AB",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "high_interest",
+      "hot_issue_score": 10,
+      "hot_issue_reasons": [
+        "고관심 적응증 (covid)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Aerinaze",
+      "generic_name": "desloratadine;pseudoephedrine",
+      "approval_date": "2007-07-30",
+      "application_number": "",
+      "indication": "Rhinitis, Allergic, Seasonal",
+      "sponsor": "Organon N.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "none",
+      "hot_issue_score": 0,
+      "hot_issue_reasons": [],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Rezurock",
+      "generic_name": "belumosudil",
+      "approval_date": "2026-03-24",
+      "application_number": "",
+      "indication": "Graft vs Host Disease",
+      "sponsor": "Sanofi Winthrop Industrie",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 50,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품",
+        "EMA Conditional Approval"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    }
+  ],
+  "mfds_new": [],
+  "hot_issues": [
+    {
+      "source": "ema",
+      "drug_name": "Rezurock",
+      "generic_name": "belumosudil",
+      "approval_date": "2026-03-24",
+      "application_number": "",
+      "indication": "Graft vs Host Disease",
+      "sponsor": "Sanofi Winthrop Industrie",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 50,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품",
+        "EMA Conditional Approval"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Cablivi",
+      "generic_name": "caplacizumab",
+      "approval_date": "2018-08-30",
+      "application_number": "",
+      "indication": "Purpura, Thrombotic Thrombocytopenic",
+      "sponsor": "Ablynx NV",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Agamree",
+      "generic_name": "vamorolone",
+      "approval_date": "2023-12-14",
+      "application_number": "",
+      "indication": "Muscular Dystrophy, Duchenne",
+      "sponsor": "Santhera Pharmaceuticals (Deutschland) GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Crysvita",
+      "generic_name": "burosumab",
+      "approval_date": "2018-02-19",
+      "application_number": "",
+      "indication": "Hypophosphatemia, Familial;Hypophosphatemic Rickets, X-Linked Dominant;Osteomalacia",
+      "sponsor": "Kyowa Kirin Holdings B.V.",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Rezzayo",
+      "generic_name": "rezafungin",
+      "approval_date": "2023-12-22",
+      "application_number": "",
+      "indication": "Candidiasis;Candidiasis, Invasive",
+      "sponsor": "Mundipharma GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": true,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 40,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "희귀의약품"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Kayshild",
+      "generic_name": "semaglutide",
+      "approval_date": "2026-03-26",
+      "application_number": "",
+      "indication": "Non-alcoholic Fatty Liver Disease;Liver Cirrhosis",
+      "sponsor": "Novo Nordisk A/S",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "EMA Conditional Approval"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Ondibta",
+      "generic_name": "insulin glargine",
+      "approval_date": "2026-01-09",
+      "application_number": "",
+      "indication": "Diabetes Mellitus",
+      "sponsor": "Gan & Lee Pharmaceuticals Europe GmbH",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 35,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인",
+        "고관심 적응증 (diabetes)"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "fda",
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211560",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "ALEMBIC",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211582",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "ZYDUS PHARMS",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "KEYTRUDA",
+      "generic_name": "PEMBROLIZUMAB",
+      "approval_date": "2014-09-04",
+      "application_number": "BLA125514",
+      "indication": "Programmed Death Receptor-1 Blocking Antibody [EPC]",
+      "sponsor": "MERCK SHARP DOHME",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211468",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "AUROBINDO PHARMA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211482",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "AJANTA PHARMA LTD",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211156",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "INVENTIA HLTHCARE",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211506",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "MACLEODS PHARMS LTD",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "TYVASO",
+      "generic_name": "TREPROSTINIL",
+      "approval_date": "2009-07-30",
+      "application_number": "NDA022387",
+      "indication": "Prostacycline Vasodilator [EPC]",
+      "sponsor": "UNITED THERAP",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211531",
+      "indication": "Sodium-Glucose Cotransporter 2 Inhibitor [EPC]",
+      "sponsor": "LUPIN LTD",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "fda",
+      "drug_name": "DAPAGLIFLOZIN",
+      "generic_name": "DAPAGLIFLOZIN",
+      "approval_date": "2026-04-06",
+      "application_number": "ANDA211535",
+      "indication": "",
+      "sponsor": "CIPLA",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "FDA+EMA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "ema",
+        "mfds"
+      ]
+    },
+    {
+      "source": "ema",
+      "drug_name": "Dupixent",
+      "generic_name": "dupilumab",
+      "approval_date": "2017-09-26",
+      "application_number": "",
+      "indication": "Dermatitis, Atopic;Prurigo;Esophageal Diseases;Asthma;Sinusitis",
+      "sponsor": "Sanofi Winthrop Industrie",
+      "is_breakthrough": false,
+      "is_accelerated": false,
+      "is_orphan": false,
+      "is_prime": false,
+      "hot_issue_type": "global_concurrent",
+      "hot_issue_score": 25,
+      "hot_issue_reasons": [
+        "EMA+FDA 동시 승인"
+      ],
+      "matched_existing": true,
+      "existing_approvals": [
+        "fda",
+        "ema",
+        "mfds"
+      ]
+    }
+  ],
+  "errors": []
+}
