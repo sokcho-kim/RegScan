@@ -503,7 +503,7 @@ async def main():
 
                             if dext5_response:
                                 raw = dext5_response[0]
-                                fname = meta["files"][0].get("name", "drug_prices.xlsx") if meta["files"] else "drug_prices.xlsx"
+                                fname = files[0].get("name", "drug_prices.xlsx") if files else "drug_prices.xlsx"
                                 save_path = dl_dir / fname
                                 with open(save_path, "wb") as f:
                                     f.write(raw)
