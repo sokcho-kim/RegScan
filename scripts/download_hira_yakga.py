@@ -1,29 +1,34 @@
-"""HIRA biz.hira.or.kr에서 적용약가파일 자동 다운로드
+"""HIRA biz.hira.or.kr 적용약가파일 다운로드 자동화
 
-Nexacro SSV API 직접 호출 방식.
-1. 메인 → 심사기준 종합서비스(InfoBank) 팝업 열기
-2. selectComBbsList.ndo → 적용약가 게시글 찾기
-3. selectComBbsFileList.ndo → 첨부파일 목록 조회
-4. 파일 다운로드
+Nexacro SSV API로 최신 약가파일 메타 조회 + 수동 다운로드 가이드.
+Dext5 파일 다운로드는 Nexacro 런타임 세션 종속이라 API 자동화 불가 →
+수동 다운로드 후 data/hira/downloads/에 넣으면 자동 변환.
 
-Usage: python scripts/download_hira_yakga.py
+Usage:
+    # 최신 약가파일 확인
+    python scripts/download_hira_yakga.py
+
+    # 수동 다운로드 후 변환
+    python -m regscan.workers.drug_price_collector --convert-only data/hira/downloads/파일명.xlsx
 """
 
+from __future__ import annotations
+
 import asyncio
-import base64
-import re
+import logging
 import sys
 import io
-import urllib.parse
 from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+log = logging.getLogger(__name__)
 
-RS = "\x1e"  # Record Separator
-US = "\x1f"  # Unit Separator
-ETX = "\x03"  # Empty value
+RS = "\x1e"
+US = "\x1f"
+ETX = "\x03"
 
-SAVE_DIR = Path(__file__).parent.parent / "data" / "hira" / "downloads"
+BBS_ID = "BBSMSTR_000000000676"
 
 
 def build_ssv_header(cookies: dict) -> str:
@@ -31,10 +36,8 @@ def build_ssv_header(cookies: dict) -> str:
     ssv += f'JSESSIONID={cookies.get("JSESSIONID", "null")}' + RS
     ssv += f'BIZINTERSESSION={cookies.get("BIZINTERSESSION", "")}' + RS
     ssv += f'WMONID={cookies.get("WMONID", "")}' + RS
-    ssv += "browserType=Chrome" + RS
-    ssv += "osVersion=Windows 10" + RS
-    ssv += "navigatorName=Chrome" + RS
-    ssv += "navigatorVersion=147" + RS
+    ssv += "browserType=Chrome" + RS + "osVersion=Windows 10" + RS
+    ssv += "navigatorName=Chrome" + RS + "navigatorVersion=147" + RS
     return ssv
 
 
@@ -43,35 +46,14 @@ async def fetch_ssv(page, url: str, body: str) -> str:
         """async ([url, body]) => {
             const r = await fetch(url, {
                 method: 'POST',
-                headers: {'Content-Type': 'text/xml', 'Accept': 'application/xml, text/xml, */*', 'X-Requested-With': 'XMLHttpRequest'},
+                headers: {'Content-Type': 'text/xml', 'Accept': 'application/xml, text/xml, */*',
+                           'X-Requested-With': 'XMLHttpRequest'},
                 body: body
             });
             return await r.text();
         }""",
         [url, body],
     )
-
-
-async def fetch_binary(page, url: str) -> tuple[bytes, dict]:
-    info = await page.evaluate(
-        """async (url) => {
-            const r = await fetch(url);
-            const buf = await r.arrayBuffer();
-            const bytes = new Uint8Array(buf);
-            let b = '';
-            for (let i = 0; i < bytes.byteLength; i++) b += String.fromCharCode(bytes[i]);
-            return {
-                b64: btoa(b),
-                status: r.status,
-                ct: r.headers.get('content-type') || '',
-                cd: r.headers.get('content-disposition') || '',
-                size: bytes.byteLength
-            };
-        }""",
-        url,
-    )
-    raw = base64.b64decode(info["b64"])
-    return raw, info
 
 
 async def main():
@@ -86,7 +68,7 @@ async def main():
         page = await context.new_page()
         page.on("dialog", lambda d: asyncio.ensure_future(d.dismiss()))
 
-        print("[1] biz.hira.or.kr 접속...")
+        log.info("[1] biz.hira.or.kr 접속...")
         try:
             await page.goto("https://biz.hira.or.kr", wait_until="load", timeout=30000)
         except Exception:
@@ -108,12 +90,12 @@ async def main():
                 break
 
         if not main_page:
-            print("ERROR: 메인 페이지 없음")
+            log.error("메인 페이지 없음")
             await browser.close()
             return
 
-        # [2] 심사기준 종합서비스 클릭 → InfoBank
-        print("[2] 심사기준 종합서비스 클릭...")
+        # InfoBank 열기
+        log.info("[2] InfoBank 열기...")
         rect = await main_page.evaluate("""() => {
             var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
             while(w.nextNode()) {
@@ -130,14 +112,13 @@ async def main():
         ib_page = await ib_info.value
         ib_page.on("dialog", lambda d: asyncio.ensure_future(d.dismiss()))
         await asyncio.sleep(8)
-        print(f"  InfoBank: {ib_page.url[-50:]}")
 
         cookies = {c["name"]: c["value"] for c in await context.cookies()}
         header = build_ssv_header(cookies)
 
-        # [3] BBS 목록 → 적용약가 찾기
-        print("[3] 적용약가파일 게시글 검색...")
-        bbs_ssv = header
+        # BBS 목록 조회
+        log.info("[3] 적용약가파일 검색...")
+        bbs_ssv = header + "Dataset:dsParam" + RS
         cols = [
             "_RowType_", "brdTyBltNo:STRING(256)", "bltNo:STRING(256)",
             "totCnt:STRING(256)", "currentPage:STRING(256)",
@@ -148,49 +129,48 @@ async def main():
             "codeId:STRING(256)", "catType01Val:STRING(256)",
             "catType02Val:STRING(256)", "catType03Val:STRING(256)",
         ]
-        bbs_ssv += "Dataset:dsParam" + RS
         bbs_ssv += US.join(cols) + RS
         vals = ["N", ETX, ETX, ETX, "1", "20", "0", ETX,
-                "BBSMSTR_000000000676", "all", ETX, ETX, ETX, ETX, ETX, ETX]
+                BBS_ID, "all", ETX, ETX, ETX, ETX, ETX, ETX]
         bbs_ssv += US.join(vals) + RS + RS
         bbs_ssv += "Dataset:gdsCurrentMenu" + RS
         bbs_ssv += US.join(["_RowType_", "menuId:STRING(256)"]) + RS
 
         bbs_result = await fetch_ssv(ib_page, "/qya/bbs/selectComBbsList.ndo", bbs_ssv)
 
-        # 적용약가 행 추출
-        rows = bbs_result.split(RS)
-        yakga_ntt_id = None
-        yakga_atch_id = None
-        yakga_title = None
-
-        for row in rows:
+        # 적용약가 게시글 파싱
+        yakga_posts = []
+        for row in bbs_result.split(RS):
             if "적용약가" in row:
                 fields = row.split(US)
                 if len(fields) > 25:
-                    yakga_ntt_id = fields[5]
-                    yakga_atch_id = fields[25]
-                    yakga_title = fields[11]
-                    break
+                    yakga_posts.append({
+                        "ntt_id": fields[5],
+                        "atch_id": fields[25],
+                        "title": fields[11],
+                        "date": fields[17][:8] if len(fields[17]) >= 8 else "",
+                        "dept": fields[32] if len(fields) > 32 else "",
+                    })
 
-        if not yakga_atch_id:
-            print("ERROR: 적용약가 게시글 못 찾음")
+        if not yakga_posts:
+            log.error("적용약가 게시글 없음")
             await browser.close()
             return
 
-        print(f"  제목: {yakga_title}")
-        print(f"  nttId: {yakga_ntt_id}, atchFileId: {yakga_atch_id}")
+        latest = yakga_posts[0]
+        log.info("  최신: %s", latest["title"])
+        log.info("  게시일: %s, 부서: %s", latest["date"], latest["dept"])
+        log.info("  nttId=%s, atchFileId=%s", latest["ntt_id"], latest["atch_id"])
 
-        # [4] 첨부파일 목록 조회
-        print("[4] 첨부파일 목록 조회...")
-        file_ssv = header
-        file_ssv += "Dataset:dsParam" + RS
+        # 파일 목록 조회
+        log.info("[4] 첨부파일 목록...")
+        file_ssv = header + "Dataset:dsParam" + RS
         file_ssv += US.join([
             "_RowType_", "atchFileId:STRING(256)",
             "nttId:STRING(256)", "bbsId:STRING(256)",
         ]) + RS
         file_ssv += US.join([
-            "N", yakga_atch_id, yakga_ntt_id, "BBSMSTR_000000000676",
+            "N", latest["atch_id"], latest["ntt_id"], BBS_ID,
         ]) + RS + RS
         file_ssv += "Dataset:gdsCurrentMenu" + RS
         file_ssv += US.join(["_RowType_", "menuId:STRING(256)"]) + RS
@@ -199,145 +179,61 @@ async def main():
             ib_page, "/qya/bbs/selectComBbsFileList.ndo", file_ssv,
         )
 
-        # 파일 정보 파싱
-        file_rows = file_result.split(RS)
-        files_found = []
-        for row in file_rows:
-            if "/share/" in row and (".xlsx" in row.lower() or ".xls" in row.lower()):
-                fields = row.split(US)
-                files_found.append(fields)
-                print(f"  파일: {[f[:60] for f in fields if f and f != ETX]}")
+        files = []
+        for frow in file_result.split(RS):
+            if "BBS_" in frow:
+                ffields = frow.split(US)
+                file_info = {}
+                for f in ffields:
+                    if f.startswith("/share/"):
+                        file_info["path"] = f
+                    elif f.startswith("BBS_"):
+                        file_info["file_id"] = f
+                    elif f.endswith(".xlsx") or f.endswith(".xls"):
+                        file_info["name"] = f
+                    elif f.isdigit() and int(f) > 10000:
+                        file_info["size"] = int(f)
+                if file_info.get("name"):
+                    files.append(file_info)
 
-        if not files_found:
-            print("ERROR: 첨부파일 없음")
-            print(f"  응답: {file_result[:500]}")
-            await browser.close()
-            return
+        log.info("")
+        log.info("=" * 60)
+        log.info("  적용약가파일 정보")
+        log.info("=" * 60)
+        log.info("  제목: %s", latest["title"])
+        log.info("  게시일: %s", latest["date"])
 
-        # [5] 게시글 상세 조회 (세션 등록)
-        print("[5] 게시글 상세 조회...")
-        detail_ssv = header
-        detail_ssv += "Dataset:dsParam" + RS
-        detail_ssv += US.join([
-            "_RowType_", "atchFileId:STRING(256)", "nttId:STRING(256)",
-            "bbsId:STRING(256)", "totCnt:STRING(256)", "currentPage:STRING(256)",
-            "recordCountPerPage:STRING(256)", "firstIndex:STRING(256)",
-            "lastIndex:STRING(256)", "codeId:STRING(256)",
-            "commentNo:STRING(256)", "commentCn:STRING(256)",
-        ]) + RS
-        detail_ssv += US.join([
-            "N", yakga_atch_id, yakga_ntt_id, "BBSMSTR_000000000676",
-            ETX, ETX, ETX, ETX, ETX, ETX, ETX, ETX,
-        ]) + RS + RS
-        detail_ssv += "Dataset:gdsCurrentMenu" + RS
-        detail_ssv += US.join(["_RowType_", "menuId:STRING(256)"]) + RS
+        for i, f in enumerate(files):
+            size_mb = f.get("size", 0) / 1024 / 1024
+            log.info("  파일 %d: %s (%.1fMB)", i + 1, f.get("name", "?"), size_mb)
 
-        await fetch_ssv(ib_page, "/qya/bbs/selectComBbsDetail.ndo", detail_ssv)
-        print("  상세 조회 완료")
+        # 기존 다운로드 파일과 비교
+        dl_dir = Path(__file__).resolve().parent.parent / "data" / "hira"
+        existing = sorted(dl_dir.glob("drug_prices_*.json"), reverse=True)
+        if existing:
+            log.info("")
+            log.info("  현재 최신 JSON: %s", existing[0].name)
 
-        # [6] Dext5 초기화 → gfs → 다운로드
-        print("[6] Dext5 파일 다운로드...")
-        SAVE_DIR.mkdir(parents=True, exist_ok=True)
-
-        for file_fields in files_found:
-            # apndFileStgPth + apndFileId 추출
-            path_val = None
-            file_id = None
-            name_val = None
-            for f in file_fields:
-                if "/share/" in f:
-                    path_val = f
-                elif f.startswith("BBS_"):
-                    file_id = f
-                elif re.search(r"\.(xlsx?|csv)$", f, re.IGNORECASE):
-                    name_val = f
-
-            if not file_id:
-                continue
-            if not name_val:
-                name_val = f"drug_prices_{file_id}.xlsx"
-
-            full_path = (path_val or "") + file_id
-            print(f"  파일: {name_val} ({file_id})")
-
-            # Dext5 gfs (get file status) — 비암호화 모드
-            gfs_body = f"dext5CMD=gfs&cd=1&urlAddress={urllib.parse.quote(full_path)}"
-            gfs_result = await ib_page.evaluate(
-                """async (body) => {
-                    const r = await fetch('/com/dext5handler.ndo', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
-                        body: body
-                    });
-                    return await r.text();
-                }""",
-                gfs_body,
-            )
-            print(f"  gfs: {gfs_result[:100]}")
-
-            # 직접 파일 경로로 다운로드 시도 (NAS 파일)
-            # Dext5 다운로드 = POST dext5handler.ndo with d00
-            def make_encrypt(s: str) -> str:
-                b1 = base64.b64encode(s.encode()).decode()
-                return base64.b64encode(("R" + b1).encode()).decode()
-
-            # d0 + fileSn + dsd + datasetIdx + fileId
-            for pattern in [
-                f"d01dsd0{file_id}",
-                f"d0dsd0{file_id}",
-                full_path,
-                file_id,
-            ]:
-                d00 = make_encrypt(pattern)
-                dl_body = f"d00={urllib.parse.quote(d00)}"
-
-                info = await ib_page.evaluate(
-                    """async (body) => {
-                        const r = await fetch('/com/dext5handler.ndo', {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
-                            body: body
-                        });
-                        const ct = r.headers.get('content-type') || '';
-                        const cd = r.headers.get('content-disposition') || '';
-                        const buf = await r.arrayBuffer();
-                        return {status: r.status, ct: ct, cd: cd, size: buf.byteLength};
-                    }""",
-                    dl_body,
-                )
-
-                if info["size"] > 100000:
-                    raw, dl_info = await fetch_binary(
-                        ib_page,
-                        f"/com/dext5handler.ndo",
-                    )
-                    # POST로 다시 보내야 함 — evaluate로 처리
-                    raw_b64 = await ib_page.evaluate(
-                        """async (body) => {
-                            const r = await fetch('/com/dext5handler.ndo', {
-                                method: 'POST',
-                                headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
-                                body: body
-                            });
-                            const buf = await r.arrayBuffer();
-                            const bytes = new Uint8Array(buf);
-                            let b = '';
-                            for (let i = 0; i < bytes.byteLength; i++) b += String.fromCharCode(bytes[i]);
-                            return btoa(b);
-                        }""",
-                        dl_body,
-                    )
-                    raw = base64.b64decode(raw_b64)
-                    save_path = SAVE_DIR / name_val
-                    with open(save_path, "wb") as f:
-                        f.write(raw)
-                    print(f"  다운로드 성공: {save_path} ({len(raw)/1024:.0f}KB)")
-                    break
+            import re
+            date_match = re.search(r"(\d{8})", existing[0].name)
+            if date_match:
+                existing_date = date_match.group(1)
+                new_date = latest["date"]
+                if new_date > existing_date:
+                    log.info("  *** 새 약가파일 있음! (%s → %s) ***", existing_date, new_date)
                 else:
-                    print(f"  d00 pattern '{pattern[:30]}...' → size={info['size']}")
+                    log.info("  최신 상태 (갱신 불필요)")
+
+        log.info("")
+        log.info("  수동 다운로드 방법:")
+        log.info("  1) biz.hira.or.kr 접속")
+        log.info("  2) 심사기준 종합서비스 → 기타 → 청구관련기준(마스터파일)")
+        log.info("  3) '%s' 게시글 클릭 → 첨부파일 다운로드", latest["title"])
+        log.info("  4) data/hira/downloads/ 에 저장")
+        log.info("  5) python -m regscan.workers.drug_price_collector --convert-only <파일경로>")
+        log.info("=" * 60)
 
         await browser.close()
-        print("\n완료.")
 
 
 if __name__ == "__main__":
