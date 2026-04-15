@@ -1,0 +1,82 @@
+[
+  {
+    "inn": "BELUMOSUDIL",
+    "fda_data": {
+      "submission_status": "AP"
+    },
+    "ema_data": {
+      "marketing_authorisation_date": "2026-03-24",
+      "medicine_status": "Authorised",
+      "therapeutic_indication": "Graft vs Host Disease"
+    },
+    "mfds_data": {
+      "approval_status": "미허가"
+    },
+    "hira_data": null
+  },
+  {
+    "inn": "CAPLACIZUMAB",
+    "fda_data": {
+      "submission_status": "AP"
+    },
+    "ema_data": {
+      "marketing_authorisation_date": "2018-08-30",
+      "medicine_status": "Authorised",
+      "therapeutic_indication": "Purpura, Thrombotic Thrombocytopenic"
+    },
+    "mfds_data": {
+      "approval_status": "미허가"
+    },
+    "hira_data": null
+  },
+  {
+    "inn": "VAMOROLONE",
+    "fda_data": {
+      "submission_status": "AP"
+    },
+    "ema_data": {
+      "marketing_authorisation_date": "2023-12-14",
+      "medicine_status": "Authorised",
+      "therapeutic_indication": "Muscular Dystrophy, Duchenne"
+    },
+    "mfds_data": {
+      "approval_status": "미허가"
+    },
+    "hira_data": null
+  },
+  {
+    "inn": "BUROSUMAB",
+    "fda_data": {
+      "submission_status": "AP"
+    },
+    "ema_data": {
+      "marketing_authorisation_date": "2018-02-19",
+      "medicine_status": "Authorised",
+      "therapeutic_indication": "Hypophosphatemia, Familial;Hypophosphatemic Rickets, X-Linked Dominant;Osteomalacia"
+    },
+    "mfds_data": {
+      "approval_status": "허가"
+    },
+    "hira_data": {
+      "reimbursement_fact": "HIRA 급여 등재, 상한가 5,333,064원",
+      "match_method": "normalized",
+      "price_ceiling": 5333064.0,
+      "ingredient_code": "691702BIJ"
+    }
+  },
+  {
+    "inn": "REZAFUNGIN",
+    "fda_data": {
+      "submission_status": "AP"
+    },
+    "ema_data": {
+      "marketing_authorisation_date": "2023-12-22",
+      "medicine_status": "Authorised",
+      "therapeutic_indication": "Candidiasis;Candidiasis, Invasive"
+    },
+    "mfds_data": {
+      "approval_status": "미허가"
+    },
+    "hira_data": null
+  }
+]

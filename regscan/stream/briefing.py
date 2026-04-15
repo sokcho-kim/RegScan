@@ -141,8 +141,30 @@ def _get_bridge():
     return bridge
 
 
+def _extract_dosage_from_raw(raw: dict) -> str:
+    """HIRA raw_data에서 용량/규격 추출.
+
+    제품명 예: "키트루다주(펨브롤리주맙,유전자재조합)_(0.1g/4mL)"
+    → "(100mg/4mL)"
+    """
+    product_name = raw.get("제품명") or ""
+    # 제품명 끝의 _(용량) 패턴
+    import re
+    m = re.search(r"_\(([^)]+)\)\s*$", product_name)
+    if m:
+        return m.group(1)
+    return ""
+
+
 def _enrich_via_bridge(drugs: list[dict]) -> int:
-    """IngredientBridge로 INN → HIRA 직접 매칭"""
+    """IngredientBridge로 INN → HIRA 직접 매칭
+
+    HIRA 상태 4단계:
+      - 급여 등재 (reimbursed)
+      - 급여 삭제 / 과거 등재 이력 (deleted)
+      - 비급여 (not_covered)
+      - 확인 자료 없음 (not_found) — "미등재"와 구분
+    """
     bridge = _get_bridge()
     if bridge is None:
         return 0
@@ -160,8 +182,12 @@ def _enrich_via_bridge(drugs: list[dict]) -> int:
         status = result.status.value
         price = result.price_ceiling
         code = result.ingredient_code or ""
+        raw = result.raw_data or {}
 
-        price_str = f", 상한가 {price:,.0f}원" if price and status == "reimbursed" else ""
+        # 용량/규격 추출
+        dosage = _extract_dosage_from_raw(raw)
+        dosage_str = f" ({dosage})" if dosage else ""
+        price_str = f", 상한가 {price:,.0f}원{dosage_str}" if price and status == "reimbursed" else ""
 
         if status == "reimbursed":
             fact = f"HIRA 급여 등재{price_str}"
@@ -170,7 +196,7 @@ def _enrich_via_bridge(drugs: list[dict]) -> int:
         elif status == "deleted":
             fact = "HIRA 급여 삭제 (과거 등재 이력)"
         else:
-            fact = "HIRA 급여목록 미등재"
+            fact = "HIRA 확인 자료 없음"
 
         hira_data: dict[str, Any] = {
             "reimbursement_fact": fact,
@@ -178,6 +204,8 @@ def _enrich_via_bridge(drugs: list[dict]) -> int:
         }
         if price and status == "reimbursed":
             hira_data["price_ceiling"] = price
+            if dosage:
+                hira_data["dosage_spec"] = dosage
         if code:
             hira_data["ingredient_code"] = code
         if status in ("not_found", "not_covered"):

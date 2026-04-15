@@ -1,0 +1,96 @@
+[
+  {
+    "inn": "PEMBROLIZUMAB",
+    "fda_data": {
+      "submission_status": "AP",
+      "submission_status_date": "2014-09-04",
+      "brand_name": "KEYTRUDA",
+      "pharm_class_epc": [
+        "Programmed Death Receptor-1 Blocking Antibody [EPC]"
+      ]
+    },
+    "ema_data": {
+      "medicine_status": "Authorised"
+    },
+    "mfds_data": {
+      "approval_status": "허가"
+    },
+    "hira_data": {
+      "reimbursement_fact": "HIRA 급여 등재, 상한가 2,103,620원",
+      "match_method": "normalized",
+      "price_ceiling": 2103620.0,
+      "ingredient_code": "639001BIJ"
+    }
+  },
+  {
+    "inn": "DUPILUMAB",
+    "fda_data": {
+      "submission_status": "AP"
+    },
+    "ema_data": {
+      "marketing_authorisation_date": "2017-09-26",
+      "medicine_status": "Authorised",
+      "therapeutic_indication": "Dermatitis, Atopic;Prurigo;Esophageal Diseases;Asthma;Sinusitis"
+    },
+    "mfds_data": {
+      "approval_status": "허가"
+    },
+    "hira_data": {
+      "reimbursement_fact": "HIRA 급여 등재, 상한가 607,976원",
+      "match_method": "normalized",
+      "price_ceiling": 607976.0,
+      "ingredient_code": "670402BIJ"
+    }
+  },
+  {
+    "inn": "SORAFENIB",
+    "fda_data": {},
+    "ema_data": {
+      "marketing_authorisation_date": "2022-11-09",
+      "medicine_status": "Authorised",
+      "therapeutic_indication": "Carcinoma, Hepatocellular;Carcinoma, Renal Cell"
+    },
+    "mfds_data": {
+      "approval_status": "미허가"
+    },
+    "hira_data": {
+      "reimbursement_fact": "HIRA 급여 등재, 상한가 9,939원",
+      "match_method": "atc",
+      "price_ceiling": 9939.0,
+      "ingredient_code": "488001ATB"
+    }
+  },
+  {
+    "inn": "MOGAMULIZUMAB",
+    "fda_data": {},
+    "ema_data": {
+      "marketing_authorisation_date": "2018-11-22",
+      "medicine_status": "Authorised",
+      "therapeutic_indication": "Sezary Syndrome;Mycosis Fungoides"
+    },
+    "mfds_data": {
+      "approval_status": "허가"
+    },
+    "hira_data": {
+      "reimbursement_fact": "HIRA 급여 등재, 상한가 1,374,875원",
+      "match_method": "normalized",
+      "price_ceiling": 1374875.0,
+      "ingredient_code": "713401BIJ"
+    }
+  },
+  {
+    "inn": "BELUMOSUDIL",
+    "fda_data": {
+      "submission_status": "AP"
+    },
+    "ema_data": {
+      "marketing_authorisation_date": "2026-03-24",
+      "medicine_status": "Authorised",
+      "therapeutic_indication": "Graft vs Host Disease"
+    },
+    "mfds_data": {
+      "approval_status": "미허가"
+    },
+    "hira_data": null
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "version": "v5.2_auto_top5",
+  "timestamp": "2026-04-15T17:28:14.971504",
+  "selection": "hot_issue_score DESC top 5 (자동)",
+  "drugs": [
+    {
+      "inn": "BELUMOSUDIL",
+      "score": 50
+    },
+    {
+      "inn": "CAPLACIZUMAB",
+      "score": 40
+    },
+    {
+      "inn": "VAMOROLONE",
+      "score": 40
+    },
+    {
+      "inn": "BUROSUMAB",
+      "score": 40
+    },
+    {
+      "inn": "REZAFUNGIN",
+      "score": 40
+    }
+  ]
+}
