@@ -8,172 +8,25 @@
   - Level 2 (염):  삭제 금지 → ref_normalization_map 기반 표준명 치환 후 salt 컬럼
   - Level 3 (함량): 삭제 금지 → strength 컬럼으로 파싱
   - Level 4 (첫 단어 매칭): 불허
+
+사전 데이터: regscan/map/assets/*.json (assets_loader.py에서 로드)
 """
 
 from __future__ import annotations
+
+__version__ = "1.0.0"
 
 import re
 from dataclasses import dataclass
 from typing import Optional
 
-
-# ════════════════════════════════════════════════════════════════════
-# 상수
-# ════════════════════════════════════════════════════════════════════
-
-# ── 염/에스테르 표준명 치환 맵 ──
-# key: MFDS 원본에서 나타나는 변이형 (소문자)
-# value: USP/INN 표준 표기
-REF_NORMALIZATION_MAP: dict[str, str] = {
-    # 오타 → 표준
-    "besylate": "besilate",
-    "tartarate": "tartrate",
-    # 약어 → 정식명
-    "hcl": "hydrochloride",
-    "hbr": "hydrobromide",
-    # 동의어 → 표준 (USP preferred term)
-    "mesilate": "mesylate",
-    "tosilate": "tosylate",
-    "esilate": "esylate",
-    "methanesulfonate": "mesylate",
-    "benzenesulfonate": "besilate",
-    "toluenesulfonate": "tosylate",
-    "ethanesulfonate": "esylate",
-    "ethanedisulfonate": "edisylate",
-    "camphorsulfonate": "camsylate",
-    "trometamol": "tromethamine",
-    "olamine": "ethanolamine",
-    "embonate": "pamoate",
-    "dimeglumine": "meglumine",
-    "dilysine": "lysine",
-    "dipotassium": "potassium",
-    "disodium": "sodium",
-    "trisodium": "sodium",
-    "tetrasodium": "sodium",
-    "monohydrochloride": "hydrochloride",
-}
-
-# ── 염/에스테르 전체 사전 ──
-# IngredientMatcher.SALT_FORMS와 동일한 목록이나, 여기서는 '분리' 용도
-SALT_FORMS: frozenset[str] = frozenset({
-    # Inorganic acid salts
-    "hydrochloride", "dihydrochloride", "trihydrochloride",
-    "hydrobromide", "hydroiodide",
-    "sulfate", "hemisulfate", "bisulfate",
-    "phosphate", "pyrophosphate",
-    "nitrate",
-    # Organic acid salts
-    "acetate", "diacetate", "triacetate", "subacetate",
-    "benzoate",
-    "citrate",
-    "fumarate", "hemifumarate",
-    "gluconate",
-    "glucuronate",
-    "glutamate",
-    "glycinate", "glycolate",
-    "hippurate",
-    "isobutyrate",
-    "lactate",
-    "lactobionate",
-    "malate",
-    "maleate", "dimaleate",
-    "mandelate",
-    "mucate",
-    "oleate",
-    "orotate",
-    "oxalate", "hemioxalate",
-    "pamoate",
-    "phthalate",
-    "propionate",
-    "salicylate", "subsalicylate",
-    "stearate",
-    "succinate", "hemisuccinate",
-    "tannate",
-    "tartrate", "bitartrate", "hemitartrate",
-    "valerate", "isovalerate",
-    "xinafoate",
-    "gentisate",
-    "aspartate",
-    "butyrate",
-    "carbonate", "bicarbonate",
-    "decanoate",
-    "enanthate", "heptanoate",
-    "hexanoate", "caproate",
-    "laurate",
-    "palmitate",
-    "undecylenate",
-    # RxNorm 검증 추가 (2026-04-15, freq >= 3)
-    "pidolate",
-    "adipate",
-    "cocoate",
-    "picrate",
-    "acetonide",
-    "cypionate",
-    "methylsulfate",
-    "polistirex",
-    # Sulfonate salts
-    "mesylate", "besilate",
-    "tosylate",
-    "esylate",
-    "edisylate",
-    "isethionate",
-    "napsylate", "napadisylate",
-    "camsylate",
-    "triflutate",
-    # Base (cation) salts
-    "sodium", "potassium", "calcium", "magnesium",
-    "zinc", "aluminum", "aluminium",
-    "lithium", "ammonium",
-    "tromethamine", "meglumine",
-    "lysine", "arginine",
-    "diethanolamine", "ethanolamine",
-    "choline", "piperazine",
-    "benzathine", "procaine",
-    "erbumine",
-    # Hydration states
-    "hydrate", "monohydrate", "dihydrate", "trihydrate",
-    "hemihydrate", "sesquihydrate", "pentahydrate",
-    "hexahydrate", "tetrahydrate", "decahydrate",
-    "anhydrous",
-})
-
-# ── 제형 Variant 토큰 ──
-# yakga_ingredient_master.csv 실데이터 기반 (2026-04-14 조사)
-FORMULATION_TOKENS: tuple[str, ...] = tuple(sorted([
-    # 물리 형태
-    "micronized",
-    "coated granules",
-    "coated powder",
-    "coated",
-    "granules",
-    "granule",
-    "concentrate powder",
-    "concentrate granule",
-    "concentrate granules",
-    "concentrate",
-    "powder",
-    # 방출 제어
-    "sustained release",
-    "extended release",
-    "extended release microspheres",
-    "delayed release",
-    "modified release",
-    "controlled release",
-    "enteric coated",
-    "enteric pellets",
-    "film coated",
-    # 특수 제형
-    "lyophilized",
-    "lyophilisate",
-    "liposomal",
-    "pegylated",
-    "nanocrystal",
-    "chewable",
-    "dispersible",
-    # 추출물 형태 (herbal 경계이나 마스터에 존재)
-    "dried extract",
-    "soft extract",
-], key=len, reverse=True))  # longest-match-first
+from regscan.map.assets_loader import (
+    SALT_FORMS,
+    REF_NORMALIZATION_MAP,
+    FORMULATION_TOKENS,
+    RE_FORMULATION as _RE_FORMULATION,
+    RE_SALT as _RE_SALT,
+)
 
 
 # ════════════════════════════════════════════════════════════════════
@@ -222,6 +75,7 @@ class DecomposedIngredient:
 # ════════════════════════════════════════════════════════════════════
 # 정규식 (컴파일 — 모듈 로드 시 1회)
 # ════════════════════════════════════════════════════════════════════
+# _RE_FORMULATION, _RE_SALT → assets_loader.py에서 import
 
 # Step 1-a: 괄호 안 (as BASE DOSE) 패턴
 #   "Bepotastine Besylate (as bepotastine 10.7mg)" → strength="10.7mg"
@@ -262,23 +116,6 @@ _RE_PAREN_FORMULATION = re.compile(
     r"\s*\((micronized|enteric\s+coated|liposomal|lyophilized)\)",
     re.IGNORECASE,
 )
-
-# Step 2: Formulation (longest-match-first, 문자열 끝)
-_RE_FORMULATION = re.compile(
-    r"\s+(" + "|".join(re.escape(f) for f in FORMULATION_TOKENS) + r")\s*$",
-    re.IGNORECASE,
-)
-
-# Step 3: Salt (longest-match-first, 문자열 끝)
-# REF_NORMALIZATION_MAP 키도 포함해서 매칭
-_ALL_SALT_TOKENS = SALT_FORMS | frozenset(REF_NORMALIZATION_MAP.keys())
-_RE_SALT = re.compile(
-    r"\s+(" + "|".join(
-        re.escape(s) for s in sorted(_ALL_SALT_TOKENS, key=len, reverse=True)
-    ) + r")\s*$",
-    re.IGNORECASE,
-)
-
 
 # ════════════════════════════════════════════════════════════════════
 # 메인 함수
