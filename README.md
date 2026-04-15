@@ -124,6 +124,22 @@ Pass 2: base_key (Base INN) → fallback 매칭
 | 급여 삭제 | `HIRA 급여 삭제 (과거 등재 이력)` |
 | 확인 자료 없음 | `HIRA 확인 자료 없음` |
 
+### HIRA 약가 수집 (완전 자동화)
+
+```
+biz.hira.or.kr 접속
+  → 심사기준 종합서비스(InfoBank)
+  → Nexacro SSV API: 적용약가 게시글 탐지
+  → UI dispatchEvent: 청구관련기준 → 적용약가 → 체크박스 → 다운로드
+  → page.route: dext5handler.ndo XHR 인터셉트
+  → xlsx 저장 → JSON 변환 (59,076건, 55초)
+```
+
+```bash
+# 1줄로 최신 약가 반영
+python -m regscan.workers.drug_price_collector
+```
+
 ## 실행
 
 ```bash
@@ -133,21 +149,24 @@ uvicorn regscan.api.main:app --host 0.0.0.0 --port 8001 --reload
 # 일일 스캔
 python -m regscan.batch.pipeline
 
+# HIRA 약가 갱신
+python -m regscan.workers.drug_price_collector
+
 # 브리핑 품질 테스트
 python scripts/test_briefing_quality.py --version v5.x --area oncology --area-ko 항암
 
 # Decomposer 테스트
 pytest tests/test_decomposer.py tests/test_decomposer_snapshot.py -v
-
-# OMOP 사전 검증
-python scripts/validate_decomposer_vocab.py
 ```
 
 ## Docker
 
 ```bash
-# 로컬 (PostgreSQL + web + batch)
+# DEV
 docker-compose up
+
+# PROD
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 # 배치 단독
 docker-compose --profile batch run batch
@@ -165,8 +184,18 @@ gcloud run deploy regscan-web --source . --dockerfile Dockerfile.web
 | `OPENAI_API_KEY` | O* | GPT-5.2 브리핑 생성 |
 | `GEMINI_API_KEY` | O* | Gemini 2.5 Flash fallback |
 | `ANTHROPIC_API_KEY` | - | Claude Sonnet fallback |
+| `POSTGRES_PASSWORD` | PROD | docker-compose PROD용 |
 
 *LLM 키 최소 1개 필수
+
+## 운영 비용
+
+| 항목 | GPT-5.2 | Gemini 2.5 Flash |
+|------|---------|-----------------|
+| 단건 브리핑 | 34원 | 3원 |
+| LLM 월 (일 4건 × 30일) | 4,092원 | 307원 |
+| 인프라 (Cloud Run + Cloud SQL) | 42,000원 | 42,000원 |
+| **월 합계** | **~46,000원** | **~42,000원** |
 
 ## 브리핑 버전 관리
 
@@ -175,6 +204,7 @@ output/briefings/snapshots/
 ├── v5.0_hira_fewshot/          # HIRA few-shot 첫 적용
 ├── v5.1_real_pipeline/         # 실제 파이프라인 데이터
 ├── v5.2_auto_top5/             # hot_issue_score 자동 선별
+├── v5.3_april_prices/          # 4월 최신 약가 반영
 └── v5.x_next/
     ├── _meta.json              # 변경사항, 약물, 모델
     ├── *_prompts.txt           # system + user prompt 원문
@@ -182,10 +212,11 @@ output/briefings/snapshots/
     └── *_therapeutic.json      # LLM 출력 결과
 ```
 
-## 사전 갱신 주기
+## 데이터 갱신 주기
 
-| 대상 | 주기 | 시점 |
+| 대상 | 주기 | 방법 |
 |------|------|------|
-| HIRA 마스터 | 연 1회 | 10월 |
-| `assets/*.json` 재검증 | 연 1회 | HIRA 갱신 후 |
-| `validate_decomposer_vocab.py` 실행 | 연 1회 | OMOP RxNorm 갱신 시 |
+| HIRA 약가 Excel | 월간 | `python -m regscan.workers.drug_price_collector` (자동) |
+| HIRA 마스터 CSV | 연 1회 (10월) | 수동 교체 |
+| `assets/*.json` 재검증 | 연 1회 | `python scripts/validate_decomposer_vocab.py` |
+| FDA/EMA/MFDS 스캔 | 일일 | `python -m regscan.batch.pipeline` (자동) |
