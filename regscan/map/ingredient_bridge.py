@@ -23,12 +23,38 @@ from .decomposer import decompose_ingredient, DecomposedIngredient
 
 
 class ReimbursementStatus(str, Enum):
-    """HIRA 급여 상태"""
-    REIMBURSED = "reimbursed"       # 급여
-    DELETED = "deleted"             # 삭제 (급여 이력 있음)
-    NOT_COVERED = "not_covered"     # 비급여 (마스터에 있지만 HIRA에 없음)
-    NOT_FOUND = "not_found"         # 매칭 실패 (마스터에 없음)
-    HERBAL = "herbal"               # 한약재/생약 (별도 급여 체계)
+    """HIRA 급여 상태 (7단계)"""
+    REIMBURSED = "reimbursed"                       # 급여 등재
+    NON_REIMBURSED = "non_reimbursed"               # 비급여 (마스터에 있지만 HIRA 약가 없음)
+    DELISTED = "delisted"                           # 급여 삭제 (과거 등재 이력)
+    EVALUATION_HISTORY = "evaluation_history"       # 급여평가/심의 이력 있음 (등재 전)
+    NOT_FOUND_IN_SOURCE = "not_found_in_source"     # HIRA 원천에 없음 (수집 범위 밖)
+    BRIDGE_UNMATCHED = "bridge_unmatched"           # 브릿지 매칭 실패
+    MANUAL_REVIEW = "manual_review_required"        # 수동 확인 필요
+
+    # 레거시 호환
+    DELETED = "deleted"
+    NOT_COVERED = "not_covered"
+    NOT_FOUND = "not_found"
+    HERBAL = "herbal"
+
+
+class MFDSStatus(str, Enum):
+    """MFDS 허가 상태 (5단계)"""
+    APPROVED = "approved"                           # 허가 확인
+    UNAPPROVED_CONFIRMED = "unapproved_confirmed"   # 미허가 확인 (공식 DB에서 부재 확인)
+    NOT_FOUND = "not_found"                         # 수집 데이터에 없음 (미확인)
+    AMBIGUOUS_MATCH = "ambiguous_match"             # 매칭 모호 (동명이의 등)
+    MANUAL_REVIEW = "manual_review_required"        # 수동 확인 필요
+
+
+class MatchConfidence(str, Enum):
+    """매칭 신뢰도"""
+    EXACT = "exact_match"                           # 정규화 후 완전 일치
+    NORMALIZED = "normalized_match"                 # 염/제형 정규화 후 일치
+    BASE_FALLBACK = "base_fallback_match"           # base INN만 일치 (variant 불일치)
+    ATC_FALLBACK = "atc_fallback"                   # ATC 코드 기반 매칭
+    UNMATCHED = "unmatched"                         # 매칭 실패
 
 
 @dataclass
@@ -44,6 +70,7 @@ class HIRAReimbursementInfo:
 
     # 매칭 메타데이터
     match_method: str = ""            # normalized, atc, exact
+    match_confidence: str = ""        # MatchConfidence value
     normalized_name: str = ""         # 매칭에 사용된 정규화 이름
 
     # 원본 데이터
@@ -57,6 +84,7 @@ class HIRAReimbursementInfo:
             "reimbursement_criteria": self.reimbursement_criteria,
             "price_ceiling": self.price_ceiling,
             "match_method": self.match_method,
+            "match_confidence": self.match_confidence,
             "normalized_name": self.normalized_name,
         }
 

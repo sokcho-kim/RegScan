@@ -156,18 +156,41 @@ def _extract_dosage_from_raw(raw: dict) -> str:
     return ""
 
 
+def _get_hira_source_date() -> str:
+    """현재 사용 중인 HIRA 약가 JSON의 기준일."""
+    from pathlib import Path
+    data_dir = Path(__file__).resolve().parent.parent.parent / "data" / "hira"
+    files = sorted(data_dir.glob("drug_prices_*.json"), reverse=True)
+    if files:
+        import re
+        m = re.search(r"(\d{8})", files[0].name)
+        return m.group(1) if m else "unknown"
+    return "unknown"
+
+
+# 확정 문장 금지 가드레일
+_GUARDRAIL_TEMPLATES: dict[str, str] = {
+    "bridge_unmatched": "HIRA 매핑 실패 — 급여/가격 정보 확인 불가 (수동 확인 필요)",
+    "not_found_ambiguous": "HIRA 원천 데이터에 없음 — 미등재 또는 수집 누락 가능 (단정 불가)",
+    "mfds_not_found": "국내 허가 여부 미확인 (수집 데이터 부재, '미허가' 단정 불가)",
+}
+
+
 def _enrich_via_bridge(drugs: list[dict]) -> int:
     """IngredientBridge로 INN → HIRA 직접 매칭
 
-    HIRA 상태 4단계:
-      - 급여 등재 (reimbursed)
-      - 급여 삭제 / 과거 등재 이력 (deleted)
-      - 비급여 (not_covered)
-      - 확인 자료 없음 (not_found) — "미등재"와 구분
+    HIRA 상태 7단계 + confidence + source date + 가드레일:
+      - reimbursed: 급여 등재 (상한가+규격 포함)
+      - non_reimbursed / not_covered: 비급여
+      - delisted / deleted: 급여 삭제 (과거 이력)
+      - not_found_in_source / not_found: 원천에 없음 (단정 불가)
+      - bridge_unmatched: 매칭 실패 (수동 확인 필요)
     """
     bridge = _get_bridge()
     if bridge is None:
         return 0
+
+    source_date = _get_hira_source_date()
 
     enriched = 0
     for drug_dict in drugs:
@@ -176,8 +199,31 @@ def _enrich_via_bridge(drugs: list[dict]) -> int:
             continue
 
         result = bridge.lookup(inn)
-        if result.match_method == "unmatched":
+
+        # match confidence 판정
+        method = result.match_method
+        if method == "unmatched":
+            # bridge_unmatched도 기록 (가드레일용)
+            drug_dict["hira_data"] = {
+                "reimbursement_fact": _GUARDRAIL_TEMPLATES["bridge_unmatched"],
+                "match_confidence": "unmatched",
+                "match_method": method,
+                "is_guardrailed": True,
+                "source_date": source_date,
+            }
+            enriched += 1
             continue
+
+        if method == "normalized":
+            confidence = "exact_match"
+        elif method == "decomposed_variant":
+            confidence = "normalized_match"
+        elif method == "decomposed_base_fallback":
+            confidence = "base_fallback_match"
+        elif method == "atc":
+            confidence = "atc_fallback"
+        else:
+            confidence = method
 
         status = result.status.value
         price = result.price_ceiling
@@ -191,16 +237,24 @@ def _enrich_via_bridge(drugs: list[dict]) -> int:
 
         if status == "reimbursed":
             fact = f"HIRA 급여 등재{price_str}"
-        elif status == "not_covered":
+        elif status in ("not_covered", "non_reimbursed"):
             fact = "HIRA 비급여 (전액 환자부담)"
-        elif status == "deleted":
+        elif status in ("deleted", "delisted"):
             fact = "HIRA 급여 삭제 (과거 등재 이력)"
+        elif status == "herbal":
+            fact = "한약재/생약 (별도 급여 체계)"
         else:
-            fact = "HIRA 확인 자료 없음"
+            fact = _GUARDRAIL_TEMPLATES["not_found_ambiguous"]
+
+        # 가드레일 판정
+        is_guardrailed = confidence in ("base_fallback_match", "atc_fallback", "unmatched")
 
         hira_data: dict[str, Any] = {
             "reimbursement_fact": fact,
-            "match_method": result.match_method,
+            "match_method": method,
+            "match_confidence": confidence,
+            "source_date": source_date,
+            "is_guardrailed": is_guardrailed,
         }
         if price and status == "reimbursed":
             hira_data["price_ceiling"] = price
@@ -208,8 +262,10 @@ def _enrich_via_bridge(drugs: list[dict]) -> int:
                 hira_data["dosage_spec"] = dosage
         if code:
             hira_data["ingredient_code"] = code
-        if status in ("not_found", "not_covered"):
+        if status in ("not_found", "not_covered", "not_found_in_source"):
             hira_data["access_routes"] = "KODC 긴급도입 / 제약사 EAP / 비급여 처방"
+        if is_guardrailed:
+            hira_data["guardrail_note"] = "낮은 매칭 신뢰도 — 급여/가격 단정 금지"
 
         drug_dict["hira_data"] = hira_data
         enriched += 1
@@ -692,7 +748,7 @@ class StreamBriefingGenerator:
             if mfds.get("approval_date"):
                 intel["mfds_date"] = mfds["approval_date"]
 
-        # HIRA 급여 데이터 (V4 추가)
+        # HIRA 급여 데이터 (V5: confidence + source_date + guardrail)
         hira = drug.get("hira_data") or {}
         if hira:
             if hira.get("reimbursement_fact"):
@@ -701,6 +757,22 @@ class StreamBriefingGenerator:
                 intel["copay_exemption"] = hira["copay_exemption"]
             if hira.get("access_routes"):
                 intel["access_routes"] = hira["access_routes"]
+            if hira.get("match_confidence"):
+                intel["hira_confidence"] = hira["match_confidence"]
+            if hira.get("source_date"):
+                intel["hira_source_date"] = hira["source_date"]
+            if hira.get("is_guardrailed"):
+                intel["hira_guardrail"] = "낮은 신뢰도 — 급여/가격 단정 금지"
+            if hira.get("guardrail_note"):
+                intel["hira_guardrail"] = hira["guardrail_note"]
+
+        # MFDS 상태 가드레일 (V5)
+        mfds_status = (drug.get("mfds_data") or {}).get("approval_status", "")
+        if mfds_status == "미허가":
+            # 수집 데이터에 없는 건 "미확인"이지 "미허가 확정"이 아닐 수 있음
+            existing = drug.get("existing_approvals") or drug.get("fda_data", {}).get("existing_approvals", [])
+            if not existing:
+                intel["mfds_guardrail"] = "국내 허가 여부 미확인 (수집 데이터 부재)"
 
         # 치료영역 (V3 추가)
         areas = drug.get("therapeutic_areas") or drug.get("therapeutic_area")
