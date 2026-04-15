@@ -119,6 +119,32 @@ async def stream_briefing_page(
     run_id: Optional[str] = Query(None),
 ):
     """V2 Executive Briefing 페이지"""
+
+    if settings.is_postgres:
+        runs, unified, streams = await _load_briefings_pg(run_id)
+    else:
+        runs, unified, streams = _load_briefings_sqlite(run_id)
+
+    if not runs:
+        raise HTTPException(status_code=404, detail="No briefings found")
+
+    current_run = run_id or runs[0]["id"]
+
+    return templates.TemplateResponse(
+        "stream_briefing.html",
+        {
+            "request": request,
+            "today": _today_str(),
+            "runs": runs,
+            "current_run": current_run,
+            "unified": unified,
+            "streams": streams,
+        },
+    )
+
+
+def _load_briefings_sqlite(run_id: str | None):
+    """SQLite에서 브리핑 로드."""
     import sqlite3
 
     raw_url = settings.DATABASE_URL
@@ -126,12 +152,11 @@ async def stream_briefing_page(
         raw_url = raw_url.replace(prefix, "")
     db_path = Path(raw_url)
     if not db_path.exists():
-        raise HTTPException(status_code=404, detail="SQLite DB not found")
+        return [], None, []
 
     conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
 
-    # 파이프라인 실행 목록
     run_rows = conn.execute(
         """SELECT pipeline_run_id, MIN(generated_at) as first_at, COUNT(*) as cnt
            FROM stream_briefings
@@ -146,11 +171,10 @@ async def stream_briefing_page(
 
     if not runs:
         conn.close()
-        raise HTTPException(status_code=404, detail="No briefings found")
+        return [], None, []
 
     current_run = run_id or runs[0]["id"]
 
-    # 해당 run의 브리핑 조회
     rows = conn.execute(
         """SELECT stream_name, sub_category, briefing_type, headline, content_json
            FROM stream_briefings
@@ -176,14 +200,63 @@ async def stream_briefing_page(
         else:
             streams.append(entry)
 
-    return templates.TemplateResponse(
-        "stream_briefing.html",
-        {
-            "request": request,
-            "today": _today_str(),
-            "runs": runs,
-            "current_run": current_run,
-            "unified": unified,
-            "streams": streams,
-        },
-    )
+    return runs, unified, streams
+
+
+async def _load_briefings_pg(run_id: str | None):
+    """PostgreSQL에서 브리핑 로드."""
+    from sqlalchemy import select, func
+    from regscan.db.database import get_async_session
+    from regscan.db.models import StreamBriefingDB
+
+    session_factory = get_async_session()
+    async with session_factory() as session:
+        # 파이프라인 실행 목록
+        stmt = (
+            select(
+                StreamBriefingDB.pipeline_run_id,
+                func.min(StreamBriefingDB.generated_at).label("first_at"),
+                func.count().label("cnt"),
+            )
+            .group_by(StreamBriefingDB.pipeline_run_id)
+            .order_by(func.min(StreamBriefingDB.generated_at).desc())
+        )
+        result = await session.execute(stmt)
+        run_rows = result.all()
+
+        runs = []
+        for r in run_rows:
+            dt = r.first_at.strftime("%Y-%m-%d %H:%M") if r.first_at else ""
+            runs.append({"id": r.pipeline_run_id, "date": dt, "count": r.cnt})
+
+        if not runs:
+            return [], None, []
+
+        current_run = run_id or runs[0]["id"]
+
+        # 해당 run의 브리핑
+        stmt2 = (
+            select(StreamBriefingDB)
+            .where(StreamBriefingDB.pipeline_run_id == current_run)
+            .order_by(StreamBriefingDB.id)
+        )
+        result2 = await session.execute(stmt2)
+        rows = result2.scalars().all()
+
+    unified = None
+    streams = []
+    for row in rows:
+        content = row.content_json or {}
+        entry = {
+            "stream_name": row.stream_name,
+            "sub_category": row.sub_category or "",
+            "briefing_type": row.briefing_type,
+            "headline": row.headline or "",
+            "content": content,
+        }
+        if row.briefing_type == "unified":
+            unified = content
+        else:
+            streams.append(entry)
+
+    return runs, unified, streams
