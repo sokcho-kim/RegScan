@@ -224,13 +224,181 @@ async def main():
                 else:
                     log.info("  최신 상태 (갱신 불필요)")
 
+        # [5] UI 자동 다운로드 시도
+        log.info("[5] UI 네비게이션으로 다운로드 시도...")
+
+        # 공지사항(마지막 보이는 항목) 클릭 후 ArrowDown으로 청구관련기준까지 스크롤
+        await ib_page.evaluate("""() => {
+            var els = document.querySelectorAll('[id*=controltreeTextBoxElement]');
+            var last = els[els.length - 1];
+            if (last) {
+                var r = last.getBoundingClientRect();
+                ['mousedown','mouseup','click'].forEach(function(evt) {
+                    last.dispatchEvent(new MouseEvent(evt, {
+                        bubbles:true, cancelable:true,
+                        clientX:r.x+r.width/2, clientY:r.y+r.height/2, button:0
+                    }));
+                });
+            }
+        }""")
+        await asyncio.sleep(1)
+
+        # ArrowDown으로 청구관련기준까지
+        for _ in range(5):
+            await ib_page.keyboard.press("ArrowDown")
+            await asyncio.sleep(0.5)
+
+        await asyncio.sleep(1)
+
+        # 청구관련기준(마스터파일) 찾아서 클릭
+        found = await ib_page.evaluate("""() => {
+            var els = document.querySelectorAll('[id*=controltreeTextBoxElement]');
+            for (var i = 0; i < els.length; i++) {
+                if (els[i].textContent.includes('청구관련기준')) {
+                    var r = els[i].getBoundingClientRect();
+                    ['mousedown','mouseup','click'].forEach(function(evt) {
+                        els[i].dispatchEvent(new MouseEvent(evt, {
+                            bubbles:true, cancelable:true,
+                            clientX:r.x+r.width/2, clientY:r.y+r.height/2, button:0
+                        }));
+                    });
+                    return true;
+                }
+            }
+            return false;
+        }""")
+
+        if found:
+            log.info("  청구관련기준 클릭 완료!")
+            await asyncio.sleep(5)
+
+            # 우측에 게시글 목록 로드됨 — 적용약가 텍스트 찾기
+            yakga_el = await ib_page.evaluate("""() => {
+                var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+                while(w.nextNode()) {
+                    if (w.currentNode.textContent.includes('적용약가')) {
+                        var el = w.currentNode.parentElement;
+                        var r = el.getBoundingClientRect();
+                        if (r.x > 150 && r.width > 0) {
+                            return {text: el.textContent.trim().substring(0,50), cx: r.x+r.width/2, cy: r.y+r.height/2};
+                        }
+                    }
+                }
+                return null;
+            }""")
+
+            if yakga_el:
+                log.info("  적용약가 발견: %s", yakga_el["text"])
+
+                # CDP 다운로드 설정
+                from pathlib import Path as P
+                dl_dir = P(__file__).resolve().parent.parent / "data" / "hira" / "downloads"
+                dl_dir.mkdir(parents=True, exist_ok=True)
+
+                cdp = await context.new_cdp_session(ib_page)
+                await cdp.send("Browser.setDownloadBehavior", {
+                    "behavior": "allowAndName",
+                    "downloadPath": str(dl_dir),
+                    "eventsEnabled": True,
+                })
+
+                dl_done = asyncio.Event()
+                dl_guid = [None]
+
+                def on_dl_progress(params):
+                    if params.get("state") == "completed":
+                        dl_guid[0] = params.get("guid")
+                        dl_done.set()
+
+                cdp.on("Browser.downloadProgress", on_dl_progress)
+
+                # 적용약가 게시글 클릭 (제목 텍스트)
+                await ib_page.mouse.click(yakga_el["cx"], yakga_el["cy"])
+                await asyncio.sleep(5)
+
+                # 첨부파일 다운로드 — 새 팝업 또는 페이지에서 Dext5 컴포넌트
+                # 다운로드가 시작되면 CDP가 캡처
+                try:
+                    await asyncio.wait_for(dl_done.wait(), timeout=30)
+                    log.info("  다운로드 완료: %s", dl_guid[0])
+
+                    # 다운로드된 파일 찾기
+                    for f in dl_dir.iterdir():
+                        if f.stat().st_size > 100000:
+                            log.info("  파일: %s (%dKB)", f.name, f.stat().st_size // 1024)
+                except asyncio.TimeoutError:
+                    log.info("  CDP 다운로드 타임아웃 — 첨부파일 아이콘 클릭 필요할 수 있음")
+
+                    # 첨부파일 아이콘 찾기 (파일 이미지)
+                    file_icon = await ib_page.evaluate("""() => {
+                        var imgs = document.querySelectorAll('img[src*=ico_File], img[src*=file], [id*=imgNm]');
+                        for (var img of imgs) {
+                            var r = img.getBoundingClientRect();
+                            if (r.width > 0 && r.x > 150) {
+                                return {cx: r.x+r.width/2, cy: r.y+r.height/2, src: img.src};
+                            }
+                        }
+                        return null;
+                    }""")
+
+                    if file_icon:
+                        log.info("  첨부파일 아이콘 발견 — 클릭")
+
+                        # ComFileDownPop 팝업 대기
+                        popup_pages_before = len(context.pages)
+                        await ib_page.mouse.click(file_icon["cx"], file_icon["cy"])
+                        await asyncio.sleep(5)
+
+                        # 새 팝업 확인
+                        popup = None
+                        for p in context.pages:
+                            if not p.is_closed() and p != ib_page and p != main_page:
+                                if "FileDown" in p.url or "popup" in p.url:
+                                    popup = p
+                                    break
+
+                        # Nexacro 내부 팝업(ComFileDownPop)이 레이어로 열림
+                        # Dext5 다운로드 링크가 DOM에 나타날 때까지 대기
+                        await asyncio.sleep(8)
+
+                        # Dext5 다운로드 링크 찾기 (iframe 안에 있을 수 있음)
+                        for frame in ib_page.frames:
+                            dl_el = await frame.evaluate("""() => {
+                                // Dext5 다운로드 리스트에서 파일 링크 찾기
+                                var links = document.querySelectorAll('a[href], span[onclick], div[onclick], td');
+                                var results = [];
+                                for (var el of links) {
+                                    var text = el.textContent || '';
+                                    if (text.includes('xlsx') || text.includes('약가')) {
+                                        var r = el.getBoundingClientRect();
+                                        if (r.width > 0) results.push({text: text.trim().substring(0,50), cx: r.x+r.width/2, cy: r.y+r.height/2});
+                                    }
+                                }
+                                return results;
+                            }""")
+                            if dl_el:
+                                log.info("  Dext5 파일 링크: %s", dl_el)
+                                # 첫 번째 파일 클릭
+                                await frame.click("text=xlsx")
+                                await asyncio.sleep(3)
+
+                        try:
+                            await asyncio.wait_for(dl_done.wait(), timeout=30)
+                            log.info("  다운로드 완료!")
+                            for f in dl_dir.iterdir():
+                                if f.stat().st_size > 100000:
+                                    log.info("  파일: %s (%dKB)", f.name, f.stat().st_size // 1024)
+                        except asyncio.TimeoutError:
+                            log.info("  다운로드 타임아웃 — 30초 대기 후 실패")
+            else:
+                log.info("  적용약가 게시글 UI에서 못 찾음")
+        else:
+            log.info("  청구관련기준 못 찾음")
+
         log.info("")
-        log.info("  수동 다운로드 방법:")
-        log.info("  1) biz.hira.or.kr 접속")
-        log.info("  2) 심사기준 종합서비스 → 기타 → 청구관련기준(마스터파일)")
-        log.info("  3) '%s' 게시글 클릭 → 첨부파일 다운로드", latest["title"])
-        log.info("  4) data/hira/downloads/ 에 저장")
-        log.info("  5) python -m regscan.workers.drug_price_collector --convert-only <파일경로>")
+        log.info("  수동 다운로드 필요 시:")
+        log.info("  biz.hira.or.kr → 심사기준 종합서비스 → 기타 → 청구관련기준(마스터파일)")
+        log.info("  → '%s' → 다운로드 → data/hira/downloads/", latest["title"])
         log.info("=" * 60)
 
         await browser.close()
