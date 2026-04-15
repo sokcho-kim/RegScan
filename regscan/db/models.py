@@ -149,6 +149,15 @@ class HIRAReimbursementDB(Base):
     ingredient_code = Column(String(20))
     price_ceiling = Column(Float)
     criteria = Column(Text)
+
+    # Decomposer v1.0.0 분해 결과 (2026-04-15)
+    raw_ingredient = Column(String(500))         # MFDS 원본 성분명
+    base_inn = Column(String(200), index=True)   # 핵심 INN (소문자)
+    salt = Column(String(100))                   # 표준화된 염 형태
+    formulation = Column(String(100))            # 제형 variant
+    strength = Column(String(50))                # 함량
+    match_method = Column(String(30))            # normalized / decomposed_variant / decomposed_base_fallback / atc
+
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     drug = relationship("DrugDB", back_populates="hira")
