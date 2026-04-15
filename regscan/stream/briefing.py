@@ -486,10 +486,26 @@ THERAPEUTIC_BRIEFING_PROMPT = """[FACT DATA]
   ],
   "trend_analysis": "이번 수집에서 드러난 치료영역 트렌드 (3-5줄, 숫자 기반)",
   "action_items": [
-    "약제팀이 이번 주 해야 할 구체적 행동 1",
-    "약제팀이 이번 주 해야 할 구체적 행동 2"
+    "약제팀 후속 조치 (확인 필요 / 검토 권고 / 수동 점검 필요 톤)"
   ]
-}}"""
+}}
+
+[출력 규칙 — 반드시 준수]
+
+1. MFDS 상태 표기:
+   - 확정 근거가 있으면: "국내 MFDS 미허가"
+   - 수집 데이터에 없거나 미확인이면: "국내 MFDS 허가 여부는 추가 확인 필요"
+   - "미허가"와 "미확인"을 동시에 쓰지 마라.
+   - hira_guardrail 또는 mfds_guardrail 필드가 있으면 해당 문구를 우선 사용하라.
+
+2. Action item 톤:
+   - 데이터 불완전 시 명령형 금지. "~하라", "~확정하라" 대신:
+     "확인 필요", "검토 권고", "수동 점검 필요", "후속 검증 권장"
+   - "이번 주 내 확정" 같은 확정 기한은 데이터가 충분할 때만 사용.
+
+3. orphan 표현:
+   - "희귀질환 N건" 대신 "orphan 지정 약물 N건" 사용.
+   - "희귀질환 계열", "희귀 적응증 중심" 정도까지 허용."""
 
 # ────────────────────────────────────────────────────────
 # 혁신 시그널 브리핑 프롬프트
@@ -766,13 +782,15 @@ class StreamBriefingGenerator:
             if hira.get("guardrail_note"):
                 intel["hira_guardrail"] = hira["guardrail_note"]
 
-        # MFDS 상태 가드레일 (V5)
-        mfds_status = (drug.get("mfds_data") or {}).get("approval_status", "")
+        # MFDS 상태 가드레일 (V5) — "미허가"/"미확인" 충돌 방지
+        mfds_raw = drug.get("mfds_data") or {}
+        mfds_status = mfds_raw.get("approval_status", "")
         if mfds_status == "미허가":
-            # 수집 데이터에 없는 건 "미확인"이지 "미허가 확정"이 아닐 수 있음
-            existing = drug.get("existing_approvals") or drug.get("fda_data", {}).get("existing_approvals", [])
-            if not existing:
-                intel["mfds_guardrail"] = "국내 허가 여부 미확인 (수집 데이터 부재)"
+            # 확정 근거(approval_date 존재 등)가 없으면 "미확인"으로 완화
+            has_evidence = bool(mfds_raw.get("approval_date"))
+            if not has_evidence:
+                intel["mfds_status"] = "허가 여부 추가 확인 필요"
+                intel["mfds_guardrail"] = "수집 데이터에 MFDS 정보 부재 — '미허가' 단정 불가"
 
         # 치료영역 (V3 추가)
         areas = drug.get("therapeutic_areas") or drug.get("therapeutic_area")
