@@ -953,10 +953,19 @@ class StreamBriefingGenerator:
 
     # ── LLM 호출 ──
 
+    # 마지막 LLM 호출의 프롬프트 캡처 (디버깅/스냅샷용)
+    _last_system_prompt: str = ""
+    _last_user_prompt: str = ""
+    _last_model_used: str = ""
+
     async def _call_llm(self, prompt: str) -> str:
         """LLM 호출 — shared 기반 시스템 프롬프트 조립 + 사용자 프롬프트 분리"""
         today = datetime.now().strftime("%Y-%m-%d")
         system_prompt = _build_stream_system_prompt(today)
+
+        # 프롬프트 캡처
+        self._last_system_prompt = system_prompt
+        self._last_user_prompt = prompt
 
         # 1차: OpenAI (gpt-5.2 — V4.1 검증 완료 모델)
         if settings.OPENAI_API_KEY:
@@ -972,6 +981,7 @@ class StreamBriefingGenerator:
                     max_completion_tokens=3500,
                     temperature=0.3,
                 )
+                self._last_model_used = settings.WRITER_MODEL
                 return response.choices[0].message.content or ""
             except Exception as e:
                 logger.debug("OpenAI 브리핑 호출 실패: %s", e)
@@ -986,6 +996,7 @@ class StreamBriefingGenerator:
                     model=settings.GEMINI_MODEL,
                     contents=full_prompt,
                 )
+                self._last_model_used = settings.GEMINI_MODEL
                 return response.text or ""
             except Exception as e:
                 logger.debug("Gemini 브리핑 호출 실패: %s", e)
@@ -1001,6 +1012,7 @@ class StreamBriefingGenerator:
                     system=system_prompt,
                     messages=[{"role": "user", "content": prompt}],
                 )
+                self._last_model_used = "claude-sonnet-4-5-20250929"
                 return response.content[0].text
             except Exception as e:
                 logger.debug("Anthropic 브리핑 호출 실패: %s", e)

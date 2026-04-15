@@ -1,0 +1,30 @@
+{
+  "version": "v5.0_hira_fewshot",
+  "timestamp": "2026-04-15T17:04:32.369033",
+  "area": "oncology",
+  "drug_count": 5,
+  "drugs": [
+    "PEMBROLIZUMAB",
+    "NIVOLUMAB",
+    "SOTORASIB",
+    "TRASTUZUMAB",
+    "RILZABRUTINIB"
+  ],
+  "hira_keywords_found": [
+    "급여",
+    "HIRA",
+    "상한가",
+    "비급여",
+    "KODC",
+    "긴급도입"
+  ],
+  "hira_coverage": "6/8",
+  "model": "gpt-5.2 (primary) / gemini-2.5-flash (fallback)",
+  "max_completion_tokens": 3500,
+  "changes": [
+    "few-shot HIRA 3패턴 (급여/미등재/데이터없음)",
+    "네거티브 few-shot (날짜없음 → 승인일 미공개)",
+    "access_routes 유무 분기",
+    "max_completion_tokens 2500→3500"
+  ]
+}

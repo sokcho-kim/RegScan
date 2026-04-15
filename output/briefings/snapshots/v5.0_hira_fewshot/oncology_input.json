@@ -1,0 +1,121 @@
+[
+  {
+    "inn": "PEMBROLIZUMAB",
+    "fda_data": {
+      "submission_status": "AP",
+      "submission_status_date": "2014-09-04",
+      "brand_name": "KEYTRUDA",
+      "submission_class_code_description": "Type 1 - New Molecular Entity",
+      "pharm_class_epc": [
+        "Programmed Death Receptor 1 (PD-1)-Blocking Antibody"
+      ]
+    },
+    "ema_data": {
+      "marketing_authorisation_date": "2015-07-17",
+      "medicine_status": "Authorised"
+    },
+    "mfds_data": {
+      "approval_status": "허가",
+      "approval_date": "2015-03-25"
+    },
+    "hira_data": {
+      "reimbursement_fact": "HIRA 급여 등재, 상한가 2,103,620원",
+      "match_method": "normalized",
+      "price_ceiling": 2103620.0,
+      "ingredient_code": "639001BIJ"
+    }
+  },
+  {
+    "inn": "NIVOLUMAB",
+    "fda_data": {
+      "submission_status": "AP",
+      "submission_status_date": "2014-12-22",
+      "brand_name": "OPDIVO",
+      "submission_class_code_description": "Type 1 - New Molecular Entity",
+      "pharm_class_epc": [
+        "Programmed Death Receptor 1 (PD-1)-Blocking Antibody"
+      ]
+    },
+    "ema_data": {
+      "marketing_authorisation_date": "2015-06-19",
+      "medicine_status": "Authorised"
+    },
+    "mfds_data": {
+      "approval_status": "허가",
+      "approval_date": "2016-03-24"
+    },
+    "hira_data": {
+      "reimbursement_fact": "HIRA 급여 등재, 상한가 2,534,904원",
+      "match_method": "normalized",
+      "price_ceiling": 2534904.0,
+      "ingredient_code": "638403BIJ"
+    }
+  },
+  {
+    "inn": "SOTORASIB",
+    "fda_data": {
+      "submission_status": "AP",
+      "submission_status_date": "2021-05-28",
+      "brand_name": "LUMAKRAS",
+      "submission_class_code_description": "Type 1 - New Molecular Entity",
+      "pharm_class_epc": [
+        "KRAS G12C Inhibitor"
+      ]
+    },
+    "ema_data": {
+      "marketing_authorisation_date": "2022-01-06",
+      "medicine_status": "Authorised"
+    },
+    "mfds_data": {
+      "approval_status": "미허가"
+    },
+    "hira_data": {
+      "reimbursement_fact": "HIRA 비급여 (전액 환자부담)",
+      "match_method": "normalized",
+      "ingredient_code": "707301ATB",
+      "access_routes": "KODC 긴급도입 / 제약사 EAP / 비급여 처방"
+    }
+  },
+  {
+    "inn": "TRASTUZUMAB",
+    "fda_data": {
+      "submission_status": "AP",
+      "submission_status_date": "1998-09-25",
+      "brand_name": "HERCEPTIN",
+      "submission_class_code_description": "Type 1 - New Molecular Entity",
+      "pharm_class_epc": [
+        "HER2/ErbB2 Receptor Inhibitor"
+      ]
+    },
+    "ema_data": {
+      "marketing_authorisation_date": "2000-08-28",
+      "medicine_status": "Authorised"
+    },
+    "mfds_data": {
+      "approval_status": "허가",
+      "approval_date": "2003-06-18"
+    },
+    "hira_data": {
+      "reimbursement_fact": "HIRA 급여 삭제 (과거 등재 이력)",
+      "match_method": "normalized",
+      "ingredient_code": "242803BIJ"
+    }
+  },
+  {
+    "inn": "RILZABRUTINIB",
+    "fda_data": {
+      "submission_status": "AP",
+      "submission_status_date": "2025-03-28",
+      "brand_name": "",
+      "submission_class_code_description": "Type 1 - New Molecular Entity",
+      "pharm_class_epc": [
+        "Bruton Tyrosine Kinase Inhibitor"
+      ]
+    },
+    "ema_data": null,
+    "mfds_data": {
+      "approval_status": "미허가"
+    },
+    "hira_data": null
+  }
+]

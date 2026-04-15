@@ -69,5 +69,5 @@ data/bridge/yakga_master_latest.csv
 # OMOP Athena vocabulary (2.9GB+)
 data/omop/
 
-# Auto-generated snapshots
-output/briefings/snapshots/
+# Auto-generated snapshots (v5.0+ 품질 테스트 결과는 추적)
+# output/briefings/snapshots/
