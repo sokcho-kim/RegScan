@@ -66,5 +66,8 @@ data/hira/drug_prices_*.json
 data/bridge/drug_dictionary_normalized.json
 data/bridge/yakga_master_latest.csv
 
+# OMOP Athena vocabulary (2.9GB+)
+data/omop/
+
 # Auto-generated snapshots
 output/briefings/snapshots/

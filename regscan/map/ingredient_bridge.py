@@ -19,6 +19,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional, Any
 
+from .decomposer import decompose_ingredient, DecomposedIngredient
+
 
 class ReimbursementStatus(str, Enum):
     """HIRA 급여 상태"""
@@ -305,32 +307,44 @@ class IngredientBridge:
         # Method 1: 정규화 매칭
         norm_name = normalize_ingredient_name(first_ingredient)
         if norm_name in self._name_to_codes:
-            codes = self._name_to_codes[norm_name]
-            for code in codes:
-                if self._hira_loaded and code in self._hira_by_code:
-                    hira_info = self._hira_by_code[code][0]
-                    return HIRAReimbursementInfo(
-                        ingredient_code=code,
-                        ingredient_name=self._code_to_info.get(code, {}).get('name', ''),
-                        status=self._determine_status(hira_info),
-                        reimbursement_criteria=hira_info.get("급여기준", ""),
-                        price_ceiling=hira_info.get("price_ceiling"),
-                        match_method="normalized",
-                        normalized_name=norm_name,
-                        raw_data=hira_info,
-                    )
-
-            # 코드는 있지만 HIRA에 없음 (비급여)
-            code = list(codes)[0]
-            return HIRAReimbursementInfo(
-                ingredient_code=code,
-                ingredient_name=self._code_to_info.get(code, {}).get('name', ''),
-                status=ReimbursementStatus.NOT_COVERED,
-                match_method="normalized",
-                normalized_name=norm_name,
+            result = self._resolve_codes(
+                self._name_to_codes[norm_name], norm_name, "normalized",
             )
+            if result:
+                return result
 
-        # Method 2: ATC fallback
+        # Method 2: Decomposition 2-Pass Lookup
+        # 원본을 [base_inn, salt, formulation, strength]로 분해 후 재매칭
+        decomposed = decompose_ingredient(first_ingredient)
+
+        # Pass 1: variant_key (Base+Salt+Formulation) 완전 일치
+        vk = decomposed.variant_key
+        if vk != norm_name and vk in self._name_to_codes:
+            codes = self._name_to_codes[vk]
+            result = self._resolve_codes(
+                codes, decomposed.variant_key, "decomposed_variant",
+            )
+            if result:
+                result.raw_data["decomposed"] = decomposed.to_dict()
+                return result
+
+        # Pass 2: base_key (Base INN만) fallback
+        bk = decomposed.base_key
+        if bk != norm_name and bk != vk and bk in self._name_to_codes:
+            codes = self._name_to_codes[bk]
+            result = self._resolve_codes(
+                codes, decomposed.base_key, "decomposed_base_fallback",
+            )
+            if result:
+                result.raw_data["decomposed"] = decomposed.to_dict()
+                # base fallback은 약가 정확도가 낮으므로 표시
+                result.raw_data["base_fallback_note"] = (
+                    f"variant={decomposed.variant_key} 미매칭, "
+                    f"base={decomposed.base_key}로 대체 매칭"
+                )
+                return result
+
+        # Method 3: ATC fallback
         inn_lower = first_ingredient.lower()
         if inn_lower in self._inn_to_code:
             code = self._inn_to_code[inn_lower]
@@ -347,13 +361,73 @@ class IngredientBridge:
                     raw_data=hira_info,
                 )
 
-        # 매칭 실패
+        # 매칭 실패 — decomposed 정보는 보존
         return HIRAReimbursementInfo(
             ingredient_code="",
             ingredient_name=first_ingredient,
             status=ReimbursementStatus.NOT_FOUND,
             match_method="unmatched",
             normalized_name=norm_name,
+            raw_data={"decomposed": decomposed.to_dict()},
+        )
+
+    def _resolve_codes(
+        self,
+        codes: set[str],
+        normalized_name: str,
+        match_method: str,
+    ) -> Optional[HIRAReimbursementInfo]:
+        """코드 집합에서 HIRA 급여 정보를 조회하는 공통 로직.
+
+        코드가 여러 개일 때, 코드의 원본 이름이 조회 이름과 가장
+        유사한 것을 우선 선택하여 오매칭을 방지한다.
+        """
+        def _name_matches(code: str) -> bool:
+            """코드의 원본 이름이 조회 이름과 관련있는지 확인."""
+            code_name = self._code_to_info.get(code, {}).get('name', '').lower()
+            return (
+                normalized_name in code_name
+                or code_name in normalized_name
+                or code_name == normalized_name
+            )
+
+        # HIRA에 존재하는 코드만 필터 + 이름 일치 우선
+        hira_codes = [c for c in codes if self._hira_loaded and c in self._hira_by_code]
+
+        if hira_codes:
+            # 이름이 일치하는 코드만 우선
+            matched_codes = [c for c in hira_codes if _name_matches(c)]
+            if not matched_codes:
+                # decomposed fallback 경로에서는 이름 불일치 = 오매칭 위험
+                # → normalized 매칭(기존 경로)에서만 이름 무관 선택 허용
+                if match_method.startswith("decomposed_"):
+                    return None  # 오매칭 방지
+                best_code = hira_codes[0]
+            else:
+                best_code = matched_codes[0]
+
+            hira_info = self._hira_by_code[best_code][0]
+            return HIRAReimbursementInfo(
+                ingredient_code=best_code,
+                ingredient_name=self._code_to_info.get(best_code, {}).get('name', ''),
+                status=self._determine_status(hira_info),
+                reimbursement_criteria=hira_info.get("급여기준", ""),
+                price_ceiling=hira_info.get("price_ceiling"),
+                match_method=match_method,
+                normalized_name=normalized_name,
+                raw_data=hira_info,
+            )
+
+        # 코드는 있지만 HIRA에 없음 (비급여) — 이름 일치 우선
+        matched_codes = [c for c in codes if _name_matches(c)]
+        best_code = matched_codes[0] if matched_codes else list(codes)[0]
+
+        return HIRAReimbursementInfo(
+            ingredient_code=best_code,
+            ingredient_name=self._code_to_info.get(best_code, {}).get('name', ''),
+            status=ReimbursementStatus.NOT_COVERED,
+            match_method=match_method,
+            normalized_name=normalized_name,
         )
 
     def _determine_status(self, hira_info: dict) -> ReimbursementStatus:
