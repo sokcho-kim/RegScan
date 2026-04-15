@@ -102,8 +102,50 @@ async def run_stream_pipeline(
         except Exception as e:
             logger.debug("[1.5/6] PDUFA 자동 시드 건너뜀: %s", e)
 
+        # Step 1.7: 공공데이터 워커 수집 (HIRA 약가 + MFDS 증분)
+        logger.info("[1.7/7] 공공데이터 워커 수집...")
+        worker_summary: dict = {}
+        try:
+            # DrugPriceCollector — HIRA 약가파일 변경 감지
+            try:
+                from regscan.workers.drug_price_collector import DrugPriceCollector
+                collector = DrugPriceCollector()
+                dp_result = await collector.run(headless=True, force=force)
+                worker_summary["drug_price"] = dp_result.get("status", "unknown")
+                logger.info("  DrugPriceCollector: %s", dp_result.get("status"))
+            except Exception as e:
+                logger.debug("  DrugPriceCollector 건너뜀: %s", e)
+                worker_summary["drug_price"] = f"skip: {e}"
+
+            # MFDS 워커 — 최근 변경분 증분 수집
+            try:
+                from regscan.workers.mfds_worker import MFDSPermitWorker
+                mfds_w = MFDSPermitWorker()
+                mfds_result = await mfds_w.run(mode="delta", days_back=7)
+                worker_summary["mfds_permit"] = mfds_result.get("status", "unknown")
+                logger.info("  MFDSPermitWorker: %s", mfds_result.get("status"))
+            except Exception as e:
+                logger.debug("  MFDSPermitWorker 건너뜀: %s", e)
+                worker_summary["mfds_permit"] = f"skip: {e}"
+
+            # HIRA 워커 — DB INN 기반 급여 조회
+            try:
+                from regscan.workers.hira_worker import HIRAReimbursementWorker
+                hira_w = HIRAReimbursementWorker()
+                hira_result = await hira_w.run(mode="by_inn")
+                worker_summary["hira_reimbursement"] = hira_result.get("status", "unknown")
+                logger.info("  HIRAReimbursementWorker: %s", hira_result.get("status"))
+            except Exception as e:
+                logger.debug("  HIRAReimbursementWorker 건너뜀: %s", e)
+                worker_summary["hira_reimbursement"] = f"skip: {e}"
+
+        except Exception as e:
+            logger.warning("  워커 수집 실패: %s", e)
+            worker_summary["error"] = str(e)
+        result["steps"]["workers"] = worker_summary
+
         # Step 2: 스트림 오케스트레이터 실행
-        logger.info("[2/6] 스트림 수집 실행...")
+        logger.info("[2/7] 스트림 수집 실행...")
         from regscan.stream.orchestrator import StreamOrchestrator
 
         areas_list = [area] if area else None

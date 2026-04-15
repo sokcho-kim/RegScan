@@ -317,8 +317,8 @@ def test_extract_drug_intel_v3_fields(rilzabrutinib_drug):
     assert len(found_v3) >= 2, f"V3 필드 2개 미만: {found_v3}, intel={intel}"
 
 
-def test_extract_drug_intel_max_14():
-    """max_fields=14로 더 많은 필드 보존"""
+def test_extract_drug_intel_max_17():
+    """max_fields=17로 V4 HIRA 필드 포함"""
     rich_drug = {
         "inn": "TEST",
         "fda_data": {
@@ -338,11 +338,17 @@ def test_extract_drug_intel_max_14():
         "designations": ["NME"],
         "clinical_results": {"trial_phase": "Phase III", "trial_status": "Completed"},
         "mfds_data": {"approval_status": "허가", "approval_date": "2025-06-01"},
+        "hira_data": {
+            "reimbursement_fact": "HIRA 급여 등재, 상한가 1,377원",
+            "copay_exemption": "암환자 산정특례(5%) 대상 가능",
+        },
         "therapeutic_areas": ["oncology"],
     }
     intel = StreamBriefingGenerator._extract_drug_intel(rich_drug)
-    # 14개 필드 제한 내에서 V3 필드도 포함
-    assert len(intel) <= 14
+    # V4: max_fields 20 — HIRA 필드 포함 (빈 값 제거 후 실제 ��력은 더 적음)
+    assert len(intel) <= 20
+    assert "reimbursement_fact" in intel
+    assert "copay_exemption" in intel
     assert "trial_phase" in intel or "mfds_status" in intel or "therapeutic_areas" in intel
 
 

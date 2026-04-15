@@ -30,6 +30,134 @@ from regscan.stream.base import StreamResult
 
 logger = logging.getLogger(__name__)
 
+
+# ────────────────────────────────────────────────────────
+# HIRA Enrichment — DB에서 급여 정보를 조회하여 drug dict에 주입
+# ────────────────────────────────────────────────────────
+
+async def enrich_drugs_with_hira(drugs: list[dict]) -> int:
+    """drugs_found 리스트에 HIRA 급여 데이터를 주입한다.
+
+    DB에서 INN 기준으로 hira_reimbursements를 일괄 조회하여
+    각 drug dict에 hira_data 키를 추가.
+
+    Returns:
+        enriched count
+    """
+    if not drugs:
+        return 0
+
+    try:
+        from sqlalchemy import select
+        from regscan.db.database import get_async_session
+        from regscan.db.models import DrugDB, HIRAReimbursementDB
+    except Exception:
+        logger.debug("HIRA enrichment 스킵: DB 모듈 로드 불가")
+        return 0
+
+    # INN → drug dict 매핑 (빠른 lookup)
+    inn_to_drugs: dict[str, list[dict]] = {}
+    for d in drugs:
+        inn = (d.get("inn") or "").strip().upper()
+        if inn:
+            inn_to_drugs.setdefault(inn, []).append(d)
+
+    if not inn_to_drugs:
+        return 0
+
+    enriched = 0
+    try:
+        session_factory = get_async_session()
+        async with session_factory() as session:
+            # DrugDB.inn → hira relationship 일괄 조회
+            stmt = (
+                select(DrugDB.inn, HIRAReimbursementDB)
+                .join(HIRAReimbursementDB, DrugDB.id == HIRAReimbursementDB.drug_id)
+                .where(DrugDB.inn.in_([inn for inn in inn_to_drugs]))
+            )
+            result = await session.execute(stmt)
+            rows = result.all()
+
+            for drug_inn, hira_row in rows:
+                norm_inn = drug_inn.strip().upper()
+                targets = inn_to_drugs.get(norm_inn, [])
+                if not targets:
+                    # 대소문자 불일치 fallback
+                    for key in inn_to_drugs:
+                        if key == norm_inn:
+                            targets = inn_to_drugs[key]
+                            break
+                if not targets:
+                    continue
+
+                hira_dict = _build_hira_intel(hira_row)
+                for drug_dict in targets:
+                    drug_dict["hira_data"] = hira_dict
+                    enriched += 1
+
+    except Exception as e:
+        logger.warning("HIRA enrichment 실패: %s", e)
+
+    if enriched:
+        logger.info("[HIRA Enrichment] %d개 약물에 급여 데이터 주입", enriched)
+    return enriched
+
+
+def _build_hira_intel(hira: Any) -> dict:
+    """HIRAReimbursementDB row → 브리핑용 dict 변환.
+
+    3개 파생 필드 생성:
+    - reimbursement_fact: 급여 상태 한 줄 요약
+    - copay_exemption: 산정특례 대상 여부 (해당 시)
+    - access_routes: 미허가 시 접근 경로 (해당 시)
+    """
+    status = getattr(hira, "status", None) or "unknown"
+    price = getattr(hira, "price_ceiling", None)
+    criteria = getattr(hira, "criteria", None) or ""
+    ingredient_code = getattr(hira, "ingredient_code", None) or ""
+
+    # 1) reimbursement_fact
+    if status == "reimbursed":
+        price_str = f", 상한가 {price:,.0f}원" if price else ""
+        fact = f"HIRA 급여 등재{price_str}"
+    elif status == "not_covered":
+        fact = "HIRA 비급여 (전액 환자부담)"
+    elif status == "deleted":
+        fact = "HIRA 급여 삭제 (과거 등재 이력)"
+    elif status == "not_found":
+        fact = "HIRA 급여목록 미등재"
+    else:
+        fact = f"HIRA 상태: {status}"
+
+    # 2) copay_exemption — criteria 텍스트에서 산정특례 키워드 탐지
+    copay = None
+    if status == "reimbursed" and criteria:
+        criteria_lower = criteria.lower()
+        if "산정특례" in criteria_lower or "본인부담" in criteria_lower:
+            if "암" in criteria_lower or "항암" in criteria_lower:
+                copay = "암환자 산정특례(5%) 대상 가능"
+            elif "희귀" in criteria_lower:
+                copay = "희귀질환 산정특례(10%) 대상 가능"
+            else:
+                copay = "산정특례 대상 가능 (세부 확인 필요)"
+
+    # 3) access_routes — 미등재 시 접근 경로
+    access = None
+    if status in ("not_found", "not_covered"):
+        access = "KODC 긴급도입 / 제약사 EAP / 비급여 처방"
+
+    result = {"reimbursement_fact": fact}
+    if copay:
+        result["copay_exemption"] = copay
+    if access:
+        result["access_routes"] = access
+    if price and status == "reimbursed":
+        result["price_ceiling"] = price
+    if ingredient_code:
+        result["ingredient_code"] = ingredient_code
+
+    return result
+
 # ────────────────────────────────────────────────────────
 # 시스템 프롬프트 V1.2 (롤백용 보존)
 # ────────────────────────────────────────────────────────
@@ -336,8 +464,9 @@ UNIFIED_BRIEFING_PROMPT = """[FACT DATA]
 [ANALYSIS FRAME — 내부 추론용, 출력에는 JSON만]
 1. **교차 신호 추출**: 2개 이상 스트림에 등장하는 약물 식별 → 강한 신호
 2. **모순/보완 분석**: 스트림 간 모순되는 정보 또는 보완 관계 파악
-3. **Top 5 선정**: 교차 등장 빈도 + 규제 단계 + 환자 영향 기준으로 순위
-4. **리스크/기회 분류**: 즉각 대응 필요 리스크 vs 선제 대응 기회 분리
+3. **급여/접근성 분석**: reimbursement_fact, copay_exemption, access_routes 정보가 있으면 국내 시장 진입 단계를 평가하라
+4. **Top 5 선정**: 교차 등장 빈도 + 규제 단계 + 급여 상태 + 환자 영향 기준으로 순위
+5. **리스크/기회 분류**: 즉각 대응 필요 리스크 vs 선제 대응 기회 분리
 
 [TASK]
 3개 스트림을 종합한 오늘의 RegScan Executive Daily Briefing을 작성하라.
@@ -379,8 +508,12 @@ class StreamBriefingGenerator:
     # ── 약물 인텔리전스 추출 헬퍼 ──
 
     @staticmethod
-    def _extract_drug_intel(drug: dict, max_fields: int = 14) -> dict:
-        """drugs_found 항목에서 브리핑에 필요한 핵심 정보 추출"""
+    def _extract_drug_intel(drug: dict, max_fields: int = 20) -> dict:
+        """drugs_found 항목에서 브리핑에 필요한 핵심 정보 추출
+
+        V4: HIRA 급여 데이터 3필드 추가 (reimbursement_fact, copay_exemption, access_routes)
+        max_fields 14 → 20 (빈 값은 제거되므로 실제 출력은 12~18개)
+        """
         intel: dict[str, Any] = {"inn": drug.get("inn", "UNKNOWN")}
 
         # FDA 데이터
@@ -436,6 +569,16 @@ class StreamBriefingGenerator:
             if mfds.get("approval_date"):
                 intel["mfds_date"] = mfds["approval_date"]
 
+        # HIRA 급여 데이터 (V4 추가)
+        hira = drug.get("hira_data") or {}
+        if hira:
+            if hira.get("reimbursement_fact"):
+                intel["reimbursement_fact"] = hira["reimbursement_fact"]
+            if hira.get("copay_exemption"):
+                intel["copay_exemption"] = hira["copay_exemption"]
+            if hira.get("access_routes"):
+                intel["access_routes"] = hira["access_routes"]
+
         # 치료영역 (V3 추가)
         areas = drug.get("therapeutic_areas") or drug.get("therapeutic_area")
         if areas:
@@ -470,6 +613,9 @@ class StreamBriefingGenerator:
         result: StreamResult,
     ) -> dict[str, Any]:
         """치료영역 Executive Briefing"""
+        # V4: HIRA 급여 데이터 주입
+        await enrich_drugs_with_hira(result.drugs_found)
+
         top_n = min(10, result.drug_count) if result.drug_count else 0
         prompt = THERAPEUTIC_BRIEFING_PROMPT.format(
             area=area,
@@ -493,6 +639,9 @@ class StreamBriefingGenerator:
         result: StreamResult,
     ) -> dict[str, Any]:
         """혁신 시그널 Executive Briefing"""
+        # V4: HIRA 급여 데이터 주입
+        await enrich_drugs_with_hira(result.drugs_found)
+
         # 지정 통계 계산
         nme_count = orphan_count = prime_count = conditional_count = 0
         for d in result.drugs_found:
@@ -531,6 +680,9 @@ class StreamBriefingGenerator:
         result: StreamResult,
     ) -> dict[str, Any]:
         """외부시그널 Future Trend Report"""
+        # V4: HIRA 급여 데이터 주입
+        await enrich_drugs_with_hira(result.drugs_found)
+
         fail_count = sum(1 for s in result.signals if s.get("verdict") == "FAIL")
         pending_count = sum(1 for s in result.signals if s.get("verdict") == "PENDING")
         needs_ai_count = sum(1 for s in result.signals if s.get("verdict") == "NEEDS_AI")

@@ -38,7 +38,10 @@ logger = logging.getLogger(__name__)
 DATA_DIR = Path(__file__).parent.parent.parent / "data" / "hira"
 DOWNLOAD_DIR = DATA_DIR / "downloads"
 
-# biz.hira.or.kr 청구관련기준 마스터
+# HIRA 약제기준정��� 페이지 (biz.hira.or.kr은 Nexacro14 RIA라 크롤링 불가)
+# 대안 1: HIRA 본사이트 약제기준 게시판 (파일 첨부 공지)
+HIRA_NOTICE_URL = "https://www.hira.or.kr/bbsDummy.do?pgmid=HIRAA030056000000"
+# 대안 2: biz.hira.or.kr — Nexacro14 RIA 기반, Playwright 일반 셀렉터 불가
 HIRA_BIZ_URL = "https://biz.hira.or.kr/popup.ndo?formname=qya_bizcom%3A%3AInfoBank.xfdl&framename=InfoBank"
 
 # Excel → JSON 컬럼 매핑 (원본 한글 컬럼 → 내부 영문 키)
@@ -85,17 +88,38 @@ async def download_latest_drug_price(
     headless: bool = True,
     timeout: int = 60000,
 ) -> Path | None:
-    """biz.hira.or.kr에서 최신 적용약가 Excel 파일을 다운로드한다.
+    """HIRA에서 최신 적용약가 Excel 파일을 다운로드한다.
+
+    전략:
+    1) data/hira/downloads/ 에 새 Excel이 있으면 사용 (수동 다운로드 지원)
+    2) Playwright로 HIRA 본사이트 약제기준 게시판에서 시도
+
+    Note: biz.hira.or.kr은 Nexacro14 RIA 기반이라 일반 Playwright 셀렉터 불가.
+    www.hira.or.kr 본사이트 게시판을 우선 시도한다.
 
     Returns
     -------
     다운로드된 Excel 파일 경로, 실패 시 None
     """
-    from playwright.async_api import async_playwright
-
     DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-    logger.info("[DrugPrice] biz.hira.or.kr 접속 시작 (headless=%s)", headless)
+    # 전�� 1: downloads 폴더에 수동 다운로드된 새 파일 확인
+    manual = _find_new_manual_download()
+    if manual:
+        logger.info("[DrugPrice] 수동 다운로드 파일 감지: %s", manual.name)
+        return manual
+
+    # 전략 2: Playwright로 HIRA 본사이트 시도
+    try:
+        from playwright.async_api import async_playwright
+    except ImportError:
+        logger.warning(
+            "[DrugPrice] playwright 미설치. "
+            "`pip install playwright && playwright install chromium`"
+        )
+        return None
+
+    logger.info("[DrugPrice] HIRA 본사이트 접속 시작 (headless=%s)", headless)
 
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(headless=headless)
@@ -103,28 +127,28 @@ async def download_latest_drug_price(
         page = await context.new_page()
 
         try:
-            # 1) 메인 페이지 접속
-            await page.goto(HIRA_BIZ_URL, wait_until="networkidle", timeout=timeout)
-            logger.info("[DrugPrice] 페이지 로드 완료")
+            await page.goto(
+                HIRA_NOTICE_URL, wait_until="networkidle", timeout=timeout,
+            )
+            logger.info("[DrugPrice] 페이지 로드 완료: %s", page.url)
 
-            # 2) "약가" 또는 "적용약가" 관련 링크/메뉴 탐색
-            #    biz.hira.or.kr의 InfoBank 페이지에서 약가파일 다운로드 링크를 찾는다
-            #    사이트 구조에 따라 셀렉터 조정 필요
-            drug_price_link = await _find_drug_price_link(page)
+            download_link = await _find_drug_price_link(page)
 
-            if not drug_price_link:
-                logger.warning("[DrugPrice] 약가파일 링크를 찾을 수 없습니다. 사이트 구조 변경 확인 필요.")
+            if not download_link:
+                logger.warning(
+                    "[DrugPrice] 약가파일 링크를 찾을 수 없습니다.\n"
+                    "  → 수동 다운로드 후 data/hira/downloads/ 에 Excel 파일을 넣어주세요.\n"
+                    "  → biz.hira.or.kr에서 '적용약가파일' 검색 → Excel 다운로드"
+                )
                 await browser.close()
                 return None
 
-            # 3) 다운로드 대기 + 클릭
             async with page.expect_download(timeout=timeout) as download_info:
-                await drug_price_link.click()
+                await download_link.click()
 
             download = await download_info.value
             original_name = download.suggested_filename or "drug_prices.xlsx"
 
-            # 날짜 추출 시도 (파일명에서)
             date_str = _extract_date_from_filename(original_name)
             if not date_str:
                 date_str = datetime.now(timezone.utc).strftime("%Y%m%d")
@@ -140,68 +164,124 @@ async def download_latest_drug_price(
 
         except Exception as e:
             logger.error("[DrugPrice] 다운로드 실패: %s", e)
+            logger.info(
+                "[DrugPrice] 자동 다운로드 실패. 수동 다운로드 안내:\n"
+                "  1) https://biz.hira.or.kr 접속 → '적용약가파일' 검색\n"
+                "  2) Excel 파일 다운로드\n"
+                "  3) data/hira/downloads/ 폴더에 저장\n"
+                "  4) 다시 실행: python -m regscan.workers.drug_price_collector"
+            )
             await browser.close()
             return None
 
 
-async def _find_drug_price_link(page: Any) -> Any | None:
-    """페이지에서 약가파일 다운로드 링크를 찾는다.
+def _find_new_manual_download() -> Path | None:
+    """data/hira/downloads/ 에서 ��직 변환되지 않은 최신 xlsx/xls 파일을 찾는다."""
+    if not DOWNLOAD_DIR.exists():
+        return None
 
-    biz.hira.or.kr InfoBank 페이지의 구조에 따라 셀렉터를 조정한다.
+    excel_files = sorted(
+        [f for f in DOWNLOAD_DIR.iterdir() if f.suffix.lower() in (".xlsx", ".xls")],
+        key=lambda f: f.stat().st_mtime,
+        reverse=True,
+    )
+
+    for excel in excel_files:
+        date_str = _extract_date_from_filename(excel.name)
+        if date_str:
+            json_candidate = DATA_DIR / f"drug_prices_{date_str}.json"
+            if json_candidate.exists():
+                continue
+        return excel
+
+    return None
+
+
+async def _find_drug_price_link(page: Any) -> Any | None:
+    """HIRA 본사이트 게시판에서 약가파일 다운로드 링크를 찾는다.
+
+    www.hira.or.kr 약제기준정보 게시판 구조:
+    게시물 목록 → 게시물 클릭 → 첨부파일 다운로드
+
     여러 전략을 순서대로 시도.
     """
-    strategies = [
-        # 전략 1: "적용약가" 텍스트가 포함된 링크
+    # 전략 1: 게시판 목록에서 약가 관련 게시물 제목 링크
+    post_selectors = [
         "a:has-text('적용약가')",
         "a:has-text('약가파일')",
-        # 전략 2: "약가" 텍스트가 포함된 다운로드 버튼
-        "button:has-text('약가')",
-        # 전략 3: 파일 목록에서 xlsx/xls 다운로드 링크
-        "a[href*='.xlsx']",
-        "a[href*='.xls']",
-        "a[href*='download'][href*='yakga']",
-        # 전략 4: onclick에 다운로드 함수가 있는 요소
-        "[onclick*='약가']",
-        "[onclick*='yakga']",
-        "[onclick*='download']",
+        "a:has-text('상한금액')",
+        "td a:has-text('약가')",
     ]
 
-    for selector in strategies:
+    for selector in post_selectors:
         try:
             elements = await page.query_selector_all(selector)
             if elements:
-                logger.info("[DrugPrice] 링크 발견 (selector: %s, %d개)", selector, len(elements))
-                return elements[0]
-        except Exception:
+                logger.info(
+                    "[DrugPrice] 게시물 발견 (selector: %s, %d개)",
+                    selector, len(elements),
+                )
+                await elements[0].click()
+                await page.wait_for_load_state("networkidle", timeout=15000)
+
+                dl_link = await _find_attachment_link(page)
+                if dl_link:
+                    return dl_link
+
+                await page.go_back()
+                await page.wait_for_load_state("networkidle", timeout=10000)
+        except Exception as e:
+            logger.debug("[DrugPrice] 전략 실패 (%s): %s", selector, e)
             continue
 
-    # 전략 5: iframe 내부 탐색 (InfoBank가 iframe일 수 있음)
-    for frame in page.frames:
-        for selector in strategies[:3]:
-            try:
-                elements = await frame.query_selector_all(selector)
-                if elements:
-                    logger.info("[DrugPrice] iframe 내 링크 발견 (frame: %s)", frame.url)
-                    return elements[0]
-            except Exception:
-                continue
+    # 전략 2: 페이지에 직접 첨부파일이 있는 경우
+    return await _find_attachment_link(page)
+
+
+async def _find_attachment_link(page: Any) -> Any | None:
+    """페이지에서 Excel 첨부파일 다운로드 링크를 찾는다."""
+    attachment_selectors = [
+        "a[href*='.xlsx']",
+        "a[href*='.xls']",
+        "a[href*='fileDown']",
+        "a[href*='download']",
+        "a[onclick*='fileDown']",
+        "a[onclick*='download']",
+        ".file_list a",
+        ".attach a",
+        ".board_file a",
+    ]
+
+    for selector in attachment_selectors:
+        try:
+            elements = await page.query_selector_all(selector)
+            for el in elements:
+                text = (await el.text_content() or "").strip()
+                href = await el.get_attribute("href") or ""
+                onclick = await el.get_attribute("onclick") or ""
+                combined = (text + href + onclick).lower()
+                if any(k in combined for k in [".xlsx", ".xls", "약가", "yakga", "상한"]):
+                    logger.info("[DrugPrice] 첨부파일 발견: %s", text[:50] or href[:50])
+                    return el
+        except Exception:
+            continue
 
     return None
 
 
 def _extract_date_from_filename(filename: str) -> str | None:
     """파일명에서 날짜 추출. 예: '260201 적용약가파일' → '20260201'"""
+    # YYYYMMDD 패턴 (우선)
+    m = re.search(r"(20\d{6})", filename)
+    if m:
+        return m.group(1)
+
     # YYMMDD 패턴
     m = re.search(r"(\d{6})", filename)
     if m:
         yy = m.group(1)[:2]
         century = "20" if int(yy) < 50 else "19"
         return f"{century}{m.group(1)}"
-
-    # YYYYMMDD 패턴
-    m = re.search(r"(20\d{6})", filename)
-    if m:
-        return m.group(1)
 
     return None
 
@@ -233,6 +313,17 @@ def convert_excel_to_json(
     # Excel 읽기
     df = pd.read_excel(excel_path, engine="openpyxl")
     logger.info("[DrugPrice] Excel 로드: %d행 x %d열", len(df), len(df.columns))
+
+    # 스키마 검증: 필수 컬럼 존재 확인
+    REQUIRED_COLUMNS = {"\uc81c\ud488\ucf54\ub4dc", "\uc801\uc6a9\uc2dc\uc791\uc77c\uc790", "\uc0c1\ud55c\uac00", "\uc8fc\uc131\ubd84\ucf54\ub4dc", "\uc81c\ud488\uba85", "\uae09\uc5ec\uae30\uc900"}
+    actual_columns = {str(c).strip() for c in df.columns}
+    missing = REQUIRED_COLUMNS - actual_columns
+    if missing:
+        raise ValueError(
+            f"[DrugPrice] Excel 필수 컬럼 누락: {missing}. "
+            f"실제 컬럼: {sorted(actual_columns)[:10]}... "
+            f"HIRA 약가파일 형식이 변경되었을 수 있습니다."
+        )
 
     # 컬럼 매핑
     rename_map = {}

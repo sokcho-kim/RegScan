@@ -175,6 +175,9 @@ class StreamOrchestrator:
                         # MFDS 데이터 병합
                         if drug.get("mfds_data") and not existing.get("mfds_data"):
                             existing["mfds_data"] = drug["mfds_data"]
+                        # HIRA 데이터 병합
+                        if drug.get("hira_data") and not existing.get("hira_data"):
+                            existing["hira_data"] = drug["hira_data"]
                         # 임상 결과 병합
                         if drug.get("clinical_results") and not existing.get("clinical_results"):
                             existing["clinical_results"] = drug["clinical_results"]
@@ -191,6 +194,7 @@ class StreamOrchestrator:
                             "fda_data": drug.get("fda_data"),
                             "ema_data": drug.get("ema_data"),
                             "mfds_data": drug.get("mfds_data"),
+                            "hira_data": drug.get("hira_data"),
                             "atc_code": drug.get("atc_code", ""),
                             "signals": list(drug.get("signals", [])),
                             "clinical_results": drug.get("clinical_results"),

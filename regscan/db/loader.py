@@ -646,6 +646,118 @@ class DBLoader:
         )
         session.add(log)
 
+    # ------------------------------------------------------------------ #
+    #  Worker 전용 upsert 메서드
+    # ------------------------------------------------------------------ #
+
+    async def upsert_hira_reimbursement(
+        self,
+        *,
+        ingredient_code: str,
+        status: str,
+        price_ceiling: float | None = None,
+        criteria: str = "",
+        product_name: str = "",
+        query_inn: str = "",
+    ) -> int:
+        """HIRA 워커에서 호출 — ingredient_code 또는 query_inn 기준 upsert.
+
+        Returns: 1 if upserted, 0 if skipped.
+        """
+        async with self._session_factory() as session:
+            async with session.begin():
+                # INN으로 drug_id 찾기 (query_inn 우선, 없으면 product_name)
+                lookup = query_inn or product_name
+                if not lookup:
+                    return 0
+
+                drug_id = await self._get_drug_id(session, lookup)
+                if drug_id is None:
+                    return 0
+
+                stmt = select(HIRAReimbursementDB).where(
+                    HIRAReimbursementDB.drug_id == drug_id,
+                )
+                result = await session.execute(stmt)
+                hira: HIRAReimbursementDB | None = result.scalar_one_or_none()
+
+                if hira:
+                    hira.status = status
+                    hira.ingredient_code = ingredient_code
+                    hira.price_ceiling = price_ceiling
+                    hira.criteria = criteria
+                    hira.updated_at = datetime.utcnow()
+                else:
+                    hira = HIRAReimbursementDB(
+                        drug_id=drug_id,
+                        status=status,
+                        ingredient_code=ingredient_code,
+                        price_ceiling=price_ceiling,
+                        criteria=criteria,
+                    )
+                    session.add(hira)
+
+        return 1
+
+    async def upsert_mfds_permit(
+        self,
+        *,
+        inn: str,
+        approval_status: str,
+        approval_date: str | None = None,
+        brand_name: str = "",
+        raw_data: dict | None = None,
+    ) -> int:
+        """MFDS 워커에서 호출 — INN 기준 regulatory_events(agency='mfds') upsert.
+
+        Returns: 1 if upserted, 0 if skipped.
+        """
+        if not inn:
+            return 0
+
+        async with self._session_factory() as session:
+            async with session.begin():
+                drug_id = await self._get_drug_id(session, inn)
+                if drug_id is None:
+                    return 0
+
+                stmt = select(RegulatoryEventDB).where(
+                    RegulatoryEventDB.drug_id == drug_id,
+                    RegulatoryEventDB.agency == "mfds",
+                )
+                result = await session.execute(stmt)
+                event: RegulatoryEventDB | None = result.scalar_one_or_none()
+
+                # 날짜 파싱
+                parsed_date: date | None = None
+                if approval_date:
+                    try:
+                        cleaned = str(approval_date).replace("-", "")[:8]
+                        parsed_date = datetime.strptime(cleaned, "%Y%m%d").date()
+                    except (ValueError, TypeError):
+                        parsed_date = None
+
+                mfds_status = "approved" if "허가" in approval_status or "승인" in approval_status else "pending"
+
+                if event:
+                    event.status = mfds_status
+                    event.approval_date = parsed_date
+                    event.brand_name = brand_name
+                    event.raw_data = raw_data
+                    event.collected_at = datetime.utcnow()
+                else:
+                    event = RegulatoryEventDB(
+                        drug_id=drug_id,
+                        agency="mfds",
+                        status=mfds_status,
+                        approval_date=parsed_date,
+                        brand_name=brand_name,
+                        raw_data=raw_data,
+                    )
+                    session.add(event)
+
+        return 1
+
     async def normalize_existing_inns(self) -> int:
         """기존 DB의 INN을 IngredientMatcher.normalize() 기준으로 정규화.
 

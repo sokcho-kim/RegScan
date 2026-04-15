@@ -19,15 +19,11 @@ logger = logging.getLogger(__name__)
 
 KDCA_BASE = "https://www.kdca.go.kr"
 
-# 보도자료 목록 URL
-PRESS_RELEASE_URL = (
-    f"{KDCA_BASE}/board/board.es?mid=a20501010000&bid=0015"
-)
+# 보도자료 목록 URL (2026-04 사이트 리뉴얼 반영)
+PRESS_RELEASE_URL = f"{KDCA_BASE}/kdca/2847/subview.do"
 
-# 감염병 관련 공지
-DISEASE_INFO_URL = (
-    f"{KDCA_BASE}/board/board.es?mid=a20501000000&bid=0015"
-)
+# 보도설명자료
+PRESS_EXPLAIN_URL = f"{KDCA_BASE}/kdca/2849/subview.do"
 
 
 class KDCAIngestor(BaseIngestor):
@@ -144,10 +140,28 @@ class KDCAIngestor(BaseIngestor):
         return records
 
     async def _navigate_to_page(self, page, page_num: int) -> bool:
-        """페이지 이동"""
+        """페이지 이동 (2026-04 리뉴얼 대응)"""
         try:
-            # 공공기관 사이트 공통 페이지네이션: fn_egov_link_page(N) 또는 직접 링크
-            # 방법 1: 페이지 번호 링크 클릭
+            # 방법 1: javascript:page_link('N') 패턴 (신규 사이트)
+            paging_link = await page.query_selector(
+                f"a[href*=\"page_link('{page_num}')\"]"
+            )
+            if paging_link:
+                await paging_link.click()
+                await page.wait_for_load_state("networkidle")
+                await asyncio.sleep(1.5)
+                return True
+
+            # 방법 2: page_link JS 함수 직접 호출
+            try:
+                await page.evaluate(f"page_link('{page_num}')")
+                await page.wait_for_load_state("networkidle")
+                await asyncio.sleep(1.5)
+                return True
+            except Exception:
+                pass
+
+            # 방법 3: URL 파라미터 방식 (레거시 호환)
             paging_link = await page.query_selector(
                 f'a[href*="nPage={page_num}"], '
                 f'a[onclick*="({page_num})"]'
@@ -158,12 +172,7 @@ class KDCAIngestor(BaseIngestor):
                 await asyncio.sleep(1.5)
                 return True
 
-            # 방법 2: URL 직접 변경
-            url = f"{PRESS_RELEASE_URL}&nPage={page_num}"
-            await page.goto(url, wait_until="domcontentloaded")
-            await page.wait_for_load_state("networkidle")
-            await asyncio.sleep(1.5)
-            return True
+            return False
 
         except Exception as e:
             logger.error("[KDCA] 페이지 %d 이동 실패: %s", page_num, e)
@@ -237,20 +246,33 @@ class KDCAIngestor(BaseIngestor):
         href = await link.get_attribute("href") or ""
         onclick = await link.get_attribute("onclick") or ""
 
-        # URL 생성
+        # URL 생성 (2026-04 리뉴얼: jf_viewArtcl('kdca','41','310734') 패턴)
         detail_url = ""
         if href and href.startswith("http"):
             detail_url = href
         elif href and not href.startswith("javascript"):
             detail_url = f"{KDCA_BASE}{href}" if href.startswith("/") else href
-        elif onclick:
-            # fn_detail('12345') 등의 패턴
-            id_match = re.search(r"['\"](\d+)['\"]", onclick)
-            if id_match:
+        else:
+            # jf_viewArtcl('kdca', 'NN', 'XXXXXX') → /bbs/kdca/NN/XXXXXX/artclView.do
+            combined = href or onclick or ""
+            art_match = re.search(
+                r"jf_viewArtcl\(\s*'(\w+)'\s*,\s*'(\d+)'\s*,\s*'(\d+)'\s*\)",
+                combined,
+            )
+            if art_match:
+                site, board_id, artcl_id = art_match.groups()
                 detail_url = (
-                    f"{PRESS_RELEASE_URL}"
-                    f"&act=view&list_no={id_match.group(1)}"
+                    f"{KDCA_BASE}/bbs/{site}/{board_id}/"
+                    f"{artcl_id}/artclView.do"
                 )
+            else:
+                # 레거시 fallback: fn_detail('12345') 패턴
+                id_match = re.search(r"['\"](\d+)['\"]", combined)
+                if id_match:
+                    detail_url = (
+                        f"{KDCA_BASE}/bbs/kdca/42/"
+                        f"{id_match.group(1)}/artclView.do"
+                    )
 
         # 날짜 추출 (마지막 열들에서)
         date_str = ""

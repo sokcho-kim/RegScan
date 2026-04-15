@@ -49,8 +49,39 @@ async def run_daily_pipeline() -> dict:
     }
 
     try:
+        # Step 0: 공공데이터 워커 수집
+        logger.info("[0/6] 공공데이터 워커 수집...")
+        try:
+            worker_results = {}
+            try:
+                from regscan.workers.drug_price_collector import DrugPriceCollector
+                dp = await DrugPriceCollector().run(headless=True)
+                worker_results["drug_price"] = dp.get("status", "unknown")
+            except Exception as e:
+                logger.debug("  DrugPriceCollector 건너뜀: %s", e)
+
+            try:
+                from regscan.workers.mfds_worker import MFDSPermitWorker
+                mw = await MFDSPermitWorker().run(mode="delta", days_back=7)
+                worker_results["mfds_permit"] = mw.get("status", "unknown")
+            except Exception as e:
+                logger.debug("  MFDSPermitWorker 건너뜀: %s", e)
+
+            try:
+                from regscan.workers.hira_worker import HIRAReimbursementWorker
+                hw = await HIRAReimbursementWorker().run(mode="by_inn")
+                worker_results["hira_reimbursement"] = hw.get("status", "unknown")
+            except Exception as e:
+                logger.debug("  HIRAReimbursementWorker 건너뜀: %s", e)
+
+            result_summary["steps"]["workers"] = worker_results
+            logger.info("  워커 수집 완료: %s", worker_results)
+        except Exception as e:
+            logger.warning("  워커 수집 실패: %s", e)
+            result_summary["steps"]["workers"] = f"error: {e}"
+
         # Step 1: 일간 스캔
-        logger.info("[1/5] 일간 스캔 실행...")
+        logger.info("[1/6] 일간 스캔 실행...")
         from regscan.monitor import DailyScanner
 
         scanner = DailyScanner()
