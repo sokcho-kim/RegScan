@@ -38,8 +38,8 @@ logger = logging.getLogger(__name__)
 async def enrich_drugs_with_hira(drugs: list[dict]) -> int:
     """drugs_found 리스트에 HIRA 급여 데이터를 주입한다.
 
-    DB에서 INN 기준으로 hira_reimbursements를 일괄 조회하여
-    각 drug dict에 hira_data 키를 추가.
+    1차: DB에서 INN 기준으로 hira_reimbursements 조회 (PostgreSQL 환경)
+    2차: DB 미사용 or 미매칭 → IngredientBridge JSON 직접 조회 (fallback)
 
     Returns:
         enriched count
@@ -47,59 +47,147 @@ async def enrich_drugs_with_hira(drugs: list[dict]) -> int:
     if not drugs:
         return 0
 
+    enriched = 0
+
+    # ── 1차: DB 경유 ──
     try:
         from sqlalchemy import select
         from regscan.db.database import get_async_session
         from regscan.db.models import DrugDB, HIRAReimbursementDB
-    except Exception:
-        logger.debug("HIRA enrichment 스킵: DB 모듈 로드 불가")
-        return 0
 
-    # INN → drug dict 매핑 (빠른 lookup)
-    inn_to_drugs: dict[str, list[dict]] = {}
-    for d in drugs:
-        inn = (d.get("inn") or "").strip().upper()
-        if inn:
-            inn_to_drugs.setdefault(inn, []).append(d)
+        inn_to_drugs: dict[str, list[dict]] = {}
+        for d in drugs:
+            inn = (d.get("inn") or "").strip().upper()
+            if inn:
+                inn_to_drugs.setdefault(inn, []).append(d)
 
-    if not inn_to_drugs:
+        if inn_to_drugs:
+            session_factory = get_async_session()
+            async with session_factory() as session:
+                stmt = (
+                    select(DrugDB.inn, HIRAReimbursementDB)
+                    .join(HIRAReimbursementDB, DrugDB.id == HIRAReimbursementDB.drug_id)
+                    .where(DrugDB.inn.in_([inn for inn in inn_to_drugs]))
+                )
+                result = await session.execute(stmt)
+                rows = result.all()
+
+                for drug_inn, hira_row in rows:
+                    norm_inn = drug_inn.strip().upper()
+                    targets = inn_to_drugs.get(norm_inn, [])
+                    if not targets:
+                        for key in inn_to_drugs:
+                            if key == norm_inn:
+                                targets = inn_to_drugs[key]
+                                break
+                    if not targets:
+                        continue
+                    hira_dict = _build_hira_intel(hira_row)
+                    for drug_dict in targets:
+                        drug_dict["hira_data"] = hira_dict
+                        enriched += 1
+    except Exception as e:
+        logger.debug("HIRA DB 경로 스킵: %s", e)
+
+    # ── 2차: IngredientBridge JSON fallback (DB 미주입 약물 대상) ──
+    remaining = [d for d in drugs if "hira_data" not in d]
+    if remaining:
+        bridge_count = _enrich_via_bridge(remaining)
+        enriched += bridge_count
+
+    if enriched:
+        logger.info("[HIRA Enrichment] %d/%d 약물에 급여 데이터 주입", enriched, len(drugs))
+    return enriched
+
+
+# ── IngredientBridge 기반 JSON 직접 조회 ──
+
+_bridge_instance = None
+
+
+def _get_bridge():
+    """IngredientBridge 싱글턴 (최초 1회 로드)"""
+    global _bridge_instance
+    if _bridge_instance is not None:
+        return _bridge_instance
+
+    from pathlib import Path
+    from regscan.map.ingredient_bridge import IngredientBridge
+
+    data_dir = Path(__file__).resolve().parent.parent.parent / "data"
+    bridge = IngredientBridge()
+
+    master = data_dir / "bridge" / "yakga_ingredient_master.csv"
+    atc = data_dir / "bridge" / "건강보험심사평가원_ATC코드_매핑_목록_20250630.csv"
+
+    # HIRA 약가 JSON — 최신 파일 자동 탐색
+    hira_dir = data_dir / "hira"
+    hira_files = sorted(hira_dir.glob("drug_prices_*.json"), reverse=True) if hira_dir.exists() else []
+
+    if not master.exists():
+        logger.warning("IngredientBridge 마스터 없음: %s", master)
+        return None
+
+    bridge.load_master(master)
+    if atc.exists():
+        bridge.load_atc_mapping(atc)
+    if hira_files:
+        bridge.load_hira(hira_files[0])
+        logger.info("[HIRA Bridge] 로드: %s", hira_files[0].name)
+    else:
+        logger.warning("HIRA 약가 JSON 없음 — 급여 상태만 제공")
+
+    _bridge_instance = bridge
+    return bridge
+
+
+def _enrich_via_bridge(drugs: list[dict]) -> int:
+    """IngredientBridge로 INN → HIRA 직접 매칭"""
+    bridge = _get_bridge()
+    if bridge is None:
         return 0
 
     enriched = 0
-    try:
-        session_factory = get_async_session()
-        async with session_factory() as session:
-            # DrugDB.inn → hira relationship 일괄 조회
-            stmt = (
-                select(DrugDB.inn, HIRAReimbursementDB)
-                .join(HIRAReimbursementDB, DrugDB.id == HIRAReimbursementDB.drug_id)
-                .where(DrugDB.inn.in_([inn for inn in inn_to_drugs]))
-            )
-            result = await session.execute(stmt)
-            rows = result.all()
+    for drug_dict in drugs:
+        inn = (drug_dict.get("inn") or "").strip()
+        if not inn:
+            continue
 
-            for drug_inn, hira_row in rows:
-                norm_inn = drug_inn.strip().upper()
-                targets = inn_to_drugs.get(norm_inn, [])
-                if not targets:
-                    # 대소문자 불일치 fallback
-                    for key in inn_to_drugs:
-                        if key == norm_inn:
-                            targets = inn_to_drugs[key]
-                            break
-                if not targets:
-                    continue
+        result = bridge.lookup(inn)
+        if result.match_method == "unmatched":
+            continue
 
-                hira_dict = _build_hira_intel(hira_row)
-                for drug_dict in targets:
-                    drug_dict["hira_data"] = hira_dict
-                    enriched += 1
+        status = result.status.value
+        price = result.price_ceiling
+        code = result.ingredient_code or ""
 
-    except Exception as e:
-        logger.warning("HIRA enrichment 실패: %s", e)
+        price_str = f", 상한가 {price:,.0f}원" if price and status == "reimbursed" else ""
+
+        if status == "reimbursed":
+            fact = f"HIRA 급여 등재{price_str}"
+        elif status == "not_covered":
+            fact = "HIRA 비급여 (전액 환자부담)"
+        elif status == "deleted":
+            fact = "HIRA 급여 삭제 (과거 등재 이력)"
+        else:
+            fact = "HIRA 급여목록 미등재"
+
+        hira_data: dict[str, Any] = {
+            "reimbursement_fact": fact,
+            "match_method": result.match_method,
+        }
+        if price and status == "reimbursed":
+            hira_data["price_ceiling"] = price
+        if code:
+            hira_data["ingredient_code"] = code
+        if status in ("not_found", "not_covered"):
+            hira_data["access_routes"] = "KODC 긴급도입 / 제약사 EAP / 비급여 처방"
+
+        drug_dict["hira_data"] = hira_data
+        enriched += 1
 
     if enriched:
-        logger.info("[HIRA Enrichment] %d개 약물에 급여 데이터 주입", enriched)
+        logger.info("[HIRA Bridge] %d개 약물 JSON 직접 매칭 성공", enriched)
     return enriched
 
 
