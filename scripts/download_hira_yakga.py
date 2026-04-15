@@ -358,38 +358,138 @@ async def main():
                                     break
 
                         # Nexacro 내부 팝업(ComFileDownPop)이 레이어로 열림
-                        # Dext5 다운로드 링크가 DOM에 나타날 때까지 대기
+                        # Dext5 파일 리스트 → 체크박스 선택 → 다운로드 버튼
                         await asyncio.sleep(8)
 
-                        # Dext5 다운로드 링크 찾기 (iframe 안에 있을 수 있음)
-                        for frame in ib_page.frames:
-                            dl_el = await frame.evaluate("""() => {
-                                // Dext5 다운로드 리스트에서 파일 링크 찾기
-                                var links = document.querySelectorAll('a[href], span[onclick], div[onclick], td');
-                                var results = [];
-                                for (var el of links) {
-                                    var text = el.textContent || '';
-                                    if (text.includes('xlsx') || text.includes('약가')) {
-                                        var r = el.getBoundingClientRect();
-                                        if (r.width > 0) results.push({text: text.trim().substring(0,50), cx: r.x+r.width/2, cy: r.y+r.height/2});
+                        # 1) 팝업 내 모든 요소 확인
+                        popup_els = await ib_page.evaluate("""() => {
+                            var results = [];
+                            // Dext5 popup 영역 — FileDownPop ID 패턴
+                            var els = document.querySelectorAll(
+                                '[id*=FileDown] input[type=checkbox], ' +
+                                '[id*=dext5] input[type=checkbox], ' +
+                                'input[type=checkbox], ' +
+                                '[id*=FileDown] button, ' +
+                                '[id*=FileDown] [id*=btn], ' +
+                                '[class*=check], [class*=download]'
+                            );
+                            for (var el of els) {
+                                var r = el.getBoundingClientRect();
+                                if (r.width > 0) {
+                                    results.push({
+                                        tag: el.tagName, type: el.type || '',
+                                        id: el.id, cls: (el.className || '').substring(0,30),
+                                        text: (el.textContent || el.value || '').trim().substring(0,30),
+                                        cx: r.x+r.width/2, cy: r.y+r.height/2
+                                    });
+                                }
+                            }
+                            return results;
+                        }""")
+                        # Nexacro Dext5 파일 리스트 — 체크박스 + 다운로드 버튼
+                        # 스크린샷에서 확인: 파일 행 체크박스, "다운로드" 버튼이 Nexacro DIV로 렌더링됨
+
+                        # 1) 파일 행의 체크박스 찾기 — Dext5 체크박스 이미지
+                        checkbox = await ib_page.evaluate("""() => {
+                            // Dext5 체크박스 — 보통 img 또는 div로 렌더링
+                            // 파일명 텍스트 근처의 체크박스 찾기
+                            var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+                            while(w.nextNode()) {
+                                var text = w.currentNode.textContent.trim();
+                                if (text.includes('적용약가') && text.includes('.xlsx')) {
+                                    var el = w.currentNode.parentElement;
+                                    var r = el.getBoundingClientRect();
+                                    // 체크박스는 파일명 왼쪽 — x 좌표가 더 작은 클릭 가능 요소
+                                    return {file_cx: r.x, file_cy: r.y + r.height/2,
+                                            check_cx: r.x - 30, check_cy: r.y + r.height/2};
+                                }
+                            }
+                            return null;
+                        }""")
+
+                        # 체크박스와 다운로드 버튼은 Nexacro DIV — dispatchEvent 필요
+                        # 1) 체크박스: 파일명 행 왼쪽의 체크 이미지
+                        chk_result = await ib_page.evaluate("""() => {
+                            // Dext5 체크박스 — ID에 checkbox 또는 chk 패턴
+                            var els = document.querySelectorAll('[id*=chk], [id*=check], [id*=Check]');
+                            var results = [];
+                            for (var el of els) {
+                                var r = el.getBoundingClientRect();
+                                if (r.width > 0 && r.y > 550) {
+                                    results.push({id: el.id, cx: r.x+r.width/2, cy: r.y+r.height/2, w: r.width});
+                                }
+                            }
+                            // 못 찾으면 파일 행 근처 img 태그
+                            if (results.length === 0) {
+                                var imgs = document.querySelectorAll('img');
+                                for (var img of imgs) {
+                                    var r = img.getBoundingClientRect();
+                                    if (r.y > 580 && r.y < 660 && r.x < 280 && r.width < 30 && r.width > 5) {
+                                        results.push({id: img.id || img.parentElement.id, cx: r.x+r.width/2, cy: r.y+r.height/2, w: r.width, src: (img.src||'').slice(-30)});
                                     }
                                 }
-                                return results;
-                            }""")
-                            if dl_el:
-                                log.info("  Dext5 파일 링크: %s", dl_el)
-                                # 첫 번째 파일 클릭
-                                await frame.click("text=xlsx")
-                                await asyncio.sleep(3)
+                            }
+                            return results;
+                        }""")
+                        log.info("  체크박스 후보: %s", chk_result)
+
+                        if chk_result:
+                            # 데이터 행 체크박스 선택 (head가 아닌 body row 0)
+                            body_chk = [c for c in chk_result if "body_gridrow_0" in c.get("id", "")]
+                            target_chk = body_chk[0] if body_chk else chk_result[-1]
+                            log.info("  체크박스 dispatchEvent (%d, %d) id=%s", target_chk["cx"], target_chk["cy"], target_chk.get("id","")[-40:])
+                            await ib_page.evaluate("""(pos) => {
+                                var el = document.elementFromPoint(pos.cx, pos.cy);
+                                if (el) {
+                                    ['mousedown','mouseup','click'].forEach(function(evt) {
+                                        el.dispatchEvent(new MouseEvent(evt, {
+                                            bubbles:true, cancelable:true,
+                                            clientX:pos.cx, clientY:pos.cy, button:0
+                                        }));
+                                    });
+                                }
+                            }""", target_chk)
+                            await asyncio.sleep(2)
+
+                        # 2) 다운로드 버튼 — dispatchEvent
+                        dl_result = await ib_page.evaluate("""() => {
+                            var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+                            while(w.nextNode()) {
+                                if (w.currentNode.textContent.trim() === '다운로드') {
+                                    var el = w.currentNode.parentElement;
+                                    var r = el.getBoundingClientRect();
+                                    if (r.width > 0 && r.x > 500) {
+                                        return {cx: r.x+r.width/2, cy: r.y+r.height/2, id: el.id};
+                                    }
+                                }
+                            }
+                            return null;
+                        }""")
+
+                        if dl_result:
+                            log.info("  다운로드 버튼 dispatchEvent (%d, %d)", dl_result["cx"], dl_result["cy"])
+                            await ib_page.evaluate("""(pos) => {
+                                var el = document.elementFromPoint(pos.cx, pos.cy);
+                                if (el) {
+                                    ['mousedown','mouseup','click'].forEach(function(evt) {
+                                        el.dispatchEvent(new MouseEvent(evt, {
+                                            bubbles:true, cancelable:true,
+                                            clientX:pos.cx, clientY:pos.cy, button:0
+                                        }));
+                                    });
+                                }
+                            }""", dl_result)
+                            await asyncio.sleep(5)
 
                         try:
-                            await asyncio.wait_for(dl_done.wait(), timeout=30)
+                            await asyncio.wait_for(dl_done.wait(), timeout=60)
                             log.info("  다운로드 완료!")
                             for f in dl_dir.iterdir():
                                 if f.stat().st_size > 100000:
                                     log.info("  파일: %s (%dKB)", f.name, f.stat().st_size // 1024)
                         except asyncio.TimeoutError:
-                            log.info("  다운로드 타임아웃 — 30초 대기 후 실패")
+                            log.info("  다운로드 타임아웃 — 스크린샷 저장")
+                            await ib_page.screenshot(path=str(dl_dir / "debug_final.png"))
             else:
                 log.info("  적용약가 게시글 UI에서 못 찾음")
         else:
