@@ -1,0 +1,70 @@
+[
+  {
+    "inn": "BELUMOSUDIL",
+    "hira_data": {
+      "reimbursement_fact": "HIRA 매핑 실패 — 급여/가격 정보 확인 불가 (수동 확인 필요)",
+      "match_confidence": "unmatched",
+      "match_method": "unmatched",
+      "is_guardrailed": true,
+      "source_date": "20260401"
+    },
+    "mfds_data": {
+      "approval_status": "미허가"
+    }
+  },
+  {
+    "inn": "CAPLACIZUMAB",
+    "hira_data": {
+      "reimbursement_fact": "HIRA 매핑 실패 — 급여/가격 정보 확인 불가 (수동 확인 필요)",
+      "match_confidence": "unmatched",
+      "match_method": "unmatched",
+      "is_guardrailed": true,
+      "source_date": "20260401"
+    },
+    "mfds_data": {
+      "approval_status": "미허가"
+    }
+  },
+  {
+    "inn": "VAMOROLONE",
+    "hira_data": {
+      "reimbursement_fact": "HIRA 매핑 실패 — 급여/가격 정보 확인 불가 (수동 확인 필요)",
+      "match_confidence": "unmatched",
+      "match_method": "unmatched",
+      "is_guardrailed": true,
+      "source_date": "20260401"
+    },
+    "mfds_data": {
+      "approval_status": "미허가"
+    }
+  },
+  {
+    "inn": "BUROSUMAB",
+    "hira_data": {
+      "reimbursement_fact": "HIRA 급여 등재, 상한가 7,999,595원 (30mg/1병)",
+      "match_method": "normalized",
+      "match_confidence": "exact_match",
+      "source_date": "20260401",
+      "is_guardrailed": false,
+      "price_ceiling": 7999595.0,
+      "dosage_spec": "30mg/1병",
+      "ingredient_code": "691701BIJ"
+    },
+    "mfds_data": {
+      "approval_status": "허가"
+    }
+  },
+  {
+    "inn": "REZAFUNGIN",
+    "hira_data": {
+      "reimbursement_fact": "HIRA 매핑 실패 — 급여/가격 정보 확인 불가 (수동 확인 필요)",
+      "match_confidence": "unmatched",
+      "match_method": "unmatched",
+      "is_guardrailed": true,
+      "source_date": "20260401"
+    },
+    "mfds_data": {
+      "approval_status": "미허가"
+    }
+  }
+]
