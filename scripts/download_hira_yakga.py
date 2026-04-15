@@ -467,6 +467,19 @@ async def main():
                         }""")
 
                         if dl_result:
+                            # dext5handler.ndo 응답을 직접 가로채기
+                            dext5_response = []
+
+                            async def intercept_dext5(route):
+                                resp = await route.fetch()
+                                body = await resp.body()
+                                if len(body) > 10000:
+                                    dext5_response.append(body)
+                                    log.info("  dext5handler 응답 캡처: %dKB", len(body) // 1024)
+                                await route.fulfill(response=resp)
+
+                            await ib_page.route("**/dext5handler.ndo", intercept_dext5)
+
                             log.info("  다운로드 버튼 dispatchEvent (%d, %d)", dl_result["cx"], dl_result["cy"])
                             await ib_page.evaluate("""(pos) => {
                                 var el = document.elementFromPoint(pos.cx, pos.cy);
@@ -479,17 +492,24 @@ async def main():
                                     });
                                 }
                             }""", dl_result)
-                            await asyncio.sleep(5)
 
-                        try:
-                            await asyncio.wait_for(dl_done.wait(), timeout=60)
-                            log.info("  다운로드 완료!")
-                            for f in dl_dir.iterdir():
-                                if f.stat().st_size > 100000:
-                                    log.info("  파일: %s (%dKB)", f.name, f.stat().st_size // 1024)
-                        except asyncio.TimeoutError:
-                            log.info("  다운로드 타임아웃 — 스크린샷 저장")
-                            await ib_page.screenshot(path=str(dl_dir / "debug_final.png"))
+                            # 다운로드 응답 대기
+                            for _ in range(60):
+                                if dext5_response:
+                                    break
+                                await asyncio.sleep(1)
+
+                            await ib_page.unroute("**/dext5handler.ndo")
+
+                            if dext5_response:
+                                raw = dext5_response[0]
+                                fname = meta["files"][0].get("name", "drug_prices.xlsx") if meta["files"] else "drug_prices.xlsx"
+                                save_path = dl_dir / fname
+                                with open(save_path, "wb") as f:
+                                    f.write(raw)
+                                log.info("  *** 저장 성공: %s (%dKB) ***", save_path, len(raw) // 1024)
+                            else:
+                                log.info("  dext5handler 응답 없음 — 60초 타임아웃")
             else:
                 log.info("  적용약가 게시글 UI에서 못 찾음")
         else:
