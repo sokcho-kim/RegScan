@@ -280,10 +280,10 @@ def _resolve_mfds_phrase(mfds_data: dict) -> tuple[str, Optional[str]]:
 def _resolve_hira(drug_dict: dict, hira_source_date: str) -> dict:
     """HIRA enrichment → phrase + evidence_type + 가드레일.
 
-    기존 _enrich_via_bridge의 로직을 팩트카드용으로 재구성.
-    IngredientBridge를 직접 호출한다.
+    DrugCodeResolver 경유: ATC → EDI → INN fallback.
     """
-    from regscan.stream.briefing import _get_bridge, _extract_dosage_from_raw
+    from regscan.map.code_resolver import get_code_resolver
+    from regscan.stream.briefing import _extract_dosage_from_raw
 
     inn = (drug_dict.get("inn") or "").strip()
     if not inn:
@@ -298,12 +298,15 @@ def _resolve_hira(drug_dict: dict, hira_source_date: str) -> dict:
             "copay": None,
         }
 
-    bridge = _get_bridge()
-    if bridge is None:
+    resolver = get_code_resolver()
+    atc = drug_dict.get("atc_code", "")
+    match = resolver.resolve(inn, atc_code=atc)
+
+    if not match.matched:
         return {
             "phrase": "심평원 원천 데이터 미확인 — 미등재 또는 수집 누락 가능",
             "confidence": "unmatched",
-            "evidence_type": "source_not_loaded",
+            "evidence_type": match.match_detail or "bridge_unmatched",
             "is_guardrailed": True,
             "price": None,
             "dosage": "",
@@ -311,11 +314,20 @@ def _resolve_hira(drug_dict: dict, hira_source_date: str) -> dict:
             "copay": None,
         }
 
-    result = bridge.lookup(inn)
-    method = result.match_method
-    status = result.status.value
-    price = result.price_ceiling
-    raw = result.raw_data or {}
+    # resolver 내부에서 Bridge를 이미 호출했으므로 결과 재사용
+    # Bridge 상세 정보가 필요하면 resolver._bridge에서 가져옴
+    bridge = resolver._bridge
+    if bridge:
+        result = bridge.lookup(inn)
+        method = result.match_method
+        status = result.status.value
+        price = result.price_ceiling
+        raw = result.raw_data or {}
+    else:
+        method = "unmatched"
+        status = match.hira_status or "not_found"
+        price = match.price_ceiling
+        raw = match.raw_data
 
     # confidence 매핑
     confidence_map = {
@@ -361,7 +373,7 @@ def _resolve_hira(drug_dict: dict, hira_source_date: str) -> dict:
 
     # copay
     copay = None
-    criteria = result.reimbursement_criteria or ""
+    criteria = (result.reimbursement_criteria if bridge else "") or ""
     if status == "reimbursed" and criteria:
         criteria_lower = criteria.lower()
         if "산정특례" in criteria_lower or "본인부담" in criteria_lower:

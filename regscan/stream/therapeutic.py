@@ -359,6 +359,8 @@ class TherapeuticAreaStream(BaseStream):
                                 "generic_name": inn,
                                 "brand_name": brand_names[0] if brand_names else "",
                                 "pharm_class_epc": atc,
+                                "rxcui": openfda.get("rxcui", []),
+                                "unii": openfda.get("unii", []),
                                 "application_number": r.get("application_number", ""),
                                 "submission_status_date": sub_info.get("submission_status_date", ""),
                                 "submission_status": sub_info.get("submission_status", ""),
@@ -555,7 +557,9 @@ class TherapeuticAreaStream(BaseStream):
         return count
 
     async def _enrich_with_mfds(self, drugs_by_inn: dict[str, dict]) -> int:
-        """IngredientBridge → HIRA 제품코드(EDI코드) → MFDS API 정확 매칭
+        """DrugCodeResolver → edi_code → MFDS API 정확 매칭
+
+        4단계 fallback: ATC → EDI → 품목기준코드 → INN
 
         Args:
             drugs_by_inn: 정규화된 INN → drug dict
@@ -565,16 +569,13 @@ class TherapeuticAreaStream(BaseStream):
         """
         import asyncio as _aio
         from regscan.ingest.mfds import MFDSClient
+        from regscan.map.code_resolver import get_code_resolver
         from regscan.parse.mfds_parser import MFDSPermitParser
-        from regscan.stream.briefing import _get_bridge
 
-        bridge = _get_bridge()
-        if bridge is None:
-            logger.warning("[MFDS] IngredientBridge 로드 실패 — MFDS enrichment 스킵")
-            return 0
-
+        resolver = get_code_resolver()
         count = 0
         skipped = 0
+        tier_stats: dict[str, int] = {}
         parser = MFDSPermitParser()
 
         async with MFDSClient() as client:
@@ -583,20 +584,20 @@ class TherapeuticAreaStream(BaseStream):
                 if not inn or len(inn) < 3:
                     continue
 
-                # 1) Bridge에서 제품코드(EDI코드) 확보
-                try:
-                    lookup = bridge.lookup(inn)
-                    edi_code = (lookup.raw_data or {}).get("제품코드")
-                except Exception:
-                    edi_code = None
+                # 다단계 매칭 — ATC 코드가 있으면 1순위 활용
+                atc = drug.get("atc_code", "")
+                match = resolver.resolve(inn, atc_code=atc)
 
-                if not edi_code:
+                if not match.edi_code:
                     skipped += 1
                     continue
 
-                # 2) edi_code로 MFDS API 조회 (정확 매칭)
+                tier_label = match.tier_label
+                tier_stats[tier_label] = tier_stats.get(tier_label, 0) + 1
+
+                # edi_code로 MFDS API 조회 (정확 매칭)
                 try:
-                    response = await client.search_permits(edi_code=edi_code, num_of_rows=5)
+                    response = await client.search_permits(edi_code=match.edi_code, num_of_rows=5)
                     items = response.get("body", {}).get("items", [])
                     if items:
                         parsed = parser.parse_many(items)
@@ -609,7 +610,9 @@ class TherapeuticAreaStream(BaseStream):
                 await _aio.sleep(0.2)
 
         if skipped:
-            logger.debug("[MFDS] Bridge 미매칭 %d건 스킵", skipped)
+            logger.debug("[MFDS] 미매칭 %d건 스킵", skipped)
+        if tier_stats:
+            logger.info("[MFDS] 매칭 tier별: %s", tier_stats)
         return count
 
     def _group_by_atc(
