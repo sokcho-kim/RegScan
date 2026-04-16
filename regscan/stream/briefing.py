@@ -761,7 +761,7 @@ V2_THERAPEUTIC_PROMPT = """[이번 주 수집 약물 — {n}건]
 
 출력 JSON:
 {{
-  "headline": "이번 주 가장 중요한 규제 이벤트 1줄 (구체적 약물명+이벤트)",
+  "headline": "이번 주 전체를 아우르는 종합 헤드라인 (예: '신규 승인 1건, 고가 급여 유지 2건 — 항생제·안과·혈액암 동시 변동')",
   "key_takeaway": "경영진이 알아야 할 핵심 1문장",
   "top_stories": [
     {{
@@ -891,7 +891,7 @@ V2_UNIFIED_PROMPT = """[이번 주 주요 약물 — {n}건]
 
 출력 JSON:
 {{
-  "headline": "이번 주 핵심 이벤트 1줄",
+  "headline": "이번 주 전체를 아우르는 종합 헤드라인",
   "key_takeaway": "경영진이 알아야 할 핵심 1문장",
   "executive_summary": "이번 주 일어난 일 3-5줄. 구체적 약물명과 이벤트.",
   "top_stories": [
