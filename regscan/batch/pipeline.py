@@ -422,10 +422,13 @@ async def _generate_stream_briefings(
         for sr in sresults:
             try:
                 if sname == "therapeutic_area":
-                    area_config = TherapeuticAreaConfig.get_area(sr.sub_category)
-                    area_ko = area_config.label_ko if area_config else sr.sub_category
+                    if sr.sub_category:
+                        area_config = TherapeuticAreaConfig.get_area(sr.sub_category)
+                        area_ko = area_config.label_ko if area_config else sr.sub_category
+                    else:
+                        area_ko = "최근 규제 변경"
                     briefing = await generator.generate_therapeutic_briefing(
-                        sr.sub_category, area_ko, sr,
+                        sr.sub_category or "recent", area_ko, sr,
                     )
                 elif sname == "innovation":
                     briefing = await generator.generate_innovation_briefing(sr)

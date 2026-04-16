@@ -184,8 +184,11 @@ class TherapeuticAreaStream(BaseStream):
     def __init__(self, areas: list[str] | None = None):
         """
         Args:
-            areas: 수집할 치료영역 목록. None이면 settings에서 읽음.
+            areas: 수집할 치료영역 목록.
+                   None → 최근 변경 전체 수집 (신규 방식)
+                   명시적 지정 → 해당 영역만 기존 방식으로 수집
         """
+        self._explicit_areas = areas is not None
         if areas:
             self._areas = [
                 TherapeuticAreaConfig.AREAS[a]
@@ -201,23 +204,309 @@ class TherapeuticAreaStream(BaseStream):
         return "therapeutic_area"
 
     async def collect(self) -> list[StreamResult]:
-        """영역별로 FDA + EMA 데이터 수집"""
-        results: list[StreamResult] = []
-        for area in self._areas:
+        """최근 변경 약물 수집 (기본) / 영역별 수집 (--area 지정 시)"""
+        if self._explicit_areas:
+            # 기존 방식: --area oncology 등 명시적 지정 시
+            results: list[StreamResult] = []
+            for area in self._areas:
+                try:
+                    result = await self._collect_area(area)
+                    results.append(result)
+                except Exception as e:
+                    logger.error("치료영역 '%s' 수집 실패: %s", area.name, e)
+                    results.append(StreamResult(
+                        stream_name=self.stream_name,
+                        sub_category=area.name,
+                        errors=[str(e)],
+                    ))
+            return results
+        else:
+            # 새 방식: 최근 N일 FDA/EMA 변경 전체 수집
             try:
-                result = await self._collect_area(area)
-                results.append(result)
+                result = await self._collect_recent_changes()
+                return [result]
             except Exception as e:
-                logger.error("치료영역 '%s' 수집 실패: %s", area.name, e)
-                results.append(StreamResult(
+                logger.error("최근 변경 수집 실패: %s", e)
+                return [StreamResult(
                     stream_name=self.stream_name,
-                    sub_category=area.name,
                     errors=[str(e)],
-                ))
-        return results
+                )]
+
+    # ── 신규: 최근 변경 기반 수집 ──
+
+    async def _collect_recent_changes(self) -> StreamResult:
+        """최근 N일 FDA/EMA 변경 약물 전체 수집 — 치료영역 무관"""
+        logger.info("[Stream1] 최근 %d일 변경 약물 수집 시작...", settings.SCAN_DAYS_BACK)
+
+        drugs_by_inn: dict[str, dict] = {}
+        errors: list[str] = []
+
+        # 1) FDA 최근 변경
+        try:
+            fda_drugs = await self._search_fda_recent()
+            for drug in fda_drugs:
+                inn = drug.get("inn", "")
+                if not inn:
+                    continue
+                norm = self._matcher.normalize(inn)
+                if norm in drugs_by_inn:
+                    drugs_by_inn[norm]["sources"].append("fda")
+                    drugs_by_inn[norm]["fda_data"] = drug.get("fda_data")
+                else:
+                    drugs_by_inn[norm] = {
+                        "inn": inn,
+                        "normalized_name": norm,
+                        "therapeutic_areas": [],
+                        "sources": ["fda"],
+                        "fda_data": drug.get("fda_data"),
+                        "ema_data": None,
+                        "atc_code": drug.get("atc_code", ""),
+                        "stream_sources": ["therapeutic_area"],
+                    }
+            logger.info("  FDA 최근 변경: %d개 약물", len(fda_drugs))
+        except Exception as e:
+            logger.warning("  FDA 최근 변경 수집 실패: %s", e)
+            errors.append(f"FDA recent: {e}")
+
+        # 2) EMA 최근 변경
+        try:
+            ema_drugs = await self._filter_ema_recent()
+            for drug in ema_drugs:
+                inn = drug.get("inn", "")
+                if not inn:
+                    continue
+                norm = self._matcher.normalize(inn)
+                if norm in drugs_by_inn:
+                    if "ema" not in drugs_by_inn[norm]["sources"]:
+                        drugs_by_inn[norm]["sources"].append("ema")
+                    drugs_by_inn[norm]["ema_data"] = drug.get("ema_data")
+                    if not drugs_by_inn[norm].get("atc_code") and drug.get("atc_code"):
+                        drugs_by_inn[norm]["atc_code"] = drug["atc_code"]
+                else:
+                    drugs_by_inn[norm] = {
+                        "inn": inn,
+                        "normalized_name": norm,
+                        "therapeutic_areas": [],
+                        "sources": ["ema"],
+                        "fda_data": None,
+                        "ema_data": drug.get("ema_data"),
+                        "atc_code": drug.get("atc_code", ""),
+                        "stream_sources": ["therapeutic_area"],
+                    }
+            logger.info("  EMA 최근 변경: %d개 약물", len(ema_drugs))
+        except Exception as e:
+            logger.warning("  EMA 최근 변경 수집 실패: %s", e)
+            errors.append(f"EMA recent: {e}")
+
+        # 3) MFDS enrichment
+        if settings.ENABLE_MFDS_ENRICHMENT:
+            try:
+                mfds_count = await self._enrich_with_mfds(drugs_by_inn)
+                if mfds_count > 0:
+                    logger.info("  MFDS 매칭: %d개", mfds_count)
+            except Exception as e:
+                logger.debug("  MFDS 보강 실패: %s", e)
+
+        # 4) 치료영역 사후 태깅
+        self._tag_therapeutic_areas(drugs_by_inn)
+
+        drugs_list = list(drugs_by_inn.values())
+        logger.info("[Stream1] 최근 변경 완료: %d개 약물", len(drugs_list))
+
+        return StreamResult(
+            stream_name=self.stream_name,
+            sub_category="",
+            drugs_found=drugs_list,
+            errors=errors,
+        )
+
+    async def _search_fda_recent(self) -> list[dict]:
+        """FDA 최근 N일 변경 약물"""
+        from regscan.ingest.fda import FDAClient
+        from regscan.parse.fda_parser import FDADrugParser
+
+        fda_parser = FDADrugParser()
+        all_drugs: list[dict] = []
+        seen_inns: set[str] = set()
+
+        async with FDAClient() as client:
+            response = await client.search_drug_approvals(
+                days_back=settings.SCAN_DAYS_BACK,
+                limit=100,
+            )
+            results = response.get("results", [])
+            for r in results:
+                openfda = r.get("openfda", {})
+                inns = openfda.get("generic_name", [])
+                inn = inns[0] if inns else ""
+                if not inn:
+                    substance = openfda.get("substance_name", [])
+                    inn = substance[0] if substance else ""
+                if not inn:
+                    continue
+
+                norm = self._matcher.normalize(inn)
+                if norm in seen_inns:
+                    continue
+                seen_inns.add(norm)
+
+                brand_names = openfda.get("brand_name", [])
+                submissions = r.get("submissions", [])
+                sub_info = fda_parser._extract_latest_submission(submissions)
+
+                all_drugs.append({
+                    "inn": inn,
+                    "atc_code": "",
+                    "fda_data": {
+                        "generic_name": inn,
+                        "brand_name": brand_names[0] if brand_names else "",
+                        "pharm_class_epc": openfda.get("pharm_class_epc", []),
+                        "rxcui": openfda.get("rxcui", []),
+                        "unii": openfda.get("unii", []),
+                        "application_number": r.get("application_number", ""),
+                        "submission_status_date": sub_info.get("submission_status_date", ""),
+                        "submission_status": sub_info.get("submission_status", ""),
+                        "submission_type": sub_info.get("submission_type", ""),
+                        "submission_class_code": sub_info.get("submission_class_code", ""),
+                        "submission_class_code_description": sub_info.get("submission_class_code_description", ""),
+                        "submissions": submissions,
+                        "raw": r,
+                    },
+                })
+
+        return all_drugs
+
+    @staticmethod
+    def _parse_ema_date(raw: str) -> str:
+        """EMA 날짜 (DD/MM/YYYY 또는 YYYY-MM-DD) → YYYY-MM-DD 정규화."""
+        if not raw:
+            return ""
+        if "/" in raw:
+            parts = raw.split("/")
+            if len(parts) == 3 and len(parts[2]) == 4:
+                return f"{parts[2]}-{parts[1]}-{parts[0]}"
+        return raw
+
+    async def _filter_ema_recent(self) -> list[dict]:
+        """EMA 최근 N일 허가/변경 약물 — 치료영역 무관"""
+        from regscan.ingest.ema import EMAClient
+
+        all_drugs: list[dict] = []
+        seen_inns: set[str] = set()
+        cutoff = (datetime.now() - timedelta(days=settings.SCAN_DAYS_BACK)).strftime("%Y-%m-%d")
+
+        async with EMAClient() as client:
+            medicines = await client.fetch_medicines()
+
+        for med in medicines:
+            inn = (med.get("activeSubstance", "") or
+                   med.get("inn", "") or
+                   med.get("active_substance", "") or
+                   med.get("international_non_proprietary_name_common_name", "") or "")
+            if not inn:
+                continue
+
+            norm = self._matcher.normalize(inn)
+            if norm in seen_inns:
+                continue
+
+            # 최근 변경분 필터 — 날짜 정규화 후 cutoff 비교
+            ma_date_raw = (med.get("marketingAuthorisationDate", "") or
+                           med.get("marketing_authorisation_date", "") or "")
+            ma_date = self._parse_ema_date(ma_date_raw)
+            if not ma_date or ma_date < cutoff:
+                continue
+
+            seen_inns.add(norm)
+
+            atc_code = (med.get("atcCode", "") or
+                        med.get("atc_code", "") or
+                        med.get("atc_code_human", "") or "")
+            med_name = (med.get("medicineName", "") or
+                        med.get("name", "") or
+                        med.get("name_of_medicine", "") or "")
+
+            all_drugs.append({
+                "inn": inn,
+                "atc_code": atc_code,
+                "ema_data": {
+                    "inn": inn,
+                    "active_substance": inn,
+                    "name": med_name,
+                    "therapeutic_area": (med.get("therapeuticArea", "") or
+                                        med.get("therapeutic_area", "") or ""),
+                    "atc_code": atc_code,
+                    "marketing_authorisation_date": ma_date,
+                    "medicine_status": med.get("authorisationStatus", "") or med.get("medicine_status", ""),
+                    "is_orphan": _bool_field(med, "orphanMedicine", "is_orphan", "orphan_medicine"),
+                    "is_prime": _bool_field(med, "primeMedicine", "is_prime", "prime_priority_medicine"),
+                    "is_conditional": _bool_field(med, "conditionalApproval", "is_conditional", "conditional_approval"),
+                    "is_accelerated": _bool_field(med, "acceleratedAssessment", "is_accelerated", "accelerated_assessment"),
+                    "ema_product_number": med.get("emaProductNumber", "") or med.get("ema_product_number", ""),
+                    "therapeutic_indication": (
+                        med.get("therapeuticIndication", "") or
+                        med.get("therapeutic_indication", "") or ""
+                    ),
+                    "raw": med,
+                },
+            })
+
+        return all_drugs
+
+    def _tag_therapeutic_areas(self, drugs_by_inn: dict[str, dict]) -> None:
+        """ATC 코드 / pharm_class_epc로 치료영역 사후 태깅"""
+        # ATC prefix → 영역 매핑
+        atc_area_map = {
+            "L01": "oncology", "L02": "oncology", "L04": "immunology",
+            "C": "cardiovascular", "A10": "metabolic", "A16": "rare_disease",
+            "B": "cardiovascular", "N": "neurology",
+        }
+        # pharm_class 키워드 → 영역 매핑
+        pharm_area_map = {
+            "antineoplastic": "oncology", "kinase inhibitor": "oncology",
+            "immunosuppress": "immunology", "interleukin": "immunology",
+            "cardiovascular": "cardiovascular", "antihypertensive": "cardiovascular",
+            "antidiabetic": "metabolic", "insulin": "metabolic",
+        }
+
+        for drug in drugs_by_inn.values():
+            areas = set(drug.get("therapeutic_areas", []))
+
+            # ATC 기반
+            atc = drug.get("atc_code", "")
+            if atc:
+                for prefix, area in atc_area_map.items():
+                    if atc.startswith(prefix):
+                        areas.add(area)
+                        break
+
+            # pharm_class 기반
+            pharm_classes = (drug.get("fda_data") or {}).get("pharm_class_epc", [])
+            for pc in pharm_classes:
+                pc_lower = pc.lower()
+                for keyword, area in pharm_area_map.items():
+                    if keyword in pc_lower:
+                        areas.add(area)
+
+            # EMA therapeutic_area 기반
+            ema_ta = ((drug.get("ema_data") or {}).get("therapeutic_area", "") or "").lower()
+            if ema_ta:
+                for keyword in ["cancer", "oncol", "neoplas", "tumor", "leukaem", "lymphom"]:
+                    if keyword in ema_ta:
+                        areas.add("oncology")
+                for keyword in ["immun", "autoimmun", "rheumat"]:
+                    if keyword in ema_ta:
+                        areas.add("immunology")
+                for keyword in ["rare", "orphan"]:
+                    if keyword in ema_ta:
+                        areas.add("rare_disease")
+
+            drug["therapeutic_areas"] = list(areas) if areas else ["uncategorized"]
+
+    # ── 기존: 치료영역별 수집 (--area 지정 시) ──
 
     async def _collect_area(self, area: AreaConfig) -> StreamResult:
-        """단일 치료영역 수집"""
+        """단일 치료영역 수집 (레거시 — --area 지정 시 사용)"""
         logger.info("[Stream1] 치료영역 '%s' 수집 시작...", area.label_ko)
 
         drugs_by_inn: dict[str, dict[str, Any]] = {}
@@ -419,10 +708,11 @@ class TherapeuticAreaStream(BaseStream):
             if norm in seen_inns:
                 continue
 
-            # 최근 변경분 필터 — marketing_authorisation_date가 cutoff 이후만
-            ma_date = (med.get("marketingAuthorisationDate", "") or
-                       med.get("marketing_authorisation_date", "") or "")
-            if ma_date and ma_date < cutoff:
+            # 최근 변경분 필터 — 날짜 정규화 후 cutoff 비교
+            ma_date_raw = (med.get("marketingAuthorisationDate", "") or
+                           med.get("marketing_authorisation_date", "") or "")
+            ma_date = self._parse_ema_date(ma_date_raw)
+            if not ma_date or ma_date < cutoff:
                 continue
 
             seen_inns.add(norm)
