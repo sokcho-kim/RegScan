@@ -693,6 +693,172 @@ UNIFIED_BRIEFING_PROMPT = """[FACT DATA]
 }}"""
 
 
+# ════════════════════════════════════════════════════════
+# V2 프롬프트 — 팩트카드 기반 Article Writer
+# ════════════════════════════════════════════════════════
+
+V2_ARTICLE_SYSTEM_PROMPT = """당신은 제약·바이오 규제 인텔리전스 전문 기자입니다.
+
+## 핵심 규칙
+1. 아래 [FACT PHRASES]의 문구를 **그대로** 사용하라. 변형/의역 금지.
+2. 팩트카드에 없는 날짜, 가격, 상태를 만들지 마라.
+3. [GUARDRAILED DRUGS]에 해당하는 약물은 "확인 필요" 수준으로만 기술하라. 단정 금지.
+4. 당신의 역할은 **문장 연결 + 구조화**뿐이다. 팩트 판정은 이미 완료되었다.
+5. 출력은 순수 JSON만. 코드블록/마크다운 금지.
+6. 한글로 작성.
+
+## 톤
+- BLUF: 첫 문장에서 핵심 결론
+- 40자 이내 짧은 문장, 능동태
+- "확인 필요", "검토 권고" 톤 (명령형 금지)
+- orphan → "orphan 지정 약물" (희귀질환 일반화 금지)
+
+오늘 날짜: {today}
+"""
+
+V2_THERAPEUTIC_PROMPT = """[FACT CARDS — {n}건, {area_ko} ({area})]
+{fact_cards}
+
+[FACT PHRASES — 반드시 verbatim 사용]
+{fact_phrases}
+
+[TREND ANALYSIS]
+{trends}
+
+[GUARDRAILED DRUGS — 단정 금지]
+{guardrailed}
+
+[TASK]
+위 팩트카드와 트렌드를 기반으로 {area_ko} 치료영역 주간 Executive Briefing을 작성하라.
+
+출력 JSON:
+{{
+  "headline": "40자 이내 BLUF 헤드라인",
+  "key_takeaway": "경영진이 알아야 할 핵심 1문장 (필수)",
+  "top_drugs": [
+    {{
+      "inn": "약물명",
+      "status": "팩트카드의 fda/ema/mfds/hira 문구 조합 (verbatim)",
+      "why_it_matters": "2관점 이상: (a)경쟁구도, (b)급여/가격, (c)환자규모, (d)처방변화"
+    }}
+  ],
+  "trend_analysis": "트렌드 분석 결과 기반 3-5줄 요약",
+  "action_items": ["약제팀 후속 조치 — 확인 필요/검토 권고 톤"]
+}}"""
+
+V2_INNOVATION_PROMPT = """[FACT CARDS — {n}건, 혁신 시그널]
+{fact_cards}
+
+[FACT PHRASES — 반드시 verbatim 사용]
+{fact_phrases}
+
+[TREND ANALYSIS]
+{trends}
+
+[GUARDRAILED DRUGS — 단정 금지]
+{guardrailed}
+
+[SIGNAL STATS]
+NME: {nme_count}건, PRIME: {prime_count}건, orphan: {orphan_count}건, conditional: {conditional_count}건
+
+[TASK]
+위 팩트카드와 트렌드를 기반으로 혁신 시그널 Executive Briefing을 작성하라.
+
+출력 JSON:
+{{
+  "headline": "40자 이내 BLUF",
+  "key_takeaway": "경영진이 알아야 할 핵심 1문장 (필수)",
+  "nme_spotlight": [
+    {{
+      "inn": "약물명",
+      "designation": "NME/PRIME/orphan 등",
+      "implication": "팩트 문구 기반 — (a)혁신성, (b)도입 시점, (c)포지셔닝"
+    }}
+  ],
+  "pdufa_watch": ["PDUFA 일정 주시 대상"],
+  "strategic_implications": "전략적 시사점 3-5줄",
+  "action_items": ["약제팀 후속 조치"]
+}}"""
+
+V2_EXTERNAL_PROMPT = """[FACT CARDS — {n}건, 외부시그널]
+{fact_cards}
+
+[FACT PHRASES — 반드시 verbatim 사용]
+{fact_phrases}
+
+[TREND ANALYSIS]
+{trends}
+
+[GUARDRAILED DRUGS — 단정 금지]
+{guardrailed}
+
+[SIGNAL STATS]
+임상실패: {fail_count}건, 결과대기: {pending_count}건, medRxiv: {medrxiv_count}건
+
+[TASK]
+위 팩트카드와 트렌드를 기반으로 외부시그널 Future Trend Report를 작성하라.
+
+출력 JSON:
+{{
+  "headline": "40자 이내 BLUF",
+  "key_takeaway": "경영진이 알아야 할 핵심 1문장 (필수)",
+  "trial_failures": [
+    {{
+      "inn": "약물명",
+      "verdict": "FAIL 사유 1줄",
+      "hospital_impact": "(a)재고영향, (b)대체약물, (c)보험청구"
+    }}
+  ],
+  "medrxiv_insights": [
+    {{
+      "topic": "논문 주제",
+      "finding": "핵심 발견",
+      "timeline": "임상 적용 예상 시간"
+    }}
+  ],
+  "watch_list": ["향후 주시 대상 INN"],
+  "action_items": ["약제팀 후속 조치"]
+}}"""
+
+V2_UNIFIED_PROMPT = """[FACT CARDS — 전체 Top {n}건]
+{fact_cards}
+
+[FACT PHRASES — 반드시 verbatim 사용]
+{fact_phrases}
+
+[STREAM TRENDS]
+{stream_trends}
+
+[CROSS-STREAM SIGNALS]
+{cross_signals}
+
+[GUARDRAILED DRUGS — 단정 금지]
+{guardrailed}
+
+[TASK]
+3개 스트림(치료영역/혁신/외부시그널)을 종합한 RegScan Executive Daily Briefing을 작성하라.
+단순 반복·요약이 아닌, 스트림 간 교차·종합 인사이트를 도출하라.
+
+출력 JSON:
+{{
+  "headline": "50자 이내 — 오늘의 RegScan 한 줄 요약",
+  "key_takeaway": "경영진이 알아야 할 핵심 1문장 (필수)",
+  "executive_summary": "5줄 이내 BLUF 톤",
+  "cross_analysis": "스트림 간 교차 신호 분석 3-5줄",
+  "top_5_drugs": [
+    {{
+      "rank": 1,
+      "inn": "약물명",
+      "reason": "선정 이유 (팩트 문구 기반)",
+      "action": "약제팀 즉각 행동"
+    }}
+  ],
+  "risk_alerts": ["즉각 대응 필요 리스크"],
+  "opportunities": ["선제 대응 기회"],
+  "tomorrow_watch": "내일 주시할 것 1줄"
+}}"""
+
+
 # ────────────────────────────────────────────────────────
 # Generator
 # ────────────────────────────────────────────────────────
@@ -817,6 +983,22 @@ class StreamBriefingGenerator:
             lines.append(f"{i+1}. {json.dumps(intel, ensure_ascii=False, default=str)}")
         return "\n".join(lines)
 
+    @staticmethod
+    def _count_designations(drugs: list[dict]) -> dict[str, int]:
+        """NME/orphan/PRIME/conditional 지정 통계"""
+        counts = {"nme": 0, "orphan": 0, "prime": 0, "conditional": 0}
+        for d in drugs:
+            desig = d.get("designations", [])
+            if "NME" in desig:
+                counts["nme"] += 1
+            if "orphan" in desig:
+                counts["orphan"] += 1
+            if "PRIME" in desig:
+                counts["prime"] += 1
+            if "conditional" in desig:
+                counts["conditional"] += 1
+        return counts
+
     # ── 스트림별 브리핑 생성 ──
 
     async def generate_therapeutic_briefing(
@@ -826,7 +1008,10 @@ class StreamBriefingGenerator:
         result: StreamResult,
     ) -> dict[str, Any]:
         """치료영역 Executive Briefing"""
-        # V4: HIRA 급여 데이터 주입
+        if settings.ENABLE_FACT_CARD_PIPELINE:
+            return await self._v2_therapeutic(area, area_ko, result)
+
+        # ── 레거시 경로 ──
         await enrich_drugs_with_hira(result.drugs_found)
 
         top_n = min(10, result.drug_count) if result.drug_count else 0
@@ -852,7 +1037,10 @@ class StreamBriefingGenerator:
         result: StreamResult,
     ) -> dict[str, Any]:
         """혁신 시그널 Executive Briefing"""
-        # V4: HIRA 급여 데이터 주입
+        if settings.ENABLE_FACT_CARD_PIPELINE:
+            return await self._v2_innovation(result)
+
+        # ── 레거시 경로 ──
         await enrich_drugs_with_hira(result.drugs_found)
 
         # 지정 통계 계산
@@ -893,7 +1081,10 @@ class StreamBriefingGenerator:
         result: StreamResult,
     ) -> dict[str, Any]:
         """외부시그널 Future Trend Report"""
-        # V4: HIRA 급여 데이터 주입
+        if settings.ENABLE_FACT_CARD_PIPELINE:
+            return await self._v2_external(result)
+
+        # ── 레거시 경로 ──
         await enrich_drugs_with_hira(result.drugs_found)
 
         fail_count = sum(1 for s in result.signals if s.get("verdict") == "FAIL")
@@ -937,7 +1128,11 @@ class StreamBriefingGenerator:
         all_results: dict[str, list[StreamResult]],
         stream_briefings: list[dict],
     ) -> dict[str, Any]:
-        """통합 Executive Daily Briefing — V3: 스트림 브리핑 JSON 직접 주입"""
+        """통합 Executive Daily Briefing"""
+        if settings.ENABLE_FACT_CARD_PIPELINE:
+            return await self._v2_unified(all_results, stream_briefings)
+
+        # ── 레거시 경로 ──
         truncation_cap = 4000  # 토큰 예산 보호
 
         # 스트림 브리핑을 카테고리별로 분류
@@ -1060,6 +1255,204 @@ class StreamBriefingGenerator:
             lines.append(f"- {inn}: {', '.join(streams)} ({len(streams)}개 스트림)")
         return "\n".join(lines)
 
+    # ── V2 팩트카드 기반 메서드 ──
+
+    def _v2_build_card_context(
+        self, cards: list, today: str,
+    ) -> tuple[str, str, str]:
+        """팩트카드 → (fact_cards_json, fact_phrases_json, guardrailed_json)"""
+        compact = [c.to_compact_dict() for c in cards]
+        fact_cards_json = json.dumps(compact, ensure_ascii=False, indent=2)
+        phrases = {c.inn: c.all_fact_phrases for c in cards}
+        fact_phrases_json = json.dumps(phrases, ensure_ascii=False, indent=2)
+        guardrailed = [c.inn for c in cards if c.is_guardrailed]
+        guardrailed_json = json.dumps(guardrailed, ensure_ascii=False)
+        return fact_cards_json, fact_phrases_json, guardrailed_json
+
+    async def _v2_generate_cards_and_trends(
+        self,
+        result: StreamResult,
+        stream_name: str,
+        today: str,
+    ) -> tuple[list, dict]:
+        """공통: HIRA enrichment → 팩트카드 → 트렌드 분석"""
+        from regscan.stream.fact_card import generate_fact_cards
+        from regscan.stream.trend_analyzer import analyze_trends
+
+        await enrich_drugs_with_hira(result.drugs_found)
+        cards = generate_fact_cards(result.drugs_found, today=today)
+        trends = await analyze_trends(cards, stream_name=stream_name, today=today)
+        return cards, trends
+
+    async def _v2_therapeutic(
+        self, area: str, area_ko: str, result: StreamResult,
+        today: str | None = None,
+    ) -> dict[str, Any]:
+        """V2 치료영역 브리핑 — 팩트카드 기반"""
+        if today is None:
+            today = datetime.now().strftime("%Y-%m-%d")
+        cards, trends = await self._v2_generate_cards_and_trends(
+            result, f"therapeutic_{area}", today,
+        )
+        if not cards:
+            return self._fallback_therapeutic(area, area_ko, result)
+
+        fc_json, fp_json, gr_json = self._v2_build_card_context(cards, today)
+        system = V2_ARTICLE_SYSTEM_PROMPT.format(today=today)
+        prompt = V2_THERAPEUTIC_PROMPT.format(
+            n=len(cards), area=area, area_ko=area_ko,
+            fact_cards=fc_json, fact_phrases=fp_json,
+            trends=json.dumps(trends, ensure_ascii=False, default=str),
+            guardrailed=gr_json,
+        )
+
+        try:
+            content = await self._call_llm(prompt, system_prompt=system)
+            result_json = self._parse_json_response(content, fallback_headline=f"{area_ko} 치료영역 브리핑")
+            result_json["_v2"] = True
+            result_json["_card_count"] = len(cards)
+            return result_json
+        except Exception as e:
+            logger.warning("[V2] 치료영역 브리핑 실패 (%s): %s", area, e)
+            return self._fallback_therapeutic(area, area_ko, result)
+
+    async def _v2_innovation(self, result: StreamResult, today: str | None = None) -> dict[str, Any]:
+        """V2 혁신 시그널 브리핑 — 팩트카드 기반"""
+        if today is None:
+            today = datetime.now().strftime("%Y-%m-%d")
+        cards, trends = await self._v2_generate_cards_and_trends(
+            result, "innovation", today,
+        )
+        if not cards:
+            return {"headline": "혁신 시그널 브리핑", "signals": result.signals[:10]}
+
+        dc = self._count_designations(result.drugs_found)
+
+        fc_json, fp_json, gr_json = self._v2_build_card_context(cards, today)
+        system = V2_ARTICLE_SYSTEM_PROMPT.format(today=today)
+        prompt = V2_INNOVATION_PROMPT.format(
+            n=len(cards),
+            fact_cards=fc_json, fact_phrases=fp_json,
+            trends=json.dumps(trends, ensure_ascii=False, default=str),
+            guardrailed=gr_json,
+            nme_count=dc["nme"], prime_count=dc["prime"],
+            orphan_count=dc["orphan"], conditional_count=dc["conditional"],
+        )
+
+        try:
+            content = await self._call_llm(prompt, system_prompt=system)
+            result_json = self._parse_json_response(content, fallback_headline="혁신 시그널 브리핑")
+            result_json["_v2"] = True
+            result_json["_card_count"] = len(cards)
+            return result_json
+        except Exception as e:
+            logger.warning("[V2] 혁신 브리핑 실패: %s", e)
+            return {"headline": "혁신 시그널 브리핑", "signals": result.signals[:10]}
+
+    async def _v2_external(self, result: StreamResult, today: str | None = None) -> dict[str, Any]:
+        """V2 외부시그널 브리핑 — 팩트카드 기반"""
+        if today is None:
+            today = datetime.now().strftime("%Y-%m-%d")
+        cards, trends = await self._v2_generate_cards_and_trends(
+            result, "external", today,
+        )
+        if not cards:
+            return {"headline": "미래 트렌드 리포트", "signals": result.signals[:10]}
+
+        fail_count = sum(1 for s in result.signals if s.get("verdict") == "FAIL")
+        pending_count = sum(1 for s in result.signals if s.get("verdict") == "PENDING")
+        medrxiv_count = sum(1 for s in result.signals if s.get("type") == "medrxiv_paper")
+
+        fc_json, fp_json, gr_json = self._v2_build_card_context(cards, today)
+        system = V2_ARTICLE_SYSTEM_PROMPT.format(today=today)
+        prompt = V2_EXTERNAL_PROMPT.format(
+            n=len(cards),
+            fact_cards=fc_json, fact_phrases=fp_json,
+            trends=json.dumps(trends, ensure_ascii=False, default=str),
+            guardrailed=gr_json,
+            fail_count=fail_count, pending_count=pending_count,
+            medrxiv_count=medrxiv_count,
+        )
+
+        try:
+            content = await self._call_llm(prompt, system_prompt=system)
+            result_json = self._parse_json_response(content, fallback_headline="미래 트렌드 리포트")
+            result_json["_v2"] = True
+            result_json["_card_count"] = len(cards)
+            return result_json
+        except Exception as e:
+            logger.warning("[V2] 외부시그널 브리핑 실패: %s", e)
+            return {"headline": "미래 트렌드 리포트", "signals": result.signals[:10]}
+
+    async def _v2_unified(
+        self,
+        all_results: dict[str, list[StreamResult]],
+        stream_briefings: list[dict],
+    ) -> dict[str, Any]:
+        """V2 통합 브리핑 — 전체 팩트카드 Top N 기반"""
+        from regscan.stream.fact_card import generate_fact_cards
+        from regscan.stream.trend_analyzer import analyze_trends
+
+        today = datetime.now().strftime("%Y-%m-%d")  # unified는 외부 주입 불필요
+
+        # 전체 스트림에서 약물 수집 → 배치 1회 enrichment
+        all_drugs: list[dict] = []
+        for sresults in all_results.values():
+            for sr in sresults:
+                all_drugs.extend(sr.drugs_found)
+        await enrich_drugs_with_hira(all_drugs)
+
+        cards = generate_fact_cards(all_drugs, today=today)
+        if not cards:
+            return {
+                "headline": "RegScan 데일리 브리핑",
+                "date": today,
+                "stream_count": len(all_results),
+            }
+
+        # 상위 약물 선별 (가드레일 아닌 것 우선, 최대 15개)
+        sorted_cards = sorted(cards, key=lambda c: (c.is_guardrailed, not bool(c.fda_phrase)))
+        top_cards = sorted_cards[:15]
+
+        # 트렌드 분석
+        trends = await analyze_trends(top_cards, stream_name="unified", today=today)
+
+        # 스트림별 트렌드 요약 (이미 생성된 브리핑에서 추출)
+        stream_trend_lines = []
+        for sb in stream_briefings:
+            headline = sb.get("headline", "")
+            takeaway = sb.get("key_takeaway", "")
+            if headline and takeaway:
+                stream_trend_lines.append(f"- {headline}: {takeaway}")
+        stream_trends_text = "\n".join(stream_trend_lines) if stream_trend_lines else "스트림 브리핑 없음"
+
+        # 교차 약물
+        cross_drugs = self._find_cross_stream_drugs(all_results)
+
+        fc_json, fp_json, gr_json = self._v2_build_card_context(top_cards, today)
+        system = V2_ARTICLE_SYSTEM_PROMPT.format(today=today)
+        prompt = V2_UNIFIED_PROMPT.format(
+            n=len(top_cards),
+            fact_cards=fc_json, fact_phrases=fp_json,
+            stream_trends=stream_trends_text,
+            cross_signals=cross_drugs,
+            guardrailed=gr_json,
+        )
+
+        try:
+            content = await self._call_llm(prompt, system_prompt=system)
+            result_json = self._parse_json_response(content, fallback_headline="RegScan 데일리 브리핑")
+            result_json["_v2"] = True
+            result_json["_card_count"] = len(top_cards)
+            return result_json
+        except Exception as e:
+            logger.warning("[V2] 통합 브리핑 실패: %s", e)
+            return {
+                "headline": "RegScan 데일리 브리핑",
+                "date": today,
+                "stream_count": len(all_results),
+            }
+
     def _fallback_therapeutic(self, area: str, area_ko: str, result: StreamResult) -> dict:
         """LLM 실패 시 구조화 데이터 기반 브리핑"""
         return {
@@ -1076,10 +1469,11 @@ class StreamBriefingGenerator:
     _last_user_prompt: str = ""
     _last_model_used: str = ""
 
-    async def _call_llm(self, prompt: str) -> str:
-        """LLM 호출 — shared 기반 시스템 프롬프트 조립 + 사용자 프롬프트 분리"""
+    async def _call_llm(self, prompt: str, system_prompt: str | None = None) -> str:
+        """LLM 호출 — system_prompt가 None이면 기존 shared 기반 조립"""
         today = datetime.now().strftime("%Y-%m-%d")
-        system_prompt = _build_stream_system_prompt(today)
+        if system_prompt is None:
+            system_prompt = _build_stream_system_prompt(today)
 
         # 프롬프트 캡처
         self._last_system_prompt = system_prompt

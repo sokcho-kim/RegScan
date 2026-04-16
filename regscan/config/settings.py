@@ -109,6 +109,7 @@ class Settings(BaseSettings):
 
     ENABLE_STREAM_BRIEFINGS: bool = True
     ENABLE_UNIFIED_BRIEFING: bool = True
+    ENABLE_FACT_CARD_PIPELINE: bool = True  # V2 팩트카드 기반 브리핑 (False → 레거시)
 
     # ── 뉴스 수집 (C-3) ──
     ENABLE_NEWS_FETCH: bool = True
