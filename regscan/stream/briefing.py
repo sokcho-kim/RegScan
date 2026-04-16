@@ -707,6 +707,11 @@ V2_ARTICLE_SYSTEM_PROMPT = """당신은 제약·바이오 규제 인텔리전스
 5. 출력은 순수 JSON만. 코드블록/마크다운 금지.
 6. 한글로 작성.
 
+## 적응증/경쟁구도 활용
+5. [INDICATIONS]가 제공되면 질환명·바이오마커·치료라인·병용약물을 구체적으로 기술하라.
+6. [COMPETITIONS]가 제공되면 경쟁약 대비 포지셔닝을 포함하라.
+7. 적응증이 있으면 "표적치료제" 같은 막연한 표현 대신 "FLT3-ITD 변이 AML 1차 치료" 수준으로 기술하라.
+
 ## 톤
 - BLUF: 첫 문장에서 핵심 결론
 - 40자 이내 짧은 문장, 능동태
@@ -728,8 +733,16 @@ V2_THERAPEUTIC_PROMPT = """[FACT CARDS — {n}건, {area_ko} ({area})]
 [GUARDRAILED DRUGS — 단정 금지]
 {guardrailed}
 
+[INDICATIONS — 적응증 구조화 데이터]
+{indications}
+
+[COMPETITIONS — 경쟁구도 (HemOnc 기반, 있을 때만)]
+{competitions}
+
 [TASK]
 위 팩트카드와 트렌드를 기반으로 {area_ko} 치료영역 주간 Executive Briefing을 작성하라.
+적응증 데이터가 있으면 질환명·바이오마커·치료라인을 구체적으로 기술하라.
+경쟁구도 데이터가 있으면 head-to-head 비교약 대비 포지셔닝을 포함하라.
 
 출력 JSON:
 {{
@@ -757,6 +770,12 @@ V2_INNOVATION_PROMPT = """[FACT CARDS — {n}건, 혁신 시그널]
 
 [GUARDRAILED DRUGS — 단정 금지]
 {guardrailed}
+
+[INDICATIONS]
+{indications}
+
+[COMPETITIONS]
+{competitions}
 
 [SIGNAL STATS]
 NME: {nme_count}건, PRIME: {prime_count}건, orphan: {orphan_count}건, conditional: {conditional_count}건
@@ -791,6 +810,12 @@ V2_EXTERNAL_PROMPT = """[FACT CARDS — {n}건, 외부시그널]
 
 [GUARDRAILED DRUGS — 단정 금지]
 {guardrailed}
+
+[INDICATIONS]
+{indications}
+
+[COMPETITIONS]
+{competitions}
 
 [SIGNAL STATS]
 임상실패: {fail_count}건, 결과대기: {pending_count}건, medRxiv: {medrxiv_count}건
@@ -834,6 +859,12 @@ V2_UNIFIED_PROMPT = """[FACT CARDS — 전체 Top {n}건]
 
 [GUARDRAILED DRUGS — 단정 금지]
 {guardrailed}
+
+[INDICATIONS]
+{indications}
+
+[COMPETITIONS]
+{competitions}
 
 [TASK]
 3개 스트림(치료영역/혁신/외부시그널)을 종합한 RegScan Executive Daily Briefing을 작성하라.
@@ -1259,15 +1290,37 @@ class StreamBriefingGenerator:
 
     def _v2_build_card_context(
         self, cards: list, today: str,
-    ) -> tuple[str, str, str]:
-        """팩트카드 → (fact_cards_json, fact_phrases_json, guardrailed_json)"""
+        indication_cards: dict | None = None,
+        competition_cards: dict | None = None,
+    ) -> tuple[str, str, str, str, str]:
+        """팩트카드 + 적응증 + 경쟁구도 → JSON strings
+
+        Returns:
+            (fact_cards_json, fact_phrases_json, guardrailed_json,
+             indications_json, competitions_json)
+        """
         compact = [c.to_compact_dict() for c in cards]
         fact_cards_json = json.dumps(compact, ensure_ascii=False, indent=2)
         phrases = {c.inn: c.all_fact_phrases for c in cards}
         fact_phrases_json = json.dumps(phrases, ensure_ascii=False, indent=2)
         guardrailed = [c.inn for c in cards if c.is_guardrailed]
         guardrailed_json = json.dumps(guardrailed, ensure_ascii=False)
-        return fact_cards_json, fact_phrases_json, guardrailed_json
+
+        # IndicationCard
+        ind_dict = {}
+        if indication_cards:
+            for inn, ic in indication_cards.items():
+                ind_dict[inn] = ic.to_compact_dict()
+        indications_json = json.dumps(ind_dict, ensure_ascii=False, indent=2) if ind_dict else "{}"
+
+        # CompetitionCard
+        comp_dict = {}
+        if competition_cards:
+            for inn, cc in competition_cards.items():
+                comp_dict[inn] = cc.to_compact_dict()
+        competitions_json = json.dumps(comp_dict, ensure_ascii=False, indent=2) if comp_dict else "{}"
+
+        return fact_cards_json, fact_phrases_json, guardrailed_json, indications_json, competitions_json
 
     @staticmethod
     def _v2_validate(briefing_json: dict, cards: list) -> dict:
@@ -1281,15 +1334,45 @@ class StreamBriefingGenerator:
         result: StreamResult,
         stream_name: str,
         today: str,
-    ) -> tuple[list, dict]:
-        """공통: HIRA enrichment → 팩트카드 → 트렌드 분석"""
+    ) -> tuple[list, dict, dict, dict]:
+        """공통: HIRA enrichment → 팩트카드 → IndicationCard → CompetitionCard → 트렌드 분석
+
+        Returns:
+            (fact_cards, trends, indication_cards, competition_cards)
+        """
         from regscan.stream.fact_card import generate_fact_cards
         from regscan.stream.trend_analyzer import analyze_trends
 
         await enrich_drugs_with_hira(result.drugs_found)
         cards = generate_fact_cards(result.drugs_found, today=today)
         trends = await analyze_trends(cards, stream_name=stream_name, today=today)
-        return cards, trends
+
+        # IndicationCard 생성 (Phase 1)
+        indication_cards: dict = {}
+        try:
+            from regscan.map.indication_card import generate_indication_cards
+            indication_cards = await generate_indication_cards(result.drugs_found)
+        except Exception as e:
+            logger.debug("[V2] IndicationCard 생성 실패: %s", e)
+
+        # CompetitionCard 생성 (Phase 2 — HemOnc 데이터 있을 때만)
+        competition_cards: dict = {}
+        try:
+            from regscan.map.hemonc import get_hemonc_index
+            hemonc = get_hemonc_index()
+            if hemonc:
+                for drug in result.drugs_found:
+                    inn = (drug.get("inn") or "").strip().upper()
+                    if inn:
+                        comp = hemonc.get_competition_card(inn)
+                        if comp.compared_drugs or comp.diseases:
+                            competition_cards[inn] = comp
+                if competition_cards:
+                    logger.info("[V2] CompetitionCard: %d건 (HemOnc)", len(competition_cards))
+        except Exception as e:
+            logger.debug("[V2] CompetitionCard 생성 실패: %s", e)
+
+        return cards, trends, indication_cards, competition_cards
 
     async def _v2_therapeutic(
         self, area: str, area_ko: str, result: StreamResult,
@@ -1298,19 +1381,23 @@ class StreamBriefingGenerator:
         """V2 치료영역 브리핑 — 팩트카드 기반"""
         if today is None:
             today = datetime.now().strftime("%Y-%m-%d")
-        cards, trends = await self._v2_generate_cards_and_trends(
+        cards, trends, ind_cards, comp_cards = await self._v2_generate_cards_and_trends(
             result, f"therapeutic_{area}", today,
         )
         if not cards:
             return self._fallback_therapeutic(area, area_ko, result)
 
-        fc_json, fp_json, gr_json = self._v2_build_card_context(cards, today)
+        fc_json, fp_json, gr_json, ind_json, comp_json = self._v2_build_card_context(
+            cards, today, ind_cards, comp_cards,
+        )
         system = V2_ARTICLE_SYSTEM_PROMPT.format(today=today)
         prompt = V2_THERAPEUTIC_PROMPT.format(
             n=len(cards), area=area, area_ko=area_ko,
             fact_cards=fc_json, fact_phrases=fp_json,
             trends=json.dumps(trends, ensure_ascii=False, default=str),
             guardrailed=gr_json,
+            indications=ind_json,
+            competitions=comp_json,
         )
 
         try:
@@ -1328,7 +1415,7 @@ class StreamBriefingGenerator:
         """V2 혁신 시그널 브리핑 — 팩트카드 기반"""
         if today is None:
             today = datetime.now().strftime("%Y-%m-%d")
-        cards, trends = await self._v2_generate_cards_and_trends(
+        cards, trends, ind_cards, comp_cards = await self._v2_generate_cards_and_trends(
             result, "innovation", today,
         )
         if not cards:
@@ -1336,13 +1423,17 @@ class StreamBriefingGenerator:
 
         dc = self._count_designations(result.drugs_found)
 
-        fc_json, fp_json, gr_json = self._v2_build_card_context(cards, today)
+        fc_json, fp_json, gr_json, ind_json, comp_json = self._v2_build_card_context(
+            cards, today, ind_cards, comp_cards,
+        )
         system = V2_ARTICLE_SYSTEM_PROMPT.format(today=today)
         prompt = V2_INNOVATION_PROMPT.format(
             n=len(cards),
             fact_cards=fc_json, fact_phrases=fp_json,
             trends=json.dumps(trends, ensure_ascii=False, default=str),
             guardrailed=gr_json,
+            indications=ind_json,
+            competitions=comp_json,
             nme_count=dc["nme"], prime_count=dc["prime"],
             orphan_count=dc["orphan"], conditional_count=dc["conditional"],
         )
@@ -1362,7 +1453,7 @@ class StreamBriefingGenerator:
         """V2 외부시그널 브리핑 — 팩트카드 기반"""
         if today is None:
             today = datetime.now().strftime("%Y-%m-%d")
-        cards, trends = await self._v2_generate_cards_and_trends(
+        cards, trends, ind_cards, comp_cards = await self._v2_generate_cards_and_trends(
             result, "external", today,
         )
         if not cards:
@@ -1372,13 +1463,17 @@ class StreamBriefingGenerator:
         pending_count = sum(1 for s in result.signals if s.get("verdict") == "PENDING")
         medrxiv_count = sum(1 for s in result.signals if s.get("type") == "medrxiv_paper")
 
-        fc_json, fp_json, gr_json = self._v2_build_card_context(cards, today)
+        fc_json, fp_json, gr_json, ind_json, comp_json = self._v2_build_card_context(
+            cards, today, ind_cards, comp_cards,
+        )
         system = V2_ARTICLE_SYSTEM_PROMPT.format(today=today)
         prompt = V2_EXTERNAL_PROMPT.format(
             n=len(cards),
             fact_cards=fc_json, fact_phrases=fp_json,
             trends=json.dumps(trends, ensure_ascii=False, default=str),
             guardrailed=gr_json,
+            indications=ind_json,
+            competitions=comp_json,
             fail_count=fail_count, pending_count=pending_count,
             medrxiv_count=medrxiv_count,
         )
@@ -1439,7 +1534,7 @@ class StreamBriefingGenerator:
         # 교차 약물
         cross_drugs = self._find_cross_stream_drugs(all_results)
 
-        fc_json, fp_json, gr_json = self._v2_build_card_context(top_cards, today)
+        fc_json, fp_json, gr_json, ind_json, comp_json = self._v2_build_card_context(top_cards, today)
         system = V2_ARTICLE_SYSTEM_PROMPT.format(today=today)
         prompt = V2_UNIFIED_PROMPT.format(
             n=len(top_cards),
@@ -1447,6 +1542,8 @@ class StreamBriefingGenerator:
             stream_trends=stream_trends_text,
             cross_signals=cross_drugs,
             guardrailed=gr_json,
+            indications=ind_json,
+            competitions=comp_json,
         )
 
         try:
