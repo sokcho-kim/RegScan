@@ -354,10 +354,9 @@ class TherapeuticAreaStream(BaseStream):
                         submissions = r.get("submissions", [])
                         sub_info = fda_parser._extract_latest_submission(submissions)
 
-                        # 최근 변경분 필터 — submission_status_date가 cutoff 이후만
-                        sub_date = sub_info.get("submission_status_date", "")
-                        sub_date_norm = sub_date.replace("-", "")
-                        if sub_date_norm and sub_date_norm < cutoff:
+                        # 최근 변경분 필터
+                        sub_date = (sub_info.get("submission_status_date", "") or "").replace("-", "")
+                        if sub_date and sub_date < cutoff:
                             continue
 
                         all_drugs.append({
