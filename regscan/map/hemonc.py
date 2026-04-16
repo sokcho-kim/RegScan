@@ -1,13 +1,13 @@
 """HemOnc 온톨로지 인덱스 — 항암 경쟁구도 구조화
 
-ATHENA(https://athena.ohdsi.org/)에서 다운로드한 HemOnc vocabulary 기반.
-OMOP CDM 포맷: CONCEPT.csv + CONCEPT_RELATIONSHIP.csv
+Harvard Dataverse HemOncKB CC BY subset 기반.
+파일: data/hemonc/YYYY-MM-DD.ccby_concepts.csv + ccby_rels.csv + ccby_synonyms.csv
 
 Usage:
     index = get_hemonc_index()
     card = index.get_competition_card("quizartinib")
     # card.diseases = ["Acute myeloid leukemia"]
-    # card.compared_drugs = [{"inn": "midostaurin", ...}]
+    # card.same_indication_drugs = ["midostaurin", "gilteritinib", ...]
 """
 
 from __future__ import annotations
@@ -21,256 +21,233 @@ from typing import Any, Optional
 logger = logging.getLogger(__name__)
 
 
-# ════════════════════════════════════════════════════════════════════
-# CompetitionCard
-# ════════════════════════════════════════════════════════════════════
-
 @dataclass
 class CompetitionCard:
     """HemOnc 기반 경쟁 구도 카드."""
     inn: str
 
-    # 레지멘/질환/맥락
-    regimens: list[str] = field(default_factory=list)
-    diseases: list[str] = field(default_factory=list)
-    treatment_contexts: list[str] = field(default_factory=list)  # first-line, salvage, etc
+    # 적응증
+    fda_indications: list[str] = field(default_factory=list)
 
-    # 경쟁약 (head-to-head RCT 비교)
-    compared_drugs: list[dict] = field(default_factory=list)
+    # 분류
+    major_class: str = ""           # e.g. "Tyrosine kinase inhibitor"
+    minor_class: str = ""           # e.g. "FLT3 inhibitor"
 
-    # 같은 레지멘 공간 약물 (동일 질환)
-    same_space_drugs: list[str] = field(default_factory=list)
+    # 경쟁약 — 같은 FDA indication
+    same_indication_drugs: list[str] = field(default_factory=list)
+
+    # 경쟁약 — 같은 minor class (기전)
+    same_class_drugs: list[str] = field(default_factory=list)
 
     # 메타
-    source: str = "hemonc"
-    hemonc_concept_id: str = ""
+    brand_name: str = ""
+    fda_approved_year: str = ""
+    route: str = ""
+    source: str = "hemonc_ccby"
+    hemonc_code: str = ""
 
     def to_compact_dict(self) -> dict:
         """LLM 입력용 압축 dict."""
         d: dict[str, Any] = {"inn": self.inn}
-        if self.diseases:
-            d["diseases"] = self.diseases
-        if self.treatment_contexts:
-            d["contexts"] = self.treatment_contexts
-        if self.compared_drugs:
-            d["compared_to"] = [c["inn"] for c in self.compared_drugs[:5]]
-        if self.same_space_drugs:
-            d["same_space"] = self.same_space_drugs[:5]
-        if self.regimens:
-            d["regimens"] = self.regimens[:3]
+        if self.fda_indications:
+            d["indications"] = self.fda_indications
+        if self.major_class:
+            d["major_class"] = self.major_class
+        if self.minor_class:
+            d["minor_class"] = self.minor_class
+        if self.same_indication_drugs:
+            d["same_indication"] = self.same_indication_drugs[:8]
+        if self.same_class_drugs:
+            d["same_class"] = self.same_class_drugs[:5]
+        if self.brand_name:
+            d["brand"] = self.brand_name
         return d
 
 
-# ════════════════════════════════════════════════════════════════════
-# HemOncIndex
-# ════════════════════════════════════════════════════════════════════
-
 class HemOncIndex:
-    """HemOnc 온톨로지 인메모리 인덱스.
-
-    OMOP CDM의 CONCEPT + CONCEPT_RELATIONSHIP 테이블에서
-    Drug → Regimen → Disease → Context 관계를 인덱싱.
-    """
-
-    # HemOnc vocabulary_id
-    VOCAB_ID = "HemOnc"
-
-    # 관심 relationship_id
-    REL_CONTAINS = "Has antineoplastic Rx"    # regimen → drug
-    REL_HAS_CONTEXT = "Has context"           # regimen → context (line)
-    REL_COMPARED = "Has been compared to"     # drug ↔ drug (RCT)
-    REL_IS_A = "Is a"                         # hierarchy
+    """HemOnc CC BY 온톨로지 인메모리 인덱스."""
 
     def __init__(self):
-        # concept_id → concept dict
-        self._concepts: dict[int, dict] = {}
-        # INN (lowercase) → concept_id
-        self._inn_to_id: dict[str, int] = {}
-        # concept_id → [related concept_ids] by relationship
-        self._rels: dict[str, dict[int, list[int]]] = {}
-        # concept_id → domain_id
+        self._code_to_name: dict[str, str] = {}
+        self._code_to_class: dict[str, str] = {}  # concept_class_id
+        self._name_to_code: dict[str, str] = {}    # lowercase name → code
+        # 관계 인덱스: relationship_id → {code_1 → [code_2]}
+        self._rels_fwd: dict[str, dict[str, list[str]]] = {}
+        # 역방향: relationship_id → {code_2 → [code_1]}
+        self._rels_rev: dict[str, dict[str, list[str]]] = {}
         self._loaded = False
 
     def load(
         self,
-        concept_path: str | Path | None = None,
-        relationship_path: str | Path | None = None,
+        concepts_path: str | Path | None = None,
+        rels_path: str | Path | None = None,
+        synonyms_path: str | Path | None = None,
     ) -> None:
-        """ATHENA TSV/CSV 로드."""
+        """HemOnc CC BY CSV 로드."""
         data_dir = Path(__file__).resolve().parent.parent.parent / "data" / "hemonc"
 
-        concept_file = Path(concept_path) if concept_path else data_dir / "CONCEPT.csv"
-        rel_file = Path(relationship_path) if relationship_path else data_dir / "CONCEPT_RELATIONSHIP.csv"
+        # 파일 자동 탐색 (날짜 prefix)
+        if concepts_path is None:
+            files = sorted(data_dir.glob("*ccby_concepts.csv"), reverse=True)
+            concepts_path = files[0] if files else data_dir / "ccby_concepts.csv"
+        if rels_path is None:
+            files = sorted(data_dir.glob("*ccby_rels.csv"), reverse=True)
+            rels_path = files[0] if files else data_dir / "ccby_rels.csv"
+        if synonyms_path is None:
+            files = sorted(data_dir.glob("*ccby_synonyms.csv"), reverse=True)
+            synonyms_path = files[0] if files else None
 
-        if not concept_file.exists():
-            logger.warning("[HemOnc] CONCEPT 파일 없음: %s", concept_file)
+        concepts_path = Path(concepts_path)
+        rels_path = Path(rels_path)
+
+        if not concepts_path.exists():
+            logger.warning("[HemOnc] concepts 파일 없음: %s", concepts_path)
             return
-        if not rel_file.exists():
-            logger.warning("[HemOnc] CONCEPT_RELATIONSHIP 파일 없음: %s", rel_file)
+        if not rels_path.exists():
+            logger.warning("[HemOnc] rels 파일 없음: %s", rels_path)
             return
 
-        self._load_concepts(concept_file)
-        self._load_relationships(rel_file)
+        self._load_concepts(concepts_path)
+        self._load_relationships(rels_path)
+        if synonyms_path and Path(synonyms_path).exists():
+            self._load_synonyms(Path(synonyms_path))
         self._loaded = True
 
     def _load_concepts(self, path: Path) -> None:
-        """CONCEPT.csv 로드 — HemOnc vocabulary만 필터."""
-        count = 0
-        for enc in ["utf-8", "utf-8-sig", "cp949"]:
-            try:
-                with open(path, "r", encoding=enc) as f:
-                    # ATHENA는 tab-delimited
-                    sample = f.read(1000)
-                    delimiter = "\t" if "\t" in sample else ","
-                    f.seek(0)
-                    reader = csv.DictReader(f, delimiter=delimiter)
-                    for row in reader:
-                        vocab = row.get("vocabulary_id", "")
-                        if vocab != self.VOCAB_ID:
-                            continue
-                        cid = int(row["concept_id"])
-                        self._concepts[cid] = {
-                            "concept_id": cid,
-                            "concept_name": row.get("concept_name", ""),
-                            "domain_id": row.get("domain_id", ""),
-                            "concept_class_id": row.get("concept_class_id", ""),
-                            "vocabulary_id": vocab,
-                        }
-                        # Drug 도메인이면 INN 인덱스
-                        if row.get("domain_id") == "Drug" or row.get("concept_class_id") in ("Component", "Component Class"):
-                            name_lower = row.get("concept_name", "").strip().lower()
-                            self._inn_to_id[name_lower] = cid
-                        count += 1
-                break
-            except (UnicodeDecodeError, KeyError):
-                continue
+        with open(path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                code = row.get("concept_code", "")
+                name = row.get("concept_name", "")
+                cls = row.get("concept_class_id", "")
+                if not code or not name:
+                    continue
+                self._code_to_name[code] = name
+                self._code_to_class[code] = cls
+                # Component(약물)만 INN 인덱스
+                if cls in ("Component", "Component Class"):
+                    self._name_to_code[name.lower()] = code
 
-        logger.info("[HemOnc] CONCEPT 로드: %d건, Drug INN: %d개", count, len(self._inn_to_id))
+        logger.info("[HemOnc] concepts 로드: %d건, drugs: %d개",
+                    len(self._code_to_name), len(self._name_to_code))
 
     def _load_relationships(self, path: Path) -> None:
-        """CONCEPT_RELATIONSHIP.csv 로드 — 관심 관계만 필터."""
-        target_rels = {
-            self.REL_CONTAINS,
-            self.REL_HAS_CONTEXT,
-            self.REL_COMPARED,
-            self.REL_IS_A,
-            # 추가 관계
-            "Has antineoplastic Rx",
-            "Has been compared to",
-            "Has context",
-            "Is a",
-            "Has finding context",
-        }
         count = 0
-        for enc in ["utf-8", "utf-8-sig", "cp949"]:
-            try:
-                with open(path, "r", encoding=enc) as f:
-                    sample = f.read(1000)
-                    delimiter = "\t" if "\t" in sample else ","
-                    f.seek(0)
-                    reader = csv.DictReader(f, delimiter=delimiter)
-                    for row in reader:
-                        rel_id = row.get("relationship_id", "")
-                        if rel_id not in target_rels:
-                            continue
-                        c1 = int(row["concept_id_1"])
-                        c2 = int(row["concept_id_2"])
+        with open(path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                rel = row.get("relationship_id", "")
+                c1 = row.get("concept_code_1", "")
+                c2 = row.get("concept_code_2", "")
+                # HemOnc 내부 관계만 (외부 vocab 매핑 제외)
+                v1 = row.get("vocabulary_id_1", "")
+                v2 = row.get("vocabulary_id_2", "")
+                if v1 != "HemOnc" or v2 != "HemOnc":
+                    continue
+                if not rel or not c1 or not c2:
+                    continue
 
-                        if rel_id not in self._rels:
-                            self._rels[rel_id] = {}
-                        self._rels[rel_id].setdefault(c1, []).append(c2)
+                self._rels_fwd.setdefault(rel, {}).setdefault(c1, []).append(c2)
+                self._rels_rev.setdefault(rel, {}).setdefault(c2, []).append(c1)
+                count += 1
+
+        logger.info("[HemOnc] relationships 로드: %d건", count)
+
+    def _load_synonyms(self, path: Path) -> None:
+        """동의어 로드 → INN 매칭 보강."""
+        count = 0
+        with open(path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                code = row.get("concept_code", "")
+                syn = row.get("concept_synonym_name", "")
+                cls = self._code_to_class.get(code, "")
+                if cls in ("Component", "Component Class") and syn:
+                    syn_lower = syn.lower()
+                    if syn_lower not in self._name_to_code:
+                        self._name_to_code[syn_lower] = code
                         count += 1
-                break
-            except (UnicodeDecodeError, KeyError):
-                continue
+        logger.info("[HemOnc] synonyms 로드: %d건 추가", count)
 
-        logger.info("[HemOnc] RELATIONSHIP 로드: %d건, 관계 유형: %s",
-                    count, list(self._rels.keys()))
+    def _get_related(self, rel: str, code: str, direction: str = "fwd") -> list[str]:
+        """관계 조회. direction: fwd(code→target) / rev(target→code)."""
+        idx = self._rels_fwd if direction == "fwd" else self._rels_rev
+        return idx.get(rel, {}).get(code, [])
 
     def get_competition_card(self, inn: str) -> CompetitionCard:
         """INN → CompetitionCard."""
         if not self._loaded:
             self.load()
+            if not self._loaded:
+                return CompetitionCard(inn=inn)
 
-        inn_lower = inn.strip().lower()
-        concept_id = self._inn_to_id.get(inn_lower)
-
-        if concept_id is None:
+        code = self._name_to_code.get(inn.lower())
+        if code is None:
             return CompetitionCard(inn=inn)
 
-        concept = self._concepts.get(concept_id, {})
+        # FDA indications
+        ind_codes = self._get_related("Has FDA indication", code)
+        indications = [self._code_to_name.get(c, "") for c in ind_codes if c in self._code_to_name]
 
-        # 1) "Has been compared to" — 직접 경쟁약
-        compared_ids = self._rels.get(self.REL_COMPARED, {}).get(concept_id, [])
-        compared_drugs = []
-        for cid in compared_ids:
-            comp = self._concepts.get(cid, {})
-            if comp:
-                compared_drugs.append({
-                    "inn": comp["concept_name"],
-                    "concept_id": cid,
-                    "relationship": "has been compared to",
-                })
+        # Major/Minor class
+        major_codes = self._get_related("Has major class", code)
+        minor_codes = self._get_related("Has minor class", code)
+        major = self._code_to_name.get(major_codes[0], "") if major_codes else ""
+        minor = self._code_to_name.get(minor_codes[0], "") if minor_codes else ""
 
-        # 2) 이 약물이 포함된 레지멘 찾기
-        regimen_names = []
-        disease_names = set()
-        context_names = set()
-        same_space = set()
+        # Brand name
+        brand_codes = self._get_related("Has brand name", code)
+        brand = self._code_to_name.get(brand_codes[0], "") if brand_codes else ""
 
-        # "Has antineoplastic Rx" 역방향: 레지멘 → 이 약물
-        rx_rels = self._rels.get(self.REL_CONTAINS, {})
-        for regimen_id, drug_ids in rx_rels.items():
-            if concept_id in drug_ids:
-                reg = self._concepts.get(regimen_id, {})
-                if reg:
-                    regimen_names.append(reg["concept_name"])
+        # FDA approved year
+        yr_codes = self._get_related("Was FDA approved yr", code)
+        year = self._code_to_name.get(yr_codes[0], "") if yr_codes else ""
 
-                    # 레지멘의 context (치료라인)
-                    ctx_ids = self._rels.get(self.REL_HAS_CONTEXT, {}).get(regimen_id, [])
-                    for ctx_id in ctx_ids:
-                        ctx = self._concepts.get(ctx_id, {})
-                        if ctx:
-                            context_names.add(ctx["concept_name"])
+        # Route
+        route_codes = self._get_related("Has route", code)
+        route = self._code_to_name.get(route_codes[0], "") if route_codes else ""
 
-                    # 같은 레지멘의 다른 약물
-                    for did in drug_ids:
-                        if did != concept_id:
-                            d = self._concepts.get(did, {})
-                            if d:
-                                same_space.add(d["concept_name"])
+        # 같은 FDA indication 약물 (경쟁약)
+        same_ind_drugs: list[str] = []
+        for ind_code in ind_codes:
+            # 역방향: indication → 이 적응증을 가진 약물들
+            drug_codes = self._get_related("Has FDA indication", ind_code, direction="rev")
+            for dc in drug_codes:
+                if dc != code and self._code_to_class.get(dc) == "Component":
+                    name = self._code_to_name.get(dc, "")
+                    if name and name not in same_ind_drugs:
+                        same_ind_drugs.append(name)
 
-        # 3) Disease (Is a 관계 또는 context에서 추출)
-        # HemOnc에서 disease는 보통 regimen의 상위 concept으로 연결
-        is_a_rels = self._rels.get(self.REL_IS_A, {})
-        for regimen_id, drug_ids in rx_rels.items():
-            if concept_id in drug_ids:
-                parent_ids = is_a_rels.get(regimen_id, [])
-                for pid in parent_ids:
-                    parent = self._concepts.get(pid, {})
-                    if parent and parent.get("domain_id") == "Condition":
-                        disease_names.add(parent["concept_name"])
+        # 같은 minor class 약물
+        same_class_drugs: list[str] = []
+        for mc in minor_codes:
+            drug_codes = self._get_related("Has minor class", mc, direction="rev")
+            for dc in drug_codes:
+                if dc != code and self._code_to_class.get(dc) == "Component":
+                    name = self._code_to_name.get(dc, "")
+                    if name and name not in same_class_drugs:
+                        same_class_drugs.append(name)
 
         return CompetitionCard(
             inn=inn,
-            regimens=regimen_names[:10],
-            diseases=list(disease_names),
-            treatment_contexts=list(context_names),
-            compared_drugs=compared_drugs,
-            same_space_drugs=list(same_space)[:10],
-            hemonc_concept_id=str(concept_id),
+            fda_indications=indications,
+            major_class=major,
+            minor_class=minor,
+            same_indication_drugs=same_ind_drugs,
+            same_class_drugs=same_class_drugs,
+            brand_name=brand,
+            fda_approved_year=year,
+            route=route,
+            hemonc_code=code,
         )
 
 
-# ════════════════════════════════════════════════════════════════════
 # 싱글턴
-# ════════════════════════════════════════════════════════════════════
-
 _hemonc_instance: Optional[HemOncIndex] = None
 
 
 def get_hemonc_index() -> HemOncIndex | None:
-    """HemOncIndex 싱글턴. 데이터 없으면 None 반환."""
+    """HemOncIndex 싱글턴. 데이터 없으면 None."""
     global _hemonc_instance
     if _hemonc_instance is None:
         idx = HemOncIndex()
