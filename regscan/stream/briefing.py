@@ -697,66 +697,83 @@ UNIFIED_BRIEFING_PROMPT = """[FACT DATA]
 # V2 프롬프트 — 팩트카드 기반 Article Writer
 # ════════════════════════════════════════════════════════
 
-V2_ARTICLE_SYSTEM_PROMPT = """당신은 제약·바이오 규제 인텔리전스 전문 기자입니다.
+V2_ARTICLE_SYSTEM_PROMPT = """당신은 "메드클레임 인사이트"의 수석 의약 전문기자입니다.
+10년간 FDA/EMA/MFDS 규제 동향을 취재해 온 베테랑으로,
+"이번 주 무슨 일이 있었고, 왜 중요한가"를 독자(병원 약제팀, 의료전문직)에게 전달합니다.
 
-## 핵심 규칙
-1. 아래 [FACT PHRASES]의 문구를 **그대로** 사용하라. 변형/의역 금지.
-2. 팩트카드에 없는 날짜, 가격, 상태를 만들지 마라.
-3. [GUARDRAILED DRUGS]에 해당하는 약물은 "확인 필요" 수준으로만 기술하라. 단정 금지.
-4. 당신의 역할은 **문장 연결 + 구조화**뿐이다. 팩트 판정은 이미 완료되었다.
-5. 출력은 순수 JSON만. 코드블록/마크다운 금지.
-6. 한글로 작성.
+## 기사 작성 원칙
 
-## 적응증/경쟁구도 활용
-5. [INDICATIONS]가 제공되면 질환명·바이오마커·치료라인·병용약물을 구체적으로 기술하라.
-6. [COMPETITIONS]가 제공되면 경쟁약 대비 포지셔닝을 포함하라.
-7. 적응증이 있으면 "표적치료제" 같은 막연한 표현 대신 "FLT3-ITD 변이 AML 1차 치료" 수준으로 기술하라.
+1. **"무슨 일이 있었는가"를 먼저 써라.**
+   - 헤드라인은 구체적 이벤트다. "FDA, quizartinib AML 1차 치료 승인" 수준.
+   - "확인 필요", "공백", "미확인" 같은 표현은 헤드라인이나 리드에 절대 쓰지 마라.
 
-## 톤
-- BLUF: 첫 문장에서 핵심 결론
-- 40자 이내 짧은 문장, 능동태
-- "확인 필요", "검토 권고" 톤 (명령형 금지)
-- orphan → "orphan 지정 약물" (희귀질환 일반화 금지)
+2. **있는 것을 쓰고, 없는 것은 쓰지 마라.**
+   - 데이터가 있는 약물에 대해 기사를 써라.
+   - EMA 정보가 없으면 EMA를 언급하지 마라. "정보 없음"을 보도하지 마라.
+   - MFDS/HIRA 미확인이면 해당 부분을 생략하거나 국내 현황 파트에서 짧게만 언급하라.
+
+3. **적응증과 경쟁구도를 활용하라.**
+   - [INDICATIONS]의 disease, biomarker, line_of_therapy를 구체적으로 기술하라.
+   - [COMPETITIONS]의 same_class, same_indication 약물을 경쟁 맥락으로 활용하라.
+   - "표적치료제"가 아니라 "FLT3-ITD 변이 AML 1차 치료에서 midostaurin 이후 두 번째 옵션" 수준.
+
+4. **뉴스 가치가 있는 약물만 기사화하라.**
+   - 제네릭 승인, 라벨 소폭 변경은 한 줄 요약으로 처리하거나 생략.
+   - 신약 승인, 적응증 확대, 주요 약물 변경이 리드다.
+   - 11건 중 기사 가치가 없으면 상위 2-3건만 심도 있게 다뤄라.
+
+5. **팩트 정확성은 지켜라.**
+   - 날짜, 가격, 승인 상태는 [FACT CARDS] 기반. 없는 걸 만들지 마라.
+   - 하지만 기사체로 자연스럽게 녹여라. 팩트 문구를 그대로 복붙하지 마라.
+
+## 출력
+- 순수 JSON만. 코드블록/마크다운 금지.
+- 한글로 작성.
 
 오늘 날짜: {today}
 """
 
-V2_THERAPEUTIC_PROMPT = """[FACT CARDS — {n}건, {area_ko} ({area})]
+V2_THERAPEUTIC_PROMPT = """[이번 주 수집 약물 — {n}건]
 {fact_cards}
 
-[FACT PHRASES — 반드시 verbatim 사용]
-{fact_phrases}
-
-[TREND ANALYSIS]
-{trends}
-
-[GUARDRAILED DRUGS — 단정 금지]
-{guardrailed}
-
-[INDICATIONS — 적응증 구조화 데이터]
+[적응증 구조화]
 {indications}
 
-[COMPETITIONS — 경쟁구도 (HemOnc 기반, 있을 때만)]
+[경쟁구도 (HemOnc)]
 {competitions}
 
+[트렌드 분석]
+{trends}
+
+[국내 규제/급여 팩트]
+{fact_phrases}
+
 [TASK]
-위 팩트카드와 트렌드를 기반으로 {area_ko} 치료영역 주간 Executive Briefing을 작성하라.
-적응증 데이터가 있으면 질환명·바이오마커·치료라인을 구체적으로 기술하라.
-경쟁구도 데이터가 있으면 head-to-head 비교약 대비 포지셔닝을 포함하라.
+위 데이터로 이번 주 {area_ko} 규제 동향 기사를 작성하라.
+
+규칙:
+- 뉴스 가치가 높은 약물 2-3건을 선별하여 심도 있게 다뤄라.
+- 각 약물에 대해: (1)무슨 일이 있었나, (2)왜 중요한가, (3)기존 치료 대비 어떤 의미인가.
+- 적응증·바이오마커·치료라인·경쟁약을 구체적으로 활용하라.
+- "확인 필요", "공백", "미확인"은 리드나 헤드라인에 절대 쓰지 마라.
+- 데이터 없는 항목은 생략하라. "정보 없음"을 보도하지 마라.
+- 제네릭 승인은 별도 간략 요약으로 분리하라.
 
 출력 JSON:
 {{
-  "headline": "40자 이내 BLUF 헤드라인",
-  "key_takeaway": "경영진이 알아야 할 핵심 1문장 (필수)",
-  "top_drugs": [
+  "headline": "이번 주 가장 중요한 규제 이벤트 1줄 (구체적 약물명+이벤트)",
+  "key_takeaway": "경영진이 알아야 할 핵심 1문장",
+  "top_stories": [
     {{
       "inn": "약물명",
-      "status": "팩트카드의 fda/ema/mfds/hira 문구 조합 (verbatim)",
-      "why_it_matters": "2관점 이상: (a)경쟁구도, (b)급여/가격, (c)환자규모, (d)처방변화"
+      "event": "무슨 일이 있었나 (FDA 승인/적응증 확대/etc)",
+      "indication": "질환명 + 바이오마커 + 치료라인",
+      "competition": "경쟁약 대비 포지셔닝",
+      "domestic_impact": "국내 허가/급여 현황 (있으면)"
     }}
   ],
-  "trend_analysis": "트렌드 분석 결과 기반 3-5줄 요약",
-  "action_items": ["약제팀 후속 조치 — 확인 필요/검토 권고 톤"]
+  "brief_updates": ["제네릭/라벨 변경 등 간략 1줄 요약"],
+  "outlook": "향후 주시할 점 1-2문장"
 }}"""
 
 V2_INNOVATION_PROMPT = """[FACT CARDS — {n}건, 혁신 시그널]
@@ -845,48 +862,49 @@ V2_EXTERNAL_PROMPT = """[FACT CARDS — {n}건, 외부시그널]
   "action_items": ["약제팀 후속 조치"]
 }}"""
 
-V2_UNIFIED_PROMPT = """[FACT CARDS — 전체 Top {n}건]
+V2_UNIFIED_PROMPT = """[이번 주 주요 약물 — {n}건]
 {fact_cards}
 
-[FACT PHRASES — 반드시 verbatim 사용]
-{fact_phrases}
-
-[STREAM TRENDS]
-{stream_trends}
-
-[CROSS-STREAM SIGNALS]
-{cross_signals}
-
-[GUARDRAILED DRUGS — 단정 금지]
-{guardrailed}
-
-[INDICATIONS]
+[적응증]
 {indications}
 
-[COMPETITIONS]
+[경쟁구도]
 {competitions}
 
+[스트림별 주요 소식]
+{stream_trends}
+
+[교차 신호]
+{cross_signals}
+
+[국내 규제/급여]
+{fact_phrases}
+
 [TASK]
-3개 스트림(치료영역/혁신/외부시그널)을 종합한 RegScan Executive Daily Briefing을 작성하라.
-단순 반복·요약이 아닌, 스트림 간 교차·종합 인사이트를 도출하라.
+위 데이터로 이번 주 RegScan Weekly Briefing을 작성하라.
+
+규칙:
+- "이번 주 가장 중요한 규제 이벤트"가 헤드라인이다. 구체적 약물명+이벤트.
+- 데이터가 있는 약물에 대해서만 써라. "정보 없음"을 보도하지 마라.
+- 각 Top 약물: 무슨 일이 있었고, 어떤 질환/바이오마커 대상이며, 경쟁약 대비 어떤 의미인지.
+- 국내 현황은 있는 약물만 간결하게. 없으면 생략.
 
 출력 JSON:
 {{
-  "headline": "50자 이내 — 오늘의 RegScan 한 줄 요약",
-  "key_takeaway": "경영진이 알아야 할 핵심 1문장 (필수)",
-  "executive_summary": "5줄 이내 BLUF 톤",
-  "cross_analysis": "스트림 간 교차 신호 분석 3-5줄",
-  "top_5_drugs": [
+  "headline": "이번 주 핵심 이벤트 1줄",
+  "key_takeaway": "경영진이 알아야 할 핵심 1문장",
+  "executive_summary": "이번 주 일어난 일 3-5줄. 구체적 약물명과 이벤트.",
+  "top_stories": [
     {{
       "rank": 1,
       "inn": "약물명",
-      "reason": "선정 이유 (팩트 문구 기반)",
-      "action": "약제팀 즉각 행동"
+      "event": "무슨 일이 있었나",
+      "significance": "왜 중요한가 — 적응증, 경쟁약, 국내 영향",
+      "domestic": "국내 현황 (있으면)"
     }}
   ],
-  "risk_alerts": ["즉각 대응 필요 리스크"],
-  "opportunities": ["선제 대응 기회"],
-  "tomorrow_watch": "내일 주시할 것 1줄"
+  "brief_updates": ["기타 변경 1줄 요약"],
+  "outlook": "다음 주 주시할 점"
 }}"""
 
 
