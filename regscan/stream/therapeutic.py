@@ -602,7 +602,23 @@ class TherapeuticAreaStream(BaseStream):
                     if items:
                         parsed = parser.parse_many(items)
                         if parsed:
-                            drug["mfds_data"] = parsed[0]
+                            p = parsed[0]
+                            # FactCard가 이해하는 키로 변환
+                            cancel = (p.get("cancel_name") or "").strip()
+                            is_valid = p.get("is_valid", True)
+                            permit_date = str(p.get("permit_date_str") or "")
+                            # YYYY-MM-DD 포맷 변환 (20150320 → 2015-03-20)
+                            if len(permit_date) == 8 and permit_date.isdigit():
+                                permit_date = f"{permit_date[:4]}-{permit_date[4:6]}-{permit_date[6:]}"
+                            drug["mfds_data"] = {
+                                "approval_status": "허가" if (cancel == "정상" and is_valid) else "미허가",
+                                "approval_date": permit_date,
+                                "item_name": p.get("item_name", ""),
+                                "item_seq": p.get("item_seq", ""),
+                                "entp_name": p.get("entp_name", ""),
+                                "main_ingredient": p.get("main_ingredient", ""),
+                                "raw": p,
+                            }
                             count += 1
                 except Exception:
                     pass
