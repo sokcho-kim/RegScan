@@ -156,15 +156,15 @@ def _hard_check_prices(text: str, card: FactCard) -> list[Violation]:
 def _hard_check_status(text: str, card: FactCard) -> list[Violation]:
     """본문의 상태 단정문이 팩트카드와 일치하는지 검증."""
     violations = []
-    card_phrases_lower = " ".join(card.all_fact_phrases).lower()
+    card_phrases_joined = " ".join(card.all_fact_phrases)
 
     for pattern, status_key in _ASSERTIVE_PATTERNS:
-        matches = re.findall(pattern, text)
+        matches = re.findall(pattern, text, re.IGNORECASE)
         if not matches:
             continue
 
         # 팩트카드에 해당 상태가 없는데 본문에서 단정 → 위반
-        pattern_in_card = re.search(pattern, card_phrases_lower)
+        pattern_in_card = re.search(pattern, card_phrases_joined, re.IGNORECASE)
         if not pattern_in_card:
             violations.append(Violation(
                 inn=card.inn,
@@ -176,20 +176,29 @@ def _hard_check_status(text: str, card: FactCard) -> list[Violation]:
 
 
 def _hard_check_guardrail(text: str, card: FactCard) -> list[Violation]:
-    """가드레일 약물에 단정문 사용 여부 검증."""
+    """가드레일 약물에 단정문 사용 여부 검증.
+
+    팩트카드 자체의 문구에 포함된 표현은 허용 (예: FDA 승인 완료가 카드 문구인 경우).
+    가드레일은 HIRA/MFDS 등 불확실한 영역의 단정만 차단.
+    """
     if not card.is_guardrailed:
         return []
 
+    card_phrases_text = " ".join(card.all_fact_phrases)
     violations = []
     for pattern in _GUARDRAIL_FORBIDDEN:
         matches = re.findall(pattern, text)
-        if matches:
-            violations.append(Violation(
-                inn=card.inn,
-                check_type="hard",
-                category="guardrail",
-                detail=f"가드레일 약물에 단정문: '{matches[0]}' (guardrail: {card.guardrail_notes})",
-            ))
+        if not matches:
+            continue
+        # 팩트카드 자체 문구에 해당 표현이 있으면 허용
+        if re.search(pattern, card_phrases_text):
+            continue
+        violations.append(Violation(
+            inn=card.inn,
+            check_type="hard",
+            category="guardrail",
+            detail=f"가드레일 약물에 단정문: '{matches[0]}' (guardrail: {card.guardrail_notes})",
+        ))
     return violations
 
 

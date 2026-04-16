@@ -1269,6 +1269,13 @@ class StreamBriefingGenerator:
         guardrailed_json = json.dumps(guardrailed, ensure_ascii=False)
         return fact_cards_json, fact_phrases_json, guardrailed_json
 
+    @staticmethod
+    def _v2_validate(briefing_json: dict, cards: list) -> dict:
+        """Step 4 Validator 호출 — 위반 시 fallback 교체."""
+        from regscan.stream.fact_validator import validate_briefing
+        vr = validate_briefing(briefing_json, cards)
+        return vr.corrected_briefing
+
     async def _v2_generate_cards_and_trends(
         self,
         result: StreamResult,
@@ -1309,6 +1316,7 @@ class StreamBriefingGenerator:
         try:
             content = await self._call_llm(prompt, system_prompt=system)
             result_json = self._parse_json_response(content, fallback_headline=f"{area_ko} 치료영역 브리핑")
+            result_json = self._v2_validate(result_json, cards)
             result_json["_v2"] = True
             result_json["_card_count"] = len(cards)
             return result_json
@@ -1342,6 +1350,7 @@ class StreamBriefingGenerator:
         try:
             content = await self._call_llm(prompt, system_prompt=system)
             result_json = self._parse_json_response(content, fallback_headline="혁신 시그널 브리핑")
+            result_json = self._v2_validate(result_json, cards)
             result_json["_v2"] = True
             result_json["_card_count"] = len(cards)
             return result_json
@@ -1377,6 +1386,7 @@ class StreamBriefingGenerator:
         try:
             content = await self._call_llm(prompt, system_prompt=system)
             result_json = self._parse_json_response(content, fallback_headline="미래 트렌드 리포트")
+            result_json = self._v2_validate(result_json, cards)
             result_json["_v2"] = True
             result_json["_card_count"] = len(cards)
             return result_json
@@ -1442,6 +1452,7 @@ class StreamBriefingGenerator:
         try:
             content = await self._call_llm(prompt, system_prompt=system)
             result_json = self._parse_json_response(content, fallback_headline="RegScan 데일리 브리핑")
+            result_json = self._v2_validate(result_json, top_cards)
             result_json["_v2"] = True
             result_json["_card_count"] = len(top_cards)
             return result_json
