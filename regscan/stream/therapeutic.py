@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from typing import Any
 
 from regscan.config import settings
@@ -317,13 +318,14 @@ class TherapeuticAreaStream(BaseStream):
         )
 
     async def _search_fda_pharm_class(self, area: AreaConfig) -> list[dict]:
-        """FDA pharm_class_epc로 약물 검색"""
+        """FDA pharm_class_epc로 약물 검색 — 최근 변경분만 수집"""
         from regscan.ingest.fda import FDAClient
         from regscan.parse.fda_parser import FDADrugParser
 
         fda_parser = FDADrugParser()
         all_drugs: list[dict] = []
         seen_inns: set[str] = set()
+        cutoff = (datetime.now() - timedelta(days=settings.SCAN_DAYS_BACK)).strftime("%Y%m%d")
 
         async with FDAClient() as client:
             for term in area.fda_pharm_classes:
@@ -352,6 +354,12 @@ class TherapeuticAreaStream(BaseStream):
                         submissions = r.get("submissions", [])
                         sub_info = fda_parser._extract_latest_submission(submissions)
 
+                        # 최근 변경분 필터 — submission_status_date가 cutoff 이후만
+                        sub_date = sub_info.get("submission_status_date", "")
+                        sub_date_norm = sub_date.replace("-", "")
+                        if sub_date_norm and sub_date_norm < cutoff:
+                            continue
+
                         all_drugs.append({
                             "inn": inn,
                             "atc_code": "",
@@ -378,12 +386,13 @@ class TherapeuticAreaStream(BaseStream):
         return all_drugs
 
     async def _filter_ema_therapeutic(self, area: AreaConfig) -> list[dict]:
-        """EMA medicines JSON에서 therapeutic_area 키워드 필터"""
+        """EMA medicines JSON에서 therapeutic_area 키워드 필터 — 최근 변경분만"""
         from regscan.ingest.ema import EMAClient
 
         all_drugs: list[dict] = []
         seen_inns: set[str] = set()
         keywords_lower = [k.lower() for k in area.ema_therapeutic_keywords]
+        cutoff = (datetime.now() - timedelta(days=settings.SCAN_DAYS_BACK)).strftime("%Y-%m-%d")
 
         async with EMAClient() as client:
             medicines = await client.fetch_medicines()
@@ -410,6 +419,13 @@ class TherapeuticAreaStream(BaseStream):
             norm = self._matcher.normalize(inn)
             if norm in seen_inns:
                 continue
+
+            # 최근 변경분 필터 — marketing_authorisation_date가 cutoff 이후만
+            ma_date = (med.get("marketingAuthorisationDate", "") or
+                       med.get("marketing_authorisation_date", "") or "")
+            if ma_date and ma_date < cutoff:
+                continue
+
             seen_inns.add(norm)
 
             atc_code = (med.get("atcCode", "") or
