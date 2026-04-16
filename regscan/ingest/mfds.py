@@ -60,6 +60,7 @@ class MFDSClient:
         item_name: Optional[str] = None,
         entp_name: Optional[str] = None,
         item_seq: Optional[str] = None,
+        edi_code: Optional[str] = None,
         page_no: int = 1,
         num_of_rows: int = 100,
     ) -> dict[str, Any]:
@@ -67,9 +68,10 @@ class MFDSClient:
         의약품 허가정보 검색
 
         Args:
-            item_name: 품목명 검색
+            item_name: 품목명 검색 (한글)
             entp_name: 업체명 검색
             item_seq: 품목일련번호
+            edi_code: EDI코�� (= HIRA 제품코드, 9자리)
             page_no: 페이지 번호
             num_of_rows: 페이지당 건수 (최대 100)
 
@@ -83,6 +85,8 @@ class MFDSClient:
             "type": "json",
         }
 
+        if edi_code:
+            params["edi_code"] = edi_code
         if item_name:
             params["item_name"] = item_name
         if entp_name:

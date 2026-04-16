@@ -555,7 +555,7 @@ class TherapeuticAreaStream(BaseStream):
         return count
 
     async def _enrich_with_mfds(self, drugs_by_inn: dict[str, dict]) -> int:
-        """Stream 1에서 수집된 INN으로 MFDS API 조회하여 데이터 보강
+        """IngredientBridge → HIRA 제품코드(EDI코드) → MFDS API 정확 매칭
 
         Args:
             drugs_by_inn: 정규화된 INN → drug dict
@@ -566,8 +566,15 @@ class TherapeuticAreaStream(BaseStream):
         import asyncio as _aio
         from regscan.ingest.mfds import MFDSClient
         from regscan.parse.mfds_parser import MFDSPermitParser
+        from regscan.stream.briefing import _get_bridge
+
+        bridge = _get_bridge()
+        if bridge is None:
+            logger.warning("[MFDS] IngredientBridge 로드 실패 — MFDS enrichment 스킵")
+            return 0
 
         count = 0
+        skipped = 0
         parser = MFDSPermitParser()
 
         async with MFDSClient() as client:
@@ -576,8 +583,20 @@ class TherapeuticAreaStream(BaseStream):
                 if not inn or len(inn) < 3:
                     continue
 
+                # 1) Bridge에서 제품코드(EDI코드) 확보
                 try:
-                    response = await client.search_permits(item_name=inn, num_of_rows=5)
+                    lookup = bridge.lookup(inn)
+                    edi_code = (lookup.raw_data or {}).get("제품코드")
+                except Exception:
+                    edi_code = None
+
+                if not edi_code:
+                    skipped += 1
+                    continue
+
+                # 2) edi_code로 MFDS API 조회 (정확 매칭)
+                try:
+                    response = await client.search_permits(edi_code=edi_code, num_of_rows=5)
                     items = response.get("body", {}).get("items", [])
                     if items:
                         parsed = parser.parse_many(items)
@@ -587,9 +606,10 @@ class TherapeuticAreaStream(BaseStream):
                 except Exception:
                     pass
 
-                # Rate limit (0.2초 간격)
                 await _aio.sleep(0.2)
 
+        if skipped:
+            logger.debug("[MFDS] Bridge 미매칭 %d건 스킵", skipped)
         return count
 
     def _group_by_atc(
