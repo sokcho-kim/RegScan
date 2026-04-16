@@ -728,7 +728,7 @@ V2_ARTICLE_SYSTEM_PROMPT = """당신은 "메드클레임 인사이트"의 수석
 
 ## 출력
 - 순수 JSON만. 코드블록/마크다운 금지.
-- 한글로 작성.
+- 한글로 작성하되, **약물명(INN)은 영문 그대로** 유지. fosfomycin, quizartinib, faricimab — 한글 음차 금지.
 
 오늘 날짜: {today}
 """
@@ -761,7 +761,7 @@ V2_THERAPEUTIC_PROMPT = """[이번 주 수집 약물 — {n}건]
 
 출력 JSON:
 {{
-  "headline": "이번 주 전체를 아우르는 종합 헤드라인 (예: '신규 승인 1건, 고가 급여 유지 2건 — 항생제·안과·혈액암 동시 변동')",
+  "headline": "종합 헤드라인 — 반드시 약물명(영문 INN) 포함. 예: 'fosfomycin FDA 승인 예정, quizartinib·faricimab 국내 급여 유지 확인'",
   "key_takeaway": "경영진이 알아야 할 핵심 1문장",
   "top_stories": [
     {{
@@ -891,7 +891,7 @@ V2_UNIFIED_PROMPT = """[이번 주 주요 약물 — {n}건]
 
 출력 JSON:
 {{
-  "headline": "이번 주 전체를 아우르는 종합 헤드라인",
+  "headline": "종합 헤드라인 — 약물명(영문 INN) 포함 필수",
   "key_takeaway": "경영진이 알아야 할 핵심 1문장",
   "executive_summary": "이번 주 일어난 일 3-5줄. 구체적 약물명과 이벤트.",
   "top_stories": [

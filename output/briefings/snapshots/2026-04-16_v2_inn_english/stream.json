@@ -1,0 +1,44 @@
+{
+  "headline": "FOSFOMYCIN TROMETHAMINE 4/9 FDA 승인 예정… quizartinib(FLT3-ITD+ AML 1차)·faricimab(망막질환)·azacitidine(MDS) 국내 급여 약가 재확인",
+  "key_takeaway": "이번 주는 신규 혁신신약 승인보다는, FOSFOMYCIN TROMETHAMINE의 FDA 승인 일정이 임박한 가운데 국내에서는 faricimab·azacitidine·LAMOTRIGINE의 급여·약가가 ‘유지되는 약제’로 재확인된 주간이다.",
+  "top_stories": [
+    {
+      "inn": "FOSFOMYCIN TROMETHAMINE",
+      "event": "2026-04-09 FDA 승인 예정(급성 단순 방광염 등 uncomplicated UTI 적응증).",
+      "indication": "성인 uncomplicated urinary tract infections(acute cystitis) — 치료라인 미특정",
+      "competition": "급성 단순 방광염 1차 경험적 치료에서 nitrofurantoin, TMP-SMX, pivmecillinam 등과 같은 ‘경구 단기요법’ 축에서 선택지로 자리잡을 수 있는 계열(항균제)로, 내성 패턴·복약순응도(단회/단기요법 운용) 관점에서 병원 항생제 스튜어드십 프로토콜에 영향을 줄 수 있다.",
+      "domestic_impact": "국내 허가·급여는 이번 데이터셋에서 확정 정보가 없어, 병원 약제팀은 FDA 승인 이후 국내 도입 가능성(원내 처방집/대체약, 수급) 관점에서 모니터링이 필요하다."
+    },
+    {
+      "inn": "FARICIMAB",
+      "event": "국내 식약처 허가(2023-01-20) 및 심평원 급여 등재(상한가 696,197원, 28.8mg/0.24mL) 상태가 2026-04-01 기준으로 재확인.",
+      "indication": "Neovascular(wet) AMD 및 DME, RVO 후 황반부종 — 치료라인 미특정",
+      "competition": "안과 항-VEGF 시장에서 ‘VEGF 억제’ 단일축 치료 대비(동일 적응증 내 기존 항-VEGF 주사제들과의) 투여 간격·질환군 확장 운용이 핵심 경쟁 포인트가 되는 약제로, 급여 유지가 확인되면서 장기 유지치료 환자군에서 처방 연속성과 예산 예측 가능성이 커졌다.",
+      "domestic_impact": "급여 유지 및 상한가가 확인돼, 병원은 주사제 예산(고가 생물학제제)과 외래 시술(유리체강내 주사) 물량 계획을 ‘현행 단가’ 기준으로 계속 운영 가능하다."
+    },
+    {
+      "inn": "AZACITIDINE",
+      "event": "국내 식약처 허가(2022-03-23) 및 심평원 급여 등재(상한가 1,183,274원, 0.3g/1정) 상태가 2026-04-01 기준으로 재확인.",
+      "indication": "성인 MDS(FAB: RA, RARS(혈구감소/수혈 필요 시), RAEB, RAEB-T, CMMoL) — 치료라인 미특정",
+      "competition": "MDS에서 ‘질병 조절/조혈개선’을 목표로 하는 저메틸화제 축의 대표 옵션으로, 수혈 의존·혈구감소 동반 환자군에서 지지요법 단독 대비 치료 전략을 구조화하는 약제다. 급여 유지가 확인되면서 혈액종양 다학제(외래-주사실-입원) 경로에서 치료 지속성이 강화된다.",
+      "domestic_impact": "고가 항암제(혈액종양)로서 급여·약가가 확인돼, 병원은 MDS 환자군의 장기 투약(주기 치료) 예산과 재고(제형/용량 단위) 운영을 안정적으로 이어갈 수 있다."
+    }
+  ],
+  "brief_updates": [
+    "LAMOTRIGINE: 국내 식약처 허가(2012-02-28) 및 심평원 급여 등재(상한가 660원, 0.1g/1정) 상태가 2026-04-01 기준으로 재확인(간질 유지요법 및 Bipolar I disorder 유지치료 축).",
+    "DULOXETINE: 심평원 급여 삭제(과거 등재 이력) 상태로 정리됨(우울증·불안·신경병증성 통증 등 적응증 약제이나, 본 데이터셋 기준 국내 급여는 유지되지 않음).",
+    "DILTIAZEM HYDROCHLORIDE: 심평원 급여 삭제(과거 등재 이력) 상태로 정리됨(고혈압/협심증 계열).",
+    "MYCOPHENOLATE MOFETIL: 심평원 급여 삭제(과거 등재 이력) 상태로 정리됨(이식 거부반응 예방).",
+    "NALOXONE HCL: 심평원 급여 삭제(과거 등재 이력) 상태로 정리됨(과량투여 대응 약제)."
+  ],
+  "outlook": "4/9로 예정된 FOSFOMYCIN TROMETHAMINE의 FDA 결정 이후, 실제 라벨(용법·용량/대상 환자)과 공급 형태가 국내 항생제 운영(원내 가이드·대체약) 논의에 어떤 파급을 주는지 확인이 필요하다. 혈액종양에서는 quizartinib(FLT3-ITD+ newly diagnosed AML 1차 병용)의 국내 도입·급여 경로가 열릴지 여부가 다음 관전 포인트다.",
+  "_validation": {
+    "total_violations": 0,
+    "hard_violations": 0,
+    "soft_violations": 0,
+    "fallback_count": 0,
+    "validated": true
+  },
+  "_v2": true,
+  "_card_count": 11
+}
