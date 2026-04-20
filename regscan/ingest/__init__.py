@@ -54,6 +54,11 @@ from .mfds_safety import (
     MFDSSafetyLetterIngestor,
     MFDSRecallIngestor,
 )
+from .nice import (
+    NICEClient,
+    NICETAIngestor,
+    NICERecentTAIngestor,
+)
 
 __all__ = [
     "BaseIngestor",
@@ -112,4 +117,8 @@ __all__ = [
     "MFDSSafetyClient",
     "MFDSSafetyLetterIngestor",
     "MFDSRecallIngestor",
+    # NICE HTA
+    "NICEClient",
+    "NICETAIngestor",
+    "NICERecentTAIngestor",
 ]
