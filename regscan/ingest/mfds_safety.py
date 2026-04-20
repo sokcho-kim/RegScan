@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+import ssl
 from datetime import datetime, timedelta
 from typing import Any, Optional
 from urllib.parse import urlencode
@@ -51,6 +52,13 @@ class MFDSSafetyLetterIngestor(BaseIngestor):
         self.page_size = page_size
         self.max_pages = max_pages
         self.fetch_detail = fetch_detail
+
+    async def __aenter__(self):
+        # nedrug.mfds.go.kr는 TLS 1.3 미지원 → TLS 1.2 강제
+        ctx = ssl.create_default_context()
+        ctx.maximum_version = ssl.TLSVersion.TLSv1_2
+        self._client = httpx.AsyncClient(timeout=self.timeout, verify=ctx)
+        return self
 
     def source_type(self) -> str:
         return "MFDS_SAFETY_LETTER"
