@@ -29,12 +29,12 @@ class MFDSSafetyClient:
 
     ENDPOINTS = {
         "safety_letter": (
-            "http://apis.data.go.kr/1471000/MdcinGrpInfoService"
-            "/getMdcinSftyLeterInfo"
+            "http://apis.data.go.kr/1471000/MdcinSftyLeterInfoService01"
+            "/getMdcinSftyLeterList01"
         ),
         "recall": (
-            "http://apis.data.go.kr/1471000/DrugRcllInfoService"
-            "/getDrugRcllList"
+            "http://apis.data.go.kr/1471000/MdcinRtrvlSleStpgeInfoService04"
+            "/getMdcinRtrvlSleStpgelList03"
         ),
     }
 

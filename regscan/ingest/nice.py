@@ -91,7 +91,8 @@ class NICEClient:
 
         raise last_error or Exception("NICE TA Excel download failed")
 
-    def _parse_xlsx(self, xlsx_bytes: bytes) -> list[dict[str, Any]]:
+    @staticmethod
+    def _parse_xlsx(xlsx_bytes: bytes) -> list[dict[str, Any]]:
         """Excel 파싱 (openpyxl 사용)"""
         try:
             import openpyxl
@@ -136,8 +137,10 @@ class NICEClient:
                         record[key] = str(value).strip()
 
             # TA 번호가 없으면 스킵
-            ta_ref = record.get("Appraisal number", "") or record.get(
-                "TA number", ""
+            ta_ref = (
+                record.get("TA ID", "")
+                or record.get("Appraisal number", "")
+                or record.get("TA number", "")
             )
             if not ta_ref:
                 continue
@@ -173,7 +176,7 @@ class NICETAIngestor(BaseIngestor):
             row["_fetched_at"] = today
 
             # 가이던스 URL 추가
-            ta_ref = row.get("Appraisal number", "") or row.get("TA number", "")
+            ta_ref = row.get("TA ID", "") or row.get("Appraisal number", "")
             if ta_ref:
                 row["_guidance_url"] = NICE_GUIDANCE_URL.format(ref=ta_ref.lower())
 
@@ -204,21 +207,21 @@ class NICERecentTAIngestor(BaseIngestor):
 
         records = []
         for row in all_records:
-            # 연도 필드에서 필터링
-            pub_year = row.get("Year of publication", "") or row.get(
-                "Publication year", ""
+            # 연도 필드에서 필터링 (형식: "2024/25" 또는 "2024")
+            pub_year_raw = row.get("Year of Publication", "") or row.get(
+                "Year of publication", ""
             )
             try:
-                if int(pub_year) < cutoff_year:
+                year_str = pub_year_raw.split("/")[0].strip()
+                if int(year_str) < cutoff_year:
                     continue
-            except (ValueError, TypeError):
-                # 연도 파싱 실패 → 포함 (보수적)
+            except (ValueError, TypeError, IndexError):
                 pass
 
             row["_source"] = "nice_ta"
             row["_fetched_at"] = today
 
-            ta_ref = row.get("Appraisal number", "") or row.get("TA number", "")
+            ta_ref = row.get("TA ID", "") or row.get("Appraisal number", "")
             if ta_ref:
                 row["_guidance_url"] = NICE_GUIDANCE_URL.format(ref=ta_ref.lower())
 

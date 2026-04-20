@@ -12,6 +12,7 @@ import asyncio
 import csv
 import io
 import logging
+import re
 from datetime import datetime
 from typing import Any, Optional
 
@@ -22,9 +23,9 @@ from .base import BaseIngestor
 
 logger = logging.getLogger(__name__)
 
-# 월별 CSV URL 패턴
+# 월별 CSV URL 패턴 (accessdata.fda.gov 도메인)
 PURPLE_BOOK_CSV_URL = (
-    "https://purplebooksearch.fda.gov/files/{year}/"
+    "https://www.accessdata.fda.gov/drugsatfda_docs/PurpleBook/{year}/"
     "purplebook-search-{month}-data-download.csv"
 )
 
@@ -45,7 +46,18 @@ class PurpleBookClient:
         self._client = httpx.AsyncClient(
             timeout=self.timeout,
             follow_redirects=True,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/131.0.0.0 Safari/537.36"
+                ),
+                "Accept": "text/html,application/xhtml+xml,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+            },
         )
+        # 세션 쿠키 획득 (bot 감지 우회)
+        await self._client.get("https://purplebooksearch.fda.gov/")
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -73,80 +85,114 @@ class PurpleBookClient:
         csv_text = await self._download_csv(year, month)
         return self._parse_csv(csv_text)
 
+    async def _get_download_urls(self) -> list[str]:
+        """다운로드 페이지에서 실제 CSV URL 목록 추출 (최신순)"""
+        downloads_url = "https://purplebooksearch.fda.gov/index.cfm?event=downloads"
+        response = await self.client.get(downloads_url)
+        response.raise_for_status()
+
+        urls = re.findall(
+            r'href=["\']([^"\']+\.csv)["\']', response.text, re.I
+        )
+        logger.info(f"Purple Book downloads page: {len(urls)} CSV links found")
+        return urls
+
     async def _download_csv(
         self,
         year: Optional[int] = None,
         month: Optional[int] = None,
         max_retries: int = 3,
     ) -> str:
-        """CSV 파일 다운로드 (최신 월부터 역순 탐색)"""
-        now = datetime.now()
-        target_year = year or now.year
-        target_month = month or now.month
+        """CSV 파일 다운로드
 
-        # 지정 월부터 역순으로 최대 6개월 탐색
-        for offset in range(6):
-            m = target_month - offset
-            y = target_year
-            if m <= 0:
-                m += 12
-                y -= 1
+        다운로드 페이지를 먼저 방문하여 세션/Referer를 확보한 뒤
+        실제 CSV URL을 가져옴. 최신 파일 우선.
+        """
+        # Step 1: 다운로드 페이지에서 실제 URL 추출
+        csv_urls = await self._get_download_urls()
+        if not csv_urls:
+            raise Exception("Purple Book downloads page에서 CSV 링크를 찾을 수 없음")
 
-            month_name = MONTH_NAMES[m - 1]
-            url = PURPLE_BOOK_CSV_URL.format(year=y, month=month_name)
+        # year/month 지정 시 해당 파일 우선 선택
+        target_url = None
+        if year and month:
+            month_name = MONTH_NAMES[month - 1]
+            for url in csv_urls:
+                if f"/{year}/" in url and month_name in url.lower():
+                    target_url = url
+                    break
 
-            for attempt in range(max_retries):
-                try:
-                    response = await self.client.get(url)
+        # 지정 없으면 최신 (첫 번째 = 가장 최근)
+        if not target_url:
+            target_url = csv_urls[0]
 
-                    if response.status_code == 404:
-                        logger.debug(f"Purple Book {y}-{m:02d} not found, trying earlier")
-                        break  # 이전 월 시도
+        # Step 2: Referer 설정 후 다운로드
+        headers = {
+            "Referer": "https://purplebooksearch.fda.gov/index.cfm?event=downloads",
+        }
 
-                    if response.status_code == 429:
-                        wait_time = 2.0 * (2 ** attempt)
-                        logger.warning(f"Purple Book rate limited, waiting {wait_time}s")
-                        await asyncio.sleep(wait_time)
-                        continue
+        for attempt in range(max_retries):
+            try:
+                response = await self.client.get(target_url, headers=headers)
 
-                    response.raise_for_status()
-                    logger.info(
-                        f"Purple Book CSV downloaded: {y}-{m:02d} "
-                        f"({len(response.content):,} bytes)"
-                    )
-                    return response.text
+                if response.status_code == 429:
+                    await asyncio.sleep(2.0 * (2 ** attempt))
+                    continue
 
-                except httpx.HTTPStatusError as e:
-                    if e.response.status_code == 404:
-                        break
-                    logger.warning(f"Purple Book download attempt {attempt + 1} failed: {e}")
-                    await asyncio.sleep(1.0)
+                response.raise_for_status()
+                logger.info(
+                    f"Purple Book CSV downloaded: {target_url.split('/')[-1]} "
+                    f"({len(response.content):,} bytes)"
+                )
+                return response.text
 
-                except httpx.RequestError as e:
-                    logger.warning(f"Purple Book request error attempt {attempt + 1}: {e}")
-                    await asyncio.sleep(1.0)
+            except httpx.HTTPStatusError as e:
+                logger.warning(f"Purple Book download attempt {attempt + 1} failed: {e}")
+                await asyncio.sleep(1.0)
 
-        raise Exception(
-            f"Purple Book CSV not found for {target_year}-{target_month:02d} "
-            f"(searched {min(6, target_month)} months back)"
-        )
+            except httpx.RequestError as e:
+                logger.warning(f"Purple Book request error {attempt + 1}: {e}")
+                await asyncio.sleep(1.0)
 
-    def _parse_csv(self, csv_text: str) -> list[dict[str, Any]]:
+        raise Exception(f"Purple Book CSV download failed: {target_url}")
+
+    @staticmethod
+    def _parse_csv(csv_text: str) -> list[dict[str, Any]]:
         """CSV 텍스트 → dict 리스트
 
-        Purple Book CSV는 표준 CSV (쉼표 구분, 헤더 행 포함).
-        빈 행과 메타데이터 행(합계 등) 자동 스킵.
-        """
-        rows = []
-        reader = csv.DictReader(io.StringIO(csv_text))
+        Purple Book CSV 구조:
+        - Line 0~2: 메타데이터 (제목, 빈 줄, 범례)
+        - Line 3: 실제 헤더 (N/R/U, Applicant, BLA Number, ...)
+        - Line 4+: 데이터 (변경분 + 전체 DB 순서)
+        - BOM (﻿) 포함 가능
 
+        "BLA Number" 컬럼에 숫자가 있는 행만 파싱.
+        """
+        # BOM 제거
+        csv_text = csv_text.lstrip("\ufeff")
+
+        # 실제 헤더 행 찾기: "BLA Number" 포함된 첫 줄
+        lines = csv_text.splitlines()
+        header_idx = None
+        for i, line in enumerate(lines):
+            if "BLA Number" in line:
+                header_idx = i
+                break
+
+        if header_idx is None:
+            logger.warning("Purple Book: 'BLA Number' header not found")
+            return []
+
+        # 헤더 이후부터 DictReader로 파싱
+        data_text = "\n".join(lines[header_idx:])
+        reader = csv.DictReader(io.StringIO(data_text))
+
+        rows = []
         for row in reader:
-            # 빈 행 또는 합계 행 스킵
             bla = row.get("BLA Number", "").strip()
             if not bla or not bla.isdigit():
                 continue
 
-            # 필드 정규화 (앞뒤 공백 제거)
             cleaned = {k.strip(): v.strip() for k, v in row.items() if k}
             rows.append(cleaned)
 
@@ -195,15 +241,19 @@ class FDABiologicExpiryIngestor(BaseIngestor):
         return "FDA_BIOLOGIC_EXPIRY"
 
     async def fetch(self) -> list[dict[str, Any]]:
-        """독점권 만료 데이터가 있는 BLA 제품만 반환"""
-        async with PurpleBookClient(timeout=self.timeout) as client:
-            all_records = await client.download_and_parse()
+        """독점권 만료 데이터가 있는 BLA 제품만 반환
+
+        FDAPurpleBookIngestor와 동일 데이터 재사용.
+        """
+        parent = FDAPurpleBookIngestor(timeout=self.timeout)
+        all_records = await parent.fetch()
 
         today = datetime.now().strftime("%Y-%m-%d")
         expiry_fields = [
-            "Reference Product Exclusivity Expiry Date",
-            "Orphan Exclusivity Expiry Date",
-            "First Interchangeable Exclusivity Expiry Date",
+            "Ref. Product Exclusivity Exp. Date",
+            "Orphan Exclusivity Exp. Date",
+            "First Interchangeable Exclusivity Exp. Date",
+            "Exclusivity Expiration Date",
         ]
 
         records = []
@@ -218,19 +268,23 @@ class FDABiologicExpiryIngestor(BaseIngestor):
                 "proper_name": row.get("Proper Name", ""),
                 "proprietary_name": row.get("Proprietary Name", ""),
                 "applicant": row.get("Applicant", ""),
-                "license_type": row.get("License Type", ""),
+                "bla_type": row.get("BLA Type", ""),
                 "dosage_form": row.get("Dosage Form", ""),
                 "route": row.get("Route of Administration", ""),
                 "strength": row.get("Strength", ""),
-                "approval_date": row.get("Date of First Licensure", ""),
+                "approval_date": row.get("Approval Date", ""),
+                "date_of_first_licensure": row.get("Date of First Licensure", ""),
+                "exclusivity_expiration_date": row.get(
+                    "Exclusivity Expiration Date", ""
+                ),
                 "ref_product_exclusivity_expiry": row.get(
-                    "Reference Product Exclusivity Expiry Date", ""
+                    "Ref. Product Exclusivity Exp. Date", ""
                 ),
                 "orphan_exclusivity_expiry": row.get(
-                    "Orphan Exclusivity Expiry Date", ""
+                    "Orphan Exclusivity Exp. Date", ""
                 ),
                 "interchangeable_exclusivity_expiry": row.get(
-                    "First Interchangeable Exclusivity Expiry Date", ""
+                    "First Interchangeable Exclusivity Exp. Date", ""
                 ),
                 "_source": "purple_book",
                 "_ob_type": "biologic_expiry",
