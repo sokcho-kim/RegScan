@@ -39,6 +39,11 @@ from .healthkr import HealthKRClient, HealthKRIngestor
 from .biorxiv import BioRxivClient, BioRxivIngestor
 from .khidi import KHIDIIngestor, KHIDIBriefIngestor, KHIDIReportIngestor
 from .kdca import KDCAIngestor
+from .orange_book import (
+    OrangeBookClient,
+    FDAOrangeBookIngestor,
+    FDAPatentExpiryIngestor,
+)
 
 __all__ = [
     "BaseIngestor",
@@ -85,4 +90,8 @@ __all__ = [
     "KHIDIReportIngestor",
     # KDCA
     "KDCAIngestor",
+    # FDA Orange Book
+    "OrangeBookClient",
+    "FDAOrangeBookIngestor",
+    "FDAPatentExpiryIngestor",
 ]
