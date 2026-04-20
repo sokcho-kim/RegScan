@@ -59,6 +59,11 @@ from .nice import (
     NICETAIngestor,
     NICERecentTAIngestor,
 )
+from .pmda import (
+    PMDAReviewIngestor,
+    PMDASafetyIngestor,
+    PMDAAllIngestor,
+)
 
 __all__ = [
     "BaseIngestor",
@@ -121,4 +126,8 @@ __all__ = [
     "NICEClient",
     "NICETAIngestor",
     "NICERecentTAIngestor",
+    # PMDA (Japan)
+    "PMDAReviewIngestor",
+    "PMDASafetyIngestor",
+    "PMDAAllIngestor",
 ]
