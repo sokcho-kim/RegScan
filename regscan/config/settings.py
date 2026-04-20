@@ -106,6 +106,8 @@ class Settings(BaseSettings):
     ENABLE_FDA_SAFETY: bool = True
     ENABLE_FDA_ADCOM: bool = True
     ENABLE_FDA_ORANGE_BOOK: bool = True
+    ENABLE_FDA_PURPLE_BOOK: bool = True
+    ENABLE_MFDS_SAFETY: bool = True
     ENABLE_MFDS_ENRICHMENT: bool = True
 
     ENABLE_STREAM_BRIEFINGS: bool = True

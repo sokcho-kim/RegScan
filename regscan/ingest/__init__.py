@@ -44,6 +44,16 @@ from .orange_book import (
     FDAOrangeBookIngestor,
     FDAPatentExpiryIngestor,
 )
+from .purple_book import (
+    PurpleBookClient,
+    FDAPurpleBookIngestor,
+    FDABiologicExpiryIngestor,
+)
+from .mfds_safety import (
+    MFDSSafetyClient,
+    MFDSSafetyLetterIngestor,
+    MFDSRecallIngestor,
+)
 
 __all__ = [
     "BaseIngestor",
@@ -94,4 +104,12 @@ __all__ = [
     "OrangeBookClient",
     "FDAOrangeBookIngestor",
     "FDAPatentExpiryIngestor",
+    # FDA Purple Book
+    "PurpleBookClient",
+    "FDAPurpleBookIngestor",
+    "FDABiologicExpiryIngestor",
+    # MFDS Safety
+    "MFDSSafetyClient",
+    "MFDSSafetyLetterIngestor",
+    "MFDSRecallIngestor",
 ]
