@@ -26,7 +26,7 @@
 | 5 | NICE HTA | P1 | DONE | `629b2f5` |
 | 6 | PMDA (일본) | P2 | DONE | `c811f91`, RSS+HTML, TLS 1.2 |
 | 7a | 건보심 (MOHW 보도자료) | P2 | DONE | httpx+bs4, 키워드 필터 |
-| 7b | 국회 의안정보 | P2 | BLOCKED | open.assembly.go.kr API 키 등록 필요 |
+| 7b | 국회 의안정보 | P2 | DONE | 열린국회정보 API, 104건 테스트 통과 |
 | 8 | DART/EDGAR 공시 | P3 | TODO | 라이선스 딜 선행지표 |
 | 9 | 학술/임상 가이드라인 | P3 | TODO | 적응증 확장 근거 |
 | 10 | 글로벌 약가 비교 | P3 | TODO | IRP 벤치마크 |
