@@ -323,15 +323,23 @@ async def run_stream_pipeline(
 
         if settings.ENABLE_PMDA:
             try:
-                from regscan.ingest.pmda import PMDAReviewIngestor, PMDASafetyIngestor
+                from regscan.ingest.pmda import (
+                    PMDAReviewIngestor, PMDASafetyIngestor,
+                    PMDAApprovalIngestor,
+                )
                 async with PMDAReviewIngestor(days_back=30) as ing:
                     aux_data["pmda_review"] = await ing.fetch()
                 aux_counts["pmda_review"] = len(aux_data["pmda_review"])
                 async with PMDASafetyIngestor(days_back=30) as ing:
                     aux_data["pmda_safety"] = await ing.fetch()
                 aux_counts["pmda_safety"] = len(aux_data["pmda_safety"])
-                logger.info("  PMDA: review %d + safety %d",
-                            aux_counts["pmda_review"], aux_counts["pmda_safety"])
+                async with PMDAApprovalIngestor(years=1, days_back=30) as ing:
+                    aux_data["pmda_approval"] = await ing.fetch()
+                aux_counts["pmda_approval"] = len(aux_data["pmda_approval"])
+                logger.info("  PMDA: review %d + safety %d + approval %d",
+                            aux_counts["pmda_review"],
+                            aux_counts["pmda_safety"],
+                            aux_counts["pmda_approval"])
             except Exception as e:
                 logger.warning("  PMDA 수집 실패: %s", e)
                 aux_counts["pmda"] = f"error: {e}"

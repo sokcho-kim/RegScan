@@ -344,9 +344,11 @@ class PMDAApprovalIngestor(BaseIngestor):
         self,
         timeout: float = 30.0,
         years: int = 2,
+        days_back: int | None = None,
     ):
         super().__init__(timeout=timeout)
         self.years = years
+        self.days_back = days_back
 
     async def __aenter__(self):
         self._client = httpx.AsyncClient(
@@ -359,17 +361,30 @@ class PMDAApprovalIngestor(BaseIngestor):
         return "PMDA_APPROVAL"
 
     async def fetch(self) -> list[dict[str, Any]]:
-        """연도별 Excel에서 승인 품목 수집"""
+        """연도별 Excel에서 승인 품목 수집 (days_back으로 일별 필터 가능)"""
         xlsx_urls = await self._find_xlsx_urls()
+
+        cutoff = None
+        if self.days_back is not None:
+            cutoff = (self._now() - timedelta(days=self.days_back)).date()
 
         all_records: list[dict[str, Any]] = []
         for url in xlsx_urls[:self.years]:
             records = await self._fetch_and_parse_xlsx(url)
             all_records.extend(records)
 
+        # days_back 필터
+        if cutoff is not None:
+            all_records = [
+                r for r in all_records
+                if r.get("date") and
+                datetime.strptime(r["date"], "%Y-%m-%d").date() >= cutoff
+            ]
+
         logger.info(
-            "[PMDA] 신약 승인 %d건 수집 (최근 %d년)",
-            len(all_records), self.years,
+            "[PMDA] 신약 승인 %d건 수집 (%s)",
+            len(all_records),
+            f"최근 {self.days_back}일" if self.days_back else f"최근 {self.years}년",
         )
         return all_records
 
