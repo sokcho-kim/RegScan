@@ -316,6 +316,76 @@ async def run_stream_pipeline(
             }
             logger.info("  공공 보도자료: %d건 변환, %d건 주입", len(public_article_texts), news_injected_total)
 
+        # Step 4.8: 보조 인텔리전스 소스 수집
+        logger.info("[4.8/6] 보조 인텔리전스 수집...")
+        aux_counts: dict = {}
+        aux_data: dict[str, list] = {}
+
+        if settings.ENABLE_PMDA:
+            try:
+                from regscan.ingest.pmda import PMDAReviewIngestor, PMDASafetyIngestor
+                async with PMDAReviewIngestor(days_back=30) as ing:
+                    aux_data["pmda_review"] = await ing.fetch()
+                aux_counts["pmda_review"] = len(aux_data["pmda_review"])
+                async with PMDASafetyIngestor(days_back=30) as ing:
+                    aux_data["pmda_safety"] = await ing.fetch()
+                aux_counts["pmda_safety"] = len(aux_data["pmda_safety"])
+                logger.info("  PMDA: review %d + safety %d",
+                            aux_counts["pmda_review"], aux_counts["pmda_safety"])
+            except Exception as e:
+                logger.warning("  PMDA 수집 실패: %s", e)
+                aux_counts["pmda"] = f"error: {e}"
+
+        if settings.ENABLE_NICE_HTA:
+            try:
+                from regscan.ingest.nice import NICERecentTAIngestor
+                async with NICERecentTAIngestor(years=2) as ing:
+                    aux_data["nice_hta"] = await ing.fetch()
+                aux_counts["nice_hta"] = len(aux_data["nice_hta"])
+                logger.info("  NICE HTA: %d건", aux_counts["nice_hta"])
+            except Exception as e:
+                logger.warning("  NICE HTA 수집 실패: %s", e)
+                aux_counts["nice_hta"] = f"error: {e}"
+
+        if settings.ENABLE_MFDS_SAFETY:
+            try:
+                from regscan.ingest.mfds_safety import (
+                    MFDSSafetyLetterIngestor, MFDSRecallIngestor,
+                )
+                async with MFDSSafetyLetterIngestor(days_back=30) as ing:
+                    aux_data["mfds_letter"] = await ing.fetch()
+                aux_counts["mfds_letter"] = len(aux_data["mfds_letter"])
+                logger.info("  MFDS 안전성 서한: %d건", aux_counts["mfds_letter"])
+            except Exception as e:
+                logger.warning("  MFDS 안전성 서한 수집 실패: %s", e)
+                aux_counts["mfds_letter"] = f"error: {e}"
+
+        if settings.ENABLE_MOHW_INSURANCE:
+            try:
+                from regscan.ingest.mohw_insurance import MOHWHealthInsuranceIngestor
+                async with MOHWHealthInsuranceIngestor(days_back=30) as ing:
+                    aux_data["mohw_insurance"] = await ing.fetch()
+                aux_counts["mohw_insurance"] = len(aux_data["mohw_insurance"])
+                logger.info("  MOHW 건강보험: %d건", aux_counts["mohw_insurance"])
+            except Exception as e:
+                logger.warning("  MOHW 건강보험 수집 실패: %s", e)
+                aux_counts["mohw_insurance"] = f"error: {e}"
+
+        if settings.ENABLE_ASSEMBLY_BILL:
+            try:
+                from regscan.ingest.assembly import AssemblyBillIngestor
+                async with AssemblyBillIngestor(days_back=30) as ing:
+                    aux_data["assembly_bill"] = await ing.fetch()
+                aux_counts["assembly_bill"] = len(aux_data["assembly_bill"])
+                logger.info("  국회 법안: %d건", aux_counts["assembly_bill"])
+            except Exception as e:
+                logger.warning("  국회 법안 수집 실패: %s", e)
+                aux_counts["assembly_bill"] = f"error: {e}"
+
+        result["steps"]["aux_intelligence"] = aux_counts
+        logger.info("  보조 인텔리전스 수집 완료: %s",
+                     {k: v for k, v in aux_counts.items() if isinstance(v, int)})
+
         # Step 5: 스트림별 브리핑 생성
         if settings.ENABLE_STREAM_BRIEFINGS:
             logger.info("[5/6] 스트림 브리핑 생성...")
@@ -678,6 +748,67 @@ async def run_pipeline(days_back: int = 7, force: bool = False) -> dict:
         else:
             logger.info("[4.5/9] v2 소스 수집 건너뜀 (ENABLE_*=false)")
             result["steps"]["v2_ingest"] = "skipped"
+
+        # Step 4.6: 보조 인텔리전스 소스 수집
+        logger.info("[4.6/9] 보조 인텔리전스 수집...")
+        aux_counts_legacy: dict = {}
+
+        if settings.ENABLE_PMDA:
+            try:
+                from regscan.ingest.pmda import PMDAReviewIngestor
+                async with PMDAReviewIngestor(days_back=days_back) as ing:
+                    pmda_data = await ing.fetch()
+                aux_counts_legacy["pmda"] = len(pmda_data)
+                logger.info("  PMDA: %d건", len(pmda_data))
+            except Exception as e:
+                logger.warning("  PMDA 수집 실패: %s", e)
+                aux_counts_legacy["pmda"] = f"error: {e}"
+
+        if settings.ENABLE_NICE_HTA:
+            try:
+                from regscan.ingest.nice import NICERecentTAIngestor
+                async with NICERecentTAIngestor(years=2) as ing:
+                    nice_data = await ing.fetch()
+                aux_counts_legacy["nice_hta"] = len(nice_data)
+                logger.info("  NICE HTA: %d건", len(nice_data))
+            except Exception as e:
+                logger.warning("  NICE HTA 수집 실패: %s", e)
+                aux_counts_legacy["nice_hta"] = f"error: {e}"
+
+        if settings.ENABLE_MFDS_SAFETY:
+            try:
+                from regscan.ingest.mfds_safety import MFDSSafetyLetterIngestor
+                async with MFDSSafetyLetterIngestor(days_back=days_back) as ing:
+                    mfds_letter_data = await ing.fetch()
+                aux_counts_legacy["mfds_letter"] = len(mfds_letter_data)
+                logger.info("  MFDS 안전성 서한: %d건", len(mfds_letter_data))
+            except Exception as e:
+                logger.warning("  MFDS 안전성 서한 수집 실패: %s", e)
+                aux_counts_legacy["mfds_letter"] = f"error: {e}"
+
+        if settings.ENABLE_MOHW_INSURANCE:
+            try:
+                from regscan.ingest.mohw_insurance import MOHWHealthInsuranceIngestor
+                async with MOHWHealthInsuranceIngestor(days_back=days_back) as ing:
+                    mohw_ins_data = await ing.fetch()
+                aux_counts_legacy["mohw_insurance"] = len(mohw_ins_data)
+                logger.info("  MOHW 건강보험: %d건", len(mohw_ins_data))
+            except Exception as e:
+                logger.warning("  MOHW 건강보험 수집 실패: %s", e)
+                aux_counts_legacy["mohw_insurance"] = f"error: {e}"
+
+        if settings.ENABLE_ASSEMBLY_BILL:
+            try:
+                from regscan.ingest.assembly import AssemblyBillIngestor
+                async with AssemblyBillIngestor(days_back=days_back) as ing:
+                    assembly_data = await ing.fetch()
+                aux_counts_legacy["assembly_bill"] = len(assembly_data)
+                logger.info("  국회 법안: %d건", len(assembly_data))
+            except Exception as e:
+                logger.warning("  국회 법안 수집 실패: %s", e)
+                aux_counts_legacy["assembly_bill"] = f"error: {e}"
+
+        result["steps"]["aux_intelligence"] = aux_counts_legacy
 
         # 변경 필터 결정
         if force:

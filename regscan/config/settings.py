@@ -110,6 +110,9 @@ class Settings(BaseSettings):
     ENABLE_MFDS_SAFETY: bool = True
     ENABLE_NICE_HTA: bool = True
     ENABLE_MFDS_ENRICHMENT: bool = True
+    ENABLE_PMDA: bool = True
+    ENABLE_MOHW_INSURANCE: bool = True
+    ENABLE_ASSEMBLY_BILL: bool = True
 
     ENABLE_STREAM_BRIEFINGS: bool = True
     ENABLE_UNIFIED_BRIEFING: bool = True

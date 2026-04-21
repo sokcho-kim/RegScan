@@ -36,9 +36,9 @@
 
 | # | 항목 | 상태 | 비고 |
 |---|------|------|------|
-| 12 | Purple Book → DailyScanner 통합 | TODO | |
-| 13 | NICE TA → DailyScanner 통합 | TODO | |
-| 14 | MFDS 안전성 서한 → DailyScanner 통합 | TODO | |
+| 12 | Purple Book → 파이프라인 통합 | DONE | settings 토글 기존 |
+| 13 | NICE TA → 파이프라인 통합 | DONE | Step 4.8 aux_intelligence |
+| 14 | 전체 신규 수집기 → 파이프라인 통합 | DONE | PMDA/MFDS/MOHW/Assembly 포함 |
 
 ### 1.3 크롤러 운영 (신규)
 
