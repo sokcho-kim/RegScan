@@ -35,7 +35,7 @@
 | 21 | MOHW 입법예고 | MOHW_ADMIN_NOTICE | - | Playwright 필요 | N/T |
 | 22 | MOHW 건강보험 | MOHW_HEALTH_INSURANCE | 2 | 365일, 정밀필터 | OK |
 | 23 | 국회 법안 | ASSEMBLY_BILL | 175 | 365일, 16키워드 | OK |
-| 24 | CRIS 임상시험 | CRIS_TRIAL | 11,500+ | data.go.kr (이전 실행) | OK* |
+| 24 | CRIS 임상시험 | CRIS_TRIAL | - | **엔드포인트 미존재**, API 폐기 추정 | FAIL |
 | 25 | bioRxiv/medRxiv | BIORXIV | 0 | 7일 (API 일시 장애) | WARN |
 | 26 | KHIDI | KHIDI | 4 | 30일 | OK |
 | 27 | KDCA | KDCA | - | Playwright 필요 | N/T |
@@ -44,8 +44,8 @@
 | 30 | Endpoints News | (RSS) | 24 items/피드 | RSS | OK |
 | 31 | FiercePharma | (RSS) | 5/3일 | RSS (파싱 버그 수정 `5020a54`) | OK |
 | 32 | FierceBiotech | (RSS) | 5/3일 | RSS (파싱 버그 수정 `5020a54`) | OK |
-| 33 | DART 공시 | DART_DISCLOSURE | - | API 키 미등록 | N/T |
-| 34 | KIPRIS 특허 | KIPRIS_PATENT | - | API 키 미등록 | N/T |
+| 33 | DART 공시 | DART_DISCLOSURE | 7/30일 | API 키 발급 완료, 테스트 통과 | OK |
+| 34 | KIPRIS 특허 | KIPRIS_PATENT | - | 키 발급 완료, **서비스 이용신청 필요** | WARN |
 
 **범례:** OK=정상, OK*=이전 실행 결과, WARN=일시적 이슈, FAIL=차단, N/T=미테스트(환경 제약)
 
@@ -53,7 +53,7 @@
 
 | 이슈 | 대상 | 영향 | 조치 |
 |------|------|------|------|
-| **data.go.kr API 키 401** | MFDS 허가/신약/회수 | 국내 허가 데이터 수집 불가 | 키 갱신 필요 |
+| ~~data.go.kr API 키 401~~ | ~~MFDS 허가~~ | **해결** (활용신청 재등록) | MFDS 회수도 정상 |
 | ~~FiercePharma/Biotech 403~~ | ~~뉴스 RSS 2개~~ | **해결** (`5020a54`) | title 내 HTML 파싱 버그 수정 |
 | **bioRxiv API 일시 장애** | 학술 프리프린트 | 일시적, 재시도로 해결 | 자동 재시도 |
 | **nedrug TLS 불안정** | MFDS 안전성 서한 | 간헐적 ConnectError | TLS 1.2 + 재시도 |
