@@ -116,7 +116,7 @@ class Settings(BaseSettings):
     ENABLE_MOHW_INSURANCE: bool = True
     ENABLE_ASSEMBLY_BILL: bool = True
     ENABLE_DART: bool = True
-    ENABLE_KIPRIS: bool = True
+    ENABLE_KIPRIS: bool = False  # 유료 (678,300원/년), 무료 대안 없으면 비활성
 
     ENABLE_STREAM_BRIEFINGS: bool = True
     ENABLE_UNIFIED_BRIEFING: bool = True

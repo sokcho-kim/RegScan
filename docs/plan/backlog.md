@@ -27,7 +27,7 @@
 | 6 | PMDA (일본) | P2 | DONE | `c811f91`, RSS+HTML, TLS 1.2 |
 | 7a | 건보심 (MOHW 보도자료) | P2 | DONE | httpx+bs4, 키워드 필터 |
 | 7b | 국회 의안정보 | P2 | DONE | 열린국회정보 API, 104건 테스트 통과 |
-| 8a | KIPRIS (국내 특허) | **P2** | TODO | 국내 제네릭 진입 예측, API 있음 |
+| 8a | KIPRIS (국내 특허) | P3 | BLOCKED | **유료 678,300원/년**, 코드 구현 완료, 예산 확보 후 활성화 |
 | 8b | DART (전자공시) | **P2** | TODO | 라이선스 딜 선행지표, opendart API |
 | 9 | CADTH (캐나다 HTA) | P3 | TODO | 효용 판단 보류, 이식 후 협의 |
 | 10 | 학술/임상 가이드라인 | P3 | TODO | 적응증 확장 근거 |
