@@ -84,7 +84,9 @@ def _parse_rss_xml(xml_text: str, source_name: str) -> list[NewsArticle]:
 
     # RSS 2.0: channel/item
     for item in root.iter("item"):
-        title = (item.findtext("title") or "").strip()
+        title_el = item.find("title")
+        # Fierce 등은 <title> 안에 <a> 태그가 있어 .text가 None
+        title = "".join(title_el.itertext()).strip() if title_el is not None else ""
         link = (item.findtext("link") or "").strip()
         pub_date = item.findtext("pubDate") or item.findtext("published") or ""
         description = (item.findtext("description") or "").strip()
