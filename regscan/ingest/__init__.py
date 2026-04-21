@@ -63,9 +63,12 @@ from .pmda import (
     PMDAReviewIngestor,
     PMDASafetyIngestor,
     PMDAAllIngestor,
+    PMDAApprovalIngestor,
 )
 from .mohw_insurance import MOHWHealthInsuranceIngestor
 from .assembly import AssemblyBillIngestor
+from .dart import DARTDisclosureIngestor
+from .kipris import KIPRISPatentIngestor
 
 __all__ = [
     "BaseIngestor",
@@ -132,8 +135,12 @@ __all__ = [
     "PMDAReviewIngestor",
     "PMDASafetyIngestor",
     "PMDAAllIngestor",
+    "PMDAApprovalIngestor",
     # MOHW Health Insurance
     "MOHWHealthInsuranceIngestor",
     # National Assembly Bills
     "AssemblyBillIngestor",
+    # DART / KIPRIS
+    "DARTDisclosureIngestor",
+    "KIPRISPatentIngestor",
 ]

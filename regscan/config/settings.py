@@ -50,6 +50,8 @@ class Settings(BaseSettings):
     # 공공데이터 API
     DATA_GO_KR_API_KEY: Optional[str] = None  # 공공데이터포털
     OPEN_ASSEMBLY_API_KEY: Optional[str] = None  # 열린국회정보
+    DART_API_KEY: Optional[str] = None           # DART 전자공시
+    KIPRIS_API_KEY: Optional[str] = None         # KIPRIS 특허정보원
 
     # 수집 설정
     COLLECT_DAYS_BACK: int = 7  # 최근 N일 수집
@@ -113,6 +115,8 @@ class Settings(BaseSettings):
     ENABLE_PMDA: bool = True
     ENABLE_MOHW_INSURANCE: bool = True
     ENABLE_ASSEMBLY_BILL: bool = True
+    ENABLE_DART: bool = True
+    ENABLE_KIPRIS: bool = True
 
     ENABLE_STREAM_BRIEFINGS: bool = True
     ENABLE_UNIFIED_BRIEFING: bool = True

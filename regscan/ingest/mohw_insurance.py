@@ -46,7 +46,7 @@ INSURANCE_KEYWORDS = [
     "의약품 급여",
 ]
 
-# 관련 담당부서 (우선순위 높음)
+# 관련 담당부서 — 이 부서의 보도자료만 수집 (정밀도 우선)
 RELEVANT_DEPTS = {
     "보험급여과",
     "보험약제과",
@@ -54,6 +54,18 @@ RELEVANT_DEPTS = {
     "건강보험정책과",
     "보험평가과",
     "약무정책과",
+    "보험약가과",
+    "건강보험TF",
+}
+
+# 키워드 매칭이면 부서 무관하게 수집하는 고신뢰 키워드
+HIGH_CONFIDENCE_KEYWORDS = {
+    "건보심",
+    "건강보험정책심의",
+    "약가",
+    "요양급여",
+    "비급여",
+    "선별급여",
 }
 
 
@@ -197,8 +209,12 @@ class MOHWHealthInsuranceIngestor(BaseIngestor):
                 except ValueError:
                     pass
 
-            # 담당부서 관련성 태깅
+            # 정밀도 필터: 관련 부서이거나 고신뢰 키워드인 경우만 수집
             is_relevant_dept = department in RELEVANT_DEPTS
+            is_high_confidence = keyword in HIGH_CONFIDENCE_KEYWORDS
+
+            if not is_relevant_dept and not is_high_confidence:
+                continue
 
             records.append({
                 "source": "MOHW",

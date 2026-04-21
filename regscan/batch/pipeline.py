@@ -382,6 +382,28 @@ async def run_stream_pipeline(
                 logger.warning("  국회 법안 수집 실패: %s", e)
                 aux_counts["assembly_bill"] = f"error: {e}"
 
+        if settings.ENABLE_DART:
+            try:
+                from regscan.ingest.dart import DARTDisclosureIngestor
+                async with DARTDisclosureIngestor(days_back=30) as ing:
+                    aux_data["dart"] = await ing.fetch()
+                aux_counts["dart"] = len(aux_data["dart"])
+                logger.info("  DART 공시: %d건", aux_counts["dart"])
+            except Exception as e:
+                logger.warning("  DART 수집 실패: %s", e)
+                aux_counts["dart"] = f"error: {e}"
+
+        if settings.ENABLE_KIPRIS:
+            try:
+                from regscan.ingest.kipris import KIPRISPatentIngestor
+                async with KIPRISPatentIngestor(days_back=30) as ing:
+                    aux_data["kipris"] = await ing.fetch()
+                aux_counts["kipris"] = len(aux_data["kipris"])
+                logger.info("  KIPRIS 특허: %d건", aux_counts["kipris"])
+            except Exception as e:
+                logger.warning("  KIPRIS 수집 실패: %s", e)
+                aux_counts["kipris"] = f"error: {e}"
+
         result["steps"]["aux_intelligence"] = aux_counts
         logger.info("  보조 인텔리전스 수집 완료: %s",
                      {k: v for k, v in aux_counts.items() if isinstance(v, int)})
@@ -807,6 +829,28 @@ async def run_pipeline(days_back: int = 7, force: bool = False) -> dict:
             except Exception as e:
                 logger.warning("  국회 법안 수집 실패: %s", e)
                 aux_counts_legacy["assembly_bill"] = f"error: {e}"
+
+        if settings.ENABLE_DART:
+            try:
+                from regscan.ingest.dart import DARTDisclosureIngestor
+                async with DARTDisclosureIngestor(days_back=days_back) as ing:
+                    dart_data = await ing.fetch()
+                aux_counts_legacy["dart"] = len(dart_data)
+                logger.info("  DART 공시: %d건", len(dart_data))
+            except Exception as e:
+                logger.warning("  DART 수집 실패: %s", e)
+                aux_counts_legacy["dart"] = f"error: {e}"
+
+        if settings.ENABLE_KIPRIS:
+            try:
+                from regscan.ingest.kipris import KIPRISPatentIngestor
+                async with KIPRISPatentIngestor(days_back=days_back) as ing:
+                    kipris_data = await ing.fetch()
+                aux_counts_legacy["kipris"] = len(kipris_data)
+                logger.info("  KIPRIS 특허: %d건", len(kipris_data))
+            except Exception as e:
+                logger.warning("  KIPRIS 수집 실패: %s", e)
+                aux_counts_legacy["kipris"] = f"error: {e}"
 
         result["steps"]["aux_intelligence"] = aux_counts_legacy
 
