@@ -42,8 +42,8 @@
 | 28 | ASTI | ASTI | - | Playwright, 기본 OFF | N/T |
 | 29 | Health.kr | HEALTHKR | - | Playwright, 기본 OFF | N/T |
 | 30 | Endpoints News | (RSS) | 24 items/피드 | RSS | OK |
-| 31 | FiercePharma | (RSS) | 0 | **403 차단** | FAIL |
-| 32 | FierceBiotech | (RSS) | 0 | **403 차단** | FAIL |
+| 31 | FiercePharma | (RSS) | 5/3일 | RSS (파싱 버그 수정 `5020a54`) | OK |
+| 32 | FierceBiotech | (RSS) | 5/3일 | RSS (파싱 버그 수정 `5020a54`) | OK |
 | 33 | DART 공시 | DART_DISCLOSURE | - | API 키 미등록 | N/T |
 | 34 | KIPRIS 특허 | KIPRIS_PATENT | - | API 키 미등록 | N/T |
 
@@ -54,7 +54,7 @@
 | 이슈 | 대상 | 영향 | 조치 |
 |------|------|------|------|
 | **data.go.kr API 키 401** | MFDS 허가/신약/회수 | 국내 허가 데이터 수집 불가 | 키 갱신 필요 |
-| **FiercePharma/Biotech 403** | 뉴스 RSS 2개 | 글로벌 뉴스 2/3 소스 차단 | User-Agent 추가 또는 대체 소스 |
+| ~~FiercePharma/Biotech 403~~ | ~~뉴스 RSS 2개~~ | **해결** (`5020a54`) | title 내 HTML 파싱 버그 수정 |
 | **bioRxiv API 일시 장애** | 학술 프리프린트 | 일시적, 재시도로 해결 | 자동 재시도 |
 | **nedrug TLS 불안정** | MFDS 안전성 서한 | 간헐적 ConnectError | TLS 1.2 + 재시도 |
 
@@ -310,10 +310,10 @@
 | 소스 | URL | 상태 | 건수/피드 |
 |------|-----|------|----------|
 | Endpoints News | endpts.com/feed/ | **OK** | 24 items |
-| FiercePharma | fiercepharma.com/rss/xml | **403 차단** | 0 |
-| FierceBiotech | fiercebiotech.com/rss/xml | **403 차단** | 0 |
+| FiercePharma | fiercepharma.com/rss/xml | **OK** | 5/3일 |
+| FierceBiotech | fiercebiotech.com/rss/xml | **OK** | 5/3일 |
 
-**대응 필요:** FiercePharma/FierceBiotech 403 → User-Agent 추가 또는 대체 소스 검토.
+**해결 완료:** `<title>` 내 `<a>` 태그로 인한 파싱 버그 → `itertext()`로 수정 (`5020a54`).
 
 ---
 
@@ -442,7 +442,7 @@ GRAY   — API 키 미등록 또는 ENABLE=False
 | User-Agent 필수 | open.assembly.go.kr | `User-Agent: RegScan/1.0` |
 | Bot 감지 (Akamai) | purplebooksearch.fda.gov | 세션 쿠키 선획득 |
 | API 키 만료 | data.go.kr (MFDS/CRIS) | 주기적 갱신 |
-| RSS 403 차단 | FiercePharma, FierceBiotech | User-Agent 또는 대체 소스 |
+| ~~RSS 403~~ | ~~FiercePharma, FierceBiotech~~ | **해결** — 파싱 버그 (`5020a54`) |
 | Playwright 필요 | HIRA, MOHW예고, KDCA, ASTI, Health.kr | Chromium headless |
 
 ### 데이터 품질
