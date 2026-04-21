@@ -64,6 +64,7 @@ from .pmda import (
     PMDASafetyIngestor,
     PMDAAllIngestor,
 )
+from .mohw_insurance import MOHWHealthInsuranceIngestor
 
 __all__ = [
     "BaseIngestor",
@@ -130,4 +131,6 @@ __all__ = [
     "PMDAReviewIngestor",
     "PMDASafetyIngestor",
     "PMDAAllIngestor",
+    # MOHW Health Insurance
+    "MOHWHealthInsuranceIngestor",
 ]

@@ -25,7 +25,8 @@
 | 4 | MFDS 회수/판매중지 API | P1 | DONE | 활용신청 완료, API 키 갱신 필요 |
 | 5 | NICE HTA | P1 | DONE | `629b2f5` |
 | 6 | PMDA (일본) | P2 | DONE | `c811f91`, RSS+HTML, TLS 1.2 |
-| 7 | 건보심/국회 법안 | P2 | TODO | 국내 급여 정책 선행지표 |
+| 7a | 건보심 (MOHW 보도자료) | P2 | DONE | httpx+bs4, 키워드 필터 |
+| 7b | 국회 의안정보 | P2 | BLOCKED | open.assembly.go.kr API 키 등록 필요 |
 | 8 | DART/EDGAR 공시 | P3 | TODO | 라이선스 딜 선행지표 |
 | 9 | 학술/임상 가이드라인 | P3 | TODO | 적응증 확장 근거 |
 | 10 | 글로벌 약가 비교 | P3 | TODO | IRP 벤치마크 |
