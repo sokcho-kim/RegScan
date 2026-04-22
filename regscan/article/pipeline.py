@@ -384,32 +384,50 @@ async def generate_articles(
     """
     from regscan.stream.intelligence_signals import format_for_prompt
 
+    from regscan.article.guardrails import (
+        filter_signals, dedupe_stories, post_process_article,
+    )
+
     logger.info("=== 기사 생성 파이프라인 v2 시작 ===")
 
+    # 전처리: 시그널 5건 미만 소스 제거
+    filtered = filter_signals(signals)
+    if not filtered:
+        logger.warning("전처리 후 기사 가치 있는 소스 없음")
+        return []
+    logger.info("[전처리] %d → %d 소스", len(signals), len(filtered))
+
     # Agent 1: 편집장
-    stories = await agent_editor_chief(signals)
+    stories = await agent_editor_chief(filtered)
     if not stories:
         logger.warning("편집장이 스토리를 선별하지 않음")
         return []
+
+    # 중간검증: 같은 소스 중복 제거
+    stories = dedupe_stories(stories)
+    logger.info("[중간검증] %d개 스토리 확정", len(stories))
 
     articles = []
     for story in stories:
         try:
             # Agent 2: 기자
-            draft = await agent_reporter(story, signals)
+            draft = await agent_reporter(story, filtered)
 
             # 원본 데이터 (팩트체크용)
             sources_used = story.get("sources_used", [])
             original_data = ""
             for src in sources_used:
-                if src in signals:
-                    original_data += format_for_prompt(src, signals[src]) + "\n"
+                if src in filtered:
+                    original_data += format_for_prompt(src, filtered[src]) + "\n"
 
             # Agent 3: 팩트체커
             checked = await agent_fact_checker(draft, original_data)
 
             # Agent 4: 편집자
             final = await agent_copy_editor(checked)
+
+            # 후처리: 금지표현 + 기관명 + 메타언급
+            final = post_process_article(final)
 
             final["story_id"] = story.get("story_id", 0)
             final["core_message"] = story.get("core_message", "")
