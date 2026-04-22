@@ -437,6 +437,50 @@ async def run_stream_pipeline(
                 logger.warning("  인텔리전스 브리핑 실패: %s", e)
                 result["steps"]["intelligence_briefings"] = f"error: {e}"
 
+        # Step 5.7: 4-Agent 기사 생성
+        if settings.ENABLE_STREAM_BRIEFINGS and aux_data:
+            logger.info("[5.7/6] 기사 생성 (4-Agent)...")
+            try:
+                from regscan.stream.intelligence_signals import extract_signals
+                from regscan.article.pipeline import generate_articles
+
+                article_signals = extract_signals(aux_data)
+                articles = await generate_articles(article_signals)
+
+                # DB 저장
+                for art in articles:
+                    await _save_briefing_to_db(
+                        "article",
+                        art.get("sources_used", ["unknown"])[0] if art.get("sources_used") else "unknown",
+                        "article",
+                        art.get("headline", ""),
+                        art,
+                        pipeline_run_id,
+                    )
+
+                # MD 파일 저장
+                if articles:
+                    article_dir = settings.BASE_DIR / "output" / "articles"
+                    article_dir.mkdir(parents=True, exist_ok=True)
+                    date_str_art = datetime.now().strftime("%Y-%m-%d")
+                    md = f"# RegScan Daily Articles\n\n> {date_str_art}\n\n"
+                    for i, art in enumerate(articles, 1):
+                        md += f"## {i}. {art.get('headline', '')}\n\n"
+                        md += f"**{art.get('subheadline', '')}**\n\n"
+                        md += art.get("body", "") + "\n\n---\n\n"
+                    md_path = article_dir / f"articles_{date_str_art}.md"
+                    md_path.write_text(md, encoding="utf-8")
+
+                result["steps"]["articles"] = {
+                    "generated": len(articles),
+                    "headlines": [a.get("headline", "")[:40] for a in articles],
+                }
+                logger.info("  기사 %d건 생성", len(articles))
+
+            except Exception as e:
+                logger.warning("  기사 생성 실패: %s", e)
+                result["steps"]["articles"] = f"error: {e}"
+
         # Step 6: 결과 JSON 저장 (로컬)
         logger.info("[6/6] 결과 JSON 저장...")
         output_dir = settings.BASE_DIR / "output" / "stream_results"
