@@ -153,7 +153,17 @@ def post_process_article(article: dict) -> dict:
         body,
     )
 
-    # 4. 빈 줄 정리 (연속 빈 줄 → 단일 빈 줄)
+    # 4. 불완전 문장 제거 (마지막 문장이 마침표 없이 끝나면 삭제)
+    sentences = body.rstrip().split(".")
+    if sentences and len(sentences[-1].strip()) > 0 and not sentences[-1].strip().endswith(("다", "요", "음", "임")):
+        removed = sentences.pop()
+        if removed.strip():
+            corrections.append(f"불완전 문장 삭제: {removed.strip()[:40]}")
+        body = ".".join(sentences)
+        if not body.endswith("."):
+            body += "."
+
+    # 5. 빈 줄 정리 (연속 빈 줄 → 단일 빈 줄)
     body = re.sub(r"\n{3,}", "\n\n", body)
     body = body.strip()
 
