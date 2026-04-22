@@ -1072,18 +1072,21 @@ class StreamBriefingGenerator:
 
         signal_text = format_for_prompt(source_type, signals)
 
-        system_prompt = build_system_prompt(
-            stream_name="intelligence",
-            stream_specific_rules=f"""
-당신은 '{label}' 전문 분석가입니다.
+        intelligence_rules = f"""
+## 인텔리전스 분석: {label}
 {description}
 
-## 분석 원칙
+### 분석 원칙
 - 수집된 시그널 데이터를 기반으로 핵심 동향을 분석합니다
 - 국내 의약품 시장에 미치는 영향을 중심으로 서술합니다
 - 데이터에 없는 내용은 추측하지 않습니다
 - 날짜, 약물명, 기관명 등 팩트는 원문 그대로 인용합니다
-""",
+"""
+        system_prompt = build_system_prompt(
+            today=today,
+            include_reimbursement=False,
+            include_lifecycle=False,
+            extra_sections=[intelligence_rules],
         )
 
         user_prompt = f"""오늘 날짜: {today}
