@@ -46,7 +46,7 @@
 
 | # | 항목 | 상태 | 비고 | Issue |
 |---|------|------|------|-------|
-| 15 | **크롤러 장애 모니터링 시스템** | TODO | DB 테이블(`ingest_runs`) + 대시보드 + Slack 알림 | #2 |
+| 15 | **크롤러 장애 모니터링 시스템** | **DONE** | `2e13dc6` IngestRunDB + /dashboard/health + API | #2 |
 
 **상세 설계:**
 - `ingest_runs` 테이블: source_type, status(SUCCESS/PARTIAL/FAILED), record_count, error_message, traceback, started_at, finished_at
@@ -61,9 +61,11 @@
 | # | 항목 | 상태 | 비고 |
 |---|------|------|------|
 | 16 | Step 1~4 구현 | DONE | fact_card → trend → briefing → validator |
-| 17 | 프로덕션 배치 실행 (oncology 1개 영역) | TODO | 실제 LLM 호출 + 결과 검증 |
-| 18 | 레거시 코드 제거 | BLOCKED | #17 완료 후 |
-| 19 | Cloud Run 배포 | BLOCKED | #17, #18 완료 후 |
+| 17 | 프로덕션 배치 실행 (oncology 1개 영역) | **DONE** | 58.5초 성공, 보조인텔 9개 정상 |
+| 17a | **브리핑 빈도 개선** | TODO | SCAN_DAYS_BACK=7→30 또는 보조인텔→브리핑 연동 |
+| 17b | **MFDS/KDCA 재시도 로직** | TODO | 정부 사이트 TLS 간헐적 실패 대응 |
+| 18 | 레거시 코드 제거 | TODO | |
+| 19 | Cloud Run 배포 | BLOCKED | #18 완료 후 |
 
 ---
 
