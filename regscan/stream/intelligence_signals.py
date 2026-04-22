@@ -49,6 +49,11 @@ SOURCE_META = {
         "description": "KIPRIS 의약품 관련 특허 공개·등록 현황",
         "priority": 7,
     },
+    "MFDS_PRESS": {
+        "label": "식약처 보도자료",
+        "description": "식품의약품안전처 보도자료·공지사항",
+        "priority": 2,
+    },
     "KHIDI_PHARMA_NEWS": {
         "label": "제약산업 뉴스 동향",
         "description": "KHIDI 제약산업정보포털 국내외 뉴스",
@@ -75,6 +80,7 @@ MIN_SIGNALS = {
     "MFDS_SAFETY_LETTER": 1,
     "DART_DISCLOSURE": 1,
     "KIPRIS_PATENT": 5,
+    "MFDS_PRESS": 5,
     "KHIDI_PHARMA_NEWS": 5,
     "PMDA_REVIEW": 2,
     "PMDA_SAFETY": 2,
@@ -108,6 +114,8 @@ def extract_signals(
     _extract_dart(aux_data, result)
     # KIPRIS
     _extract_kipris(aux_data, result)
+    # MFDS 보도자료
+    _extract_mfds_press(aux_data, result)
     # KHIDI 뉴스
     _extract_khidi_news(aux_data, result)
     # PMDA RSS
@@ -273,6 +281,21 @@ def _extract_kipris(aux_data: dict, result: dict) -> None:
         })
     if signals:
         result["KIPRIS_PATENT"] = signals
+
+
+def _extract_mfds_press(aux_data: dict, result: dict) -> None:
+    data = aux_data.get("mfds_press", [])
+    if not data:
+        return
+    signals = []
+    for item in data:
+        signals.append({
+            "title": item.get("title", ""),
+            "detail": f"{item.get('department', '')} | {item.get('board', '')}",
+            "date": item.get("date", ""),
+        })
+    if signals:
+        result["MFDS_PRESS"] = signals
 
 
 def _extract_khidi_news(aux_data: dict, result: dict) -> None:

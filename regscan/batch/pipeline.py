@@ -367,6 +367,11 @@ async def run_stream_pipeline(
             _aux_sources.append(
                 (KHIDIPharmaNewsIngestor, {"days_back": 7}, "KHIDI_PHARMA_NEWS"),
             )
+        if settings.ENABLE_MFDS_SAFETY:
+            from regscan.ingest.mfds_press import MFDSPressIngestor
+            _aux_sources.append(
+                (MFDSPressIngestor, {"days_back": 14}, "MFDS_PRESS"),
+            )
 
         for cls, kwargs, src_type in _aux_sources:
             data = await _run_ingestor(cls, kwargs, src_type, pipeline_run_id)
