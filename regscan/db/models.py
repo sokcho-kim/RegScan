@@ -24,6 +24,7 @@
   clinical_trials_gov — ClinicalTrials.gov Phase 3
   stream_briefings   — 스트림별 브리핑
   hira_price_stats   — HIRA 가격 스펙트럼 (사전 계산)
+  ingest_runs        — 수집기 실행 이력 (모니터링)
 """
 
 from datetime import datetime
@@ -626,3 +627,28 @@ class HiraPriceStatsDB(Base):
     source_file = Column(String(200), nullable=False)
     source_hash = Column(String(64), nullable=False)
     computed_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+
+# ──────────────────────────────────────────────
+# ingest_runs — 수집기 실행 이력 (모니터링용)
+# ──────────────────────────────────────────────
+
+class IngestRunDB(Base):
+    """수집기 개별 실행 이력 — 장애 모니터링 + 대시보드"""
+
+    __tablename__ = "ingest_runs"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    pipeline_run_id = Column(String(36), nullable=False, index=True)
+    source_type = Column(String(50), nullable=False, index=True)
+    status = Column(String(20), nullable=False)  # SUCCESS / ERROR / SKIP
+    record_count = Column(Integer, default=0)
+    error_message = Column(Text, default="")
+    started_at = Column(DateTime, nullable=False)
+    finished_at = Column(DateTime)
+    duration_ms = Column(Integer, default=0)
+
+    __table_args__ = (
+        Index("idx_ingest_run_source_date", "source_type", "started_at"),
+        Index("idx_ingest_run_pipeline", "pipeline_run_id"),
+    )

@@ -316,101 +316,57 @@ async def run_stream_pipeline(
             }
             logger.info("  공공 보도자료: %d건 변환, %d건 주입", len(public_article_texts), news_injected_total)
 
-        # Step 4.8: 보조 인텔리전스 소스 수집
+        # Step 4.8: 보조 인텔리전스 소��� 수집 (ingest_runs 자동 기록)
         logger.info("[4.8/6] 보조 인텔리전스 수집...")
         aux_counts: dict = {}
         aux_data: dict[str, list] = {}
 
+        # (enable_flag, ingestor_class_path, kwargs, source_type)
+        _aux_sources = []
         if settings.ENABLE_PMDA:
-            try:
-                from regscan.ingest.pmda import (
-                    PMDAReviewIngestor, PMDASafetyIngestor,
-                    PMDAApprovalIngestor,
-                )
-                async with PMDAReviewIngestor(days_back=30) as ing:
-                    aux_data["pmda_review"] = await ing.fetch()
-                aux_counts["pmda_review"] = len(aux_data["pmda_review"])
-                async with PMDASafetyIngestor(days_back=30) as ing:
-                    aux_data["pmda_safety"] = await ing.fetch()
-                aux_counts["pmda_safety"] = len(aux_data["pmda_safety"])
-                async with PMDAApprovalIngestor(years=1, days_back=30) as ing:
-                    aux_data["pmda_approval"] = await ing.fetch()
-                aux_counts["pmda_approval"] = len(aux_data["pmda_approval"])
-                logger.info("  PMDA: review %d + safety %d + approval %d",
-                            aux_counts["pmda_review"],
-                            aux_counts["pmda_safety"],
-                            aux_counts["pmda_approval"])
-            except Exception as e:
-                logger.warning("  PMDA 수집 실패: %s", e)
-                aux_counts["pmda"] = f"error: {e}"
-
+            from regscan.ingest.pmda import (
+                PMDAReviewIngestor, PMDASafetyIngestor, PMDAApprovalIngestor,
+            )
+            _aux_sources += [
+                (PMDAReviewIngestor, {"days_back": 30}, "PMDA_REVIEW"),
+                (PMDASafetyIngestor, {"days_back": 30}, "PMDA_SAFETY"),
+                (PMDAApprovalIngestor, {"years": 1, "days_back": 30}, "PMDA_APPROVAL"),
+            ]
         if settings.ENABLE_NICE_HTA:
-            try:
-                from regscan.ingest.nice import NICERecentTAIngestor
-                async with NICERecentTAIngestor(years=2) as ing:
-                    aux_data["nice_hta"] = await ing.fetch()
-                aux_counts["nice_hta"] = len(aux_data["nice_hta"])
-                logger.info("  NICE HTA: %d건", aux_counts["nice_hta"])
-            except Exception as e:
-                logger.warning("  NICE HTA 수집 실패: %s", e)
-                aux_counts["nice_hta"] = f"error: {e}"
-
+            from regscan.ingest.nice import NICERecentTAIngestor
+            _aux_sources.append(
+                (NICERecentTAIngestor, {"years_back": 2}, "NICE_TA"),
+            )
         if settings.ENABLE_MFDS_SAFETY:
-            try:
-                from regscan.ingest.mfds_safety import (
-                    MFDSSafetyLetterIngestor, MFDSRecallIngestor,
-                )
-                async with MFDSSafetyLetterIngestor(days_back=30) as ing:
-                    aux_data["mfds_letter"] = await ing.fetch()
-                aux_counts["mfds_letter"] = len(aux_data["mfds_letter"])
-                logger.info("  MFDS 안전성 서한: %d건", aux_counts["mfds_letter"])
-            except Exception as e:
-                logger.warning("  MFDS 안전성 서한 수집 실패: %s", e)
-                aux_counts["mfds_letter"] = f"error: {e}"
-
+            from regscan.ingest.mfds_safety import MFDSSafetyLetterIngestor
+            _aux_sources.append(
+                (MFDSSafetyLetterIngestor, {"days_back": 30}, "MFDS_SAFETY_LETTER"),
+            )
         if settings.ENABLE_MOHW_INSURANCE:
-            try:
-                from regscan.ingest.mohw_insurance import MOHWHealthInsuranceIngestor
-                async with MOHWHealthInsuranceIngestor(days_back=30) as ing:
-                    aux_data["mohw_insurance"] = await ing.fetch()
-                aux_counts["mohw_insurance"] = len(aux_data["mohw_insurance"])
-                logger.info("  MOHW 건강보험: %d건", aux_counts["mohw_insurance"])
-            except Exception as e:
-                logger.warning("  MOHW 건강보험 수집 실패: %s", e)
-                aux_counts["mohw_insurance"] = f"error: {e}"
-
+            from regscan.ingest.mohw_insurance import MOHWHealthInsuranceIngestor
+            _aux_sources.append(
+                (MOHWHealthInsuranceIngestor, {"days_back": 30}, "MOHW_HEALTH_INSURANCE"),
+            )
         if settings.ENABLE_ASSEMBLY_BILL:
-            try:
-                from regscan.ingest.assembly import AssemblyBillIngestor
-                async with AssemblyBillIngestor(days_back=30) as ing:
-                    aux_data["assembly_bill"] = await ing.fetch()
-                aux_counts["assembly_bill"] = len(aux_data["assembly_bill"])
-                logger.info("  국회 법안: %d건", aux_counts["assembly_bill"])
-            except Exception as e:
-                logger.warning("  국회 법안 수집 실패: %s", e)
-                aux_counts["assembly_bill"] = f"error: {e}"
-
+            from regscan.ingest.assembly import AssemblyBillIngestor
+            _aux_sources.append(
+                (AssemblyBillIngestor, {"days_back": 30}, "ASSEMBLY_BILL"),
+            )
         if settings.ENABLE_DART:
-            try:
-                from regscan.ingest.dart import DARTDisclosureIngestor
-                async with DARTDisclosureIngestor(days_back=30) as ing:
-                    aux_data["dart"] = await ing.fetch()
-                aux_counts["dart"] = len(aux_data["dart"])
-                logger.info("  DART 공시: %d건", aux_counts["dart"])
-            except Exception as e:
-                logger.warning("  DART 수집 실패: %s", e)
-                aux_counts["dart"] = f"error: {e}"
-
+            from regscan.ingest.dart import DARTDisclosureIngestor
+            _aux_sources.append(
+                (DARTDisclosureIngestor, {"days_back": 30}, "DART_DISCLOSURE"),
+            )
         if settings.ENABLE_KIPRIS:
-            try:
-                from regscan.ingest.kipris import KIPRISPatentIngestor
-                async with KIPRISPatentIngestor(days_back=30) as ing:
-                    aux_data["kipris"] = await ing.fetch()
-                aux_counts["kipris"] = len(aux_data["kipris"])
-                logger.info("  KIPRIS 특허: %d건", aux_counts["kipris"])
-            except Exception as e:
-                logger.warning("  KIPRIS 수집 실패: %s", e)
-                aux_counts["kipris"] = f"error: {e}"
+            from regscan.ingest.kipris import KIPRISPatentIngestor
+            _aux_sources.append(
+                (KIPRISPatentIngestor, {"years": 3}, "KIPRIS_PATENT"),
+            )
+
+        for cls, kwargs, src_type in _aux_sources:
+            data = await _run_ingestor(cls, kwargs, src_type, pipeline_run_id)
+            aux_data[src_type.lower()] = data
+            aux_counts[src_type.lower()] = len(data)
 
         result["steps"]["aux_intelligence"] = aux_counts
         logger.info("  보조 인텔리전스 수집 완료: %s",
@@ -1045,6 +1001,72 @@ def _inject_public_news(drug, matched: list, normalizer) -> int:
     existing[norm] = existing.get(norm, []) + matched
     drug._news_cache = existing
     return len(matched)
+
+
+async def _run_ingestor(
+    ingestor_class,
+    kwargs: dict,
+    source_type: str,
+    pipeline_run_id: str,
+) -> list:
+    """수집기 실행 + ingest_runs 기록.
+
+    Returns:
+        수집된 데이터 list (실패 시 빈 리스트)
+    """
+    started = datetime.now()
+    try:
+        async with ingestor_class(**kwargs) as ing:
+            data = await ing.fetch()
+        finished = datetime.now()
+        duration_ms = int((finished - started).total_seconds() * 1000)
+        await _save_ingest_run(
+            pipeline_run_id, source_type, "SUCCESS",
+            len(data), "", started, finished, duration_ms,
+        )
+        logger.info("  %s: %d건 (%dms)", source_type, len(data), duration_ms)
+        return data
+    except Exception as e:
+        finished = datetime.now()
+        duration_ms = int((finished - started).total_seconds() * 1000)
+        await _save_ingest_run(
+            pipeline_run_id, source_type, "ERROR",
+            0, str(e), started, finished, duration_ms,
+        )
+        logger.warning("  %s 수집 실패 (%dms): %s", source_type, duration_ms, e)
+        return []
+
+
+async def _save_ingest_run(
+    pipeline_run_id: str,
+    source_type: str,
+    status: str,
+    record_count: int,
+    error_message: str,
+    started_at,
+    finished_at,
+    duration_ms: int,
+) -> None:
+    """ingest_runs 테이블에 실행 기록 저장."""
+    try:
+        from regscan.db.database import get_async_session
+        from regscan.db.models import IngestRunDB
+
+        async with get_async_session()() as session:
+            row = IngestRunDB(
+                pipeline_run_id=pipeline_run_id,
+                source_type=source_type,
+                status=status,
+                record_count=record_count,
+                error_message=error_message,
+                started_at=started_at,
+                finished_at=finished_at,
+                duration_ms=duration_ms,
+            )
+            session.add(row)
+            await session.commit()
+    except Exception as e:
+        logger.debug("ingest_run 저장 실패: %s", e)
 
 
 async def _get_drug_id_by_inn(loader, inn: str) -> int | None:

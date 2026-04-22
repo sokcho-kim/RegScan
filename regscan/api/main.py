@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from regscan.api.routes import stats, drugs, scheduler as scheduler_routes
 from regscan.api.routes import dashboard as dashboard_routes
+from regscan.api.routes import health as health_routes
 from regscan.api.routes import changes as changes_routes
 from regscan.api.routes import pdufa as pdufa_routes
 from regscan.api.routes import briefings as briefing_routes
@@ -105,6 +106,7 @@ app.include_router(scheduler_routes.router, prefix="/api/v1/scheduler", tags=["S
 app.include_router(dashboard_routes.router, tags=["Dashboard"])
 app.include_router(pdufa_routes.router, prefix="/api/v1/pdufa", tags=["PDUFA"])
 app.include_router(briefing_routes.router, prefix="/api/v1/briefings", tags=["Briefings"])
+app.include_router(health_routes.router, tags=["Health"])
 
 
 @app.get("/")
