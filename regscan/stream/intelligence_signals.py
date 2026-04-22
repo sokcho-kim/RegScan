@@ -166,12 +166,19 @@ def _extract_nice_ta(aux_data: dict, result: dict) -> None:
         return
     signals = []
     for item in data:
-        title = item.get("title", "") or item.get("guidance_title", "")
+        technology = item.get("Technology", "") or item.get("title", "")
+        indication = item.get("Indication", "")
+        category = item.get("Categorisation (for specific recommendation)", "")
+        ta_id = item.get("TA ID", "")
+        comment = item.get("Comment", "")
+        if not technology:
+            continue
         signals.append({
-            "title": title,
-            "detail": item.get("recommendation", "")[:150],
-            "date": item.get("date", "") or item.get("published", ""),
-            "ref": item.get("reference_number", ""),
+            "title": f"{technology} ({ta_id})" if ta_id else technology,
+            "detail": f"{indication} — {category}. {comment[:100]}" if indication else category,
+            "date": item.get("Year of Publication", ""),
+            "ref": ta_id,
+            "category": category,
         })
     if signals:
         result["NICE_TA"] = signals
