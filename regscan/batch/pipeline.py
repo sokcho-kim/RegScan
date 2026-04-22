@@ -362,6 +362,11 @@ async def run_stream_pipeline(
             _aux_sources.append(
                 (KIPRISPatentIngestor, {"years": 3}, "KIPRIS_PATENT"),
             )
+        if settings.ENABLE_KHIDI_NEWS:
+            from regscan.ingest.khidi_news import KHIDIPharmaNewsIngestor
+            _aux_sources.append(
+                (KHIDIPharmaNewsIngestor, {"days_back": 7}, "KHIDI_PHARMA_NEWS"),
+            )
 
         for cls, kwargs, src_type in _aux_sources:
             data = await _run_ingestor(cls, kwargs, src_type, pipeline_run_id)

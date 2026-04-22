@@ -49,6 +49,11 @@ SOURCE_META = {
         "description": "KIPRIS 의약품 관련 특허 공개·등록 현황",
         "priority": 7,
     },
+    "KHIDI_PHARMA_NEWS": {
+        "label": "제약산업 뉴스 동향",
+        "description": "KHIDI 제약산업정보포털 국내외 뉴스",
+        "priority": 3,
+    },
     "PMDA_REVIEW": {
         "label": "일본 PMDA 심사 동향",
         "description": "PMDA 승인심사 관련 RSS 업데이트",
@@ -70,6 +75,7 @@ MIN_SIGNALS = {
     "MFDS_SAFETY_LETTER": 1,
     "DART_DISCLOSURE": 1,
     "KIPRIS_PATENT": 5,
+    "KHIDI_PHARMA_NEWS": 5,
     "PMDA_REVIEW": 2,
     "PMDA_SAFETY": 2,
 }
@@ -102,6 +108,8 @@ def extract_signals(
     _extract_dart(aux_data, result)
     # KIPRIS
     _extract_kipris(aux_data, result)
+    # KHIDI 뉴스
+    _extract_khidi_news(aux_data, result)
     # PMDA RSS
     _extract_pmda_rss(aux_data, result)
 
@@ -265,6 +273,22 @@ def _extract_kipris(aux_data: dict, result: dict) -> None:
         })
     if signals:
         result["KIPRIS_PATENT"] = signals
+
+
+def _extract_khidi_news(aux_data: dict, result: dict) -> None:
+    data = aux_data.get("khidi_pharma_news", [])
+    if not data:
+        return
+    signals = []
+    for item in data:
+        signals.append({
+            "title": item.get("title", ""),
+            "detail": f"{item.get('news_source', '')} | {item.get('board', '')}",
+            "date": item.get("date", ""),
+            "url": item.get("url", ""),
+        })
+    if signals:
+        result["KHIDI_PHARMA_NEWS"] = signals
 
 
 def _extract_pmda_rss(aux_data: dict, result: dict) -> None:

@@ -69,6 +69,7 @@ from .mohw_insurance import MOHWHealthInsuranceIngestor
 from .assembly import AssemblyBillIngestor
 from .dart import DARTDisclosureIngestor
 from .kipris import KIPRISPatentIngestor
+from .khidi_news import KHIDIPharmaNewsIngestor
 
 __all__ = [
     "BaseIngestor",
@@ -143,4 +144,6 @@ __all__ = [
     # DART / KIPRIS
     "DARTDisclosureIngestor",
     "KIPRISPatentIngestor",
+    # KHIDI Pharma News
+    "KHIDIPharmaNewsIngestor",
 ]
