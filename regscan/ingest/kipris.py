@@ -1,7 +1,8 @@
 """KIPRIS (특허정보원) 수집기 — 의약품 특허 현황 모니터링
 
-plus.kipris.or.kr OpenAPI — 의약품 관련 특허 검색.
-Orange Book은 미국 특허만 커버, 국내 제네릭 진입 예측엔 국내 특허 필요.
+plus.kipris.or.kr OpenAPI — 특허·실용 공개·등록공보
+엔드포인트: /kipo-api/kipi/patUtiModInfoSearchSevice/getWordSearch
+무료 월 1,000건 제한.
 """
 
 from __future__ import annotations
@@ -19,40 +20,42 @@ from .base import BaseIngestor
 
 logger = logging.getLogger(__name__)
 
-KIPRIS_API_BASE = "http://plus.kipris.or.kr/openapi/rest"
+API_URL = (
+    "http://plus.kipris.or.kr/kipo-api/kipi"
+    "/patUtiModInfoSearchSevice/getWordSearch"
+)
 
 # 의약품 특허 검색 키워드
 PHARMA_PATENT_KEYWORDS = [
     "의약품",
     "약학 조성물",
-    "항체",
-    "제제",
-    "치료용 조성물",
+    "항체 치료",
+    "바이오시밀러",
+    "제네릭 의약",
 ]
 
 # IPC(국제특허분류) 의약 관련 코드
-# A61K: 의약용 제제  A61P: 치료 활성  C07K: 펩타이드
-PHARMA_IPC_CODES = ["A61K", "A61P", "C07K"]
+PHARMA_IPC_CODES = ["A61K", "A61P", "C07K", "C07D", "C12N"]
 
 
 class KIPRISPatentIngestor(BaseIngestor):
-    """KIPRIS 의약품 특허 수집기
+    """KIPRIS 의약품 특허 수집기 (getWordSearch)
 
-    의약품 관련 키워드 + IPC 코드로 최근 공개/등록 특허 검색.
-    API: plus.kipris.or.kr/openapi/rest/patUtiModInfoSearchSevice
+    키워드 검색 + IPC 코드 필터로 의약품 관련 특허 수집.
+    year 파라미터로 최근 N년 범위 지정.
     """
 
     def __init__(
         self,
         api_key: str | None = None,
         timeout: float = 30.0,
-        days_back: int = 30,
+        years: int = 3,
         num_of_rows: int = 50,
-        max_pages: int = 3,
+        max_pages: int = 2,
     ):
         super().__init__(timeout=timeout)
         self.api_key = api_key or getattr(settings, "KIPRIS_API_KEY", None)
-        self.days_back = days_back
+        self.years = years
         self.num_of_rows = num_of_rows
         self.max_pages = max_pages
 
@@ -75,8 +78,8 @@ class KIPRISPatentIngestor(BaseIngestor):
         all_records.sort(key=lambda r: r.get("date", ""), reverse=True)
 
         logger.info(
-            "[KIPRIS] 의약품 특허 %d건 수집 (최근 %d일)",
-            len(all_records), self.days_back,
+            "[KIPRIS] 의약품 특허 %d건 수집 (최근 %d년, %d개 키워드)",
+            len(all_records), self.years, len(PHARMA_PATENT_KEYWORDS),
         )
         return all_records
 
@@ -91,17 +94,17 @@ class KIPRISPatentIngestor(BaseIngestor):
         for page_no in range(1, self.max_pages + 1):
             params = {
                 "ServiceKey": self.api_key,
-                "searchWord": keyword,
+                "word": keyword,
+                "year": self.years,
+                "patent": "true",
+                "utility": "false",
                 "numOfRows": self.num_of_rows,
                 "pageNo": page_no,
             }
 
             try:
                 response = await self.client.get(
-                    f"{KIPRIS_API_BASE}/patUtiModInfoSearchSevice"
-                    "/freeSearchInfo",
-                    params=params,
-                    follow_redirects=True,
+                    API_URL, params=params, follow_redirects=True,
                 )
                 response.raise_for_status()
             except Exception as e:
@@ -111,7 +114,7 @@ class KIPRISPatentIngestor(BaseIngestor):
                 )
                 break
 
-            items = self._parse_xml_response(response.text, seen_ids, keyword)
+            items = self._parse_xml(response.text, seen_ids, keyword)
             records.extend(items)
 
             if not items:
@@ -119,60 +122,60 @@ class KIPRISPatentIngestor(BaseIngestor):
 
         return records
 
-    def _parse_xml_response(
+    def _parse_xml(
         self,
         xml_text: str,
         seen_ids: set[str],
         keyword: str,
     ) -> list[dict[str, Any]]:
         """XML 응답 파싱"""
-        soup = BeautifulSoup(xml_text, "html.parser")
-        records: list[dict[str, Any]] = []
-        cutoff = (self._now() - timedelta(days=self.days_back)).strftime(
-            "%Y%m%d"
-        )
+        soup = BeautifulSoup(xml_text, "xml")
         now_str = self._now().strftime("%Y-%m-%d")
 
-        for item in soup.select("item"):
-            app_no = _get_text(item, "applicationnumber")
+        # 에러 체크
+        success = _get_text(soup, "successYN")
+        if success == "N":
+            msg = _get_text(soup, "resultMsg")
+            logger.warning("[KIPRIS] API 에러: %s", msg)
+            return []
+
+        records: list[dict[str, Any]] = []
+
+        for item in soup.find_all("item"):
+            app_no = _get_text(item, "applicationNumber")
             if not app_no or app_no in seen_ids:
                 continue
             seen_ids.add(app_no)
 
-            title = _get_text(item, "inventionname") or _get_text(
-                item, "inventionnameenglish"
-            )
-            applicant = _get_text(item, "applicantname")
-            app_date = _get_text(item, "applicationdate")
-            pub_date = _get_text(item, "publicationdate")
-            reg_date = _get_text(item, "registrationdate")
-            ipc_code = _get_text(item, "ipcnumber")
+            title = _get_text(item, "inventionTitle")
+            ipc_code = _get_text(item, "ipcNumber")
 
-            # 날짜 결정 (등록 > 공개 > 출원)
-            raw_date = reg_date or pub_date or app_date or ""
-            if raw_date and raw_date < cutoff:
-                continue
-
-            date_str = ""
-            if raw_date and len(raw_date) >= 8:
-                date_str = f"{raw_date[:4]}-{raw_date[4:6]}-{raw_date[6:8]}"
-
-            # IPC 관련성 체크
+            # IPC 의약 관련 필터
             is_pharma_ipc = any(
                 code in (ipc_code or "") for code in PHARMA_IPC_CODES
             )
+
+            # 날짜 (등록 > 공개 > 출원)
+            reg_date = _get_text(item, "registerDate")
+            open_date = _get_text(item, "openDate")
+            app_date = _get_text(item, "applicationDate")
+            raw_date = reg_date or open_date or app_date or ""
+            date_str = _format_date(raw_date)
 
             records.append({
                 "source": "KIPRIS",
                 "source_type": "KIPRIS_PATENT",
                 "title": title,
                 "application_number": app_no,
-                "applicant": applicant,
+                "applicant": _get_text(item, "applicantName"),
                 "application_date": _format_date(app_date),
-                "publication_date": _format_date(pub_date),
-                "registration_date": _format_date(reg_date),
-                "ipc_code": ipc_code or "",
+                "open_date": _format_date(open_date),
+                "register_date": _format_date(reg_date),
+                "register_number": _get_text(item, "registerNumber"),
+                "register_status": _get_text(item, "registerStatus"),
+                "ipc_code": ipc_code,
                 "is_pharma_ipc": is_pharma_ipc,
+                "abstract": (_get_text(item, "astrtCont") or "")[:300],
                 "date": date_str,
                 "matched_keyword": keyword,
                 "_fetched_at": now_str,
@@ -188,7 +191,10 @@ def _get_text(parent, tag_name: str) -> str:
 
 
 def _format_date(raw: str) -> str:
-    """YYYYMMDD → YYYY-MM-DD"""
-    if raw and len(raw) >= 8:
-        return f"{raw[:4]}-{raw[4:6]}-{raw[6:8]}"
+    """YYYYMMDD 또는 YYYY/MM/DD → YYYY-MM-DD"""
+    if not raw:
+        return ""
+    clean = raw.replace("/", "").replace(" ", "").replace("00:00:00", "").strip()
+    if len(clean) >= 8:
+        return f"{clean[:4]}-{clean[4:6]}-{clean[6:8]}"
     return ""

@@ -1,8 +1,10 @@
 """CRIS (임상연구정보서비스) 데이터 수집
 
-공공데이터포털 API: 질병관리청_임상연구 DB
-- 엔드포인트: apis.data.go.kr/1352159/crisinfodataview
-- 데이터: 11,547건 (2026-02 기준)
+WARNING: 이 API는 폐기된 것으로 추정됨 (2026-04-21 확인).
+엔드포인트 apis.data.go.kr/1352159/crisinfodataview → INVALID_REQUEST_PARAMETER_ERROR.
+data.go.kr에서 해당 서비스를 찾을 수 없음.
+CRIS 사이트(cris.nih.go.kr)는 웹 Excel/XML 다운로드만 제공, OpenAPI 없음.
+대안: ClinicalTrials.gov (글로벌 임상) 또는 Playwright 크롤링.
 """
 
 from __future__ import annotations

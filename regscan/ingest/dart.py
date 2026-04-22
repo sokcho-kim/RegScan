@@ -20,24 +20,24 @@ logger = logging.getLogger(__name__)
 
 DART_API_BASE = "https://opendart.fss.or.kr/api"
 
-# 제약/바이오 관련 키워드 (공시 제목 필터)
-PHARMA_KEYWORDS = [
+# 제약/바이오 관련 키워드 — 공시 **제목**에서만 매칭
+# "바이오", "임상" 등 광범위 키워드 제거 (사명 오탐 방지)
+PHARMA_TITLE_KEYWORDS = [
     "의약품",
     "신약",
     "라이선스",
     "기술이전",
     "기술수출",
     "임상시험",
-    "임상",
-    "바이오",
     "품목허가",
     "약가",
-    "특허",
     "제네릭",
     "바이오시밀러",
     "위탁생산",
     "CMO",
     "CDMO",
+    "특허실시",
+    "특허권",
 ]
 
 
@@ -111,14 +111,12 @@ class DARTDisclosureIngestor(BaseIngestor):
 
             for item in items:
                 title = item.get("report_nm", "")
-                # 제약/바이오 키워드 필터
+                # 제목에서만 키워드 매칭 (사명 오탐 방지)
                 title_lower = title.lower()
-                corp_name = item.get("corp_name", "")
-                combined = f"{title} {corp_name}".lower()
 
                 matched_kw = ""
-                for kw in PHARMA_KEYWORDS:
-                    if kw.lower() in combined:
+                for kw in PHARMA_TITLE_KEYWORDS:
+                    if kw.lower() in title_lower:
                         matched_kw = kw
                         break
 
@@ -134,7 +132,7 @@ class DARTDisclosureIngestor(BaseIngestor):
                     "source": "DART",
                     "source_type": "DART_DISCLOSURE",
                     "title": title,
-                    "corp_name": corp_name,
+                    "corp_name": item.get("corp_name", ""),
                     "corp_code": item.get("corp_code", ""),
                     "stock_code": item.get("stock_code", ""),
                     "report_no": item.get("rcept_no", ""),
