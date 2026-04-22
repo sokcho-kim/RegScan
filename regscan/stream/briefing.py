@@ -1048,6 +1048,99 @@ class StreamBriefingGenerator:
                 counts["conditional"] += 1
         return counts
 
+    # ── 인텔리전스 시그널 브리핑 ──
+
+    async def generate_intelligence_briefing(
+        self,
+        source_type: str,
+        signals: list[dict],
+    ) -> dict[str, Any] | None:
+        """소스별 인텔리전스 브리핑 — 시그널 있을 때만 생성.
+
+        Args:
+            source_type: "PMDA_APPROVAL", "NICE_TA" 등
+            signals: extract_signals()에서 추출한 시그널 리스트
+        """
+        from regscan.stream.intelligence_signals import (
+            SOURCE_META, format_for_prompt,
+        )
+
+        meta = SOURCE_META.get(source_type, {})
+        label = meta.get("label", source_type)
+        description = meta.get("description", "")
+        today = datetime.now().strftime("%Y-%m-%d")
+
+        signal_text = format_for_prompt(source_type, signals)
+
+        system_prompt = build_system_prompt(
+            stream_name="intelligence",
+            stream_specific_rules=f"""
+당신은 '{label}' 전문 분석가입니다.
+{description}
+
+## 분석 원칙
+- 수집된 시그널 데이터를 기반으로 핵심 동향을 분석합니다
+- 국내 의약품 시장에 미치는 영향을 중심으로 서술합니다
+- 데이터에 없는 내용은 추측하지 않습니다
+- 날짜, 약물명, 기관명 등 팩트는 원문 그대로 인용합니다
+""",
+        )
+
+        user_prompt = f"""오늘 날짜: {today}
+
+다음은 최근 수집된 {label} 데이터입니다.
+
+{signal_text}
+
+위 데이터를 분석하여 다음 JSON 형식으로 브리핑을 작성해주세요:
+
+```json
+{{
+  "headline": "한 줄 제목 (50자 이내)",
+  "key_takeaway": "핵심 메시지 (100자 이내)",
+  "analysis": "상세 분석 (3~5개 단락, 각 2~3문장)",
+  "impact_on_korea": "국내 시장 영향 분석 (2~3문장)",
+  "action_items": ["후속 모니터링 포인트 1", "포인트 2"]
+}}
+```"""
+
+        try:
+            response_text = await self._call_llm(system_prompt, user_prompt)
+            briefing = self._parse_json_response(response_text)
+
+            briefing.update({
+                "source_type": source_type,
+                "label": label,
+                "signal_count": len(signals),
+                "date": today,
+                "generated_at": datetime.now().isoformat(),
+            })
+
+            logger.info(
+                "[Intelligence] %s 브리핑 생성: %s (%d건)",
+                source_type, briefing.get("headline", "")[:40], len(signals),
+            )
+            return briefing
+
+        except Exception as e:
+            logger.warning(
+                "[Intelligence] %s 브리핑 생성 실패: %s", source_type, e,
+            )
+            # 폴백: LLM 없이 요약만
+            return {
+                "source_type": source_type,
+                "label": label,
+                "headline": f"{label} ({len(signals)}건)",
+                "key_takeaway": f"최근 {len(signals)}건의 시그널이 수집되었습니다.",
+                "signal_count": len(signals),
+                "signals_summary": [
+                    s.get("title", "")[:60] for s in signals[:10]
+                ],
+                "date": today,
+                "generated_at": datetime.now().isoformat(),
+                "is_fallback": True,
+            }
+
     # ── 스트림별 브리핑 생성 ──
 
     async def generate_therapeutic_briefing(

@@ -387,6 +387,51 @@ async def run_stream_pipeline(
             logger.info("[5/6] 스트림 브리핑 건너뜀 (ENABLE_STREAM_BRIEFINGS=false)")
             result["steps"]["stream_briefings"] = "skipped"
 
+        # Step 5.5: 인텔리전스 시그널 브리핑 생성
+        if settings.ENABLE_STREAM_BRIEFINGS and aux_data:
+            logger.info("[5.5/6] 인텔리전스 시그널 브리핑...")
+            try:
+                from regscan.stream.intelligence_signals import (
+                    extract_signals, should_publish,
+                )
+                from regscan.stream.briefing import StreamBriefingGenerator
+
+                source_signals = extract_signals(aux_data)
+                intel_generator = StreamBriefingGenerator()
+                intel_counts = {"generated": 0, "skipped": 0, "failed": 0}
+
+                for src_type, signals in source_signals.items():
+                    if not should_publish(src_type, signals):
+                        intel_counts["skipped"] += 1
+                        continue
+                    try:
+                        briefing = await intel_generator.generate_intelligence_briefing(
+                            src_type, signals,
+                        )
+                        if briefing:
+                            await _save_briefing_to_db(
+                                "intelligence", src_type, "intelligence",
+                                briefing.get("headline", ""),
+                                briefing, pipeline_run_id,
+                            )
+                            intel_counts["generated"] += 1
+                    except Exception as e:
+                        logger.warning(
+                            "  인텔리전스 브리핑 실패 (%s): %s", src_type, e,
+                        )
+                        intel_counts["failed"] += 1
+
+                result["steps"]["intelligence_briefings"] = intel_counts
+                logger.info(
+                    "  인텔리전스 브리핑: %d건 생성, %d건 스킵, %d건 실패",
+                    intel_counts["generated"],
+                    intel_counts["skipped"],
+                    intel_counts["failed"],
+                )
+            except Exception as e:
+                logger.warning("  인텔리전스 브리핑 실패: %s", e)
+                result["steps"]["intelligence_briefings"] = f"error: {e}"
+
         # Step 6: 결과 JSON 저장 (로컬)
         logger.info("[6/6] 결과 JSON 저장...")
         output_dir = settings.BASE_DIR / "output" / "stream_results"
