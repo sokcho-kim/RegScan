@@ -97,17 +97,18 @@ class MFDSSafetyLetterIngestor(BaseIngestor):
         return records
 
     async def _fetch_page(self, page_num: int) -> str | None:
-        """목록 페이지 HTML 가져오기"""
+        """목록 페이지 HTML 가져오기 (재시도 포함)"""
         try:
-            response = await self.client.post(
+            response = await self._request_with_retry(
+                "POST",
                 SAFETY_LETTER_URL,
                 data={"page": str(page_num), "pageSize": str(self.page_size)},
-                follow_redirects=True,
+                max_retries=3,
+                retry_delay=2.0,
             )
-            response.raise_for_status()
             return response.text
         except Exception as e:
-            logger.error("[MFDS Safety] 페이지 %d 요청 실패: %s", page_num, e)
+            logger.error("[MFDS Safety] 페이지 %d 요청 실패 (재시도 소진): %s", page_num, e)
             return None
 
     def _parse_list(

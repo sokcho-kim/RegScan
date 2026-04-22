@@ -98,8 +98,18 @@ class KDCAIngestor(BaseIngestor):
         try:
             logger.info("[KDCA] 보도자료 수집 시작")
 
-            await page.goto(PRESS_RELEASE_URL, wait_until="domcontentloaded")
-            await page.wait_for_load_state("networkidle")
+            # 정부 사이트 TLS 불안정 대응 — 최대 3회 재시도
+            for _retry in range(3):
+                try:
+                    await page.goto(PRESS_RELEASE_URL, wait_until="domcontentloaded")
+                    await page.wait_for_load_state("networkidle")
+                    break
+                except Exception as nav_err:
+                    if _retry < 2:
+                        logger.debug("[KDCA] 접속 재시도 (%d/3): %s", _retry + 1, nav_err)
+                        await asyncio.sleep(3)
+                    else:
+                        raise
             await asyncio.sleep(2.0)
 
             for page_num in range(1, self.config.max_pages + 1):

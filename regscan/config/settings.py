@@ -60,7 +60,7 @@ class Settings(BaseSettings):
     SCHEDULER_ENABLED: bool = True
     DAILY_SCAN_HOUR: int = 8        # 매일 08:00 스캔
     DAILY_SCAN_MINUTE: int = 0
-    SCAN_DAYS_BACK: int = 7         # 최근 7일 스캔
+    SCAN_DAYS_BACK: int = 30        # 최근 30일 스캔 (7일이면 신규 없을 때 빈 브리핑)
     GENERATE_BRIEFING: bool = True  # 핫이슈 브리핑 자동 생성
     GENERATE_HTML: bool = True      # HTML 뉴스레터 자동 생성
 
