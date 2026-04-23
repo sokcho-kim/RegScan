@@ -81,6 +81,9 @@ BANNED_SENTENCE_PATTERNS = [
     r"[^.。]*추가\s*확인이?\s*필요[^.。]*[.。]",
     r"[^.。]*공문서와?\s*허가사항에서\s*확인[^.。]*[.。]",
     r"[^.。]*후속\s*자료를?\s*통해\s*확인[^.。]*[.。]",
+    r"[^.。]*원문\s*공개\s*자료를?\s*통해\s*확인[^.。]*[.。]",
+    r"[^.。]*확인이\s*필요하다[^.。]*[.。]",
+    r"[^.。]*확인할\s*필요가\s*있다[^.。]*[.。]",
     r"[^.。]*약제팀은[^.。]*[.。]",
     r"[^.。]*RA/MA는[^.。]*[.。]",
     r"[^.。]*즉시\s*점검하라[^.。]*[.。]",
@@ -123,13 +126,24 @@ def post_process_article(article: dict) -> dict:
 
     # 2. 기관명 치환
     for fullname, (abbr, first_mention) in INSTITUTION_MAP.items():
-        # 이미 "(이하 약어)" 있으면 스킵
-        if f"(이하 {abbr})" in body:
-            # 이후 풀네임을 약어로 치환
-            parts = body.split(f"(이하 {abbr})")
-            if len(parts) == 2:
-                parts[1] = parts[1].replace(fullname, abbr)
-                body = f"(이하 {abbr})".join(parts)
+        # "(이하 약어)" 중복 제거 — 2회 이상이면 첫 번째만 남김
+        iha_tag = f"(이하 {abbr})"
+        iha_count = body.count(iha_tag)
+        if iha_count > 1:
+            # 첫 번째만 남기고 나머지 삭제
+            parts = body.split(iha_tag)
+            body = parts[0] + iha_tag + iha_tag.join(parts[1:]).replace(iha_tag, "")
+            corrections.append(f"기관명 중복: {iha_tag} {iha_count}회→1회")
+
+        # 이미 "(이하 약어)" 있으면 이후 풀네임만 약어로 치환
+        if iha_tag in body:
+            parts = body.split(iha_tag, 1)
+            # 첫 등장 뒤의 영문 괄호도 정리: "NICE(National...)" 같은 잔해
+            parts[1] = re.sub(
+                rf"\s*\([^)]*{re.escape(abbr)}[^)]*\)", "", parts[1],
+            )
+            parts[1] = parts[1].replace(fullname, abbr)
+            body = parts[0] + iha_tag + parts[1]
             continue
 
         # 풀네임이 있으면 첫 등장을 "풀네임(이하 약어)"로, 나머지를 약어로
