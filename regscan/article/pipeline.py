@@ -390,6 +390,14 @@ async def generate_articles(
 
     logger.info("=== 기사 생성 파이프라인 v2 시작 ===")
 
+    # 엔리칭: API로 시그널에 취재 컨텍스트 추가
+    try:
+        from regscan.article.enrichment import enrich_signals
+        signals = await enrich_signals(signals)
+        logger.info("[엔리칭] 시그널 컨텍스트 보강 완료")
+    except Exception as e:
+        logger.warning("[엔리칭] 실패, 원본 시그널로 진행: %s", e)
+
     # 전처리: 시그널 5건 미만 소스 제거
     filtered = filter_signals(signals)
     if not filtered:

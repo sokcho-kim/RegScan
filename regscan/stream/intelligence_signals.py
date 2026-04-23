@@ -146,6 +146,14 @@ def format_for_prompt(
         line = f"{i}. [{date}] {title}"
         if detail:
             line += f"\n   {detail[:150]}"
+
+        # 엔리칭 컨텍스트 (있으면 추가)
+        for ctx_key in ("fda_context", "mfds_context"):
+            ctx = sig.get(ctx_key, "")
+            if ctx:
+                for ctx_line in ctx.split("\n"):
+                    line += f"\n   {ctx_line[:200]}"
+
         lines.append(line)
 
     if len(signals) > 15:
