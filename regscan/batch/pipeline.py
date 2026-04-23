@@ -372,6 +372,11 @@ async def run_stream_pipeline(
             _aux_sources.append(
                 (MFDSPressIngestor, {"days_back": 14}, "MFDS_PRESS"),
             )
+        if settings.ENABLE_KHIDI_GLOBAL:
+            from regscan.ingest.khidi_global import KHIDIGlobalInfoIngestor
+            _aux_sources.append(
+                (KHIDIGlobalInfoIngestor, {"days_back": 30}, "KHIDI_GLOBAL_INFO"),
+            )
 
         for cls, kwargs, src_type in _aux_sources:
             data = await _run_ingestor(cls, kwargs, src_type, pipeline_run_id)

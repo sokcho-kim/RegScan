@@ -70,6 +70,7 @@ from .assembly import AssemblyBillIngestor
 from .dart import DARTDisclosureIngestor
 from .kipris import KIPRISPatentIngestor
 from .khidi_news import KHIDIPharmaNewsIngestor
+from .khidi_global import KHIDIGlobalInfoIngestor
 from .mfds_press import MFDSPressIngestor
 
 __all__ = [
@@ -147,6 +148,8 @@ __all__ = [
     "KIPRISPatentIngestor",
     # KHIDI Pharma News
     "KHIDIPharmaNewsIngestor",
+    # KHIDI Global Info (약가·보험, 법령·고시)
+    "KHIDIGlobalInfoIngestor",
     # MFDS Press
     "MFDSPressIngestor",
 ]
