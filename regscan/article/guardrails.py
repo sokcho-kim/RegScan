@@ -99,6 +99,23 @@ BANNED_SENTENCE_PATTERNS = [
     r"[^.。]*평가는?\s*포함하지\s*않았다[^.。]*[.。]",
 ]
 
+# 보고서체 → 기사체 치환 (P3: 금지 문체 사전)
+STYLE_REPLACEMENTS = {
+    "관전 포인트는": "향후 주목할 부분은",
+    "관전 포인트다": "주목된다",
+    "관전 포인트": "주목 지점",
+    "핵심이다": "핵심으로 드러난다",
+    "부담 변수가": "부담 요인이",
+    "부담 변수": "부담 요인",
+    "병존한다": "함께 나타났다",
+    "병존하는": "함께 나타나는",
+    "병존하며": "함께 나타나며",
+    "제시됐다": "나타났다",
+    "제시된다": "나타난다",
+    "포착됐다": "확인됐다",
+    "포착되면서": "확인되면서",
+}
+
 # 기관명 치환 (풀네임 → "풀네임(이하 약어)" 첫 등장, 이후 약어만)
 INSTITUTION_MAP = {
     "일본 의약품의료기기종합기구": ("PMDA", "일본 의약품의료기기종합기구(이하 PMDA)"),
@@ -161,7 +178,13 @@ def post_process_article(article: dict) -> dict:
             body = before + first_mention + after
             corrections.append(f"기관명: {fullname} → {first_mention}")
 
-    # 3. 외국어 음역 정리 (3단어 이상 연속 한글 음역)
+    # 3. 보고서체 → 기사체 치환 (P3)
+    for old_expr, new_expr in STYLE_REPLACEMENTS.items():
+        if old_expr in body:
+            body = body.replace(old_expr, new_expr)
+            corrections.append(f"문체: {old_expr} → {new_expr}")
+
+    # 4. 외국어 음역 정리 (3단어 이상 연속 한글 음역)
     # 예: "엥스띠뛰 나씨오날 드 라 쌍떼 에 드 라 흐쉐르슈 메디깔"
     body = re.sub(
         r"[가-힣]+\s+[가-힣]+\s+[가-힣]+\s+[가-힣]+\s+[가-힣]+(?:\s+[가-힣]+)*",
