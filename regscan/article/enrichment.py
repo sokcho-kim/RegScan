@@ -234,6 +234,8 @@ async def enrich_signals(
             enriched[src_type] = await _enrich_drug_signals(sigs)
         elif src_type == "MFDS_PRESS":
             enriched[src_type] = await _enrich_mfds_press(sigs)
+        elif src_type == "KIPRIS_PATENT":
+            enriched[src_type] = await _enrich_kipris_patent(sigs)
         else:
             enriched[src_type] = sigs
 
@@ -296,6 +298,70 @@ async def _enrich_mfds_press(
                     context_parts.append(f"[부작용] {easy_info['se_qesitm'][:200]}")
                 if context_parts:
                     sig["mfds_context"] = "\n".join(context_parts)
+
+        enriched.append(sig)
+
+    return enriched
+
+
+# ══════════════════════════════════════════════
+# 5. KIPRIS 특허 엔리칭 — 타겟/약물 키워드 → FDA label
+# ══════════════════════════════════════════════
+
+# 특허 제목에서 감지할 키워드 → 대표 약물 INN 매핑
+_PATENT_KEYWORD_TO_INN = {
+    "PD-1": "PEMBROLIZUMAB",
+    "PD-L1": "ATEZOLIZUMAB",
+    "HER2": "TRASTUZUMAB",
+    "CD137": "NIVOLUMAB",
+    "EGFR": "OSIMERTINIB",
+    "BRCA": "OLAPARIB",
+    "VEGF": "BEVACIZUMAB",
+    "ALK": "ALECTINIB",
+    "BTK": "IBRUTINIB",
+    "FLT3": "QUIZARTINIB",
+    "BCR-ABL": "IMATINIB",
+    "JAK": "RUXOLITINIB",
+    "BRAF": "VEMURAFENIB",
+    "CDK4": "PALBOCICLIB",
+    "CDK6": "PALBOCICLIB",
+    "PARP": "OLAPARIB",
+    "PI3K": "ALPELISIB",
+    "mTOR": "EVEROLIMUS",
+    "CAR-T": "TISAGENLECLEUCEL",
+    "ADC": "TRASTUZUMAB DERUXTECAN",
+    "BTN3A": "PEMBROLIZUMAB",  # 가장 가까운 면역항암
+}
+
+
+async def _enrich_kipris_patent(
+    sigs: list[dict],
+) -> list[dict]:
+    """특허 제목에서 타겟 키워드 감지 → 대표 약물 FDA label 조회."""
+    enriched = []
+    seen_inns: set[str] = set()
+
+    for sig in sigs:
+        title = sig.get("title", "").upper()
+
+        # 키워드 매칭
+        matched_inn = None
+        for keyword, inn in _PATENT_KEYWORD_TO_INN.items():
+            if keyword.upper() in title or keyword in sig.get("title", ""):
+                matched_inn = inn
+                break
+
+        if matched_inn and matched_inn not in seen_inns:
+            seen_inns.add(matched_inn)
+            label = await fetch_fda_label_full(matched_inn)
+            if label:
+                context_parts = [f"[참조 약물: {matched_inn}]"]
+                if label.get("indications"):
+                    context_parts.append(f"[적응증] {label['indications'][:300]}")
+                if label.get("clinical_studies"):
+                    context_parts.append(f"[임상시험] {label['clinical_studies'][:400]}")
+                if context_parts:
+                    sig["fda_context"] = "\n".join(context_parts)
 
         enriched.append(sig)
 
