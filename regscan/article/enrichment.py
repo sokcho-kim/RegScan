@@ -103,9 +103,12 @@ async def fetch_easy_drug_info(drug_name: str) -> dict[str, str]:
     if not settings.DATA_GO_KR_API_KEY:
         return {}
 
-    url = "https://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList"
+    from urllib.parse import unquote
+    raw_key = unquote(settings.DATA_GO_KR_API_KEY)
+
+    url = "http://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList"
     params = {
-        "serviceKey": settings.DATA_GO_KR_API_KEY,
+        "serviceKey": raw_key,
         "itemName": drug_name,
         "type": "json",
         "numOfRows": 1,
@@ -117,15 +120,17 @@ async def fetch_easy_drug_info(drug_name: str) -> dict[str, str]:
         async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
             r = await client.get(url, params=params)
             if r.status_code != 200:
+                logger.debug("[Enrichment] e약은요 HTTP %d (%s)", r.status_code, drug_name)
                 return result
             data = r.json()
-            items = (
-                data.get("body", {}).get("items", [])
-                or []
-            )
+
+            # 응답 구조: {header: {resultCode, ...}, body: {items: [...]}}
+            # 또는 직접: {items: [...]}
+            body = data.get("body", data)
+            items = body.get("items", [])
             if not items:
                 return result
-            item = items[0]
+            item = items[0] if isinstance(items, list) else items
 
             field_map = {
                 "item_name": "itemName",
