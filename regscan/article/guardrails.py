@@ -95,6 +95,8 @@ BANNED_SENTENCE_PATTERNS = [
     r"[^.。]*초안[은이]?\s*제시한[^.。]*[.。]",
     r"[^.。]*초안[은이]?\s*전했다[^.。]*[.。]",
     r"[^.。]*해석은?\s*포함하지\s*않았다[^.。]*[.。]",
+    r"[^.。]*본\s*기사에서는[^.。]*[.。]",
+    r"[^.。]*평가는?\s*포함하지\s*않았다[^.。]*[.。]",
 ]
 
 # 기관명 치환 (풀네임 → "풀네임(이하 약어)" 첫 등장, 이후 약어만)
@@ -167,7 +169,8 @@ def post_process_article(article: dict) -> dict:
         body,
     )
 
-    # 4. 불완전 문장 제거 (마지막 문장이 마침표 없이 끝나면 삭제)
+    # 4. 불완전 문장 제거
+    # Case A: 마지막 마침표 뒤에 잔여 텍스트 (마침표 없이 끝남)
     sentences = body.rstrip().split(".")
     if sentences and len(sentences[-1].strip()) > 0 and not sentences[-1].strip().endswith(("다", "요", "음", "임")):
         removed = sentences.pop()
@@ -176,6 +179,24 @@ def post_process_article(article: dict) -> dict:
         body = ".".join(sentences)
         if not body.endswith("."):
             body += "."
+
+    # Case B: 절단 문장 패턴 삭제
+    # "사례로서 4." — 한글 + 숫자만으로 끝나는 절단
+    truncated = re.findall(r"[^.。]*[가-힣]\s+\d{1,3}\s*\.", body)
+    for t in truncated:
+        if re.search(r"[가-힣]\s+\d{1,3}\s*\.$", t.strip()):
+            corrections.append(f"절단 문장 삭제: {t.strip()[:40]}")
+            body = body.replace(t, "")
+
+    # Case C: "한편, ." / "이어지면서, ." — 쉼표+마침표 절단
+    comma_dot = re.findall(r"[^.。]*,\s*\.\s*", body)
+    for cd in comma_dot:
+        corrections.append(f"절단 문장 삭제: {cd.strip()[:40]}")
+        body = body.replace(cd, "")
+
+    body = body.rstrip()
+    if body and not body.endswith("."):
+        body += "."
 
     # 5. 빈 줄 정리 (연속 빈 줄 → 단일 빈 줄)
     body = re.sub(r"\n{3,}", "\n\n", body)
