@@ -472,6 +472,17 @@ async def generate_articles(
             # Agent 3: 팩트체커
             checked = await agent_fact_checker(draft, original_data)
 
+            # 팩트체커 폐기 판정: 근거 불명이면 기사 드롭
+            corrections = checked.get("corrections", [])
+            kill_keywords = ["근거 불명", "검증되지 않", "확인 불가", "데이터 부족"]
+            if any(kw in str(corrections) for kw in kill_keywords):
+                logger.warning(
+                    "  기사 #%d 폐기 (팩트체커 근거 불명): %s",
+                    story.get("story_id", 0),
+                    [c for c in corrections if any(kw in c for kw in kill_keywords)][:2],
+                )
+                continue
+
             # Agent 4: 편집자
             final = await agent_copy_editor(checked)
 
