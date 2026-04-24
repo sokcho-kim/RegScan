@@ -241,6 +241,8 @@ async def enrich_signals(
             enriched[src_type] = await _enrich_mfds_press(sigs)
         elif src_type == "KIPRIS_PATENT":
             enriched[src_type] = await _enrich_kipris_patent(sigs)
+        elif src_type == "ASSEMBLY_BILL":
+            enriched[src_type] = await _enrich_assembly_bill(sigs)
         else:
             enriched[src_type] = sigs
 
@@ -281,6 +283,28 @@ async def _enrich_drug_signals(
     return enriched
 
 
+async def _enrich_assembly_bill(
+    sigs: list[dict],
+) -> list[dict]:
+    """법안 시그널에 제안이유/주요내용 추가 (상위 3건만)."""
+    enriched = []
+    fetched = 0
+
+    for sig in sigs:
+        if fetched < 3:
+            bill_url = sig.get("url", "")
+            if bill_url:
+                summary = await fetch_bill_summary(bill_url)
+                if summary:
+                    sig["fda_context"] = f"[제안이유 및 주요내용]\n{summary}"
+                    fetched += 1
+                    logger.info("[Enrichment] 법안 상세 수집: %s", sig.get("title", "")[:30])
+
+        enriched.append(sig)
+
+    return enriched
+
+
 async def _enrich_mfds_press(
     sigs: list[dict],
 ) -> list[dict]:
@@ -310,7 +334,64 @@ async def _enrich_mfds_press(
 
 
 # ══════════════════════════════════════════════
-# 5. KIPRIS 특허 엔리칭 — 타겟/약물 키워드 → FDA label
+# 5. 법안 상세 엔리칭 — 의안원문 제안이유/주요내용
+# ══════════════════════════════════════════════
+
+async def fetch_bill_summary(bill_url: str) -> str:
+    """국회 의안정보시스템에서 제안이유 및 주요내용 크롤링.
+
+    Playwright로 JS 렌더링 후 텍스트 추출.
+    Playwright 미설치 시 빈 문자열 반환.
+    """
+    if not bill_url:
+        return ""
+
+    try:
+        from playwright.async_api import async_playwright
+    except ImportError:
+        logger.debug("[Enrichment] playwright 미설치, 법안 상세 스킵")
+        return ""
+
+    try:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page()
+            await page.goto(bill_url, wait_until="networkidle", timeout=20000)
+
+            # billInfo 탭 내용 대기
+            await page.wait_for_timeout(2000)
+
+            # 제안이유 및 주요내용 영역 추출
+            content = await page.evaluate("""() => {
+                // 의안 상세 영역에서 텍스트 추출
+                const sect = document.querySelector('#tab_billInfo_sect');
+                if (sect) return sect.innerText;
+                // fallback: 전체 본문
+                const body = document.querySelector('.contIn, .bill_detail, #content');
+                return body ? body.innerText : '';
+            }""")
+
+            await browser.close()
+
+            if not content:
+                return ""
+
+            # "제안이유" ~ 끝 추출
+            import re
+            match = re.search(r"제안이유(.*?)(?:부\s*칙|법제사법위원회|$)", content, re.DOTALL)
+            if match:
+                text = match.group(1).strip()
+                return _truncate(text, 1500)
+
+            return _truncate(content, 1500)
+
+    except Exception as e:
+        logger.debug("[Enrichment] 법안 상세 크롤링 실패 (%s): %s", bill_url, e)
+        return ""
+
+
+# ══════════════════════════════════════════════
+# 6. KIPRIS 특허 엔리칭 — 타겟/약물 키워드 → FDA label
 # ══════════════════════════════════════════════
 
 # 특허 제목에서 감지할 키워드 → 대표 약물 INN 매핑
