@@ -220,6 +220,7 @@ def _extract_assembly(aux_data: dict, result: dict) -> None:
             "date": item.get("date", ""),
             "status": item.get("proc_result", "") or "계류 중",
             "keyword": item.get("matched_keyword", ""),
+            "url": item.get("url", ""),
         })
     if signals:
         result["ASSEMBLY_BILL"] = signals
