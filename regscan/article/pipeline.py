@@ -266,15 +266,16 @@ async def agent_reporter(
 
     # depth별 작성 지시
     if depth == "분석":
-        depth_instruction = """## 분석 기사 — 반드시 5블록 구조 (900자 이상)
+        depth_instruction = """## 분석 기사 — 반드시 5블록 구조 (1200자 이상)
 
-**블록 1. 사건** (1~2문장): 무슨 일이 일어났는가. 핵심 사실 + 수치.
-**블록 2. 배경** (1단락): 왜 이게 중요한가. 이전에 뭐가 있었는가. 미충족 수요, 기존 치료 옵션, 시장 상황.
-**블록 3. 기존과 차이** (1단락): 뭐가 달라졌는가. 기존 약물/제도/기술 대비 구체적 비교. 수치 필수.
-**블록 4. 영향 대상** (1단락): 누가 어떻게 영향받는가. 병원/약국/제약사/환자 중 구체적 대상과 실무 변화.
-**블록 5. 다음 관찰 포인트** (1단락): 앞으로 뭘 봐야 하는가. 국내 허가, 급여, 임상, 경쟁 파이프라인 등.
+**블록 1. 사건** (2~3문장, 150자+): 무슨 일이 일어났는가. 핵심 사실 + 수치 + 누가 발표했는가.
+**블록 2. 배경** (1단락, 200자+): 왜 이게 중요한가. 이 분야의 미충족 수요는 뭔가. 기존에 어떤 치료/제도가 있었는가. 이번 사건 이전의 맥락을 독자에게 설명하라.
+**블록 3. 기존과 차이** (1단락, 200자+): 기존 약물/기술/제도와 구체적으로 뭐가 다른가. 반드시 비교 수치를 포함하라. "최초", "기존 대비 X%", "이전에는 ~였으나 이제는 ~" 등.
+**블록 4. 영향 대상** (1단락, 200자+): 국내 시장/병원/제약사/환자에게 어떤 영향이 있는가. 허가 전망, 급여 가능성, 처방 변화, R&D 경쟁 중 구체적으로. 추상적 "영향이 클 수 있다" 금지 — 어떤 부서가 뭘 준비해야 하는지까지.
+**블록 5. 다음 관찰 포인트** (1단락, 150자+): 향후 뭘 지켜봐야 하는가. 구체적 이벤트(허가 신청일, 임상 결과 발표, 급여 심의 일정, 경쟁 약물 동향)를 나열.
 
-5블록이 모두 없으면 불합격. 900자 미만이면 불합격."""
+**5블록이 하나라도 빠지면 불합격. 1200자 미만이면 불합격.**
+**레퍼런스 기사 수준: 약업신문 1200자, 바이오뉴스 1500자, 뉴시스 2000자.**"""
 
     elif depth == "단신":
         depth_instruction = """## 단신 — 3~5문장
@@ -283,6 +284,15 @@ async def agent_reporter(
     else:  # 브리프
         depth_instruction = """## 브리프 — 500~700자
 사실 + 간략한 맥락. 국내 관점 1문장. 향후 관찰 포인트 1문장."""
+
+    # 재작성 피드백이 있으면 추가
+    rewrite_feedback = story.get("_rewrite_feedback", [])
+    rewrite_section = ""
+    if rewrite_feedback:
+        rewrite_section = "\n## ⚠️ 재작성 지시 — 이전 초안이 아래 기준에서 불합격됨:\n"
+        for fb in rewrite_feedback:
+            rewrite_section += f"- {fb}\n"
+        rewrite_section += "위 문제를 반드시 해결하여 다시 작성하라.\n"
 
     user_prompt = f"""## 편집장 지시
 
@@ -294,6 +304,7 @@ async def agent_reporter(
 근거: {json.dumps(story.get('evidence', story.get('key_facts', [])), ensure_ascii=False)}
 
 {depth_instruction}
+{rewrite_section}
 
 ## 원본 데이터
 
@@ -456,6 +467,34 @@ async def generate_articles(
         filter_signals, dedupe_stories, post_process_article,
     )
 
+    def _evaluate_quality(article: dict, depth: str) -> dict:
+        """분석 ��사 품질 평가 — 5블록 + 길이 + 국내 관점."""
+        body = article.get("body", "")
+        failures = []
+
+        if depth == "분석":
+            # 길이 체크
+            if len(body) < 1200:
+                failures.append(f"길이 부족: {len(body)}자 (최소 1200자)")
+
+            # 국내 관점 키워드
+            domestic_keywords = ["국내", "허가", "급여", "심평원", "식약처", "건보", "병원", "약가"]
+            if not any(kw in body for kw in domestic_keywords):
+                failures.append("국내 관점 누락")
+
+            # 5블록 핵심 키워드 (대략적 체크)
+            block_signals = {
+                "배경": ["기존", "이전", "그동안", "미충족", "치료 옵션", "시장"],
+                "차이": ["달라", "차이", "비교", "대비", "최초", "기존과"],
+                "영향": ["영향", "대상", "병원", "약국", "제약", "환자", "실무"],
+                "관찰": ["향후", "관찰", "지켜", "전망", "예정", "일정"],
+            }
+            for block_name, keywords in block_signals.items():
+                if not any(kw in body for kw in keywords):
+                    failures.append(f"블록 누락 가능: {block_name}")
+
+        return {"pass": len(failures) == 0, "failures": failures}
+
     logger.info("=== 기사 생성 파이프라인 v2 시작 ===")
 
     # 엔리칭: API로 시그널에 취재 컨텍스트 추가
@@ -523,6 +562,25 @@ async def generate_articles(
             # Agent 4: 편집자
             final = await agent_copy_editor(checked)
 
+            # Agent 5: 품질 검증 + 재작성 (분석 기사만)
+            depth = story.get("depth", "브리프")
+            if depth == "분석":
+                quality = _evaluate_quality(final, depth)
+                if not quality["pass"]:
+                    logger.info(
+                        "  기사 #%d 품질 미달 (%s), 재작성 시도",
+                        story.get("story_id", 0),
+                        ", ".join(quality["failures"]),
+                    )
+                    # 재작성: 실패 사유를 기자에게 전달
+                    story["_rewrite_feedback"] = quality["failures"]
+                    draft2 = await agent_reporter(story, filtered)
+                    checked2 = await agent_fact_checker(draft2, original_data)
+                    kill2 = checked2.get("corrections", [])
+                    if not any(kw in str(kill2) for kw in kill_keywords):
+                        final = await agent_copy_editor(checked2)
+                        logger.info("  기사 #%d 재작성 완료", story.get("story_id", 0))
+
             # 후처리: 금지표현 + 기관명 + 메타언급
             final = post_process_article(final)
 
@@ -530,6 +588,7 @@ async def generate_articles(
             final["core_message"] = story.get("core_message", "")
             final["sources_used"] = sources_used
             final["priority"] = story.get("priority", "medium")
+            final["depth"] = depth
             final["generated_at"] = datetime.now().isoformat()
 
             articles.append(final)
