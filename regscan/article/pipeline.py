@@ -262,7 +262,7 @@ async def agent_reporter(
         for src_type, sigs in list(signals.items())[:3]:
             relevant_data += format_for_prompt(src_type, sigs) + "\n\n"
 
-    depth = story.get("depth", "브리프")
+    depth = story.get("depth", "분석")
 
     # depth별 작성 지시
     if depth == "분석":
@@ -563,7 +563,7 @@ async def generate_articles(
             final = await agent_copy_editor(checked)
 
             # Agent 5: 품질 검증 + 재작성 (분석 기사만)
-            depth = story.get("depth", "브리프")
+            depth = story.get("depth", "분석")
             if depth == "분석":
                 quality = _evaluate_quality(final, depth)
                 if not quality["pass"]:
