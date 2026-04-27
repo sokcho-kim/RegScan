@@ -559,30 +559,31 @@ async def generate_articles(
                 )
                 continue
 
-            # Agent 4: 편집자
-            final = await agent_copy_editor(checked)
-
-            # Agent 5: 품질 검증 + 재작성 (분석 기사만)
+            # Agent 4: 편집자 + 후처리
+            final = post_process_article(await agent_copy_editor(checked))
             depth = story.get("depth", "분석")
+
+            # Agent 5: 품질 검증 — 후처리 완료된 최종본 기준
+            body_len = len(final.get("body", ""))
+            logger.info("  기사 #%d body=%d자, depth=%s",
+                        story.get("story_id", 0), body_len, depth)
+
             if depth == "분석":
                 quality = _evaluate_quality(final, depth)
                 if not quality["pass"]:
                     logger.info(
-                        "  기사 #%d 품질 미달 (%s), 재작성 시도",
+                        "  기사 #%d 품질 미달 (%s), 재작성",
                         story.get("story_id", 0),
                         ", ".join(quality["failures"]),
                     )
-                    # 재작성: 실패 사유를 기자에게 전달
                     story["_rewrite_feedback"] = quality["failures"]
                     draft2 = await agent_reporter(story, filtered)
                     checked2 = await agent_fact_checker(draft2, original_data)
                     kill2 = checked2.get("corrections", [])
                     if not any(kw in str(kill2) for kw in kill_keywords):
-                        final = await agent_copy_editor(checked2)
-                        logger.info("  기사 #%d 재작성 완료", story.get("story_id", 0))
-
-            # 후처리: 금지표현 + 기관명 + 메타언급
-            final = post_process_article(final)
+                        final = post_process_article(await agent_copy_editor(checked2))
+                        logger.info("  기사 #%d 재작성 완료 (%d자)",
+                                    story.get("story_id", 0), len(final.get("body", "")))
 
             final["story_id"] = story.get("story_id", 0)
             final["core_message"] = story.get("core_message", "")
