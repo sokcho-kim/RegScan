@@ -72,6 +72,7 @@ from .kipris import KIPRISPatentIngestor
 from .khidi_news import KHIDIPharmaNewsIngestor
 from .khidi_global import KHIDIGlobalInfoIngestor
 from .mfds_press import MFDSPressIngestor
+from .globenewswire import GlobeNewsWireIngestor
 
 __all__ = [
     "BaseIngestor",
@@ -152,4 +153,6 @@ __all__ = [
     "KHIDIGlobalInfoIngestor",
     # MFDS Press
     "MFDSPressIngestor",
+    # GlobeNewsWire
+    "GlobeNewsWireIngestor",
 ]

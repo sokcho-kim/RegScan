@@ -69,6 +69,11 @@ SOURCE_META = {
         "description": "PMDA 안전성 관련 RSS + 보고서",
         "priority": 9,
     },
+    "GNW_PRESS": {
+        "label": "글로벌 제약·바이오 보도자료",
+        "description": "GlobeNewsWire 제약·바이오 기업 발표 (승인, 임상, 파이프라인)",
+        "priority": 1,
+    },
 }
 
 # 발행 최소 기준
@@ -84,6 +89,7 @@ MIN_SIGNALS = {
     "KHIDI_PHARMA_NEWS": 5,
     "PMDA_REVIEW": 2,
     "PMDA_SAFETY": 2,
+    "GNW_PRESS": 1,
 }
 
 
@@ -118,6 +124,8 @@ def extract_signals(
     _extract_mfds_press(aux_data, result)
     # KHIDI 뉴스
     _extract_khidi_news(aux_data, result)
+    # GlobeNewsWire
+    _extract_gnw_press(aux_data, result)
     # PMDA RSS
     _extract_pmda_rss(aux_data, result)
 
@@ -321,6 +329,23 @@ def _extract_khidi_news(aux_data: dict, result: dict) -> None:
         })
     if signals:
         result["KHIDI_PHARMA_NEWS"] = signals
+
+
+def _extract_gnw_press(aux_data: dict, result: dict) -> None:
+    data = aux_data.get("gnw_press", [])
+    if not data:
+        return
+    signals = []
+    for item in data:
+        signals.append({
+            "title": item.get("title", ""),
+            "detail": item.get("description", "")[:300],
+            "date": item.get("date", ""),
+            "url": item.get("url", ""),
+            "board": item.get("board", ""),
+        })
+    if signals:
+        result["GNW_PRESS"] = signals
 
 
 def _extract_pmda_rss(aux_data: dict, result: dict) -> None:

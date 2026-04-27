@@ -491,6 +491,8 @@ async def enrich_signals(
             enriched[src_type] = await _enrich_kipris_patent(sigs)
         elif src_type == "ASSEMBLY_BILL":
             enriched[src_type] = await _enrich_assembly_bill(sigs)
+        elif src_type == "GNW_PRESS":
+            enriched[src_type] = await _enrich_gnw_press(sigs)
         else:
             enriched[src_type] = sigs
 
@@ -622,6 +624,52 @@ async def _summarize_bill_reason(raw_text: str) -> str:
         logger.debug("[Enrichment] 법안 요약 LLM 실패: %s", e)
 
     return ""
+
+
+async def _enrich_gnw_press(
+    sigs: list[dict],
+) -> list[dict]:
+    """GlobeNewsWire 보도자료 URL에서 본문 크롤링 (상위 5건)."""
+    enriched = []
+    fetched = 0
+
+    for sig in sigs:
+        if fetched < 5:
+            url = sig.get("url", "")
+            if url:
+                body = await _fetch_gnw_body(url)
+                if body:
+                    sig["fda_context"] = f"[보도자료 본문]\n{body}"
+                    fetched += 1
+
+        enriched.append(sig)
+
+    return enriched
+
+
+async def _fetch_gnw_body(url: str) -> str:
+    """GlobeNewsWire 보도자료 페이지에서 본문 추출."""
+    try:
+        async with httpx.AsyncClient(timeout=_TIMEOUT, follow_redirects=True) as client:
+            r = await client.get(url, headers={"User-Agent": "Mozilla/5.0"})
+            if r.status_code != 200:
+                return ""
+            # 본문 영역 추출 (main-body 또는 article-body)
+            body_match = re.search(
+                r'<div[^>]*class="[^"]*(?:main-body|article-body|notified-body)[^"]*"[^>]*>(.*?)</div>\s*(?:<div|</article)',
+                r.text, re.DOTALL,
+            )
+            if not body_match:
+                # fallback: <article> 태그
+                body_match = re.search(r"<article[^>]*>(.*?)</article>", r.text, re.DOTALL)
+            if not body_match:
+                return ""
+            raw = body_match.group(1)
+            text = _clean_html(raw)
+            return _truncate(text, 2000)
+    except Exception as e:
+        logger.debug("[Enrichment] GNW 본문 실패 (%s): %s", url[:50], e)
+        return ""
 
 
 async def _enrich_mfds_press(

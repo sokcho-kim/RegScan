@@ -87,6 +87,11 @@ async def run_articles(days_back: int = 30) -> None:
         _aux_sources.append(
             (KHIDIGlobalInfoIngestor, {"days_back": days_back}, "KHIDI_GLOBAL_INFO"),
         )
+    if settings.ENABLE_GNW_PRESS:
+        from regscan.ingest.globenewswire import GlobeNewsWireIngestor
+        _aux_sources.append(
+            (GlobeNewsWireIngestor, {"days_back": 7}, "GNW_PRESS"),
+        )
 
     # ── 수집 ──
     aux_data: dict[str, list] = {}

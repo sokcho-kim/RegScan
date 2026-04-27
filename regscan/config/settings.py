@@ -119,6 +119,7 @@ class Settings(BaseSettings):
     ENABLE_KIPRIS: bool = True  # 무료 월 1,000건 (getWordSearch)
     ENABLE_KHIDI_NEWS: bool = True  # KHIDI 제약산업정보포털 뉴스
     ENABLE_KHIDI_GLOBAL: bool = True  # KHIDI 제약글로벌정보센터 (약가·보험, 법령·고시)
+    ENABLE_GNW_PRESS: bool = True  # GlobeNewsWire 제약·바이오 보도자료
 
     ENABLE_STREAM_BRIEFINGS: bool = True
     ENABLE_UNIFIED_BRIEFING: bool = True
