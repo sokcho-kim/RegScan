@@ -493,6 +493,8 @@ async def enrich_signals(
             enriched[src_type] = await _enrich_assembly_bill(sigs)
         elif src_type == "GNW_PRESS":
             enriched[src_type] = await _enrich_gnw_press(sigs)
+        elif src_type in ("NICE_TA", "KHIDI_GLOBAL_INFO"):
+            enriched[src_type] = await _enrich_global_with_domestic(sigs)
         else:
             enriched[src_type] = sigs
 
@@ -848,6 +850,152 @@ async def _enrich_kipris_patent(
         enriched.append(sig)
 
     return enriched
+
+
+# ══════════════════════════════════════════════
+# 7. 글로벌 시그널 → 국내 크로스레퍼런스
+# ══════════════════════════════════════════════
+
+# 글로벌 기사에 자주 등장하는 약물 INN → 한글 품목명 매핑
+_INN_TO_KR_NAME: dict[str, list[str]] = {
+    "PEMBROLIZUMAB": ["키트루다", "펨브롤리주맙"],
+    "NIVOLUMAB": ["옵디보", "니볼루맙"],
+    "ATEZOLIZUMAB": ["티쎈트릭", "아테졸리주맙"],
+    "TRASTUZUMAB": ["허셉틴", "트라스투주맙"],
+    "TRASTUZUMAB DERUXTECAN": ["엔허투", "트라스투주맙 데룩스테칸"],
+    "BEVACIZUMAB": ["아바스틴", "베바시주맙"],
+    "OLAPARIB": ["린파자", "올라파립"],
+    "OSIMERTINIB": ["타그리소", "오시머티닙"],
+    "IBRUTINIB": ["임브루비카", "이브루티닙"],
+    "RUXOLITINIB": ["자카피", "룩소리티닙"],
+    "PALBOCICLIB": ["입랜스", "팔보시클립"],
+    "LENVATINIB": ["렌비마", "렌바티닙"],
+    "DURVALUMAB": ["임핀지", "더발루맙"],
+    "SEMAGLUTIDE": ["오젬픽", "위고비", "세마글루타이드"],
+    "OMALIZUMAB": ["졸레어", "오말리주맙"],
+    "REMIBRUTINIB": ["레미브루티닙"],
+    "GEFAPIXANT": ["게파픽산트"],
+    "MELPHALAN FLUFENAMIDE": ["멜팔란 플루페나마이드"],
+    "TISAGENLECLEUCEL": ["킴리아", "티사젠렉류셀"],
+}
+
+
+def _extract_inns_from_text(text: str) -> list[str]:
+    """텍스트에서 알려진 약물 INN 추출."""
+    text_upper = text.upper()
+    found = []
+    for inn in _INN_TO_KR_NAME:
+        if inn in text_upper:
+            found.append(inn)
+    return found
+
+
+async def _enrich_global_with_domestic(
+    sigs: list[dict],
+) -> list[dict]:
+    """글로벌 시그널(NICE, KHIDI 등)에서 약물명 감지 → 국내 허가/급여/임상 데이터 추가."""
+    enriched = []
+    seen_inns: set[str] = set()
+
+    for sig in sigs:
+        title = sig.get("title", "")
+        desc = sig.get("description", sig.get("summary", ""))
+        full_text = f"{title} {desc}"
+
+        inns = _extract_inns_from_text(full_text)
+        domestic_parts = []
+
+        for inn in inns:
+            if inn in seen_inns:
+                continue
+            seen_inns.add(inn)
+
+            kr_names = _INN_TO_KR_NAME.get(inn, [])
+            kr_label = f" ({'/'.join(kr_names)})" if kr_names else ""
+
+            # 1. MFDS 허가 확인
+            mfds = await fetch_mfds_permit_detail(inn)
+            if not mfds and kr_names:
+                # 한글 품목명으로 재시도
+                for kr in kr_names:
+                    mfds = await fetch_mfds_permit_detail(kr)
+                    if mfds:
+                        break
+
+            if mfds:
+                parts = [f"[국내 허가: {inn}{kr_label}]"]
+                if mfds.get("efficacy"):
+                    parts.append(f"효능: {mfds['efficacy'][:200]}")
+                if mfds.get("dosage"):
+                    parts.append(f"용법: {mfds['dosage'][:150]}")
+                domestic_parts.append(" | ".join(parts))
+            else:
+                domestic_parts.append(f"[국내 허가: {inn}{kr_label}] 식약처 허가정보 미확인")
+
+            # 2. HIRA 급여 확인
+            hira = await fetch_hira_reimbursement(inn)
+            if hira and hira.get("status"):
+                hira_info = f"[국내 급여: {inn}] {hira.get('status_kr', '확인불가')}"
+                if hira.get("price_ceiling"):
+                    hira_info += f", 상한가 {hira['price_ceiling']:,.0f}원"
+                domestic_parts.append(hira_info)
+            else:
+                domestic_parts.append(f"[국내 급여: {inn}] HIRA 등재정보 미확인 — 미등재 가능성")
+
+            # 3. 국내 임상시험 확인 (ClinicalTrials.gov에서 한국 사이트)
+            kr_trial = await _fetch_kr_clinical_trials(inn)
+            if kr_trial:
+                domestic_parts.append(kr_trial)
+
+        if domestic_parts:
+            existing = sig.get("fda_context", "")
+            kr_context = "\n".join(domestic_parts)
+            sig["fda_context"] = f"{existing}\n\n[국내 크로스레퍼런스]\n{kr_context}" if existing else f"[국내 크로스레퍼런스]\n{kr_context}"
+
+        enriched.append(sig)
+
+    return enriched
+
+
+async def _fetch_kr_clinical_trials(inn: str) -> str:
+    """ClinicalTrials.gov에서 한국 사이트 임상시험 검색."""
+    url = "https://clinicaltrials.gov/api/v2/studies"
+    params = {
+        "query.intr": inn,
+        "query.locn": "Korea",
+        "filter.overallStatus": "RECRUITING,ACTIVE_NOT_RECRUITING,ENROLLING_BY_INVITATION",
+        "pageSize": 3,
+        "format": "json",
+        "fields": "NCTId,BriefTitle,Phase,OverallStatus,EnrollmentCount",
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
+            r = await client.get(url, params=params)
+            if r.status_code != 200:
+                return ""
+            data = r.json()
+            studies = data.get("studies", [])
+            if not studies:
+                return ""
+
+            parts = [f"[국내 임상시험: {inn}] {len(studies)}건 진행 중"]
+            for s in studies[:3]:
+                proto = s.get("protocolSection", {})
+                ident = proto.get("identificationModule", {})
+                status = proto.get("statusModule", {})
+                design = proto.get("designModule", {})
+                nct = ident.get("nctId", "")
+                title = ident.get("briefTitle", "")[:60]
+                phase = (design.get("phases") or [""])[0] if design.get("phases") else ""
+                overall = status.get("overallStatus", "")
+                parts.append(f"  - {nct} {phase} ({overall}): {title}")
+
+            return "\n".join(parts)
+
+    except Exception as e:
+        logger.debug("[Enrichment] 국내 임상 검색 실패 (%s): %s", inn, e)
+        return ""
 
 
 # ══════════════════════════════════════════════

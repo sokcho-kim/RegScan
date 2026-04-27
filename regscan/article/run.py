@@ -120,16 +120,34 @@ async def run_articles(days_back: int = 30) -> None:
 
         md = f"# RegScan Daily Articles\n\n> {date_str}\n\n"
         for i, art in enumerate(articles, 1):
-            md += f"## {i}. {art.get('headline', '')}\n\n"
-            md += f"**{art.get('subheadline', '')}**\n\n"
+            grade = art.get("grade", "A")
+            grade_label = {"A": "분석", "B": "해설", "C": "카드"}.get(grade, grade)
+            md += f"## {i}. {art.get('headline', '')} [{grade_label}]\n\n"
+            if grade != "C":
+                md += f"**{art.get('subheadline', '')}**\n\n"
             md += art.get("body", "") + "\n\n"
             if art.get("_guardrail_corrections"):
                 md += f"> guardrail: {len(art['_guardrail_corrections'])} corrections\n\n"
             md += "---\n\n"
 
-        out_path = article_dir / f"articles_{date_str}.md"
+        # 자동 버전 넘버링: 기존 파일 중 가장 높은 버전 + 1
+        existing = list(article_dir.glob(f"articles_{date_str}*.md"))
+        max_ver = 0
+        for f in existing:
+            name = f.stem  # e.g. articles_2026-04-27-v5
+            if "-v" in name:
+                try:
+                    v = int(name.split("-v")[-1])
+                    max_ver = max(max_ver, v)
+                except ValueError:
+                    pass
+            else:
+                # articles_2026-04-27.md (버전 없음) → v1 취급
+                max_ver = max(max_ver, 1)
+        next_ver = max_ver + 1
+        out_path = article_dir / f"articles_{date_str}-v{next_ver}.md"
         out_path.write_text(md, encoding="utf-8")
-        logger.info("저장: %s", out_path)
+        logger.info("저장: %s (v%d)", out_path, next_ver)
 
     duration = (datetime.now() - started).total_seconds()
     logger.info("=== 기사 전용 파이프라인 완료: %d건 (%.1f초) ===", len(articles), duration)
