@@ -180,8 +180,8 @@ async def fetch_mfds_permit_detail(drug_name: str) -> dict[str, str]:
             if not item_seq:
                 return result
 
-            # Step 2: 상세 조회 (item_seq 기반)
-            detail_url = "http://apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnDtlInq04"
+            # Step 2: 상세 조회 (item_seq 기반) — DtlInq06이 정확한 오퍼레이션
+            detail_url = "http://apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnDtlInq06"
             detail_params = {
                 "serviceKey": raw_key,
                 "item_seq": item_seq,
@@ -199,10 +199,10 @@ async def fetch_mfds_permit_detail(drug_name: str) -> dict[str, str]:
 
             ee = item.get("EE_DOC_DATA", "")
             if ee:
-                result["efficacy"] = _clean_html(str(ee))[:500]
+                result["efficacy"] = _parse_mfds_doc(str(ee))[:500]
             ud = item.get("UD_DOC_DATA", "")
             if ud:
-                result["dosage"] = _clean_html(str(ud))[:500]
+                result["dosage"] = _parse_mfds_doc(str(ud))[:500]
 
     except Exception as e:
         logger.debug("[Enrichment] MFDS 허가상세 실패 (%s): %s", drug_name, e)
@@ -745,6 +745,22 @@ def _truncate(text: str, max_len: int) -> str:
     if len(text) <= max_len:
         return text
     return text[:max_len] + "..."
+
+
+def _parse_mfds_doc(xml_text: str) -> str:
+    """MFDS DOC XML (CDATA 포함) → 평문 추출."""
+    # CDATA 내용 추출
+    import re
+    cdata = re.findall(r"<!\[CDATA\[(.*?)\]\]>", xml_text, re.DOTALL)
+    if cdata:
+        text = "\n".join(cdata)
+    else:
+        text = xml_text
+    # XML/HTML 태그 제거
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = html.unescape(text)
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
 
 
 def _clean_html(text: str) -> str:
