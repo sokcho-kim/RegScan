@@ -116,12 +116,21 @@ EDITOR_CHIEF_SYSTEM = """당신은 의약품 전문 매체의 편집장입니다
     "evidence": ["이 방향을 뒷받침하는 근거 1 (소스+수치)", "근거 2", "근거 3"],
     "domestic_angle": "국내 영향 — 허가/급여/R&D/병원실무 중 어떤 관점으로 연결할 것인가",
     "sources_used": ["KIPRIS_PATENT", "NICE_TA", "FDA_LABEL"],
+    "depth": "단신/브리프/분석",
+    "depth_reason": "왜 이 깊이인가 — 분석이려면 배경+차이+영향이 모두 데이터에 있어야",
     "publishable": "가능/보류/불가",
     "publishable_reason": "가능하면 빈칸, 보류/불가면 이유",
     "priority": "high/medium"
   }
 ]
-```"""
+```
+
+### depth 판정 기준
+- **단신**: 사실 1개, 배경·차이·영향 데이터 부족. 3~5문장으로 충분. (예: "식약처 2차 단속 실시")
+- **브리프**: 사실 + 약간의 맥락은 있지만, 비교 데이터나 영향 분석 근거가 부족. 500~700자.
+- **분석**: 사건 + 배경 + 기존 대비 차이 + 영향 대상 + 관찰 포인트가 모두 데이터에 있음. 900자 이상.
+  → 보도자료 본문, 임상 수치, 국내 허가/급여 데이터가 함께 있을 때만 분석.
+  → **데이터가 부족하면 분석으로 올리지 마라. 단신이나 브리프가 낫다.**"""
 
 
 async def agent_editor_chief(
@@ -253,24 +262,48 @@ async def agent_reporter(
         for src_type, sigs in list(signals.items())[:3]:
             relevant_data += format_for_prompt(src_type, sigs) + "\n\n"
 
+    depth = story.get("depth", "브리프")
+
+    # depth별 작성 지시
+    if depth == "분석":
+        depth_instruction = """## 분석 기사 — 반드시 5블록 구조 (900자 이상)
+
+**블록 1. 사건** (1~2문장): 무슨 일이 일어났는가. 핵심 사실 + 수치.
+**블록 2. 배경** (1단락): 왜 이게 중요한가. 이전에 뭐가 있었는가. 미충족 수요, 기존 치료 옵션, 시장 상황.
+**블록 3. 기존과 차이** (1단락): 뭐가 달라졌는가. 기존 약물/제도/기술 대비 구체적 비교. 수치 필수.
+**블록 4. 영향 대상** (1단락): 누가 어떻게 영향받는가. 병원/약국/제약사/환자 중 구체적 대상과 실무 변화.
+**블록 5. 다음 관찰 포인트** (1단락): 앞으로 뭘 봐야 하는가. 국내 허가, 급여, 임상, 경쟁 파이프라인 등.
+
+5블록이 모두 없으면 불합격. 900자 미만이면 불합격."""
+
+    elif depth == "단신":
+        depth_instruction = """## 단신 — 3~5문장
+사실 중심. 해석 최소화. 출처와 날짜 명시. 200~300자."""
+
+    else:  # 브리프
+        depth_instruction = """## 브리프 — 500~700자
+사실 + 간략한 맥락. 국내 관점 1문장. 향후 관찰 포인트 1문장."""
+
     user_prompt = f"""## 편집장 지시
 
+기사 깊이: {depth}
 기사 방향: {story.get('direction', story.get('angle', ''))}
 핵심 메시지: {story.get('core_message', '')}
 헤드라인 초안: {story.get('headline_draft', '')}
 국내 관점: {story.get('domestic_angle', '')}
 근거: {json.dumps(story.get('evidence', story.get('key_facts', [])), ensure_ascii=False)}
 
+{depth_instruction}
+
 ## 원본 데이터
 
 {relevant_data}
 
-## 작성 규칙
-1. **방향이 먼저다.** 편집장이 정한 "기사 방향"에 맞춰 써라. 데이터를 나열하지 마라.
-2. **모든 문단은 "사실 → 해석 → 영향" 구조로.** 사실만 쓰고 끝내지 마라.
-3. **국내 관점 필수.** 편집장이 지정한 domestic_angle을 반드시 반영하라.
-4. **데이터에 없는 내용은 단정하지 마라.** 단, 합리적 해석은 "가능성", "관찰 포인트"로 구분해 작성.
-5. **기사 말미에 "향후 관찰 포인트"를 반드시 포함하라.** (국내 허가, 급여 등재, 임상 결과, 병원 실무 영향 등)"""
+## 공통 규칙
+1. **방향이 먼저다.** 편집장이 정한 방향에 맞춰 써라. 데이터를 나열하지 마라.
+2. **컬럼 나열 금지.** "FDA 승인 정보는 PRIORITY로 분류, 일자는 X" → 이건 데이터 덤프. 해석하라.
+3. **국내 관점 필수.** domestic_angle을 반드시 반영.
+4. **데이터에 없는 건 단정하지 마라.** 합리적 해석은 "가능성", "관찰 포인트"로."""
 
     response = await _call_llm(REPORTER_SYSTEM, user_prompt)
     article = _extract_json(response)
