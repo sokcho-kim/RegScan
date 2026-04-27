@@ -273,6 +273,63 @@ async def fetch_clinical_trial(nct_id: str) -> dict[str, Any]:
 
 
 # ══════════════════════════════════════════════
+# 1-E. HIRA 급여/약가 (SQLite DB 조회)
+# ══════════════════════════════════════════════
+
+async def fetch_hira_reimbursement(inn: str) -> dict[str, Any]:
+    """HIRA 급여 상태 + 상한가 조회 (로컬 DB).
+
+    Returns:
+        {
+            "status": "reimbursed" / "not_covered" / "not_found",
+            "status_kr": "급여" / "비급여" / "미등재",
+            "price_ceiling": 45652.0,
+            "ingredient_code": "626103ATB",
+        }
+    """
+    import sqlite3
+    from pathlib import Path
+
+    db_path = Path(settings.BASE_DIR) / "data" / "regscan.db"
+    if not db_path.exists():
+        return {}
+
+    result: dict[str, Any] = {}
+    try:
+        conn = sqlite3.connect(str(db_path))
+        conn.row_factory = sqlite3.Row
+        row = conn.execute(
+            """SELECT hr.status, hr.price_ceiling, hr.ingredient_code
+               FROM hira_reimbursements hr
+               JOIN drugs d ON hr.drug_id = d.id
+               WHERE UPPER(d.inn) = ?
+               LIMIT 1""",
+            (inn.upper(),),
+        ).fetchone()
+        conn.close()
+
+        if row:
+            status = row["status"]
+            status_map = {
+                "reimbursed": "급여",
+                "not_covered": "비급여",
+                "not_found": "미등재",
+                "deleted": "삭제",
+            }
+            result["status"] = status
+            result["status_kr"] = status_map.get(status, status)
+            if row["price_ceiling"]:
+                result["price_ceiling"] = row["price_ceiling"]
+            if row["ingredient_code"]:
+                result["ingredient_code"] = row["ingredient_code"]
+
+    except Exception as e:
+        logger.debug("[Enrichment] HIRA 조회 실패 (%s): %s", inn, e)
+
+    return result
+
+
+# ══════════════════════════════════════════════
 # 2. 식약처 e약은요 — 한글 효능/용법/부작용
 # ══════════════════════════════════════════════
 
@@ -488,6 +545,14 @@ async def _enrich_drug_signals(
                 context_parts.append(f"[식약처 효능효과] {mfds['efficacy'][:300]}")
             if mfds.get("dosage"):
                 context_parts.append(f"[식약처 용법용량] {mfds['dosage'][:200]}")
+
+        # HIRA 급여/약가
+        hira = await fetch_hira_reimbursement(inn)
+        if hira:
+            hira_parts = [f"국내 급여상태: {hira.get('status_kr', '확인불가')}"]
+            if hira.get("price_ceiling"):
+                hira_parts.append(f"상한가: {hira['price_ceiling']:,.0f}원")
+            context_parts.append(f"[국내 급여] {', '.join(hira_parts)}")
 
         if context_parts:
             sig["fda_context"] = "\n".join(context_parts)
