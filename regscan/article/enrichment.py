@@ -82,6 +82,197 @@ async def fetch_fda_label_full(inn: str) -> dict[str, str]:
 
 
 # ══════════════════════════════════════════════
+# 1-B. openFDA 승인 이력 (Priority/Standard, 스폰서)
+# ══════════════════════════════════════════════
+
+async def fetch_fda_approval_history(inn: str) -> dict[str, Any]:
+    """openFDA drug/drugsfda에서 승인 이력 조회.
+
+    Returns:
+        {
+            "sponsor": "ROCHE",
+            "approval_date": "2024-03-15",
+            "review_type": "Priority",
+            "application_number": "NDA215310",
+        }
+    """
+    url = "https://api.fda.gov/drug/drugsfda.json"
+    params: dict[str, Any] = {
+        "search": f'openfda.generic_name:"{inn}"',
+        "limit": 1,
+    }
+    if settings.FDA_API_KEY:
+        params["api_key"] = settings.FDA_API_KEY
+
+    result: dict[str, Any] = {}
+    try:
+        async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
+            r = await client.get(url, params=params)
+            if r.status_code != 200:
+                return result
+            data = r.json()
+            results = data.get("results", [])
+            if not results:
+                return result
+            drug = results[0]
+
+            result["sponsor"] = drug.get("sponsor_name", "")
+            app_num = drug.get("application_number", "")
+            result["application_number"] = app_num
+
+            # 최신 submission에서 review type 추출
+            submissions = drug.get("submissions", [])
+            if submissions:
+                latest = submissions[0]
+                result["review_type"] = latest.get("review_priority", "")
+                sub_date = latest.get("submission_status_date", "")
+                if sub_date and len(sub_date) == 8:
+                    result["approval_date"] = f"{sub_date[:4]}-{sub_date[4:6]}-{sub_date[6:8]}"
+
+    except Exception as e:
+        logger.debug("[Enrichment] FDA approval history 실패 (%s): %s", inn, e)
+
+    return result
+
+
+# ══════════════════════════════════════════════
+# 1-C. MFDS 허가 상세 (효능효과/용법용량)
+# ══════════════════════════════════════════════
+
+async def fetch_mfds_permit_detail(drug_name: str) -> dict[str, str]:
+    """MFDS 허가 상세 — 허가정보 목록에서 item_seq 확보 → 상세 조회.
+
+    Args:
+        drug_name: 약물명 (INN 영문 또는 한글 품목명)
+
+    Returns:
+        {"efficacy": "...", "dosage": "..."}
+    """
+    if not settings.DATA_GO_KR_API_KEY:
+        return {}
+
+    from urllib.parse import unquote
+    raw_key = unquote(settings.DATA_GO_KR_API_KEY)
+
+    # Step 1: 허가정보 목록에서 item_seq 확보
+    list_url = "http://apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnInq07"
+    list_params = {
+        "serviceKey": raw_key,
+        "item_name": drug_name,
+        "type": "json",
+        "numOfRows": 1,
+        "pageNo": 1,
+    }
+
+    result: dict[str, str] = {}
+    try:
+        async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
+            r1 = await client.get(list_url, params=list_params)
+            if r1.status_code != 200:
+                return result
+            data1 = r1.json()
+            body1 = data1.get("body", data1)
+            items1 = body1.get("items", [])
+            if not items1:
+                return result
+            first = items1[0] if isinstance(items1, list) else items1
+            item_seq = first.get("ITEM_SEQ", "")
+            if not item_seq:
+                return result
+
+            # Step 2: 상세 조회 (item_seq 기반)
+            detail_url = "http://apis.data.go.kr/1471000/DrugPrdtPrmsnInfoService07/getDrugPrdtPrmsnDtlInq04"
+            detail_params = {
+                "serviceKey": raw_key,
+                "item_seq": item_seq,
+                "type": "json",
+            }
+            r2 = await client.get(detail_url, params=detail_params)
+            if r2.status_code != 200:
+                return result
+            data2 = r2.json()
+            body2 = data2.get("body", data2)
+            items2 = body2.get("items", [])
+            if not items2:
+                return result
+            item = items2[0] if isinstance(items2, list) else items2
+
+            ee = item.get("EE_DOC_DATA", "")
+            if ee:
+                result["efficacy"] = _clean_html(str(ee))[:500]
+            ud = item.get("UD_DOC_DATA", "")
+            if ud:
+                result["dosage"] = _clean_html(str(ud))[:500]
+
+    except Exception as e:
+        logger.debug("[Enrichment] MFDS 허가상세 실패 (%s): %s", drug_name, e)
+
+    return result
+
+
+# ══════════════════════════════════════════════
+# 1-D. ClinicalTrials.gov NCT 상세
+# ══════════════════════════════════════════════
+
+async def fetch_clinical_trial(nct_id: str) -> dict[str, Any]:
+    """ClinicalTrials.gov v2 API에서 임상시험 상세 조회.
+
+    Returns:
+        {
+            "title": "...",
+            "phase": "Phase 3",
+            "status": "Recruiting",
+            "enrollment": 1200,
+            "primary_outcome": "Progression-free survival",
+            "start_date": "2024-01",
+            "completion_date": "2027-06",
+        }
+    """
+    if not nct_id or not nct_id.startswith("NCT"):
+        return {}
+
+    url = f"https://clinicaltrials.gov/api/v2/studies/{nct_id}"
+    params = {
+        "fields": "NCTId,BriefTitle,Phase,OverallStatus,EnrollmentCount,"
+                  "PrimaryOutcomeMeasure,StartDate,CompletionDate",
+        "format": "json",
+    }
+
+    result: dict[str, Any] = {}
+    try:
+        async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
+            r = await client.get(url, params=params)
+            if r.status_code != 200:
+                return result
+            data = r.json()
+
+            proto = data.get("protocolSection", {})
+            ident = proto.get("identificationModule", {})
+            status_mod = proto.get("statusModule", {})
+            design = proto.get("designModule", {})
+            outcomes = proto.get("outcomesModule", {})
+
+            result["title"] = ident.get("briefTitle", "")
+            result["phase"] = (design.get("phases") or [""])[0] if design.get("phases") else ""
+            result["status"] = status_mod.get("overallStatus", "")
+            result["enrollment"] = design.get("enrollmentInfo", {}).get("count", 0)
+
+            primary = outcomes.get("primaryOutcomes", [])
+            if primary:
+                result["primary_outcome"] = primary[0].get("measure", "")
+
+            start = status_mod.get("startDateStruct", {})
+            result["start_date"] = start.get("date", "")
+            comp = status_mod.get("completionDateStruct", {})
+            result["completion_date"] = comp.get("date", "")
+
+    except Exception as e:
+        logger.debug("[Enrichment] ClinicalTrials.gov 실패 (%s): %s", nct_id, e)
+
+    return result
+
+
+# ══════════════════════════════════════════════
 # 2. 식약처 e약은요 — 한글 효능/용법/부작용
 # ══════════════════════════════════════════════
 
@@ -252,7 +443,7 @@ async def enrich_signals(
 async def _enrich_drug_signals(
     sigs: list[dict],
 ) -> list[dict]:
-    """약물명이 있는 시그널에 FDA label + e약은요 데이터 추가."""
+    """약물명이 있는 시그널에 글로벌 심사 데이터 추가."""
     enriched = []
     seen_inns: set[str] = set()
 
@@ -263,20 +454,43 @@ async def _enrich_drug_signals(
             continue
         seen_inns.add(inn)
 
-        # FDA label
+        context_parts = []
+
+        # FDA label (적응증/용법/임상/부작용)
         label = await fetch_fda_label_full(inn)
         if label:
-            context_parts = []
             if label.get("indications"):
-                context_parts.append(f"[적응증] {label['indications'][:300]}")
+                context_parts.append(f"[FDA 적응증] {label['indications'][:300]}")
             if label.get("dosage"):
-                context_parts.append(f"[용법] {label['dosage'][:200]}")
+                context_parts.append(f"[FDA 용법] {label['dosage'][:200]}")
             if label.get("clinical_studies"):
-                context_parts.append(f"[임상시험] {label['clinical_studies'][:500]}")
+                context_parts.append(f"[FDA 임상시험] {label['clinical_studies'][:500]}")
             if label.get("adverse_reactions"):
-                context_parts.append(f"[부작용] {label['adverse_reactions'][:200]}")
-            if context_parts:
-                sig["fda_context"] = "\n".join(context_parts)
+                context_parts.append(f"[FDA 부작용] {label['adverse_reactions'][:200]}")
+
+        # FDA 승인 이력 (Priority/Standard)
+        approval = await fetch_fda_approval_history(inn)
+        if approval:
+            parts = []
+            if approval.get("review_type"):
+                parts.append(f"심사유형: {approval['review_type']}")
+            if approval.get("approval_date"):
+                parts.append(f"승인일: {approval['approval_date']}")
+            if approval.get("sponsor"):
+                parts.append(f"스폰서: {approval['sponsor']}")
+            if parts:
+                context_parts.append(f"[FDA 승인이력] {', '.join(parts)}")
+
+        # MFDS 허가 상세 (한글 효능효과/용법)
+        mfds = await fetch_mfds_permit_detail(inn)
+        if mfds:
+            if mfds.get("efficacy"):
+                context_parts.append(f"[식약처 효능효과] {mfds['efficacy'][:300]}")
+            if mfds.get("dosage"):
+                context_parts.append(f"[식약처 용법용량] {mfds['dosage'][:200]}")
+
+        if context_parts:
+            sig["fda_context"] = "\n".join(context_parts)
 
         enriched.append(sig)
 
@@ -439,15 +653,44 @@ async def _enrich_kipris_patent(
 
         if matched_inn and matched_inn not in seen_inns:
             seen_inns.add(matched_inn)
+            context_parts = [f"[참조 약물: {matched_inn}]"]
+
+            # FDA label
             label = await fetch_fda_label_full(matched_inn)
             if label:
-                context_parts = [f"[참조 약물: {matched_inn}]"]
                 if label.get("indications"):
                     context_parts.append(f"[적응증] {label['indications'][:300]}")
                 if label.get("clinical_studies"):
                     context_parts.append(f"[임상시험] {label['clinical_studies'][:400]}")
-                if context_parts:
-                    sig["fda_context"] = "\n".join(context_parts)
+
+            # FDA 승인 이력
+            approval = await fetch_fda_approval_history(matched_inn)
+            if approval and approval.get("review_type"):
+                context_parts.append(
+                    f"[FDA 승인] {approval.get('review_type', '')}, "
+                    f"{approval.get('approval_date', '')}, "
+                    f"스폰서: {approval.get('sponsor', '')}"
+                )
+
+            # NCT 번호가 clinical_studies에 있으면 상세 조회
+            clinical_text = label.get("clinical_studies", "") if label else ""
+            nct_match = re.search(r"(NCT\d{8})", clinical_text)
+            if nct_match:
+                trial = await fetch_clinical_trial(nct_match.group(1))
+                if trial:
+                    trial_parts = [f"[임상 상세: {nct_match.group(1)}]"]
+                    if trial.get("phase"):
+                        trial_parts.append(f"Phase: {trial['phase']}")
+                    if trial.get("enrollment"):
+                        trial_parts.append(f"참여자: {trial['enrollment']}명")
+                    if trial.get("primary_outcome"):
+                        trial_parts.append(f"주요 평가변수: {trial['primary_outcome']}")
+                    if trial.get("status"):
+                        trial_parts.append(f"상태: {trial['status']}")
+                    context_parts.append(" | ".join(trial_parts))
+
+            if len(context_parts) > 1:
+                sig["fda_context"] = "\n".join(context_parts)
 
         enriched.append(sig)
 
