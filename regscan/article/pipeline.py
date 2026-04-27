@@ -472,10 +472,11 @@ async def generate_articles(
         body = article.get("body", "")
         failures = []
 
+        min_len = {"분석": 1200, "브리프": 700, "단신": 150}.get(depth, 700)
+        if len(body) < min_len:
+            failures.append(f"길이 부족: {len(body)}자 (최소 {min_len}자)")
+
         if depth == "분석":
-            # 길이 체크
-            if len(body) < 1200:
-                failures.append(f"길이 부족: {len(body)}자 (최소 1200자)")
 
             # 국내 관점 키워드
             domestic_keywords = ["국내", "허가", "급여", "심평원", "식약처", "건보", "병원", "약가"]
@@ -562,15 +563,17 @@ async def generate_articles(
             # Agent 4: 편집자 + 후처리
             final = post_process_article(await agent_copy_editor(checked))
             depth = story.get("depth", "분석")
+            # GNW 보도자료 본문이 있으면 분석으로 강제
+            if "GNW_PRESS" in sources_used:
+                depth = "분석"
 
             # Agent 5: 품질 검증 — 후처리 완료된 최종본 기준
             body_len = len(final.get("body", ""))
             logger.info("  기사 #%d body=%d자, depth=%s",
                         story.get("story_id", 0), body_len, depth)
 
-            if depth == "분석":
-                quality = _evaluate_quality(final, depth)
-                if not quality["pass"]:
+            quality = _evaluate_quality(final, depth)
+            if depth in ("분석", "브리프") and not quality["pass"]:
                     logger.info(
                         "  기사 #%d 품질 미달 (%s), 재작성",
                         story.get("story_id", 0),
