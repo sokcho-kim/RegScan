@@ -26,21 +26,7 @@ logger = logging.getLogger(__name__)
 # ── LLM 호출 공통 ──
 
 async def _call_llm(system: str, user: str, temperature: float = 0.3) -> str:
-    """LLM 호출 (Gemini Pro 우선, OpenAI 폴백) — 기사용은 긴 출력이 중요"""
-    # Gemini 2.5 Pro 우선 (긴 출력 + 지시 준수)
-    if getattr(settings, "GEMINI_API_KEY", None):
-        try:
-            from google import genai
-            client = genai.Client(api_key=settings.GEMINI_API_KEY)
-            resp = client.models.generate_content(
-                model="gemini-2.5-pro",
-                contents=f"{system}\n\n{user}",
-            )
-            return resp.text or ""
-        except Exception as e:
-            logger.warning("Gemini Pro 호출 실패, OpenAI 폴백: %s", e)
-
-    # OpenAI 폴백
+    """LLM 호출 (OpenAI, max_completion_tokens=4096)"""
     if settings.OPENAI_API_KEY:
         try:
             from openai import AsyncOpenAI
@@ -52,6 +38,7 @@ async def _call_llm(system: str, user: str, temperature: float = 0.3) -> str:
                     {"role": "user", "content": user},
                 ],
                 temperature=temperature,
+                max_completion_tokens=4096,
             )
             return resp.choices[0].message.content or ""
         except Exception as e:
