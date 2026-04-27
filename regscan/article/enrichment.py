@@ -500,23 +500,63 @@ async def _enrich_drug_signals(
 async def _enrich_assembly_bill(
     sigs: list[dict],
 ) -> list[dict]:
-    """법안 시그널에 제안이유/주요내용 추가 (상위 3건만)."""
+    """법안 시그널에 제안이유 크롤링 + LLM 3문장 요약 + 원문 링크."""
     enriched = []
     fetched = 0
 
     for sig in sigs:
-        if fetched < 3:
+        if fetched < 5:
             bill_url = sig.get("url", "")
             if bill_url:
-                summary = await fetch_bill_summary(bill_url)
-                if summary:
-                    sig["fda_context"] = f"[제안이유 및 주요내용]\n{summary}"
+                raw_reason = await fetch_bill_summary(bill_url)
+                if raw_reason:
+                    # LLM 3문장 요약
+                    summary = await _summarize_bill_reason(raw_reason)
+                    context = f"[제안이유 요약]\n{summary}" if summary else f"[제안이유 원문]\n{raw_reason[:800]}"
+                    # 원문 링크 추가
+                    context += f"\n[원문 링크] {bill_url}"
+                    sig["fda_context"] = context
                     fetched += 1
-                    logger.info("[Enrichment] 법안 상세 수집: %s", sig.get("title", "")[:30])
+                    logger.info("[Enrichment] 법안 요약: %s", sig.get("title", "")[:30])
 
         enriched.append(sig)
 
     return enriched
+
+
+async def _summarize_bill_reason(raw_text: str) -> str:
+    """제안이유를 기자가 쓸 수 있는 3문장으로 요약."""
+    if not raw_text or len(raw_text) < 50:
+        return ""
+
+    prompt = f"""다음은 법률 개정안의 제안이유 및 주요내용입니다.
+기자가 기사에 바로 쓸 수 있도록 정확히 3문장으로 요약하세요.
+
+1문장: 현행법의 문제점 (왜 바꾸려는지)
+2문장: 개정안의 핵심 변경 내용 (뭐가 바뀌는지, 조항 번호 포함)
+3문장: 영향받는 대상/기관 (누가 영향받는지)
+
+법률 용어는 일상어로 바꾸되, 조항 번호(안 제XX조)는 유지하세요.
+3문장 외에 다른 말은 쓰지 마세요.
+
+제안이유:
+{raw_text[:2000]}"""
+
+    try:
+        if settings.OPENAI_API_KEY:
+            from openai import AsyncOpenAI
+            client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+            resp = await client.chat.completions.create(
+                model=getattr(settings, "LLM_MODEL", "gpt-5.2"),
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,
+                max_completion_tokens=300,
+            )
+            return (resp.choices[0].message.content or "").strip()
+    except Exception as e:
+        logger.debug("[Enrichment] 법안 요약 LLM 실패: %s", e)
+
+    return ""
 
 
 async def _enrich_mfds_press(
