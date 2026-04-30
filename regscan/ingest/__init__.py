@@ -73,6 +73,14 @@ from .khidi_news import KHIDIPharmaNewsIngestor
 from .khidi_global import KHIDIGlobalInfoIngestor
 from .mfds_press import MFDSPressIngestor
 from .globenewswire import GlobeNewsWireIngestor
+from .hira_drug_info import (
+    HIRADrugInfoIngestor,
+    HIRADrugCommitteeIngestor,
+    HIRACancerNoticeIngestor,
+    HIRADrugListIngestor,
+    DrugInfoConfig,
+    DRUG_INFO_BOARDS,
+)
 
 __all__ = [
     "BaseIngestor",
@@ -155,4 +163,11 @@ __all__ = [
     "MFDSPressIngestor",
     # GlobeNewsWire
     "GlobeNewsWireIngestor",
+    # HIRA Drug Info (약제 기준정보 9개 게시판)
+    "HIRADrugInfoIngestor",
+    "HIRADrugCommitteeIngestor",
+    "HIRACancerNoticeIngestor",
+    "HIRADrugListIngestor",
+    "DrugInfoConfig",
+    "DRUG_INFO_BOARDS",
 ]

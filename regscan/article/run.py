@@ -3,12 +3,15 @@
 Usage:
     python -m regscan.article.run
     python -m regscan.article.run --days-back 14
+    python -m regscan.article.run --save-signals          # 수집 후 시그널 저장
+    python -m regscan.article.run --load-signals PATH     # 저장된 시그널로 기사 생성
 """
 
 from __future__ import annotations
 
 import asyncio
 import argparse
+import json
 import logging
 from datetime import datetime
 from pathlib import Path
@@ -20,9 +23,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-async def run_articles(days_back: int = 30) -> None:
+async def run_articles(
+    days_back: int = 30,
+    save_signals: bool = False,
+    load_signals: str | None = None,
+) -> None:
     """보조 소스 전체 수집 → 시그널 추출 → 엔리칭 → 4-Agent 기사 생성."""
-    from regscan.batch.pipeline import _run_ingestor
     from regscan.stream.intelligence_signals import extract_signals
     from regscan.article.pipeline import generate_articles
     from regscan.config import settings
@@ -30,80 +36,111 @@ async def run_articles(days_back: int = 30) -> None:
     started = datetime.now()
     logger.info("=== 기사 전용 파이프라인 시작 (days_back=%d) ===", days_back)
 
-    # ── 전체 보조 소스 수집 (PMDA/NICE 포함) ──
-    _aux_sources = []
+    # ── 시그널 확보: 저장본 로드 또는 신규 수집 ──
+    signal_dir = settings.BASE_DIR / "output" / "signals"
+    signal_dir.mkdir(parents=True, exist_ok=True)
 
-    if settings.ENABLE_PMDA:
-        from regscan.ingest.pmda import (
-            PMDAReviewIngestor, PMDASafetyIngestor, PMDAApprovalIngestor,
-        )
-        _aux_sources += [
-            (PMDAReviewIngestor, {"days_back": days_back}, "PMDA_REVIEW"),
-            (PMDASafetyIngestor, {"days_back": days_back}, "PMDA_SAFETY"),
-            (PMDAApprovalIngestor, {"years": 1, "days_back": days_back}, "PMDA_APPROVAL"),
-        ]
-    if settings.ENABLE_NICE_HTA:
-        from regscan.ingest.nice import NICERecentTAIngestor
-        _aux_sources.append(
-            (NICERecentTAIngestor, {"years_back": 2}, "NICE_TA"),
-        )
-    if settings.ENABLE_MFDS_SAFETY:
-        from regscan.ingest.mfds_safety import MFDSSafetyLetterIngestor
-        _aux_sources.append(
-            (MFDSSafetyLetterIngestor, {"days_back": days_back}, "MFDS_SAFETY_LETTER"),
-        )
-    if settings.ENABLE_MOHW_INSURANCE:
-        from regscan.ingest.mohw_insurance import MOHWHealthInsuranceIngestor
-        _aux_sources.append(
-            (MOHWHealthInsuranceIngestor, {"days_back": days_back}, "MOHW_HEALTH_INSURANCE"),
-        )
-    if settings.ENABLE_ASSEMBLY_BILL:
-        from regscan.ingest.assembly import AssemblyBillIngestor
-        _aux_sources.append(
-            (AssemblyBillIngestor, {"days_back": days_back}, "ASSEMBLY_BILL"),
-        )
-    if settings.ENABLE_DART:
-        from regscan.ingest.dart import DARTDisclosureIngestor
-        _aux_sources.append(
-            (DARTDisclosureIngestor, {"days_back": days_back}, "DART_DISCLOSURE"),
-        )
-    if settings.ENABLE_KIPRIS:
-        from regscan.ingest.kipris import KIPRISPatentIngestor
-        _aux_sources.append(
-            (KIPRISPatentIngestor, {"years": 3}, "KIPRIS_PATENT"),
-        )
-    if settings.ENABLE_KHIDI_NEWS:
-        from regscan.ingest.khidi_news import KHIDIPharmaNewsIngestor
-        _aux_sources.append(
-            (KHIDIPharmaNewsIngestor, {"days_back": 7}, "KHIDI_PHARMA_NEWS"),
-        )
-    if settings.ENABLE_MFDS_SAFETY:
-        from regscan.ingest.mfds_press import MFDSPressIngestor
-        _aux_sources.append(
-            (MFDSPressIngestor, {"days_back": 14}, "MFDS_PRESS"),
-        )
-    if settings.ENABLE_KHIDI_GLOBAL:
-        from regscan.ingest.khidi_global import KHIDIGlobalInfoIngestor
-        _aux_sources.append(
-            (KHIDIGlobalInfoIngestor, {"days_back": days_back}, "KHIDI_GLOBAL_INFO"),
-        )
-    if settings.ENABLE_GNW_PRESS:
-        from regscan.ingest.globenewswire import GlobeNewsWireIngestor
-        _aux_sources.append(
-            (GlobeNewsWireIngestor, {"days_back": 7}, "GNW_PRESS"),
-        )
+    if load_signals:
+        # 저장된 시그널 로드 — 수집 스킵
+        sig_path = Path(load_signals)
+        if not sig_path.exists():
+            logger.error("시그널 파일 없음: %s", sig_path)
+            return
+        signals = json.loads(sig_path.read_text(encoding="utf-8"))
+        logger.info("=== 저장된 시그널 로드: %s ===", sig_path.name)
+        for k, v in signals.items():
+            logger.info("  %s: %d건", k, len(v))
+    else:
+        # 신규 수집
+        from regscan.batch.pipeline import _run_ingestor
 
-    # ── 수집 ──
-    aux_data: dict[str, list] = {}
-    for cls, kwargs, src_type in _aux_sources:
-        data = await _run_ingestor(cls, kwargs, src_type, "article-run")
-        aux_data[src_type.lower()] = data
+        _aux_sources = []
 
-    # ── 시그널 추출 ──
-    signals = extract_signals(aux_data)
-    logger.info("시그널 소스 %d개:", len(signals))
-    for k, v in signals.items():
-        logger.info("  %s: %d건", k, len(v))
+        if settings.ENABLE_PMDA:
+            from regscan.ingest.pmda import (
+                PMDAReviewIngestor, PMDASafetyIngestor, PMDAApprovalIngestor,
+            )
+            _aux_sources += [
+                (PMDAReviewIngestor, {"days_back": days_back}, "PMDA_REVIEW"),
+                (PMDASafetyIngestor, {"days_back": days_back}, "PMDA_SAFETY"),
+                (PMDAApprovalIngestor, {"years": 1, "days_back": days_back}, "PMDA_APPROVAL"),
+            ]
+        if settings.ENABLE_NICE_HTA:
+            from regscan.ingest.nice import NICERecentTAIngestor
+            _aux_sources.append(
+                (NICERecentTAIngestor, {"years_back": 2}, "NICE_TA"),
+            )
+        if settings.ENABLE_MFDS_SAFETY:
+            from regscan.ingest.mfds_safety import MFDSSafetyLetterIngestor
+            _aux_sources.append(
+                (MFDSSafetyLetterIngestor, {"days_back": days_back}, "MFDS_SAFETY_LETTER"),
+            )
+        if settings.ENABLE_MOHW_INSURANCE:
+            from regscan.ingest.mohw_insurance import MOHWHealthInsuranceIngestor
+            _aux_sources.append(
+                (MOHWHealthInsuranceIngestor, {"days_back": days_back}, "MOHW_HEALTH_INSURANCE"),
+            )
+        if settings.ENABLE_ASSEMBLY_BILL:
+            from regscan.ingest.assembly import AssemblyBillIngestor
+            _aux_sources.append(
+                (AssemblyBillIngestor, {"days_back": days_back}, "ASSEMBLY_BILL"),
+            )
+        if settings.ENABLE_DART:
+            from regscan.ingest.dart import DARTDisclosureIngestor
+            _aux_sources.append(
+                (DARTDisclosureIngestor, {"days_back": days_back}, "DART_DISCLOSURE"),
+            )
+        if settings.ENABLE_KIPRIS:
+            from regscan.ingest.kipris import KIPRISPatentIngestor
+            _aux_sources.append(
+                (KIPRISPatentIngestor, {"years": 3}, "KIPRIS_PATENT"),
+            )
+        if settings.ENABLE_KHIDI_NEWS:
+            from regscan.ingest.khidi_news import KHIDIPharmaNewsIngestor
+            _aux_sources.append(
+                (KHIDIPharmaNewsIngestor, {"days_back": 7}, "KHIDI_PHARMA_NEWS"),
+            )
+        if settings.ENABLE_MFDS_SAFETY:
+            from regscan.ingest.mfds_press import MFDSPressIngestor
+            _aux_sources.append(
+                (MFDSPressIngestor, {"days_back": 14}, "MFDS_PRESS"),
+            )
+        if settings.ENABLE_KHIDI_GLOBAL:
+            from regscan.ingest.khidi_global import KHIDIGlobalInfoIngestor
+            _aux_sources.append(
+                (KHIDIGlobalInfoIngestor, {"days_back": days_back}, "KHIDI_GLOBAL_INFO"),
+            )
+        if settings.ENABLE_GNW_PRESS:
+            from regscan.ingest.globenewswire import GlobeNewsWireIngestor
+            _aux_sources.append(
+                (GlobeNewsWireIngestor, {"days_back": 7}, "GNW_PRESS"),
+            )
+
+        # ── 수집 ──
+        aux_data: dict[str, list] = {}
+        for cls, kwargs, src_type in _aux_sources:
+            data = await _run_ingestor(cls, kwargs, src_type, "article-run")
+            aux_data[src_type.lower()] = data
+
+        # ── 시그널 추출 ──
+        signals = extract_signals(aux_data)
+        logger.info("시그널 소스 %d개:", len(signals))
+        for k, v in signals.items():
+            logger.info("  %s: %d건", k, len(v))
+
+        if not signals:
+            logger.warning("시그널 없음 — 기사 생성 중단")
+            return
+
+        # ── 시그널 저장 (--save-signals) ──
+        if save_signals:
+            date_str = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+            sig_path = signal_dir / f"signals_{date_str}.json"
+            sig_path.write_text(
+                json.dumps(signals, ensure_ascii=False, indent=2, default=str),
+                encoding="utf-8",
+            )
+            logger.info("=== 시그널 저장: %s ===", sig_path)
 
     if not signals:
         logger.warning("시그널 없음 — 기사 생성 중단")
@@ -156,8 +193,16 @@ async def run_articles(days_back: int = 30) -> None:
 def main():
     parser = argparse.ArgumentParser(description="기사 전용 파이프라인")
     parser.add_argument("--days-back", type=int, default=30)
+    parser.add_argument("--save-signals", action="store_true",
+                        help="수집 후 시그널을 output/signals/에 JSON 저장")
+    parser.add_argument("--load-signals", type=str, default=None,
+                        help="저장된 시그널 JSON 경로 — 수집 스킵하고 기사만 생성")
     args = parser.parse_args()
-    asyncio.run(run_articles(days_back=args.days_back))
+    asyncio.run(run_articles(
+        days_back=args.days_back,
+        save_signals=args.save_signals,
+        load_signals=args.load_signals,
+    ))
 
 
 if __name__ == "__main__":

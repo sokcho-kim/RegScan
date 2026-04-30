@@ -1,10 +1,13 @@
-"""기사 생성 에이전트 파이프라인 v2
+"""기사 생성 에이전트 파이프라인 v3 (2-Pass)
 
-4-Agent Loop (전문지 기사체):
-  1. Editor-in-Chief: 핵심 이슈 1개 중심 스토리 선별
-  2. Reporter: 사실→의미→영향→전망 구조의 기사 초안
+5-Agent Pipeline (전문지 기사체):
+  1. Editor-in-Chief: 핵심 이슈 중심 스토리 선별 + 등급/슬롯 지정
+  2. Reporter: 사실→의미→영향→전망 구조의 기사 초안 (1st Pass)
   3. Fact-Checker: 결측 제거 + 지시문 제거 + 수치 검증
-  4. Copy-Editor: 제목-리드-본문 메시지 일치 + 최종 정제
+  4. Structure-Validator: 슬롯 기반 구조 누락 검증 + 삽입 (2nd Pass)
+  5. Copy-Editor: 제목-리드-본문 메시지 일치 + 최종 정제
+
+v2→v3 변경: 3회 보강 루프 제거, 구조검증기 추가로 1회 서술+1회 검증 구조
 
 품질 기준: docs/research/article-reference/article-quality-spec.md
 레퍼런스: 약업신문 + 뉴시스 산업 기사 톤
@@ -345,7 +348,8 @@ async def agent_reporter(
 1. **방향이 먼저다.** 편집장이 정한 방향에 맞춰 써라. 데이터를 나열하지 마라.
 2. **컬럼 나열 금지.** "FDA 승인 정보는 PRIORITY로 분류, 일자는 X" → 이건 데이터 덤프. 해석하라.
 3. **국내 관점 필수.** domestic_angle을 반드시 반영.
-4. **데이터에 없는 건 단정하지 마라.** 합리적 해석은 "가능성", "관찰 포인트"로."""
+4. **국내 크로스레퍼런스 활용.** 원본 데이터에 국내 허가·급여·임상 태그가 있으면 기사에 녹여라.
+5. **데이터에 없는 건 단정하지 마라.** 합리적 해석은 "가능성", "관찰 포인트"로."""
 
     response = await _call_llm(REPORTER_SYSTEM, user_prompt)
     article = _extract_json(response)
@@ -418,6 +422,136 @@ async def agent_fact_checker(
 
 
 # ══════════════════════════════════════════════
+# Agent 5: 구조검증기 — 2nd Pass 슬롯 검증+삽입
+# ══════════════════════════════════════════════
+
+STRUCTURE_VALIDATOR_SYSTEM = """당신은 의약품 전문 매체의 구조검증 편집자입니다.
+
+## 역할
+기자가 쓴 기사(1st Pass)를 받아, **빠진 구조 요소를 원본 데이터에서 찾아 삽입**합니다.
+기사를 다시 쓰는 것이 아닙니다. 기존 기사의 흐름을 유지하면서, 누락된 슬롯만 채워 넣습니다.
+
+## 검증 슬롯 (A등급)
+
+### 슬롯 1: 핵심 정보 (structural_info)
+편집장이 지정한 핵심 정보가 본문에 있는가?
+- 수치, 건수, 비율 등 구체적 팩트가 본문에 반영돼야 함
+- 누락 시: 원본 데이터에서 해당 정보를 찾아 가장 적절한 단락에 삽입
+
+### 슬롯 2: 국내 관점 (domestic_angle)
+국내 허가·급여·R&D·병원실무 중 1개 이상 **구체적** 언급이 있는가?
+- "국내에서도 주목된다" 수준은 불합격 — 약물명+허가상태/급여상태/상한가/임상 단계 등 구체적 팩트 필요
+- 누락 시: 원본 데이터의 [국내 크로스레퍼런스] 태그에서 추출하여 영향 대상 단락 뒤에 삽입
+
+### 슬롯 3: 근거 반영 (evidence)
+편집장이 제시한 근거(evidence)가 본문에 반영됐는가?
+- 소스+수치가 본문 어딘가에 있어야 함
+- 누락 시: 해당 근거를 배경 또는 대표 사례 단락에 삽입
+
+### 슬롯 4: 비교 블록
+"A vs B" 형태의 수치 비교가 있는가?
+- "기존 X → 현재 Y", "A 대비 B", "전작 대비" 등
+- 누락 시: 원본 데이터에서 비교 가능한 수치 쌍을 찾아 맥락/비교 단락에 삽입
+- 원본에 비교 데이터 없으면 "N/A" 표기
+
+### 슬롯 5: 관찰 포인트
+구체적 이벤트(날짜, 일정, 심의 예정, 임상 발표 등)가 마무리에 있는가?
+- "전망이다"로 끝나면 불합격 — 무엇을/언제 지켜볼지 명시 필요
+- 누락 시: 원본 데이터에서 일정/이벤트를 찾아 마무리 단락에 삽입
+
+## B등급
+슬롯 1(핵심 정보) + 슬롯 2(국내 관점) + 슬롯 5(관찰 포인트)만 검증.
+슬롯 3, 4는 생략 가능.
+
+## C/D등급
+검증 불필요. 입력 그대로 반환.
+
+## 작업 규칙
+- 기존 문장을 삭제하지 마라. 추가/삽입만 한다.
+- 삽입한 문장은 주변 문체와 톤을 맞춘다 (보도체).
+- 원본 데이터에 없는 내용을 만들어내지 마라.
+- 삽입 불가(원본에 해당 정보 없음)면 해당 슬롯을 "NOT_FOUND"로 표기.
+
+## 출력
+```json
+{
+  "headline": "...",
+  "subheadline": "...",
+  "body": "보강된 전체 기사 본문",
+  "slot_results": {
+    "structural_info": "PASS / INSERTED: 삽입 내용 요약 / NOT_FOUND",
+    "domestic_angle": "PASS / INSERTED: ... / NOT_FOUND",
+    "evidence": "PASS / INSERTED: ... / NOT_FOUND",
+    "comparison": "PASS / INSERTED: ... / NOT_FOUND / SKIPPED(B등급)",
+    "observation_point": "PASS / INSERTED: ... / NOT_FOUND"
+  }
+}
+```"""
+
+
+async def agent_structure_validator(
+    article: dict,
+    story: dict,
+    original_data: str,
+) -> dict:
+    """Agent 5: 구조검증 — 슬롯 기반 누락 검증 + 삽입 (2nd Pass)"""
+    grade = story.get("grade", "A")
+
+    # C/D 등급은 검증 불필요
+    if grade in ("C", "D"):
+        article["slot_results"] = {
+            "structural_info": "SKIPPED",
+            "domestic_angle": "SKIPPED",
+            "evidence": "SKIPPED",
+            "comparison": "SKIPPED",
+            "observation_point": "SKIPPED",
+        }
+        return article
+
+    structural_info = story.get("structural_info", [])
+    evidence = story.get("evidence", story.get("key_facts", []))
+    domestic_angle = story.get("domestic_angle", "")
+
+    user_prompt = f"""## 기사 (1st Pass 완료)
+
+{json.dumps(article, ensure_ascii=False, indent=2)}
+
+## 편집장 지시 — 이것들이 기사에 있어야 한다
+
+기사 등급: {grade}
+
+### structural_info (핵심 정보 — 삭제 금지 항목):
+{json.dumps(structural_info, ensure_ascii=False) if structural_info else "(없음)"}
+
+### domestic_angle (국내 관점):
+{domestic_angle or "(없음)"}
+
+### evidence (근거):
+{json.dumps(evidence, ensure_ascii=False) if evidence else "(없음)"}
+
+## 원본 데이터 (삽입 시 여기서 팩트를 가져와라)
+
+{original_data[:6000]}
+
+위 슬롯을 하나씩 검증하고, 누락된 것만 삽입하라."""
+
+    response = await _call_llm(STRUCTURE_VALIDATOR_SYSTEM, user_prompt, temperature=0.15)
+    validated = _extract_json(response)
+
+    slot_results = validated.get("slot_results", {})
+    inserted = sum(1 for v in slot_results.values() if "INSERTED" in str(v))
+    not_found = sum(1 for v in slot_results.values() if "NOT_FOUND" in str(v))
+    logger.info(
+        "[구조검증] grade=%s, PASS=%d, INSERTED=%d, NOT_FOUND=%d",
+        grade,
+        sum(1 for v in slot_results.values() if v == "PASS"),
+        inserted,
+        not_found,
+    )
+    return validated
+
+
+# ══════════════════════════════════════════════
 # Agent 4: 편집자 — 최종 정제
 # ══════════════════════════════════════════════
 
@@ -444,6 +578,11 @@ COPY_EDITOR_SYSTEM = """당신은 의약품 전문 매체의 최종 편집자입
 - 리드 → 사례 → 맥락 → 영향 → 마무리 순서 확인
 - 단락 간 자연스러운 연결 ("이에 따라", "한편", "반면")
 - 사실→의미 흐름 (사실만 나열하면 수정)
+
+### 해석 톤 규칙
+- "기준선이다", "좌우한다", "변수가 된다" 같은 단정은 해석이지 사실이 아님
+- 해석 문장은 "~로 거론된다", "~가능성이 있다", "~관찰 포인트다"로 톤을 낮출 것
+- 가격·수치가 다른 제품의 '기준'이 된다고 단정하지 말 것 — "비교 참고점으로 언급된다" 수준
 
 ### 분량
 - 800~1200자
@@ -484,7 +623,12 @@ async def agent_copy_editor(article: dict) -> dict:
 async def generate_articles(
     signals: dict[str, list[dict]],
 ) -> list[dict]:
-    """4-Agent 기사 생성 파이프라인 v2.
+    """5-Agent 기사 생성 파이프라인 v3 (2-Pass).
+
+    흐름: 편집장 → 기자 → 팩트체커 → 구조검증기(2nd Pass) → 편집자
+    - 기존 3회 보강 루프 제거
+    - 구조검증기가 슬롯 단위로 누락 검증+삽입
+    - 삽입 불가 시 등급 다운그레이드
 
     Args:
         signals: extract_signals()의 결과
@@ -496,56 +640,10 @@ async def generate_articles(
 
     from regscan.article.guardrails import (
         filter_signals, dedupe_stories, post_process_article,
+        validate_article_grounding,
     )
 
-    def _evaluate_quality(article: dict, grade: str, story: dict) -> dict:
-        """기사 품질 평가 — 등급별 기준."""
-        body = article.get("body", "")
-        failures = []
-
-        # C/D 등급은 품질 루프 불필요
-        if grade in ("C", "D"):
-            return {"pass": True, "failures": []}
-
-        min_len = {"A": 700, "B": 400}.get(grade, 400)
-        if len(body) < min_len:
-            failures.append(f"길이 부족: {len(body)}자 (최소 {min_len}자)")
-
-        if grade == "A":
-            # 국내 관점 키워드
-            domestic_keywords = ["국내", "허가", "급여", "심평원", "식약처", "건보", "병원", "약가"]
-            if not any(kw in body for kw in domestic_keywords):
-                failures.append("국내 관점 누락")
-
-            # 5블록 핵심 키워드 (대략적 체크)
-            block_signals = {
-                "배경": ["기존", "이전", "그동안", "미충족", "치료 옵션", "시장"],
-                "차이": ["달라", "차이", "비교", "대비", "최초", "기존과"],
-                "영향": ["영향", "대상", "병원", "약국", "제약", "환자", "실무"],
-                "관찰": ["향후", "관찰", "지켜", "전망", "예정", "일정"],
-            }
-            for block_name, keywords in block_signals.items():
-                if not any(kw in body for kw in keywords):
-                    failures.append(f"블록 누락 가능: {block_name}")
-
-            # structural_info 누락 체크
-            for info in story.get("structural_info", []):
-                numbers = re.findall(r'\d+', info)
-                if numbers and not any(n in body for n in numbers):
-                    failures.append(f"핵심 정보 누락 가능: {info[:50]}")
-
-        # 전망 문장 구체성 체크
-        vague_endings = ["쟁점이 될 전망이다", "쟁점이 될 수 있다", "변수가 될 전망이다"]
-        for vague in vague_endings:
-            if vague in body:
-                idx = body.index(vague)
-                context = body[max(0, idx-200):idx]
-                if context.count(",") < 2:
-                    failures.append(f"전망 문장 추상적: '{vague}' — 쟁점 2~3개 구체화 필요")
-
-        return {"pass": len(failures) == 0, "failures": failures}
-
-    logger.info("=== 기사 생성 파이프라인 v2 시작 ===")
+    logger.info("=== 기사 생성 파이프라인 v3 (2-Pass) 시작 ===")
 
     # 엔리칭: API로 시그널에 취재 컨텍스트 추가
     try:
@@ -570,6 +668,38 @@ async def generate_articles(
 
     # 중간검증: 같은 소스 중복 제거
     stories = dedupe_stories(stories)
+
+    # 법안 고정 슬롯: 편집장이 ASSEMBLY_BILL을 안 골랐으면 강제 추가
+    _assembly_aliases = {"ASSEMBLY_BILL", "KOREA_LEGISLATION", "ASSEMBLY", "LEGISLATION"}
+    has_assembly = any(
+        any(src in _assembly_aliases for src in s.get("sources_used", []))
+        for s in stories
+    )
+    if not has_assembly and "ASSEMBLY_BILL" in filtered:
+        # 최근 법안 중 제안이유가 있는 것만 후보
+        assembly_sigs = filtered["ASSEMBLY_BILL"]
+        top_bills = [
+            s for s in assembly_sigs
+            if s.get("proposal_reason") or s.get("statute_articles")
+        ][:3]
+        if top_bills:
+            bill_titles = ", ".join(b.get("title", "")[:30] for b in top_bills)
+            stories.append({
+                "story_id": len(stories) + 1,
+                "article_type": "regulation",
+                "grade": "B",
+                "grade_reason": "법안 고정 슬롯 — 편집장 미선택 보완",
+                "read_reason": "최근 발의된 보건의료 법안 동향",
+                "direction": "최근 발의 법안의 핵심 조문과 영향을 정리",
+                "core_message": f"최근 보건의료 법안: {bill_titles}",
+                "headline_draft": "보건의료 법안 동향",
+                "domestic_angle": "국내 의료기관·제약사에 직접 영향",
+                "sources_used": ["ASSEMBLY_BILL"],
+                "publishable": "가능",
+                "priority": "medium",
+            })
+            logger.info("[법안 고정] 편집장 미선택 → 법안 스토리 강제 추가")
+
     logger.info("[중간검증] %d개 스토리 확정", len(stories))
 
     articles = []
@@ -586,97 +716,148 @@ async def generate_articles(
             continue
 
         try:
-            # 원본 데이터 (팩트체크용)
+            # 원본 데이터 (팩트체크 + 구조검증용)
+            # 편집장이 소스명을 다르게 쓰는 경우 대비 alias 매핑
+            _SOURCE_ALIAS = {
+                "KOREA_LEGISLATION": "ASSEMBLY_BILL",
+                "ASSEMBLY": "ASSEMBLY_BILL",
+                "LEGISLATION": "ASSEMBLY_BILL",
+                "MFDS": "MFDS_PRESS",
+                "MFDS_SAFETY": "MFDS_SAFETY_LETTER",
+                "KHIDI": "KHIDI_PHARMA_NEWS",
+                "KHIDI_NEWS": "KHIDI_PHARMA_NEWS",
+                "KHIDI_GLOBAL": "KHIDI_GLOBAL_INFO",
+                "GNW": "GNW_PRESS",
+                "GLOBENEWSWIRE": "GNW_PRESS",
+                "PMDA": "PMDA_REVIEW",
+                "DART": "DART_DISCLOSURE",
+                "KIPRIS": "KIPRIS_PATENT",
+                "MOHW": "MOHW_HEALTH_INSURANCE",
+                "NICE": "NICE_TA",
+            }
             sources_used = story.get("sources_used", [])
             original_data = ""
+            seen_sources: set[str] = set()
             for src in sources_used:
-                if src in filtered:
+                resolved = _SOURCE_ALIAS.get(src, src)
+                if resolved in filtered and resolved not in seen_sources:
+                    original_data += format_for_prompt(resolved, filtered[resolved]) + "\n"
+                    seen_sources.add(resolved)
+                elif src in filtered and src not in seen_sources:
                     original_data += format_for_prompt(src, filtered[src]) + "\n"
+                    seen_sources.add(src)
 
-            # ── 보강 루프: 최대 3회 (작성 → 팩트체크 → 근거 부족 ��� 피드백 → 재작���) ──
-            evidence_keywords = ["근거 불명", "검증되지 않", "확인 불가", "데이터 부족"]
-            max_attempts = 3
-            final = None
+            # ── 1st Pass: 기자 → 팩트체커 ──
+            draft = await agent_reporter(story, filtered)
+            checked = await agent_fact_checker(draft, original_data)
+            logger.info(
+                "  기사 #%d 1st Pass 완료 (corrections=%d)",
+                story.get("story_id", 0),
+                len(checked.get("corrections", [])),
+            )
 
-            for attempt in range(1, max_attempts + 1):
-                # Agent 2: 기자
-                draft = await agent_reporter(story, filtered)
+            # ── 2nd Pass: 구조검증기 ──
+            validated = await agent_structure_validator(checked, story, original_data)
+            slot_results = validated.get("slot_results", {})
 
-                # Agent 3: 팩트체커
-                checked = await agent_fact_checker(draft, original_data)
-                corrections = checked.get("corrections", [])
-
-                # 근거 부족 항목 추출
-                weak_items = [
-                    c for c in corrections
-                    if any(kw in c for kw in evidence_keywords)
-                ]
-
-                if not weak_items:
-                    # 근거 충분 — 편집 단계로 진행
-                    final = post_process_article(await agent_copy_editor(checked))
-                    logger.info("  기사 #%d 시도 %d/%d 통과 (%d자)",
-                                story.get("story_id", 0), attempt, max_attempts,
-                                len(final.get("body", "")))
-                    break
-
-                if attempt < max_attempts:
-                    # 근거 부족 → 피드백��로 보강 요청
+            # 등급 다운그레이드 판단: A등급에서 핵심 슬롯 NOT_FOUND 2개 이상
+            if grade == "A":
+                critical_slots = ["structural_info", "domestic_angle", "evidence"]
+                not_found_count = sum(
+                    1 for s in critical_slots
+                    if "NOT_FOUND" in str(slot_results.get(s, ""))
+                )
+                if not_found_count >= 2:
+                    grade = "B"
+                    story["grade"] = "B"
                     logger.info(
-                        "  기사 #%d 시도 %d/%d 근거 부족 (%d건), 보�� 재작성",
-                        story.get("story_id", 0), attempt, max_attempts,
-                        len(weak_items),
+                        "  기사 #%d A→B 다운그레이드 (NOT_FOUND=%d/3)",
+                        story.get("story_id", 0), not_found_count,
                     )
-                    # 팩트체커가 지적한 근거 부족 항목을 기자에��� 전달
-                    story["_rewrite_feedback"] = story.get("_rewrite_feedback", []) + [
-                        f"팩트체커 지적: {item} → 해당 문장을 삭제하거나 데이터에 있는 내용으로 대체하라."
-                        for item in weak_items[:3]
+
+            # ── 편집 + 후처리 ──
+            final = post_process_article(await agent_copy_editor(validated))
+            grounding_issues = validate_article_grounding(story, final, original_data)
+            if grounding_issues:
+                logger.warning(
+                    "  기사 #%d 근거 불일치 탐지: %s",
+                    story.get("story_id", 0),
+                    "; ".join(grounding_issues),
+                )
+
+                # 날짜/조문 불일치 → 팩트 교정 재작성 1회
+                has_factual_issue = any(
+                    k in issue for issue in grounding_issues
+                    for k in ("unsupported_dates", "unsupported_statutes")
+                )
+                if has_factual_issue:
+                    logger.info(
+                        "  기사 #%d 팩트 교정 재작성 시작",
+                        story.get("story_id", 0),
+                    )
+                    # 기자에게 구체적 오류를 피드백으로 전달
+                    story["_rewrite_feedback"] = [
+                        f"팩트 교정: {issue} — 이 정보는 원본 데이터에 없다. "
+                        "원본 데이터에 실제로 있는 날짜/조문/단계만 사용해서 다시 써라. "
+                        "원본에 없으면 해당 내용을 빼라."
+                        for issue in grounding_issues
                     ]
-                else:
-                    # 3회 시도 후에도 근거 부족 �� 등급 다운그레이드
-                    logger.warning(
-                        "  기사 #%d 3회 시도 후에도 근거 부족 (%d건), 등급 다운그레이드",
-                        story.get("story_id", 0), len(weak_items),
+                    # 1st pass 재실행
+                    draft2 = await agent_reporter(story, filtered)
+                    checked2 = await agent_fact_checker(draft2, original_data)
+                    validated2 = await agent_structure_validator(checked2, story, original_data)
+                    slot_results = validated2.get("slot_results", {})
+                    final = post_process_article(await agent_copy_editor(validated2))
+
+                    # 재검증
+                    grounding_issues2 = validate_article_grounding(story, final, original_data)
+                    if grounding_issues2 and any(
+                        k in issue for issue in grounding_issues2
+                        for k in ("unsupported_dates", "unsupported_statutes")
+                    ):
+                        logger.warning(
+                            "  기사 #%d 재작성 후에도 팩트 불일치 — 발행 보류",
+                            story.get("story_id", 0),
+                        )
+                        continue
+                    elif grounding_issues2:
+                        final["_grounding_issues"] = grounding_issues2
+                    logger.info(
+                        "  기사 #%d 팩트 교정 완료",
+                        story.get("story_id", 0),
                     )
-                    # 근거 부족 문장을 팩트체커가 이미 ���제/수정한 버전으로 진행
-                    final = post_process_article(await agent_copy_editor(checked))
-                    # A→B, B→C로 다운그레이드
+                else:
+                    # 범위 불일치 등 나머지는 등급 강등
                     if grade == "A":
                         grade = "B"
                         story["grade"] = "B"
-                        logger.info("  기사 #%d A→B 다운그레이드", story.get("story_id", 0))
                     elif grade == "B":
                         grade = "C"
                         story["grade"] = "C"
-                        logger.info("  기사 #%d B→C 다운그레이드", story.get("story_id", 0))
+                    final["_grounding_issues"] = grounding_issues
 
-            if final is None:
-                continue
-
-            # ── 품질 검증 ──
             body_len = len(final.get("body", ""))
-            logger.info("  기사 #%d body=%d자, grade=%s",
+            logger.info("  기사 #%d 2-Pass 완료: %d자, grade=%s",
                         story.get("story_id", 0), body_len, grade)
 
-            quality = _evaluate_quality(final, grade, story)
-            if grade in ("A", "B") and not quality["pass"]:
-                logger.info(
-                    "  기사 #%d 품질 미달 (%s), 품질 재작성",
-                    story.get("story_id", 0),
-                    ", ".join(quality["failures"]),
-                )
-                story["_rewrite_feedback"] = quality["failures"]
-                draft_q = await agent_reporter(story, filtered)
-                checked_q = await agent_fact_checker(draft_q, original_data)
-                final = post_process_article(await agent_copy_editor(checked_q))
-                logger.info("  기사 #%d 품질 재작성 완료 (%d자)",
-                            story.get("story_id", 0), len(final.get("body", "")))
+            # 최소 길이 미달 시 등급 다운그레이드
+            min_len = {"A": 700, "B": 400}.get(grade, 0)
+            if min_len and body_len < min_len:
+                if grade == "A":
+                    grade = "B"
+                    story["grade"] = "B"
+                    logger.info("  기사 #%d A→B (길이 %d < 700)", story.get("story_id", 0), body_len)
+                elif grade == "B":
+                    grade = "C"
+                    story["grade"] = "C"
+                    logger.info("  기사 #%d B→C (길이 %d < 400)", story.get("story_id", 0), body_len)
 
             final["story_id"] = story.get("story_id", 0)
             final["core_message"] = story.get("core_message", "")
             final["sources_used"] = sources_used
             final["priority"] = story.get("priority", "medium")
             final["grade"] = grade
+            final["slot_results"] = slot_results
             final["generated_at"] = datetime.now().isoformat()
 
             articles.append(final)

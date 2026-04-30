@@ -155,6 +155,16 @@ def format_for_prompt(
         if detail:
             line += f"\n   {detail[:150]}"
 
+        # 법안 상세 (제안이유/주요내용/조문)
+        if sig.get("statute_articles"):
+            line += f"\n   [조문] {sig['statute_articles']}"
+        if sig.get("proposal_reason"):
+            line += f"\n   [제안이유] {sig['proposal_reason'][:300]}"
+        if sig.get("main_content"):
+            line += f"\n   [주요내용] {sig['main_content'][:500]}"
+        if sig.get("related_bills_context"):
+            line += f"\n   ⚠ [동일 법명 관련] {sig['related_bills_context']}"
+
         # 엔리칭 컨텍스트 (있으면 추가)
         for ctx_key in ("fda_context", "mfds_context"):
             ctx = sig.get(ctx_key, "")
@@ -222,14 +232,24 @@ def _extract_assembly(aux_data: dict, result: dict) -> None:
         return
     signals = []
     for item in data:
-        signals.append({
+        sig = {
             "title": item.get("title", ""),
             "detail": f"발의: {item.get('proposer', '')}",
             "date": item.get("date", ""),
             "status": item.get("proc_result", "") or "계류 중",
             "keyword": item.get("matched_keyword", ""),
             "url": item.get("url", ""),
-        })
+        }
+        # 법안 상세 (lawmake.kr에서 수집)
+        if item.get("proposal_reason"):
+            sig["proposal_reason"] = item["proposal_reason"][:1000]
+        if item.get("main_content"):
+            sig["main_content"] = item["main_content"][:1500]
+        if item.get("statute_articles"):
+            sig["statute_articles"] = item["statute_articles"]
+        if item.get("related_bills_context"):
+            sig["related_bills_context"] = item["related_bills_context"]
+        signals.append(sig)
     if signals:
         result["ASSEMBLY_BILL"] = signals
 
@@ -306,11 +326,14 @@ def _extract_mfds_press(aux_data: dict, result: dict) -> None:
         return
     signals = []
     for item in data:
-        signals.append({
+        sig = {
             "title": item.get("title", ""),
             "detail": f"{item.get('department', '')} | {item.get('board', '')}",
             "date": item.get("date", ""),
-        })
+        }
+        if item.get("url"):
+            sig["url"] = item["url"]
+        signals.append(sig)
     if signals:
         result["MFDS_PRESS"] = signals
 

@@ -652,3 +652,45 @@ class IngestRunDB(Base):
         Index("idx_ingest_run_source_date", "source_type", "started_at"),
         Index("idx_ingest_run_pipeline", "pipeline_run_id"),
     )
+
+
+# ──────────────────────────────────────────────
+# 20. hira_drug_info — 약제 기준정보 (9개 게시판 통합)
+# ──────────────────────────────────────────────
+
+class HIRADrugInfoDB(Base):
+    """HIRA 약제 기준정보 — 급여평가위/암질환공고/목록표/요법 등
+
+    테이블 조회 + 그래프 노드 양쪽에서 활용.
+    """
+
+    __tablename__ = "hira_drug_info"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    board = Column(String(30), nullable=False, index=True)       # 게시판명 (약제급여평가위원회, 암질환_공고 등)
+    source_type = Column(String(50), nullable=False, index=True) # HIRA_DRUG_COMMITTEE 등
+    post_id = Column(String(50), index=True)                     # 게시글 고유 ID
+    title = Column(Text, nullable=False)
+    content = Column(Text, default="")
+    publication_date = Column(Date, index=True)
+    url = Column(String(500))
+
+    # 약제급여평가위 전용 필드
+    ingredient = Column(String(300), index=True)    # 성분명 (INN) — 크로스레퍼런스 키
+    product_name = Column(String(300))              # 제품명 (브랜드)
+    company = Column(String(200))                   # 업소명
+    evaluation_result = Column(String(50))          # 급여/비급여/보류/재평가
+    session = Column(String(50))                    # 회차 (2026년 제5차)
+
+    # 첨부파일 메타
+    attachments = Column(JSON, default=list)        # [{filename, path, size}]
+
+    # 메타
+    department = Column(String(100))                # 담당 부서
+    raw_metadata = Column(JSON, default=dict)       # 기타 메타데이터
+    collected_at = Column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        Index("idx_hira_drug_info_board_date", "board", "publication_date"),
+        Index("idx_hira_drug_info_ingredient", "ingredient"),
+    )

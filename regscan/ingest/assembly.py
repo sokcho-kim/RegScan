@@ -3,6 +3,8 @@
 열린국회정보 API (open.assembly.go.kr)
 엔드포인트: /portal/openapi/nzmimeepazxkubdpn (국회의원 발의법률안)
 인증: OPEN_ASSEMBLY_API_KEY + User-Agent 헤더 필수
+
++ LIKMS 상세페이지 스크래핑으로 제안이유/주요내용/조문 수집
 """
 
 from __future__ import annotations
@@ -12,7 +14,10 @@ import re
 from datetime import datetime, timedelta
 from typing import Any
 
+import asyncio
+
 import httpx
+from bs4 import BeautifulSoup
 
 from regscan.config import settings
 from .base import BaseIngestor
@@ -89,11 +94,86 @@ class AssemblyBillIngestor(BaseIngestor):
 
         all_records.sort(key=lambda r: r.get("date", ""), reverse=True)
 
+        # LIKMS 상세페이지에서 제안이유/주요내용/조문 수집
+        enriched = 0
+        for record in all_records:
+            bill_id = record.get("bill_id", "")
+            if not bill_id:
+                continue
+            detail = await self._fetch_bill_detail(bill_id)
+            if detail:
+                record.update(detail)
+                enriched += 1
+            await asyncio.sleep(0.5)
+
+        # 동일 법명 복수 법안 관계 메타데이터 추가
+        self._annotate_related_bills(all_records)
+
         logger.info(
-            "[Assembly] 보건의료 법안 %d건 수집 (최근 %d일, %d대 국회)",
-            len(all_records), self.days_back, self.age,
+            "[Assembly] 보건의료 법안 %d건 수집 (상세 %d건, 최근 %d일, %d대 국회)",
+            len(all_records), enriched, self.days_back, self.age,
         )
         return all_records
+
+    @staticmethod
+    def _annotate_related_bills(records: list[dict]) -> None:
+        """동일 법명 법안이 여러 개일 때 관계 정보를 주입.
+
+        위원장 대안이 가결된 상태에서 개별 발의안이 계류 중이면,
+        개별 발의안에 '이 법명의 위원장 대안이 이미 가결됨' 맥락을 붙인다.
+        """
+        # 법안명 정규화: "일부개정법률안" 등 접미사 제거
+        def _normalize(title: str) -> str:
+            return re.sub(
+                r"\s*(일부개정법률안|전부개정법률안|제정법률안|폐지법률안).*$",
+                "", title,
+            ).strip()
+
+        # 법명별 그룹핑
+        by_law: dict[str, list[dict]] = {}
+        for r in records:
+            key = _normalize(r.get("title", ""))
+            if key:
+                by_law.setdefault(key, []).append(r)
+
+        for law_name, bills in by_law.items():
+            if len(bills) < 2:
+                continue
+
+            # 가결/공포/철회/대안반영 등 처리 완료된 법안 찾기
+            passed = [
+                b for b in bills
+                if b.get("proc_result", "") in (
+                    "원안가결", "수정가결", "대안반영폐기", "공포", "철회",
+                )
+                or "가결" in (b.get("proc_result") or "")
+            ]
+            # 위원장 대안 찾기
+            chair_bills = [
+                b for b in bills
+                if "위원장" in (b.get("rst_proposer") or b.get("proposer", ""))
+            ]
+
+            context_parts = []
+            if passed:
+                latest = max(passed, key=lambda b: b.get("proc_date", "") or b.get("date", ""))
+                context_parts.append(
+                    f"동일 법명 '{law_name}'의 다른 법안이 "
+                    f"{latest.get('proc_date') or latest.get('date', '')}에 "
+                    f"{latest.get('proc_result', '')} 처리됨 "
+                    f"(발의: {latest.get('rst_proposer', latest.get('proposer', ''))})"
+                )
+            if chair_bills:
+                for cb in chair_bills:
+                    if cb.get("proc_result"):
+                        context_parts.append(
+                            f"위원장 대안 ({cb.get('date', '')}) → {cb.get('proc_result', '')}"
+                        )
+
+            if context_parts:
+                related_context = "; ".join(context_parts)
+                for b in bills:
+                    b["related_bills_context"] = related_context
 
     async def _search_bills(
         self,
@@ -212,3 +292,53 @@ class AssemblyBillIngestor(BaseIngestor):
             })
 
         return records, should_stop
+
+    async def _fetch_bill_detail(self, bill_id: str) -> dict[str, str] | None:
+        """lawmake.kr에서 제안이유/주요내용/조문 스크래핑"""
+        url = f"https://www.lawmake.kr/bills/{bill_id}"
+        try:
+            resp = await self.client.get(
+                url,
+                headers={"User-Agent": "RegScan/1.0"},
+                follow_redirects=True,
+                timeout=15.0,
+            )
+            resp.raise_for_status()
+        except Exception as e:
+            logger.debug("[Assembly] lawmake.kr 실패 (%s): %s", bill_id, e)
+            return None
+
+        soup = BeautifulSoup(resp.text, "html.parser")
+        detail: dict[str, str] = {}
+
+        # 제안이유 추출
+        for tag in soup.find_all(["h2", "h3", "h4", "strong", "dt"]):
+            if "제안이유" in tag.get_text():
+                sibling = tag.find_next(["p", "dd", "div"])
+                if sibling:
+                    detail["proposal_reason"] = sibling.get_text(strip=True)[:2000]
+                break
+
+        # 주요내용 추출
+        for tag in soup.find_all(["h2", "h3", "h4", "strong", "dt"]):
+            if "주요내용" in tag.get_text():
+                sibling = tag.find_next(["p", "dd", "div", "ol", "ul"])
+                if sibling:
+                    detail["main_content"] = sibling.get_text(strip=True)[:3000]
+                break
+
+        # 조문 번호 추출 (페이지 전체에서)
+        page_text = soup.get_text()
+        articles = re.findall(r"제\d+조(?:의\d+)?", page_text)
+        unique_articles = list(dict.fromkeys(articles))
+        if unique_articles:
+            detail["statute_articles"] = ", ".join(unique_articles)
+
+        if detail:
+            logger.debug(
+                "[Assembly] 상세 수집: %s (조문 %d개, 제안이유 %s)",
+                bill_id[:20],
+                len(unique_articles),
+                "있음" if detail.get("proposal_reason") else "없음",
+            )
+        return detail if detail else None
