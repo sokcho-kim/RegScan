@@ -141,12 +141,23 @@ def should_publish(source_type: str, signals: list[dict]) -> bool:
 def format_for_prompt(
     source_type: str,
     signals: list[dict],
+    *,
+    include_counts: bool = True,
 ) -> str:
-    """LLM 프롬프트용 텍스트 포맷."""
+    """LLM 프롬프트용 텍스트 포맷.
+
+    Args:
+        include_counts: True면 총 건수/잔여 건수 표시 (편집장용).
+            False면 건수 메타 없이 시그널 내용만 (기자용).
+    """
     meta = SOURCE_META.get(source_type, {})
     label = meta.get("label", source_type)
 
-    lines = [f"## {label}", f"총 {len(signals)}건", ""]
+    if include_counts:
+        lines = [f"## {label}", f"총 {len(signals)}건", ""]
+    else:
+        lines = [f"## {label}", ""]
+
     for i, sig in enumerate(signals[:15], 1):
         title = sig.get("title", "")
         date = sig.get("date", "")
@@ -175,7 +186,10 @@ def format_for_prompt(
         lines.append(line)
 
     if len(signals) > 15:
-        lines.append(f"... +{len(signals) - 15}건 추가")
+        if include_counts:
+            lines.append(f"... +{len(signals) - 15}건 추가")
+        else:
+            lines.append("(이하 생략)")
 
     return "\n".join(lines)
 
