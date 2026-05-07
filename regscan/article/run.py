@@ -1,10 +1,12 @@
-"""기사 전용 실행기 — 전체 배치 없이 기사만 생성
+"""기사 전용 실행기 — 수집 → 기사 생성 → 출처 → HTML 일괄 실행
 
 Usage:
     python -m regscan.article.run
     python -m regscan.article.run --days-back 14
     python -m regscan.article.run --save-signals          # 수집 후 시그널 저장
     python -m regscan.article.run --load-signals PATH     # 저장된 시그널로 기사 생성
+    python -m regscan.article.run --no-cite               # 출처 후처리 스킵
+    python -m regscan.article.run --no-render             # HTML 렌더 스킵
 """
 
 from __future__ import annotations
@@ -27,8 +29,10 @@ async def run_articles(
     days_back: int = 30,
     save_signals: bool = False,
     load_signals: str | None = None,
+    no_cite: bool = False,
+    no_render: bool = False,
 ) -> None:
-    """보조 소스 전체 수집 → 시그널 추출 → 엔리칭 → 4-Agent 기사 생성."""
+    """보조 소스 전체 수집 → 시그널 추출 → 엔리칭 → 기사 생성 → 출처 → HTML."""
     from regscan.stream.intelligence_signals import extract_signals
     from regscan.article.pipeline import generate_articles
     from regscan.config import settings
@@ -186,6 +190,30 @@ async def run_articles(
         out_path.write_text(md, encoding="utf-8")
         logger.info("저장: %s (v%d)", out_path, next_ver)
 
+        # ── 출처 후처리 (cite) ──
+        if not no_cite and signals:
+            from regscan.article.cite import add_citations
+            cited_md = add_citations(md, signals)
+            cited_path = article_dir / f"articles_{date_str}-v{next_ver}-cited.md"
+            cited_path.write_text(cited_md, encoding="utf-8")
+            logger.info("출처 추가: %s", cited_path)
+
+            # render 대상은 cited 버전
+            render_source = cited_md
+            render_path_stem = cited_path
+        else:
+            render_source = md
+            render_path_stem = out_path
+
+        # ── HTML 렌더 ──
+        if not no_render:
+            from regscan.article.renderer import parse_articles_md, render_html
+            data = parse_articles_md(render_source)
+            html = render_html(data)
+            html_path = render_path_stem.with_suffix(".html")
+            html_path.write_text(html, encoding="utf-8")
+            logger.info("HTML 생성: %s", html_path)
+
     duration = (datetime.now() - started).total_seconds()
     logger.info("=== 기사 전용 파이프라인 완료: %d건 (%.1f초) ===", len(articles), duration)
 
@@ -197,11 +225,17 @@ def main():
                         help="수집 후 시그널을 output/signals/에 JSON 저장")
     parser.add_argument("--load-signals", type=str, default=None,
                         help="저장된 시그널 JSON 경로 — 수집 스킵하고 기사만 생성")
+    parser.add_argument("--no-cite", action="store_true",
+                        help="출처 후처리 스킵")
+    parser.add_argument("--no-render", action="store_true",
+                        help="HTML 렌더 스킵")
     args = parser.parse_args()
     asyncio.run(run_articles(
         days_back=args.days_back,
         save_signals=args.save_signals,
         load_signals=args.load_signals,
+        no_cite=args.no_cite,
+        no_render=args.no_render,
     ))
 
 
