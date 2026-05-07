@@ -166,6 +166,10 @@ def format_for_prompt(
         if detail:
             line += f"\n   {detail[:150]}"
 
+        # 보도자료 본문 (PDF 추출, 정제 후 전문)
+        if sig.get("press_body"):
+            line += f"\n   [본문] {sig['press_body']}"
+
         # 법안 상세 (제안이유/주요내용/조문)
         if sig.get("statute_articles"):
             line += f"\n   [조문] {sig['statute_articles']}"
@@ -340,13 +344,18 @@ def _extract_mfds_press(aux_data: dict, result: dict) -> None:
         return
     signals = []
     for item in data:
+        detail = f"{item.get('department', '')} | {item.get('board', '')}"
         sig = {
             "title": item.get("title", ""),
-            "detail": f"{item.get('department', '')} | {item.get('board', '')}",
+            "detail": detail,
             "date": item.get("date", ""),
         }
         if item.get("url"):
             sig["url"] = item["url"]
+        # PDF 본문이 있으면 별도 필드로 전달 (정제 후 전문)
+        body = item.get("body", "")
+        if body:
+            sig["press_body"] = body
         signals.append(sig)
     if signals:
         result["MFDS_PRESS"] = signals
