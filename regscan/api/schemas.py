@@ -243,3 +243,97 @@ class ChangeLogResponse(BaseModel):
     new_value: Optional[str] = None
     pipeline_run_id: Optional[str] = None
     detected_at: Optional[datetime] = None
+
+
+# ── 신약 도입정보 카드 스키마 (MedicinePage용) ──
+
+# DomesticStatus enum → 프론트 한글 라벨 매핑
+DOMESTIC_STATUS_KO = {
+    "reimbursed": "급여완료",
+    "approved_not_reimbursed": "허가완료",
+    "approved_deleted": "급여삭제",
+    "imminent": "급여예정",
+    "expected": "심사중",
+    "uncertain": "임상단계",
+    "domestic_only": "허가완료",
+    "not_applicable": "임상단계",
+}
+
+
+class RegulatoryEventBrief(BaseModel):
+    """규제 이벤트 요약 (기관별 허가 정보)"""
+    agency: str
+    status: str = ""
+    approval_date: Optional[date] = None
+    brand_name: str = ""
+    is_orphan: bool = False
+    is_breakthrough: bool = False
+
+
+class DrugCardSummary(BaseModel):
+    """약물 카드 요약 (MedicinePage 리스트용)"""
+    inn: str
+    brand_name_ko: str = ""
+    brand_name_en: str = ""
+    company: str = ""
+    category: str = ""
+    domestic_status: str
+    agencies: list[str] = []
+    global_score: int = 0
+    korea_relevance_score: int = 0
+    hot_issue_level: str = "LOW"
+    issue_title: str = ""
+    description: str = ""
+    earliest_approval_date: Optional[date] = None
+    expected_domestic_date: Optional[str] = None
+    has_article: bool = False
+    updated_at: Optional[datetime] = None
+
+    _normalize_price = field_validator(
+        "earliest_approval_date", mode="before",
+    )(lambda v: v if v != "" else None)
+
+
+class DrugCardDetail(DrugCardSummary):
+    """약물 카드 상세 (DrugDetailPage용)"""
+    regulatory_events: list[RegulatoryEventBrief] = []
+    article_headline: str = ""
+    article_body_html: str = ""
+    article_generated_at: Optional[datetime] = None
+    hira_status: Optional[str] = None
+    hira_price: Optional[float] = None
+    hira_criteria: str = ""
+    indication: str = ""
+    mechanism: str = ""
+
+    _normalize_hira_price = field_validator("hira_price", mode="before")(_nan_to_none)
+
+
+class DrugCardListResponse(BaseModel):
+    """약물 카드 리스트 응답"""
+    drugs: list[DrugCardSummary]
+    total_count: int
+    offset: int = 0
+    limit: int = 50
+
+
+class FeedItem(BaseModel):
+    """대시보드 피드 항목"""
+    feed_type: str  # "article" | "change"
+    inn: str = ""
+    title: str = ""
+    body_preview: str = ""
+    timestamp: Optional[datetime] = None
+    # article 전용
+    article_type: str = ""
+    # change 전용
+    change_type: str = ""
+    field_name: str = ""
+    old_value: str = ""
+    new_value: str = ""
+
+
+class FeedResponse(BaseModel):
+    """대시보드 피드 응답"""
+    items: list[FeedItem]
+    total_count: int
