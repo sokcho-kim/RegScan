@@ -59,6 +59,11 @@ SOURCE_META = {
         "description": "KHIDI 제약산업정보포털 국내외 뉴스",
         "priority": 3,
     },
+    "KHIDI_GLOBAL_INFO": {
+        "label": "KHIDI 글로벌 제약정보",
+        "description": "제약글로벌정보센터 — 시장현황/허가특허/R&D/임상/보고서/통계",
+        "priority": 3,
+    },
     "PMDA_REVIEW": {
         "label": "일본 PMDA 심사 동향",
         "description": "PMDA 승인심사 관련 RSS 업데이트",
@@ -87,6 +92,7 @@ MIN_SIGNALS = {
     "KIPRIS_PATENT": 5,
     "MFDS_PRESS": 5,
     "KHIDI_PHARMA_NEWS": 5,
+    "KHIDI_GLOBAL_INFO": 3,
     "PMDA_REVIEW": 2,
     "PMDA_SAFETY": 2,
     "GNW_PRESS": 1,
@@ -124,6 +130,8 @@ def extract_signals(
     _extract_mfds_press(aux_data, result)
     # KHIDI 뉴스
     _extract_khidi_news(aux_data, result)
+    # KHIDI 글로벌정보센터
+    _extract_khidi_global(aux_data, result)
     # GlobeNewsWire
     _extract_gnw_press(aux_data, result)
     # PMDA RSS
@@ -375,6 +383,24 @@ def _extract_khidi_news(aux_data: dict, result: dict) -> None:
         })
     if signals:
         result["KHIDI_PHARMA_NEWS"] = signals
+
+
+def _extract_khidi_global(aux_data: dict, result: dict) -> None:
+    data = aux_data.get("khidi_global_info", [])
+    if not data:
+        return
+    signals = []
+    for item in data:
+        board = item.get("board", "")
+        signals.append({
+            "title": item.get("title", ""),
+            "detail": f"[{board}] {item.get('content', '')[:120]}",
+            "date": item.get("date", ""),
+            "url": item.get("url", ""),
+            "board": board,
+        })
+    if signals:
+        result["KHIDI_GLOBAL_INFO"] = signals
 
 
 def _extract_gnw_press(aux_data: dict, result: dict) -> None:

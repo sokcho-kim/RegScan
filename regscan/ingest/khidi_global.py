@@ -21,16 +21,22 @@ logger = logging.getLogger(__name__)
 KHIDI_BASE = "https://www.khidi.or.kr"
 XML_API = f"{KHIDI_BASE}/kps/openAPI/requestxml"
 
-# 제약글로벌정보센터 게시판
+# 제약산업정보포털 게시판 (XML API 공통 구조)
+# docs/research/khidi-portal-exploration.md 참조
 GLOBAL_BOARDS = {
-    "drug_pricing": {
-        "menuId": "MENU01869",
-        "label": "약가 및 보험",
-    },
-    "regulation": {
-        "menuId": "MENU01872",
-        "label": "법령 및 고시",
-    },
+    # ── 의약품 인허가정보 ──
+    "regulation":      {"menuId": "MENU01872", "label": "법령 및 고시"},
+    "approval_patent": {"menuId": "MENU02599", "label": "허가 및 특허"},
+    # ── 의약품 시장정보 ──
+    "market_status":   {"menuId": "MENU01866", "label": "의약품 시장 현황"},
+    # ── 임상 ──
+    "clinical_trial":  {"menuId": "MENU02139", "label": "임상 및 비임상"},
+    # ── 인프라 ──
+    "infra":           {"menuId": "MENU01868", "label": "인프라 정보"},
+    # ── 자료실 ──
+    "report_external": {"menuId": "MENU01846", "label": "보고서 (유관기관)"},
+    # ── 전문가 ──
+    "expert_insight":  {"menuId": "MENU01819", "label": "전문가 Insight"},
 }
 
 
