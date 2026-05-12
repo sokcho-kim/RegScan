@@ -41,8 +41,10 @@ ENV/
 
 # Data (큰 파일)
 data/regscan.db
+data/regscan.db.bak
 data/regscan.bak.*
 data/raw/*
+data/hira/changelog/
 !data/raw/.gitkeep
 data/normalized/*
 !data/normalized/.gitkeep
@@ -69,5 +71,10 @@ data/bridge/yakga_master_latest.csv
 # OMOP Athena vocabulary (2.9GB+)
 data/omop/
 
-# Auto-generated snapshots (v5.0+ 품질 테스트 결과는 추적)
-# output/briefings/snapshots/
+# Auto-generated snapshots & pipeline output
+output/articles/
+output/articles_*
+output/intelligence_briefing*
+output/briefings/snapshots/
+output/stream_results/
+output/signals/
