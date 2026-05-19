@@ -193,7 +193,7 @@ def format_for_prompt(
             ctx = sig.get(ctx_key, "")
             if ctx:
                 for ctx_line in ctx.split("\n"):
-                    line += f"\n   {ctx_line[:200]}"
+                    line += f"\n   {ctx_line[:500]}"
 
         lines.append(line)
 
@@ -394,10 +394,11 @@ def _extract_khidi_global(aux_data: dict, result: dict) -> None:
         board = item.get("board", "")
         signals.append({
             "title": item.get("title", ""),
-            "detail": f"[{board}] {item.get('content', '')[:120]}",
+            "detail": f"[{board}]",
             "date": item.get("date", ""),
             "url": item.get("url", ""),
             "board": board,
+            "press_body": item.get("content", ""),
         })
     if signals:
         result["KHIDI_GLOBAL_INFO"] = signals

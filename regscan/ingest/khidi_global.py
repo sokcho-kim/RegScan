@@ -161,6 +161,30 @@ class KHIDIGlobalInfoIngestor(BaseIngestor):
 
         return records
 
+    async def fetch_detail(self, item: dict[str, Any]) -> dict[str, Any]:
+        """상세 페이지에서 본문 보강 (XML content가 짧을 때)."""
+        url = item.get("url", "")
+        if not url or len(item.get("content", "")) > 500:
+            return item
+
+        try:
+            resp = await self.client.get(url)
+            resp.raise_for_status()
+            match = re.search(
+                r'<div[^>]*class="viewContent"[^>]*>(.*?)</div>',
+                resp.text, re.DOTALL,
+            )
+            if match:
+                text = re.sub(r'<br\s*/?>', '\n', match.group(1))
+                text = re.sub(r'<[^>]+>', '', text)
+                text = re.sub(r'\n{3,}', '\n\n', text).strip()
+                if text and len(text) > len(item.get("content", "")):
+                    item["content"] = text
+        except Exception as e:
+            logger.debug("[KHIDI Global] 상세 fetch 실패 (%s): %s", url, e)
+
+        return item
+
     @staticmethod
     def _normalize_date(raw: str) -> str:
         """다양한 날짜 형식 → YYYY-MM-DD"""

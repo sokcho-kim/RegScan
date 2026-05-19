@@ -26,17 +26,19 @@ def filter_signals(
 ) -> dict[str, list[dict]]:
     """기사 가치 없는 소스 제거.
 
-    Returns:
-        필터링된 시그널 (5건 미만 소스 제거)
+    소스별 MIN_SIGNALS가 정의돼 있으면 그 값을, 없으면 기본 5건 적용.
     """
+    from regscan.stream.intelligence_signals import MIN_SIGNALS
+
     filtered = {}
     for src, sigs in signals.items():
-        if len(sigs) >= MIN_SIGNALS_FOR_ARTICLE:
+        min_count = MIN_SIGNALS.get(src, MIN_SIGNALS_FOR_ARTICLE)
+        if len(sigs) >= min_count:
             filtered[src] = sigs
         else:
             logger.info(
                 "[가드레일] %s 제외 (%d건 < %d건 최소)",
-                src, len(sigs), MIN_SIGNALS_FOR_ARTICLE,
+                src, len(sigs), min_count,
             )
     return filtered
 
@@ -104,6 +106,8 @@ BANNED_SENTENCE_PATTERNS = [
     r"[^.。]*단정하지\s*않는[^.。]*[.。]",
     r"[^.。]*교차\s*확인한\s*뒤[^.。]*[.。]",
     r"[^.。]*확정할\s*수\s*있는\s*것은[^.。]*[.。]",
+    r"[^.。]*취지로\s*읽힌다[^.。]*[.。]",
+    r"[^.。]*점검할\s*필요가\s*있다[^.。]*[.。]",
 ]
 
 # 보고서체 → 기사체 치환 (P3: 금지 문체 사전)
