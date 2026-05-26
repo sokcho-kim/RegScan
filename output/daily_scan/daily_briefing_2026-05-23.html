@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegScan Daily - 2026-05-23</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .wrapper {
+            max-width: 720px;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 100vh;
+        }
+
+        /* 헤더 */
+        header {
+            padding: 24px 32px;
+            border-bottom: 3px solid #1a1a1a;
+        }
+
+        .masthead {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+
+        .logo {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .date-area {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .tagline {
+            font-size: 12px;
+            color: #888;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* 요약 바 */
+        .summary-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 32px;
+            background: #fafafa;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .summary-item .num {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .summary-item.hot .num {
+            color: #c00;
+        }
+
+        /* 메인 콘텐츠 */
+        main {
+            padding: 32px;
+        }
+
+        /* 기사 스타일 */
+        .article {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .article:last-child {
+            border-bottom: none;
+        }
+
+        .article.main {
+            margin-bottom: 40px;
+            padding-bottom: 40px;
+        }
+
+        .article-meta {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tag {
+            font-size: 11px;
+            padding: 3px 8px;
+            background: #1a1a1a;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .tag.hot {
+            background: #c00;
+        }
+
+        .tag.orphan {
+            background: #5a4fcf;
+        }
+
+        .tag.fda {
+            background: #0066cc;
+        }
+
+        .tag.ema {
+            background: #cc6600;
+        }
+
+        .tag.mfds {
+            background: #008844;
+        }
+
+        .article-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .article.main .article-title {
+            font-size: 32px;
+        }
+
+        .article-subtitle {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .article-body {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .article-body p {
+            margin-bottom: 12px;
+        }
+
+        .key-points {
+            margin: 20px 0;
+            padding: 16px 20px;
+            background: #f9f9f9;
+            border-left: 3px solid #1a1a1a;
+        }
+
+        .key-points li {
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .medclaim-box {
+            margin: 20px 0;
+            padding: 16px 20px;
+            background: #fff8f0;
+            border: 1px solid #f0e0d0;
+        }
+
+        .medclaim-box .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #996633;
+            margin-bottom: 8px;
+        }
+
+        .medclaim-box .content {
+            font-size: 14px;
+            color: #664422;
+        }
+
+        .price-info {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 4px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .price-info .price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #006644;
+        }
+
+        /* 기타 승인 목록 */
+        .other-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 2px solid #1a1a1a;
+        }
+
+        .section-title {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .other-table {
+            width: 100%;
+            font-size: 13px;
+            border-collapse: collapse;
+        }
+
+        .other-table th {
+            text-align: left;
+            padding: 8px 0;
+            border-bottom: 1px solid #1a1a1a;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+        }
+
+        .other-table td {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .other-table .name {
+            font-weight: 500;
+        }
+
+        .other-table .brand {
+            color: #666;
+        }
+
+        .other-table .source {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .other-table .date {
+            color: #888;
+            text-align: right;
+        }
+
+        /* 푸터 */
+        footer {
+            padding: 24px 32px;
+            border-top: 1px solid #eee;
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+        }
+
+        footer a {
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <div class="masthead">
+                <div class="logo">RegScan</div>
+                <div class="date-area">2026년 05월 23일 (토)</div>
+            </div>
+            <div class="tagline">Global Regulatory Intelligence</div>
+        </header>
+
+        <div class="summary-bar">
+            <div class="summary-item">
+                <span>FDA</span>
+                <span class="num">65</span>
+            </div>
+            <div class="summary-item">
+                <span>EMA</span>
+                <span class="num">110</span>
+            </div>
+            <div class="summary-item">
+                <span>MFDS</span>
+                <span class="num">0</span>
+            </div>
+            <div class="summary-item hot">
+                <span>HOT</span>
+                <span class="num">8</span>
+            </div>
+        </div>
+
+        <main>
+            
+        <article class="article main">
+            <div class="article-meta"><span class="tag hot">HOT</span><span class="tag ema">EMA</span><span class="tag orphan">희귀의약품</span></div>
+            <h2 class="article-title">brexucabtagene autoleucel, EMA 승인</h2>
+            <p class="article-subtitle">Tecartus · 2020-12-14</p>
+            <div class="article-body"></div>
+        </article>
+    
+        <article class="article ">
+            <div class="article-meta"><span class="tag hot">HOT</span><span class="tag ema">EMA</span><span class="tag orphan">희귀의약품</span></div>
+            <h2 class="article-title">axicabtagene ciloleucel, EMA 승인</h2>
+            <p class="article-subtitle">Yescarta · 2018-08-23</p>
+            <div class="article-body"></div>
+        </article>
+    
+        <article class="article ">
+            <div class="article-meta"><span class="tag hot">HOT</span><span class="tag ema">EMA</span><span class="tag orphan">희귀의약품</span></div>
+            <h2 class="article-title">setmelanotide, EMA 승인</h2>
+            <p class="article-subtitle">Imcivree · 2021-07-16</p>
+            <div class="article-body"></div>
+        </article>
+    
+        <article class="article ">
+            <div class="article-meta"><span class="tag ema">EMA</span><span class="tag orphan">희귀의약품</span></div>
+            <h2 class="article-title">inotuzumab ozogamicin, EMA 승인</h2>
+            <p class="article-subtitle">Besponsa · 2017-06-28</p>
+            <div class="article-body"></div>
+        </article>
+    
+
+            
+            <div class="other-section">
+                <h3 class="section-title">Other Approvals</h3>
+                <table class="other-table">
+                    <thead>
+                        <tr>
+                            <th>성분명</th>
+                            <th>제품명</th>
+                            <th>출처</th>
+                            <th style="text-align:right">승인일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                <tr>
+                    <td class="name">POMALIDOMIDE</td>
+                    <td class="brand">POMALIDOMIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">09/26</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LAZERTINIB</td>
+                    <td class="brand">LAZCLUZE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">08/19</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">PIMAVANSERIN TARTRATE</td>
+                    <td class="brand">NUPLAZID</td>
+                    <td class="source">FDA</td>
+                    <td class="date">04/29</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ZIPRASIDONE</td>
+                    <td class="brand">ZIPRASIDONE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">09/05</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ARGATROBAN</td>
+                    <td class="brand">ARGATROBAN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">01/05</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LEUPROLIDE ACETATE</td>
+                    <td class="brand">LEUPROLIDE ACETATE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">08/04</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">DEXTROMETHORPHAN HYDROBROMIDE, BUPROPION HYDROCHLORIDE</td>
+                    <td class="brand">AUVELITY</td>
+                    <td class="source">FDA</td>
+                    <td class="date">08/18</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">GOSERELIN</td>
+                    <td class="brand">ZOLADEX</td>
+                    <td class="source">FDA</td>
+                    <td class="date">01/11</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">BRODALUMAB</td>
+                    <td class="brand">SILIQ</td>
+                    <td class="source">FDA</td>
+                    <td class="date">02/15</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ATEZOLIZUMAB</td>
+                    <td class="brand">TECENTRIQ</td>
+                    <td class="source">FDA</td>
+                    <td class="date">05/18</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">PYRIDOSTIGMINE BROMIDE</td>
+                    <td class="brand">PYRIDOSTIGMINE BROMIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">10/04</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">RUXOLITINIB</td>
+                    <td class="brand">JAKAFI XR</td>
+                    <td class="source">FDA</td>
+                    <td class="date">05/01</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">OXCARBAZEPINE</td>
+                    <td class="brand">OXCARBAZEPINE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">03/05</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">AMANTADINE HYDROCHLORIDE</td>
+                    <td class="brand">AMANTADINE HYDROCHLORIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">03/10</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">CARBIDOPA AND LEVODOPA</td>
+                    <td class="brand">CREXONT</td>
+                    <td class="source">FDA</td>
+                    <td class="date">08/07</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">PHENTERMINE AND TOPIRAMATE</td>
+                    <td class="brand">PHENTERMINE AND TOPIRAMATE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">06/25</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">HYDROCORTISONE SODIUM SUCCINATE</td>
+                    <td class="brand">HYDROCORTISONE SODIUM SUCCINATE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">05/07</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">PEGFILGRASTIM-BMEZ</td>
+                    <td class="brand">ZIEXTENZO</td>
+                    <td class="source">FDA</td>
+                    <td class="date">11/04</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LENALIDOMIDE</td>
+                    <td class="brand">LENALIDOMIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">03/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">TOCILIZUMAB-AAZG</td>
+                    <td class="brand">TYENNE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">03/14</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">OCRELIZUMAB</td>
+                    <td class="brand">OCREVUS</td>
+                    <td class="source">FDA</td>
+                    <td class="date">03/28</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ANIFROLUMAB-FNIA</td>
+                    <td class="brand">SAPHNELO</td>
+                    <td class="source">FDA</td>
+                    <td class="date">04/24</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LISDEXAMFETAMINE DIMESYLATE</td>
+                    <td class="brand">VYVANSE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">02/23</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">BREXPIPRAZOLE</td>
+                    <td class="brand">REXULTI</td>
+                    <td class="source">FDA</td>
+                    <td class="date">07/10</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LISDEXAMFETAMINE DIMESYLATE</td>
+                    <td class="brand">VYVANSE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">01/28</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ADALIMUMAB-BWWD</td>
+                    <td class="brand">ADALIMUMAB-BWWD</td>
+                    <td class="source">FDA</td>
+                    <td class="date">07/23</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">OMEPRAZOLE</td>
+                    <td class="brand">OMEPRAZOLE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">11/05</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">SELINEXOR</td>
+                    <td class="brand">XPOVIO</td>
+                    <td class="source">FDA</td>
+                    <td class="date">07/03</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">PEMBROLIZUMAB AND BERAHYALURONIDASE ALFA-PMPH</td>
+                    <td class="brand">KEYTRUDA QLEX</td>
+                    <td class="source">FDA</td>
+                    <td class="date">09/19</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">IRBESARTAN</td>
+                    <td class="brand">IRBESARTAN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">06/14</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">BENRALIZUMAB</td>
+                    <td class="brand">FASENRA</td>
+                    <td class="source">FDA</td>
+                    <td class="date">11/14</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LEUCOVORIN CALCIUM</td>
+                    <td class="brand">LEUCOVORIN CALCIUM</td>
+                    <td class="source">FDA</td>
+                    <td class="date">09/24</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">BUROSUMAB</td>
+                    <td class="brand">CRYSVITA</td>
+                    <td class="source">FDA</td>
+                    <td class="date">04/17</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">IBUPROFEN</td>
+                    <td class="brand">JUNIOR STRENGTH ADVIL</td>
+                    <td class="source">FDA</td>
+                    <td class="date">12/18</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">BICTEGRAVIR SODIUM, EMTRICITABINE, AND TENOFOVIR ALAFENAMIDE FUMARATE</td>
+                    <td class="brand">BIKTARVY</td>
+                    <td class="source">FDA</td>
+                    <td class="date">02/07</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">BRIMONIDINE TARTRATE</td>
+                    <td class="brand">BRIMONIDINE TARTRATE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">01/31</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">POMALIDOMIDE</td>
+                    <td class="brand">POMALIDOMIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">10/30</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">BRIMONIDINE TARTRATE</td>
+                    <td class="brand">BRIMONIDINE TARTRATE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">12/21</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">SPIRONOLACTONE AND HYDROCHLOROTHIAZIDE</td>
+                    <td class="brand">SPIRONOLACTONE AND HYDROCHLOROTHIAZIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">07/02</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LEVONORGESTREL</td>
+                    <td class="brand">MY WAY</td>
+                    <td class="source">FDA</td>
+                    <td class="date">06/19</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">SPIRONOLACTONE</td>
+                    <td class="brand">SPIRONOLACTONE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">09/19</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LEUPROLIDE ACETATE</td>
+                    <td class="brand">LEUPROLIDE ACETATE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">08/13</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">CALCIUM ACETATE</td>
+                    <td class="brand">CALCIUM ACETATE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">02/05</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LENALIDOMIDE</td>
+                    <td class="brand">LENALIDOMIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">03/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">TRASTUZUMAB</td>
+                    <td class="brand">HERCEPTIN</td>
+                    <td class="source">FDA</td>
+                    <td class="date">09/25</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ESOMEPRAZOLE MAGNESIUM DELAYED-RELEASE CAPSULES, 20 MG</td>
+                    <td class="brand">ESOMEPRAZOLE MAGNESIUM DELAYED-RELEASE CAPSULES, 20 MG</td>
+                    <td class="source">FDA</td>
+                    <td class="date">09/29</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">DEXTROAMPHETAMINE SACCHARATE, AMPHETAMINE ASPARTATE MONOHYDRATE, DEXTROAMPHETAMINE SULFATE, AND AMPHETAMINE SULFATE</td>
+                    <td class="brand">DEXTROAMPHETAMINE SACCHARATE, AMPHETAMINE ASPARTATE, DEXTROAMPHETAMINE SULFATE, AND AMPHETAMINE SULFATE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">10/11</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">VEPDEGESTRANT</td>
+                    <td class="brand">VEPPANU</td>
+                    <td class="source">FDA</td>
+                    <td class="date">05/01</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">OLMESARTAN MEDOXOMIL AND HYDROCHLOROTHIAZIDE</td>
+                    <td class="brand">OLMESARTAN MEDOXOMIL AND HYDROCHLOROTHIAZIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">07/11</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LENALIDOMIDE</td>
+                    <td class="brand">LENALIDOMIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">02/22</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">TRANEXAMIC ACID</td>
+                    <td class="brand">TRANEXAMIC ACID</td>
+                    <td class="source">FDA</td>
+                    <td class="date">01/14</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">POMALIDOMIDE</td>
+                    <td class="brand">POMALIDOMIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">05/04</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ALENDRONATE SODIUM</td>
+                    <td class="brand">ALENDRONATE SODIUM</td>
+                    <td class="source">FDA</td>
+                    <td class="date">02/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">SODIUM THIOSULFATE</td>
+                    <td class="brand">SODIUM THIOSULFATE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">02/14</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">TRASTUZUMAB AND HYALURONIDASE-OYSK</td>
+                    <td class="brand">HERCEPTIN HYLECTA</td>
+                    <td class="source">FDA</td>
+                    <td class="date">02/28</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ATROPINE SULFATE</td>
+                    <td class="brand">ATROPINE SULFATE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">01/08</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">VENETOCLAX</td>
+                    <td class="brand">VENCLEXTA</td>
+                    <td class="source">FDA</td>
+                    <td class="date">04/11</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">RISPERIDONE</td>
+                    <td class="brand">PERSERIS</td>
+                    <td class="source">FDA</td>
+                    <td class="date">07/27</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">BAXDROSTAT</td>
+                    <td class="brand">BAXFENDY</td>
+                    <td class="source">FDA</td>
+                    <td class="date">05/15</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LENALIDOMIDE</td>
+                    <td class="brand">LENALIDOMIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">09/11</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LENALIDOMIDE</td>
+                    <td class="brand">LENALIDOMIDE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">03/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">GALLIUM GA-68 GOZETOTIDE</td>
+                    <td class="brand">GALLIUM GA-68 PSMA-11</td>
+                    <td class="source">FDA</td>
+                    <td class="date">05/14</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">TICAGRELOR</td>
+                    <td class="brand">BRILINTA</td>
+                    <td class="source">FDA</td>
+                    <td class="date">07/20</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">CAPECITABINE</td>
+                    <td class="brand">CAPECITABINE</td>
+                    <td class="source">FDA</td>
+                    <td class="date">12/04</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">LEUPROLIDE ACETATE</td>
+                    <td class="brand">VABRINTY</td>
+                    <td class="source">FDA</td>
+                    <td class="date">01/23</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">riociguat</td>
+                    <td class="brand">Adempas</td>
+                    <td class="source">EMA</td>
+                    <td class="date">03/27</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">inebilizumab</td>
+                    <td class="brand">Uplizna</td>
+                    <td class="source">EMA</td>
+                    <td class="date">04/25</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">yttrium [90Y] chloride</td>
+                    <td class="brand">Yttriga</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/19</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">macitentan;tadalafil</td>
+                    <td class="brand">Yuvanci</td>
+                    <td class="source">EMA</td>
+                    <td class="date">09/27</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">trametinib</td>
+                    <td class="brand">Mekinist</td>
+                    <td class="source">EMA</td>
+                    <td class="date">06/30</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">denosumab</td>
+                    <td class="brand">Jubereq</td>
+                    <td class="source">EMA</td>
+                    <td class="date">05/26</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">denosumab</td>
+                    <td class="brand">Osvyrti</td>
+                    <td class="source">EMA</td>
+                    <td class="date">05/26</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">copper (64Cu) oxodotreotide</td>
+                    <td class="brand">Deqtynet</td>
+                    <td class="source">EMA</td>
+                    <td class="date">05/21</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">mitapivat</td>
+                    <td class="brand">Pyrukynd</td>
+                    <td class="source">EMA</td>
+                    <td class="date">11/09</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">iloperidone</td>
+                    <td class="brand">Iloperidone Vanda Pharmaceuticals</td>
+                    <td class="source">EMA</td>
+                    <td class="date">05/20</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">insulin aspart</td>
+                    <td class="brand">Dazparda</td>
+                    <td class="source">EMA</td>
+                    <td class="date">04/27</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">eliglustat</td>
+                    <td class="brand">Cerdelga</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/19</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">pneumococcal polysaccharide conjugate vaccine (adsorbed)</td>
+                    <td class="brand">Synflorix</td>
+                    <td class="source">EMA</td>
+                    <td class="date">03/29</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">tocilizumab</td>
+                    <td class="brand">Tuyory</td>
+                    <td class="source">EMA</td>
+                    <td class="date">04/27</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">dabrafenib</td>
+                    <td class="brand">Tafinlar</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/26</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">trametinib</td>
+                    <td class="brand">Spexotras</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/05</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ustekinumab</td>
+                    <td class="brand">Usrenty</td>
+                    <td class="source">EMA</td>
+                    <td class="date">09/17</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">sapropterin</td>
+                    <td class="brand">Sapropterin Dipharma</td>
+                    <td class="source">EMA</td>
+                    <td class="date">02/16</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ranibizumab</td>
+                    <td class="brand">Lucentis</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/22</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ponatinib</td>
+                    <td class="brand">Iclusig</td>
+                    <td class="source">EMA</td>
+                    <td class="date">07/01</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">pegcetacoplan</td>
+                    <td class="brand">Aspaveli</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/13</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">lutetium (177Lu) chloride</td>
+                    <td class="brand">EndolucinBeta</td>
+                    <td class="source">EMA</td>
+                    <td class="date">07/06</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">serplulimab</td>
+                    <td class="brand">Hetronifly</td>
+                    <td class="source">EMA</td>
+                    <td class="date">02/03</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">deucravacitinib</td>
+                    <td class="brand">Sotyktu</td>
+                    <td class="source">EMA</td>
+                    <td class="date">03/24</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">mirdametinib</td>
+                    <td class="brand">Ezmekly</td>
+                    <td class="source">EMA</td>
+                    <td class="date">07/17</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">denosumab</td>
+                    <td class="brand">Xbonzy</td>
+                    <td class="source">EMA</td>
+                    <td class="date">11/17</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">roxadustat</td>
+                    <td class="brand">Evrenzo</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/18</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">olanzapine</td>
+                    <td class="brand">Olazax Disperzi</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/10</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">maropitant</td>
+                    <td class="brand">Emepax</td>
+                    <td class="source">EMA</td>
+                    <td class="date">05/12</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">mavorixafor</td>
+                    <td class="brand">Xolremdi</td>
+                    <td class="source">EMA</td>
+                    <td class="date">04/27</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">Salmonella Infantis vaccine (live)</td>
+                    <td class="brand">AviGate S. Infantis</td>
+                    <td class="source">EMA</td>
+                    <td class="date">05/12</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">bluetongue virus vaccine (inactivated)</td>
+                    <td class="brand">VeroBlue-3</td>
+                    <td class="source">EMA</td>
+                    <td class="date">05/12</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">lenalidomide</td>
+                    <td class="brand">Lenalidomide Mylan</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/18</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">olanzapine</td>
+                    <td class="brand">Olazax</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/11</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">tobramycin</td>
+                    <td class="brand">Tobi Podhaler</td>
+                    <td class="source">EMA</td>
+                    <td class="date">07/20</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ustekinumab</td>
+                    <td class="brand">Imuldosa</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/12</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">depemokimab</td>
+                    <td class="brand">Exdensur</td>
+                    <td class="source">EMA</td>
+                    <td class="date">02/12</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">afatinib</td>
+                    <td class="brand">Giotrif</td>
+                    <td class="source">EMA</td>
+                    <td class="date">09/25</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">denosumab</td>
+                    <td class="brand">Denbrayce</td>
+                    <td class="source">EMA</td>
+                    <td class="date">06/26</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">tovorafenib</td>
+                    <td class="brand">Ojemda</td>
+                    <td class="source">EMA</td>
+                    <td class="date">04/20</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">olanzapine</td>
+                    <td class="brand">Olanzapine Glenmark Europe</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/03</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">olanzapine</td>
+                    <td class="brand">Olanzapine Glenmark</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/03</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">fluticasone furoate;umeclidinium;vilanterol</td>
+                    <td class="brand">Elebrato Ellipta</td>
+                    <td class="source">EMA</td>
+                    <td class="date">11/15</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">fluticasone furoate;umeclidinium;vilanterol</td>
+                    <td class="brand">Trelegy Ellipta</td>
+                    <td class="source">EMA</td>
+                    <td class="date">11/15</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">pirfenidone</td>
+                    <td class="brand">Esbriet</td>
+                    <td class="source">EMA</td>
+                    <td class="date">02/28</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">teriflunomide</td>
+                    <td class="brand">Teriflunomide Viatris (previously Teriflunomide Mylan)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">11/09</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">tenofovir disoproxil</td>
+                    <td class="brand">Tenofovir disoproxil Viatris (previously Tenofovir disoproxil Mylan)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/08</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">bimekizumab</td>
+                    <td class="brand">Bimzelx</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/20</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">teduglutide</td>
+                    <td class="brand">Teduglutide Viatris</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/08</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">autologous CD34+ enriched cell fraction that contains CD34+ cells transduced with retroviral vector that encodes for the human ADA cDNA sequence</td>
+                    <td class="brand">Strimvelis</td>
+                    <td class="source">EMA</td>
+                    <td class="date">05/26</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">lurasidone</td>
+                    <td class="brand">Latuda</td>
+                    <td class="source">EMA</td>
+                    <td class="date">03/21</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">tadalafil</td>
+                    <td class="brand">Talmanco (previously Tadalafil Generics)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/09</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">rivaroxaban</td>
+                    <td class="brand">Rivaroxaban Viatris (previously Rivaroxaban Mylan)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">11/12</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ritonavir</td>
+                    <td class="brand">Ritonavir Viatris (previously Ritonavir Mylan)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">11/09</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">inavolisib</td>
+                    <td class="brand">Itovebi</td>
+                    <td class="source">EMA</td>
+                    <td class="date">07/18</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">pregabalin</td>
+                    <td class="brand">Pregabalin Viatris (previously Pregabalin Mylan)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">06/24</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">pomalidomide</td>
+                    <td class="brand">Pomalidomide Viatris</td>
+                    <td class="source">EMA</td>
+                    <td class="date">02/16</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">emtricitabine;rilpivirine;tenofovir alafenamide</td>
+                    <td class="brand">Emtricitabine / Rilpivirine / Tenofovir Alafenamide Viatris</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/19</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">siponimod</td>
+                    <td class="brand">Mayzent</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/13</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">nintedanib</td>
+                    <td class="brand">Nintedanib Viatris</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/22</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">sildenafil</td>
+                    <td class="brand">Mysildecard</td>
+                    <td class="source">EMA</td>
+                    <td class="date">09/15</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">febuxostat</td>
+                    <td class="brand">Febuxostat Viatris (previously Febuxostat Mylan)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">06/15</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">entecavir</td>
+                    <td class="brand">Entecavir Viatris (previously Entecavir Mylan)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">09/18</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">eltrombopag</td>
+                    <td class="brand">Eltrombopag Viatris</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/12</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">duloxetine</td>
+                    <td class="brand">Duloxetine Viatris (previously Duloxetine Mylan)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">06/19</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">darunavir</td>
+                    <td class="brand">Darunavir Viatris (previously Darunavir Mylan)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/03</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">dapagliflozin</td>
+                    <td class="brand">Dapagliflozin Viatris</td>
+                    <td class="source">EMA</td>
+                    <td class="date">03/24</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">cinacalcet</td>
+                    <td class="brand">Cinacalcet Viatris (previously Cinacalcet Mylan)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">11/19</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">aflibercept</td>
+                    <td class="brand">Afiveg</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/18</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ambrisentan</td>
+                    <td class="brand">Ambrisentan Viatris (previously Ambrisentan Mylan)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">06/20</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">toripalimab</td>
+                    <td class="brand">Loqtorzi</td>
+                    <td class="source">EMA</td>
+                    <td class="date">09/19</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">atazanavir</td>
+                    <td class="brand">Atazanavir Viatris (previously Atazanavir Mylan)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/22</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">entacapone</td>
+                    <td class="brand">Comtan</td>
+                    <td class="source">EMA</td>
+                    <td class="date">09/22</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">fondaparinux sodium</td>
+                    <td class="brand">Arixtra</td>
+                    <td class="source">EMA</td>
+                    <td class="date">03/20</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">dimethyl fumarate</td>
+                    <td class="brand">Dimethyl fumarate Mylan</td>
+                    <td class="source">EMA</td>
+                    <td class="date">04/22</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">brolucizumab</td>
+                    <td class="brand">Beovu</td>
+                    <td class="source">EMA</td>
+                    <td class="date">02/13</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">baricitinib</td>
+                    <td class="brand">Olumiant</td>
+                    <td class="source">EMA</td>
+                    <td class="date">02/13</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">pretomanid</td>
+                    <td class="brand">Dovprela (previously Pretomanid FGK)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">07/31</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">pegaspargase</td>
+                    <td class="brand">Oncaspar</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/14</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">irbesartan</td>
+                    <td class="brand">Ifirmasta (previously Irbesartan Krka)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/01</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">irbesartan</td>
+                    <td class="brand">Irbesartan Teva</td>
+                    <td class="source">EMA</td>
+                    <td class="date">10/30</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">remibrutinib</td>
+                    <td class="brand">Rhapsido</td>
+                    <td class="source">EMA</td>
+                    <td class="date">04/23</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">levodopa;carbidopa</td>
+                    <td class="brand">Onerji</td>
+                    <td class="source">EMA</td>
+                    <td class="date">04/27</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">paltusotine</td>
+                    <td class="brand">Palsonify</td>
+                    <td class="source">EMA</td>
+                    <td class="date">04/23</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">canakinumab</td>
+                    <td class="brand">Ilaris</td>
+                    <td class="source">EMA</td>
+                    <td class="date">10/23</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">capsaicin</td>
+                    <td class="brand">Qutenza</td>
+                    <td class="source">EMA</td>
+                    <td class="date">05/15</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">lecanemab</td>
+                    <td class="brand">Leqembi</td>
+                    <td class="source">EMA</td>
+                    <td class="date">04/15</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">lenacapavir</td>
+                    <td class="brand">Yeytuo</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/25</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">asciminib</td>
+                    <td class="brand">Scemblix</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/25</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">respiratory syncytial virus mRNA vaccine</td>
+                    <td class="brand">mResvia</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/22</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">florbetaben (18F)</td>
+                    <td class="brand">Neuraceq</td>
+                    <td class="source">EMA</td>
+                    <td class="date">02/20</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">hydroxycarbamide</td>
+                    <td class="brand">Siklos</td>
+                    <td class="source">EMA</td>
+                    <td class="date">06/29</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">telmisartan;hydrochlorothiazide</td>
+                    <td class="brand">MicardisPlus</td>
+                    <td class="source">EMA</td>
+                    <td class="date">04/19</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">lopinavir;ritonavir</td>
+                    <td class="brand">Lopinavir/Ritonavir Viatris (previously Ritonavir Mylan)</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/14</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">erdafitinib</td>
+                    <td class="brand">Balversa</td>
+                    <td class="source">EMA</td>
+                    <td class="date">08/22</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ranibizumab</td>
+                    <td class="brand">Ranluspec</td>
+                    <td class="source">EMA</td>
+                    <td class="date">02/10</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ropeginterferon alfa-2b</td>
+                    <td class="brand">Besremi</td>
+                    <td class="source">EMA</td>
+                    <td class="date">02/15</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">doxorubicin</td>
+                    <td class="brand">Caelyx pegylated liposomal</td>
+                    <td class="source">EMA</td>
+                    <td class="date">06/20</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">ioflupane (123l)</td>
+                    <td class="brand">Striascan</td>
+                    <td class="source">EMA</td>
+                    <td class="date">06/25</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">insulin glargine</td>
+                    <td class="brand">Ondibta</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/09</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">teriparatide</td>
+                    <td class="brand">Terrosa</td>
+                    <td class="source">EMA</td>
+                    <td class="date">01/04</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">tipranavir</td>
+                    <td class="brand">Aptivus</td>
+                    <td class="source">EMA</td>
+                    <td class="date">10/25</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">idarucizumab</td>
+                    <td class="brand">Praxbind</td>
+                    <td class="source">EMA</td>
+                    <td class="date">11/20</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">macitentan</td>
+                    <td class="brand">Opsumit</td>
+                    <td class="source">EMA</td>
+                    <td class="date">12/20</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">adalimumab</td>
+                    <td class="brand">Amgevita</td>
+                    <td class="source">EMA</td>
+                    <td class="date">03/21</td>
+                </tr>
+            
+                <tr>
+                    <td class="name">telmisartan;amlodipine</td>
+                    <td class="brand">Twynsta</td>
+                    <td class="source">EMA</td>
+                    <td class="date">10/07</td>
+                </tr>
+            
+                    </tbody>
+                </table>
+            </div>
+            
+        </main>
+
+        <footer>
+            <p>RegScan AI · Scanning Global Regulation into Local Impact</p>
+            <p>Generated 2026-05-23 08:01</p>
+        </footer>
+    </div>
+</body>
+</html>
