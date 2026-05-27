@@ -156,6 +156,8 @@ async def main():
     parser = argparse.ArgumentParser(description="일간 규제 동향 스캔")
     parser.add_argument("--days", type=int, default=1, help="스캔 기간 (일)")
     parser.add_argument("--generate-briefing", action="store_true", help="핫이슈 브리핑 생성")
+    parser.add_argument("--refresh-mfds", action="store_true",
+                        help="스캔 전 MFDS 전체 덤프 갱신 (cron 일일 실행 시 권장)")
     parser.add_argument("--output", type=str, help="출력 디렉토리")
 
     args = parser.parse_args()
@@ -163,6 +165,17 @@ async def main():
     print()
     print(f"RegScan 일간 스캔 시작 (최근 {args.days}일)")
     print()
+
+    # MFDS 덤프 갱신 (opt-in) — 일일스캔이 읽는 permits_full_*.json 캐시를 최신화.
+    # 공공데이터 API가 증분 조회를 지원 안 해 전체 재덤프가 필요하다.
+    if args.refresh_mfds:
+        from scripts.refresh_mfds_dump import refresh as refresh_mfds_dump
+        try:
+            dump_path = await refresh_mfds_dump(keep=3)
+            print(f"MFDS 덤프 갱신: {dump_path.name}")
+        except Exception as e:
+            print(f"⚠️  MFDS 덤프 갱신 실패: {e} (기존 캐시로 진행)")
+        print()
 
     # 스캐너 실행
     scanner = DailyScanner()

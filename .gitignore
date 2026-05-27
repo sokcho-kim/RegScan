@@ -65,6 +65,8 @@ Thumbs.db
 # Large data files
 data/hira/medical_fees_*.json
 data/hira/drug_prices_*.json
+# MFDS 전체 덤프 — refresh_mfds_dump.py로 매일 재생성되는 32MB 산출물 (추적 제외)
+data/mfds/permits_full_*.json
 data/bridge/drug_dictionary_normalized.json
 data/bridge/yakga_master_latest.csv
 

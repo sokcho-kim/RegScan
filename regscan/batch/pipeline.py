@@ -118,16 +118,25 @@ async def run_stream_pipeline(
                     logger.debug("  DrugPriceCollector 건너뜀: %s", e)
                     worker_summary["drug_price"] = f"skip: {e}"
 
-                # MFDS 워커 — 최근 변경분 증분 수집
+                # MFDS — 일일스캔이 읽는 permits_full_*.json 캐시를 전체 재덤프.
+                # (delta 워커는 API 무작위 순서로 1페이지에서 멈춰 ~0건이고
+                #  DB에만 적재해 파일 기반 _scan_mfds 와 단절돼 있었음)
                 try:
-                    from regscan.workers.mfds_worker import MFDSPermitWorker
-                    mfds_w = MFDSPermitWorker()
-                    mfds_result = await mfds_w.run(mode="delta", days_back=7)
-                    worker_summary["mfds_permit"] = mfds_result.get("status", "unknown")
-                    logger.info("  MFDSPermitWorker: %s", mfds_result.get("status"))
+                    _root = str(settings.BASE_DIR)
+                    _added = _root not in sys.path
+                    if _added:
+                        sys.path.insert(0, _root)
+                    try:
+                        from scripts.refresh_mfds_dump import refresh as refresh_mfds_dump
+                        dump_path = await refresh_mfds_dump(keep=3)
+                        worker_summary["mfds_dump"] = dump_path.name
+                        logger.info("  MFDS 덤프 갱신: %s", dump_path.name)
+                    finally:
+                        if _added and _root in sys.path:
+                            sys.path.remove(_root)
                 except Exception as e:
-                    logger.debug("  MFDSPermitWorker 건너뜀: %s", e)
-                    worker_summary["mfds_permit"] = f"skip: {e}"
+                    logger.warning("  MFDS 덤프 갱신 실패: %s", e)
+                    worker_summary["mfds_dump"] = f"error: {e}"
 
                 # HIRA 워커 — DB INN 기반 급여 조회
                 try:

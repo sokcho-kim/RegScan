@@ -5,6 +5,7 @@ FDA/EMA/MFDS 신규 승인을 매일 체크하고 핫이슈를 판별합니다.
 
 import json
 import logging
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, date, timedelta
 from pathlib import Path
@@ -305,7 +306,7 @@ class DailyScanner:
 
         # MFDS 스캔
         try:
-            result.mfds_new = await self._scan_mfds(days_back)
+            result.mfds_new = await self._scan_mfds(days_back, result)
             logger.info(f"MFDS 신규 허가: {len(result.mfds_new)}건")
         except Exception as e:
             error_msg = f"MFDS 스캔 실패: {e}"
@@ -531,12 +532,32 @@ class DailyScanner:
             raw_data=item,
         )
 
-    async def _scan_mfds(self, days_back: int) -> list[NewApproval]:
+    def _mfds_cache_age_days(self, path: Path) -> Optional[int]:
+        """MFDS 캐시 파일의 나이(일)를 반환.
+
+        파일명(permits_full_YYYYMMDD.json)에서 날짜를 추출하고,
+        실패 시 파일 수정시각(mtime)으로 폴백한다.
+        """
+        cache_date = None
+        m = re.search(r"(\d{8})", path.stem)
+        if m:
+            try:
+                cache_date = datetime.strptime(m.group(1), "%Y%m%d").date()
+            except ValueError:
+                cache_date = None
+        if cache_date is None:
+            cache_date = datetime.fromtimestamp(path.stat().st_mtime).date()
+        return (date.today() - cache_date).days
+
+    async def _scan_mfds(
+        self, days_back: int, result: Optional["ScanResult"] = None
+    ) -> list[NewApproval]:
         """MFDS 신규 허가 스캔
 
         공공데이터포털 API는 날짜 필터를 미지원하고 44K건을 임의 순서로 반환.
         따라서 캐시된 전체 데이터 파일(permits_full_*.json)에서
-        최근 허가 품목을 필터링합니다.
+        최근 허가 품목을 필터링합니다. 이 캐시는 scripts/refresh_mfds_dump.py 가
+        주기적으로 전체 재덤프해야 신선도가 유지됩니다.
         """
         from_date = (datetime.now() - timedelta(days=days_back)).strftime("%Y%m%d")
 
@@ -548,11 +569,28 @@ class DailyScanner:
             full_files = sorted(mfds_dir.glob("permits_*.json")) if mfds_dir.exists() else []
 
         if not full_files:
-            logger.warning("MFDS 캐시 데이터 없음 - 먼저 collect_all을 실행하세요")
+            msg = "MFDS 캐시 데이터 없음 - scripts/refresh_mfds_dump.py 실행 필요"
+            logger.warning(msg)
+            if result is not None:
+                result.errors.append(f"MFDS: {msg}")
             return []
 
+        mfds_file = full_files[-1]  # 가장 최근 파일
+
+        # 신선도 가드: 캐시가 묵으면 조용한 0건 대신 경고를 남긴다.
+        # (스캔 창 + 1일보다 오래되면 그 사이 신규 허가를 놓쳤을 수 있음)
+        cache_age = self._mfds_cache_age_days(mfds_file)
+        stale_threshold = max(days_back + 1, 2)
+        if cache_age is not None and cache_age > stale_threshold:
+            msg = (
+                f"MFDS 캐시가 {cache_age}일 묵음 ({mfds_file.name}, 허용 {stale_threshold}일) "
+                f"- 전체 덤프 갱신 필요. 신규 허가가 누락됐을 수 있음"
+            )
+            logger.warning(msg)
+            if result is not None:
+                result.errors.append(f"MFDS: {msg}")
+
         try:
-            mfds_file = full_files[-1]  # 가장 최근 파일
             with open(mfds_file, encoding="utf-8") as f:
                 mfds_data = json.load(f)
 
